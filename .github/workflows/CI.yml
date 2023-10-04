@@ -40,7 +40,6 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run Black
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
+        uses: psf/black@stable
         # run: |
         #   poetry run black.
