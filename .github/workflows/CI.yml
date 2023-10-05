@@ -40,6 +40,4 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run Black
-        uses: psf/black@stable
-        # run: |
-        #   poetry run black.
+        run: poetry run black ./src
