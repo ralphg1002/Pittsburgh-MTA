@@ -9,4 +9,5 @@ def test_function():
     Returns:
         _type_: _description_
     """
-    return 0
+    tempInt = 0
+    return tempInt

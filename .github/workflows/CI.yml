@@ -32,4 +32,4 @@ jobs:
           
       - name: Run Pylint
         run: |
-          poetry run pylint --recursive=y -sn .
+          poetry run pylint --recursive=y .
