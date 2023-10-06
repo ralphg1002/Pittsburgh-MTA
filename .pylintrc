@@ -424,22 +424,53 @@ confidence=HIGH,
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable=raw-checker-failed,
-        bad-inline-option,
-        locally-disabled,
-        file-ignored,
-        suppressed-message,
-        useless-suppression,
-        deprecated-pragma,
-        use-symbolic-message-instead,
-        use-implicit-booleaness-not-comparison-to-string,
-        use-implicit-booleaness-not-comparison-to-zero
+; disable=raw-checker-failed,
+      ;   bad-inline-option,
+      ;   locally-disabled,
+      ;   file-ignored,
+      ;   suppressed-message,
+      ;   useless-suppression,
+      ;   deprecated-pragma,
+      ;   use-symbolic-message-instead,
+      ;   use-implicit-booleaness-not-comparison-to-string,
+      ;   use-implicit-booleaness-not-comparison-to-zero
+disable= all
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once). See also the "--disable" option for examples.
-enable=
+; enable=
+enable=C0102,
+       C0103,
+       C0112,
+       C0115,
+       C0116,
+       C0198,
+       C0199,
+       C0303,
+       C0304,
+       C0305,
+       C0321,
+       C0325,
+       C0326,
+       W0301,
+       W0311,
+       W0312,
+       C0411,
+       C0412,
+       C0413,
+       C0414,
+       C0404,
+       W9005,
+       W9011,
+       W9015,
+       W9016,
+       W9017,
+       W9018,
+       C0401,
+       C0402,
+       W1114,
 
 
 [METHOD_ARGS]
