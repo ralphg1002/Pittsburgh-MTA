@@ -62,7 +62,10 @@ git push
 _*Second should only work when pushing to a branch that already exists remotely_
 
 ### __Making a PR:__ 
-1. Go to the repository on GitHub and click on the __Compare & pull request button__. Refresh the page if you already have the repository up. It should look something like this:![Alt text](image-6.png)
+1. Go to the repository on GitHub and click on the __Compare & pull request button__. Refresh the page if you already have the repository up. It should look something like this:
+
+![Alt text](imgs/image-6.png)
+
 2. Now do the following to complete a PR:
     - Add a title and comment on all the changes you made.
     - Add everyone on the team as a reviewer.
@@ -85,7 +88,7 @@ _*Second should only work when pushing to a branch that already exists remotely_
     - Lastly, click on the __Submit new issue__ button.
     
     
-![Alt text](image-5.png)
+![Alt text](imgs/image-5.png)
 
 ## Other GitHub Commands
 __Listing branches ->__
