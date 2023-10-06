@@ -16,18 +16,28 @@ Note: This is only for Windows users
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 ```
 3. Now we need to set up the PATH environmental variable to be able to read poetry commands. To do this open the windows search bar and type in 'environment variables'.
-4. Once system properties has popped up, click on the __Environmental Variables__ button ![system properties](image-1.png)
+4. Once system properties has popped up, click on the __Environmental Variables__ button 
 
-5. Now click on __Path__ located under __System variables__ and then click on the __Edit__ button ![variables](image-2.png)
+![system properties](imgs/image-1.png)
+
+5. Now click on __Path__ located under __System variables__ and then click on the __Edit__ button 
+
+![variables](imgs/image-2.png)
+
 6. A new window should pop up showing all your path environmental variables. Before we move forward and create a new path, open your file explorer and go to the location of the poetry scripts. It should look something like shown below, and copy that path.
 ```
 C:\Users\<username>\AppData\Roaming\pypoetry\venv\Scripts
 ```
 _Here is what the folder looks like. Copy the path at the top highlighted in blue_
-![file explorer](image-3.png)
+
+![file explorer](imgs/image-3.png)
+
 >__Note:__ Make sure you can see hidden items, otherwise you will not be able to see the AppData folder. To see hidden items go to 'View' and check the Hidden items box (Hover over __Show__ in Windows 11).
 
-7. Now, go back to the 'Edit environment variable' window. Click on the __New__ button and paste the path you just copied.![new variable](image-4.png)
+7. Now, go back to the 'Edit environment variable' window. Click on the __New__ button and paste the path you just copied.
+
+![new variable](imgs/image-4.png)
+
 8. Click 'OK' 3 times to exit the environment variable window.
 9. Go back to your powershell window and type in
 ```
