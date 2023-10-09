@@ -3,6 +3,15 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+class FailureWindow():
+    def __init__(self):
+        self.failure_window = QDialog()
+        self.setup_failure_popup()
+        
+    def setup_failure_popup(self):
+        self.failure_window.setWindowTitle("Change Failures")
+        self.failure_window.setGeometry(1550, 500, 250, 300)  # Adjust the geometry as needed
+
 class SelectionWindow():
     def __init__(self):
         self.setup_selection_window()
@@ -97,6 +106,13 @@ class SelectionWindow():
         button_x = int(950 + (parent_window.width() - 950 - button_width) / 2)
         button_y = parent_window.height() - 50
         button.setGeometry(button_x, button_y, button_width, button_height)
+        
+        button.clicked.connect(self.show_failure_change_dialog)
+        
+    def show_failure_change_dialog(self):
+        # Create and show the pop-up window
+        dialog = FailureWindow()
+        dialog.failure_window.exec()
         
         
 if __name__ == '__main__':
