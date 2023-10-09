@@ -10,7 +10,16 @@ class FailureWindow():
         
     def setup_failure_popup(self):
         self.failure_window.setWindowTitle("Change Failures")
-        self.failure_window.setGeometry(1550, 500, 250, 300)  # Adjust the geometry as needed
+        self.failure_window.setGeometry(1550, 500, 250, 300)
+        self.failure_window.setStyleSheet("background-color: #ff4747;")
+    
+        self.add_exit_button()
+        
+    def add_exit_button(self):
+        self.button = QPushButton("Set Failure Configuration", self.failure_window)
+        self.button.setGeometry(50, 250, 150, 30)
+        self.button.setStyleSheet("background-color: #39E75F;") #Emerald green
+        self.button.clicked.connect(self.failure_window.close)
 
 class SelectionWindow():
     def __init__(self):
