@@ -10,16 +10,74 @@ class FailureWindow():
         
     def setup_failure_popup(self):
         self.failure_window.setWindowTitle("Change Failures")
-        self.failure_window.setGeometry(1550, 500, 250, 300)
+        self.failure_window.setGeometry(1550, 500, 250, 300)  # Adjust the geometry as needed
         self.failure_window.setStyleSheet("background-color: #ff4747;")
-    
+        
+        # Add the Failure Configuration label and horizontal line
+        self.failure_title()
+        self.add_background_widget()
+        self.add_block_selection()
+        self.add_failure_selection()
         self.add_exit_button()
+    
+    def failure_title(self):
+        # Add a bolded label for "Failure Configuration"
+        label = QLabel("Failure Configuration:", self.failure_window)
+        label.setGeometry(10, 10, 230, 30)  # Adjust the position and size as needed
+        label.setStyleSheet("font-weight: bold; font-size: 18px")
+        
+        # Add a horizontal line below the label
+        thickness = 5
+        line = QFrame(self.failure_window)
+        line.setFrameShape(QFrame.HLine)
+        line.setGeometry(0, 40, 250, thickness)  # Adjust the position and width as needed
+        line.setLineWidth(thickness)
+    
+    def add_background_widget(self):
+        # Create a widget for the background below the horizontal line
+        background_widget = QWidget(self.failure_window)
+        background_widget.setGeometry(0, 45, 250, 300)  # Adjust the position and size as needed
+        background_widget.setStyleSheet("background-color: #ffd6d6;")
+        
+    def add_block_selection(self):
+        # Add "Select Block #:" label
+        label = QLabel("Select Block #:", self.failure_window)
+        label.setGeometry(10, 50, 230, 30)  # Adjust the position and size as needed
+        label.setStyleSheet("font-weight: bold; font-size: 18px; background-color: #ffd6d6;")
+        
+        # Add a dropdown selection
+        block_dropdown = QComboBox(self.failure_window)
+        block_dropdown.setGeometry(10, 80, 115, 30)  # Adjust the position and size as needed
+        block_dropdown.setStyleSheet("background-color: white;")
+        # Add items to the dropdown as needed
+        for i in range(1, 16):
+            block_dropdown.addItem("Block " + str(i))
+    
+    def add_failure_selection(self):
+        # Add "Set Failure Type:" label
+        label2 = QLabel("Set Failure Type:", self.failure_window)
+        label2.setGeometry(10, 120, 230, 30)  # Adjust the position and size as needed
+        label2.setStyleSheet("font-weight: bold; font-size: 18px; background-color: #ffd6d6;")
+        
+        # Add checkboxes
+        failures = [
+            "Track Circuit Failure",
+            "Power Failure",
+            "Broken Rail"
+        ]
+        
+        y_offset = 150
+        for failure in failures:
+            option = QCheckBox(failure, self.failure_window)
+            option.setGeometry(10, y_offset, 230, 30)  # Adjust the position and size as needed
+            option.setStyleSheet("background-color: #ffd6d6;")
+            y_offset += 30
         
     def add_exit_button(self):
-        self.button = QPushButton("Set Failure Configuration", self.failure_window)
-        self.button.setGeometry(50, 250, 150, 30)
-        self.button.setStyleSheet("background-color: #39E75F;") #Emerald green
-        self.button.clicked.connect(self.failure_window.close)
+        button = QPushButton("Set Failure Configuration", self.failure_window)
+        button.setGeometry(50, 250, 150, 30)
+        button.setStyleSheet("background-color: #39E75F;") #Emeral green
+        button.clicked.connect(self.failure_window.close)
 
 class SelectionWindow():
     def __init__(self):
