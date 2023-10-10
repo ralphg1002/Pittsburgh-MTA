@@ -1,4 +1,5 @@
 import sys
+import load_track
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -101,6 +102,7 @@ class SelectionWindow():
         
         #Map
         self.add_import_button(mainWindow)
+        #The following are hidden initially and are shown upon an excel file import
         self.display_file_path(mainWindow)
         self.add_track_map(mainWindow)
         self.add_map_zoom(mainWindow)
@@ -192,7 +194,44 @@ class SelectionWindow():
         title_label.setAlignment(Qt.AlignCenter)
         title_font = QFont("Arial", 20, QFont.Bold)
         title_label.setFont(title_font)
-    
+
+    def add_track_map(self, parent_window):
+        self.map_png = QPixmap("pngs/blue_line.png")
+        self.og_width, self.og_height = 950, 550
+        self.map_width, self.map_height = self.og_width, self.og_height
+        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
+
+        self.track_map = QLabel(parent_window)
+        self.track_map.setPixmap(self.map_png)
+        self.track_map.setGeometry(0, 200, self.map_width, self.map_height)
+        self.track_map.hide()
+
+    def add_map_zoom(self, parent_window):
+        self.zoom_in_button = QPushButton("+", parent_window)
+        self.zoom_in_button.setGeometry(910, 210, 30, 30)
+        self.zoom_in_button.clicked.connect(self.zoom_in)
+        self.zoom_in_button.hide()
+
+        self.zoom_out_button = QPushButton("-", parent_window)
+        self.zoom_out_button.setGeometry(910, 240, 30, 30)
+        self.zoom_out_button.clicked.connect(self.zoom_out)
+        self.zoom_out_button.hide()
+
+    def zoom_in(self):
+        self.map_width += 50
+        self.map_height += 50
+        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
+        self.track_map.setPixmap(self.map_png)
+
+    def zoom_out(self):
+        self.map_width -= 50
+        self.map_height -= 50
+        #Cannot zoom out past original size map
+        self.map_width = max(self.map_width, self.og_width)
+        self.map_height = max(self.map_height, self.og_height)
+        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
+        self.track_map.setPixmap(self.map_png)    
+
     def display_file_path(self, parent_window):
         #Originally, nothing is shown
         self.file_path = QLabel("", parent_window)
@@ -217,41 +256,14 @@ class SelectionWindow():
         file_path, file_type = QFileDialog.getOpenFileName(parent_window, "Import Track Data", "", "Excel Files (*.xlsx *.xls)", options= options)
         
         if file_path:
+            #Update Gui
             self.update_file_path(file_path)
+            self.track_map.show()
+            self.zoom_in_button.show()
+            self.zoom_out_button.show()
             
-    def add_track_map(self, parent_window):
-        self.map_png = QPixmap("pngs/blue_line.png")
-        self.og_width, self.og_height = 950, 550
-        self.map_width, self.map_height = self.og_width, self.og_height
-        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
-
-        self.track_map = QLabel(parent_window)
-        self.track_map.setPixmap(self.map_png)
-        self.track_map.setGeometry(0, 200, self.map_width, self.map_height)
-        
-    def add_map_zoom(self, parent_window):
-        zoom_in = QPushButton("+", parent_window)
-        zoom_in.setGeometry(910, 210, 30, 30)
-        zoom_in.clicked.connect(self.zoom_in)
-
-        zoom_out = QPushButton("-", parent_window)
-        zoom_out.setGeometry(910, 240, 30, 30)
-        zoom_out.clicked.connect(self.zoom_out)
-
-    def zoom_in(self):
-        self.map_width += 50
-        self.map_height += 50
-        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
-        self.track_map.setPixmap(self.map_png)
-
-    def zoom_out(self):
-        self.map_width -= 50
-        self.map_height -= 50
-        #Cannot zoom out past original size map
-        self.map_width = max(self.map_width, self.og_width)
-        self.map_height = max(self.map_height, self.og_height)
-        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
-        self.track_map.setPixmap(self.map_png)    
+            self.track_data = load_track.read_track_data(file_path)
+            print(self.track_data)
         
     def add_input_section(self, parent_window):
         label = QLabel("Enter Block #:", parent_window)
