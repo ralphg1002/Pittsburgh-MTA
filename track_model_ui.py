@@ -250,6 +250,13 @@ class SelectionWindow():
         #Need to call lambda as parent_window is not accessible otherwise
         import_button.clicked.connect(lambda: self.import_track_data(parent_window))
 
+    def update_gui(self, file_path):
+        self.update_file_path(file_path)
+        self.track_map.show()
+        self.zoom_in_button.show()
+        self.zoom_out_button.show()
+        self.change_failures_button.setEnabled(True)
+        
     def import_track_data(self, parent_window):
         options = QFileDialog.Options() | QFileDialog.ReadOnly
         #Opens file explorer in new customized window
@@ -257,10 +264,7 @@ class SelectionWindow():
         
         if file_path:
             #Update Gui
-            self.update_file_path(file_path)
-            self.track_map.show()
-            self.zoom_in_button.show()
-            self.zoom_out_button.show()
+            self.update_gui(file_path)
             
             self.track_data = load_track.read_track_data(file_path)
             print(self.track_data)
@@ -305,15 +309,16 @@ class SelectionWindow():
             y_offset += 30
     
     def add_change_failures_button(self, parent_window):
-        button = QPushButton("Change Failures ->", parent_window)
-        button.setStyleSheet("background-color: red; color: white")
+        self.change_failures_button = QPushButton("Change Failures ->", parent_window)
+        self.change_failures_button.setStyleSheet("background-color: red; color: white")
         button_width = 200
         button_height = 30
         button_x = int(950 + (parent_window.width() - 950 - button_width) / 2)
         button_y = parent_window.height() - 50
-        button.setGeometry(button_x, button_y, button_width, button_height)
+        self.change_failures_button.setGeometry(button_x, button_y, button_width, button_height)
+        self.change_failures_button.setEnabled(False)
         
-        button.clicked.connect(self.show_failure_popup)
+        self.change_failures_button.clicked.connect(self.show_failure_popup)
         
     def show_failure_popup(self):
         failure_popup = FailureWindow()
