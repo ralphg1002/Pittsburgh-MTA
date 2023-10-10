@@ -89,12 +89,21 @@ class SelectionWindow():
         mainWindow = QWidget()
         mainWindow.setGeometry(350,200,1200,750)
         mainWindow.setWindowTitle("Track Model")
+        app.setWindowIcon(QIcon("pngs/mta_logo.png"))
         
+        #General layout
+        self.add_mta_logo(mainWindow)
         self.set_clock(mainWindow)
         self.set_simulation_speed_controls(mainWindow)
         self.add_vline(mainWindow)
         self.add_hline(mainWindow)
         self.add_title(mainWindow)
+        
+        #Map
+        self.add_track_map(mainWindow)
+        self.add_map_zoom(mainWindow)
+        
+        #Block Info Selection
         self.add_input_section(mainWindow)
         self.add_block_info_label(mainWindow)
         self.add_change_failures_button(mainWindow)
@@ -102,6 +111,13 @@ class SelectionWindow():
         mainWindow.show()
         sys.exit(app.exec_())
         
+    def add_mta_logo(self, parent_window):
+        mta_png = QPixmap("pngs/mta_logo.png")
+        mta_png = mta_png.scaledToWidth(90)
+        mta_logo = QLabel(parent_window)
+        mta_logo.setPixmap(mta_png)
+        mta_logo.setGeometry(0, 0, mta_png.width(), mta_png.height())
+              
     def set_clock(self, parent_window):
         self.clock = QLabel("System Clock: 00:00:00", parent_window)
         self.clock.setGeometry(980, 10, 220, 30)
@@ -164,16 +180,50 @@ class SelectionWindow():
         line.setGeometry(0, 100, 1200, thickness)
         line.setLineWidth(thickness)
         
-    def add_title(self, parent_window):
+    def add_title(self, parent_window):        
         window_width = parent_window.width()
         label_width = 300
         title_position = int((window_width - label_width) / 2)
         
         title_label = QLabel("Track Model", parent_window)
-        title_label.setGeometry(title_position, 35, label_width, 30) #########
+        title_label.setGeometry(title_position, 35, label_width, 30)
         title_label.setAlignment(Qt.AlignCenter)
         title_font = QFont("Arial", 20, QFont.Bold)
         title_label.setFont(title_font)
+            
+    def add_track_map(self, parent_window):
+        self.map_png = QPixmap("pngs/blue_line.png")
+        self.og_width, self.og_height = 950, 550
+        self.map_width, self.map_height = self.og_width, self.og_height
+        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
+
+        self.track_map = QLabel(parent_window)
+        self.track_map.setPixmap(self.map_png)
+        self.track_map.setGeometry(0, 200, self.map_width, self.map_height)
+        
+    def add_map_zoom(self, parent_window):
+        zoom_in = QPushButton("+", parent_window)
+        zoom_in.setGeometry(910, 210, 30, 30)
+        zoom_in.clicked.connect(self.zoom_in)
+
+        zoom_out = QPushButton("-", parent_window)
+        zoom_out.setGeometry(910, 240, 30, 30)
+        zoom_out.clicked.connect(self.zoom_out)
+
+    def zoom_in(self):
+        self.map_width += 50
+        self.map_height += 50
+        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
+        self.track_map.setPixmap(self.map_png)
+
+    def zoom_out(self):
+        self.map_width -= 50
+        self.map_height -= 50
+        #Cannot zoom out past original size map
+        self.map_width = max(self.map_width, self.og_width)
+        self.map_height = max(self.map_height, self.og_height)
+        self.map_png = self.map_png.scaled(self.map_width, self.map_height)
+        self.track_map.setPixmap(self.map_png)    
         
     def add_input_section(self, parent_window):
         label = QLabel("Enter Block #:", parent_window)
