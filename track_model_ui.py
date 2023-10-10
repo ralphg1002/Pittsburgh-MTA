@@ -100,12 +100,14 @@ class SelectionWindow():
         self.add_title(mainWindow)
         
         #Map
+        self.add_import_button(mainWindow)
+        self.display_file_path(mainWindow)
         self.add_track_map(mainWindow)
         self.add_map_zoom(mainWindow)
         
         #Block Info Selection
         self.add_input_section(mainWindow)
-        self.add_block_info_label(mainWindow)
+        self.add_selectable_block_info(mainWindow)
         self.add_change_failures_button(mainWindow)
         
         mainWindow.show()
@@ -190,6 +192,32 @@ class SelectionWindow():
         title_label.setAlignment(Qt.AlignCenter)
         title_font = QFont("Arial", 20, QFont.Bold)
         title_label.setFont(title_font)
+    
+    def display_file_path(self, parent_window):
+        #Originally, nothing is shown
+        self.file_path = QLabel("", parent_window)
+        self.file_path.setGeometry(740, 130, 200, 30)
+        self.file_path.setAlignment(Qt.AlignRight)
+        self.file_path.setStyleSheet("color: #008000; font-size: 9px;")
+        
+    def update_file_path(self, file_path):
+        #When file is selected, its path is shown
+        self.file_path.setText("Selected File:\n" + file_path)
+    
+    def add_import_button(self, parent_window):
+        import_button = QPushButton("Import Track Data", parent_window)
+        import_button.setGeometry(820, 160, 120, 30)
+        import_button.setStyleSheet("background-color: #39E75F;")
+        #Need to call lambda as parent_window is not accessible otherwise
+        import_button.clicked.connect(lambda: self.import_track_data(parent_window))
+
+    def import_track_data(self, parent_window):
+        options = QFileDialog.Options() | QFileDialog.ReadOnly
+        #Opens file explorer in new customized window
+        file_path, file_type = QFileDialog.getOpenFileName(parent_window, "Import Track Data", "", "Excel Files (*.xlsx *.xls)", options= options)
+        
+        if file_path:
+            self.update_file_path(file_path)
             
     def add_track_map(self, parent_window):
         self.map_png = QPixmap("pngs/blue_line.png")
@@ -238,7 +266,7 @@ class SelectionWindow():
         button.setGeometry(1080, 160, 60, 30)
         button.setStyleSheet("background-color: blue; color: white")
         
-    def add_block_info_label(self, parent_window):
+    def add_selectable_block_info(self, parent_window):
         label = QLabel("Block Information:", parent_window)
         label.setGeometry(970, 210, 200, 30)
         label.setStyleSheet("font-weight: bold; font-size: 18px")
