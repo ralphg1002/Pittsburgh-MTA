@@ -315,6 +315,10 @@ class SelectionWindow():
         self.file_path.setText("Selected File:\n" + file_path)
     
     def add_import_button(self, parent_window):
+        import_png = QLabel(parent_window)
+        import_png.setGeometry(790, 160, 30, 30)
+        import_png.setPixmap(QPixmap("pngs/import_arrow.png").scaled(30, 30))
+                
         import_button = QPushButton("Import Track Data", parent_window)
         import_button.setGeometry(820, 160, 120, 30)
         import_button.setStyleSheet("background-color: #39E75F;")
@@ -377,7 +381,20 @@ class SelectionWindow():
         y_offset += 20
         for info in track_info:
             checkbox = QCheckBox(info, parent_window)
-            checkbox.setGeometry(970, y_offset, 200, 30)
+            checkbox.setGeometry(970, y_offset, 135, 30)
+            if "Switch" in info:
+                switch_png = QLabel(parent_window)
+                switch_png.setGeometry(1060, y_offset, 30, 30)
+                switch_png.setPixmap(QPixmap("pngs/train_track.png").scaled(25, 25))
+            if "Light Signal" in info:
+                light_signal_png = QLabel(parent_window)
+                light_signal_png.setGeometry(1080, y_offset, 30, 30)
+                light_signal_png.setPixmap(QPixmap("pngs/traffic_light.png").scaled(25, 25))
+            if "Railway Crossing" in info:
+                railway_crossing_png = QLabel(parent_window)
+                railway_crossing_png.setGeometry(1110, y_offset, 30, 30)
+                railway_crossing_png.setPixmap(QPixmap("pngs/railway_crossing.png").scaled(25, 25))
+                
             y_offset += 30
     
     def add_change_failures_button(self, parent_window):
