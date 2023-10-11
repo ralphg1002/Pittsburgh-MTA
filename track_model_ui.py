@@ -261,7 +261,8 @@ class SelectionWindow():
         set_temperature_button.clicked.connect(self.set_temperature)
 
     def set_temperature(self):
-        self.temperature = self.temperature_input.text()
+        if self.temperature_input.text() != "":
+            self.temperature = self.temperature_input.text()
         self.temperature_input.setPlaceholderText(str(self.temperature))
         print(self.temperature)
 
