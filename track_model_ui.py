@@ -84,6 +84,7 @@ class SelectionWindow():
     def __init__(self):
         self.simulation_speed = 1.0
         self.selected_line = None
+        self.temperature = 65
         self.setup_selection_window()
       
     def setup_selection_window(self):
@@ -103,6 +104,7 @@ class SelectionWindow():
         
         #Map
         self.add_line_panel(mainWindow)
+        self.control_temperature(mainWindow)
         self.add_import_button(mainWindow)
         #The following are hidden initially and are shown upon an excel file import
         self.display_file_path(mainWindow)
@@ -185,6 +187,17 @@ class SelectionWindow():
         line.setFrameShape(QFrame.HLine)
         line.setGeometry(0, 100, 1200, thickness)
         line.setLineWidth(thickness)
+   
+    def add_title(self, parent_window):        
+        window_width = parent_window.width()
+        label_width = 300
+        title_position = int((window_width - label_width) / 2)
+        
+        title_label = QLabel("Track Model", parent_window)
+        title_label.setGeometry(title_position, 35, label_width, 30)
+        title_label.setAlignment(Qt.AlignCenter)
+        title_font = QFont("Arial", 20, QFont.Bold)
+        title_label.setFont(title_font)
 
     def add_line_panel(self, parent_window):
         select_line = QLabel("Select Line:", parent_window)
@@ -227,17 +240,30 @@ class SelectionWindow():
                 self.red_panel.setStyleSheet("background-color: red; color: white; border: 1px solid black; border-radius: 5px; padding: 5px;")
                 
             self.selected_line = selected_line
-   
-    def add_title(self, parent_window):        
-        window_width = parent_window.width()
-        label_width = 300
-        title_position = int((window_width - label_width) / 2)
-        
-        title_label = QLabel("Track Model", parent_window)
-        title_label.setGeometry(title_position, 35, label_width, 30)
-        title_label.setAlignment(Qt.AlignCenter)
-        title_font = QFont("Arial", 20, QFont.Bold)
-        title_label.setFont(title_font)
+            
+    def control_temperature(self, parent_window):
+        set_temperature = QLabel("Set Temperature:", parent_window)
+        set_temperature.setGeometry(420, 130, 160, 30)
+        set_temperature.setStyleSheet("font-weight: bold; font-size: 18px")
+
+        self.temperature_input = QLineEdit(parent_window)
+        self.temperature_input.setGeometry(440, 160, 40, 30)
+        self.temperature_input.setAlignment(Qt.AlignCenter)
+        self.temperature_input.setPlaceholderText("65")
+
+        fahrenheit_unit = QLabel("°F", parent_window)
+        fahrenheit_unit.setGeometry(480, 160, 30, 30)
+        fahrenheit_unit.setStyleSheet("font-weight: bold; font-size: 14px")
+
+        set_temperature_button = QPushButton("Set", parent_window)
+        set_temperature_button.setGeometry(500, 160, 60, 30)
+        set_temperature_button.setStyleSheet("background-color: blue; color: white")
+        set_temperature_button.clicked.connect(self.set_temperature)
+
+    def set_temperature(self):
+        self.temperature = self.temperature_input.text()
+        self.temperature_input.setPlaceholderText(str(self.temperature))
+        print(self.temperature)
 
     def add_track_map(self, parent_window):
         self.map_png = QPixmap("pngs/blue_line.png")
@@ -321,7 +347,7 @@ class SelectionWindow():
         
         entry_field = QLineEdit(parent_window)
         entry_field.setGeometry(970, 160, 100, 30)
-        entry_field.setPlaceholderText("Enter block number")
+        entry_field.setPlaceholderText("Enter block #")
         
         button = QPushButton("Go", parent_window)
         button.setGeometry(1080, 160, 60, 30)
