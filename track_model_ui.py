@@ -83,6 +83,7 @@ class FailureWindow():
 class SelectionWindow():
     def __init__(self):
         self.simulation_speed = 1.0
+        self.selected_line = None
         self.setup_selection_window()
       
     def setup_selection_window(self):
@@ -101,6 +102,7 @@ class SelectionWindow():
         self.add_title(mainWindow)
         
         #Map
+        self.add_line_panel(mainWindow)
         self.add_import_button(mainWindow)
         #The following are hidden initially and are shown upon an excel file import
         self.display_file_path(mainWindow)
@@ -183,7 +185,49 @@ class SelectionWindow():
         line.setFrameShape(QFrame.HLine)
         line.setGeometry(0, 100, 1200, thickness)
         line.setLineWidth(thickness)
+
+    def add_line_panel(self, parent_window):
+        select_line = QLabel("Select Line:", parent_window)
+        select_line.setGeometry(90, 130, 110, 30)
+        select_line.setStyleSheet("font-weight: bold; font-size: 18px")
+
+        self.blue_panel = QLabel("Blue Line", parent_window)
+        self.green_panel = QLabel("Green Line", parent_window)
+        self.red_panel = QLabel("Red Line", parent_window)
+
+        self.blue_panel.setGeometry(20, 160, 80, 30)
+        self.green_panel.setGeometry(100, 160, 80, 30)
+        self.red_panel.setGeometry(180, 160, 80, 30)
         
+        #Initially greyed out as none are selected
+        unselected = "background-color: grey; color: white; border: 1px solid black; border-radius: 5px; padding: 5px;"
+        self.blue_panel.setStyleSheet(unselected)
+        self.green_panel.setStyleSheet(unselected)
+        self.red_panel.setStyleSheet(unselected)
+
+        #Handlers that call the select_line method
+        self.blue_panel.mousePressEvent = lambda event, line="Blue Line": self.select_line(line)
+        self.green_panel.mousePressEvent = lambda event, line="Green Line": self.select_line(line)
+        self.red_panel.mousePressEvent = lambda event, line="Red Line": self.select_line(line)
+
+    def select_line(self, selected_line):
+        unselected = "background-color: grey; color: white; border: 1px solid black; border-radius: 5px; padding: 5px;"
+        if selected_line != self.selected_line:
+            if selected_line == "Blue Line":
+                self.blue_panel.setStyleSheet("background-color: blue; color: white; border: 1px solid black; border-radius: 5px; padding: 5px;")
+                self.green_panel.setStyleSheet(unselected)
+                self.red_panel.setStyleSheet(unselected)
+            elif selected_line == "Green Line":
+                self.blue_panel.setStyleSheet(unselected)
+                self.green_panel.setStyleSheet("background-color: green; color: white; border: 1px solid black; border-radius: 5px; padding: 5px;")
+                self.red_panel.setStyleSheet(unselected)
+            elif selected_line == "Red Line":
+                self.blue_panel.setStyleSheet(unselected)
+                self.green_panel.setStyleSheet(unselected)
+                self.red_panel.setStyleSheet("background-color: red; color: white; border: 1px solid black; border-radius: 5px; padding: 5px;")
+                
+            self.selected_line = selected_line
+   
     def add_title(self, parent_window):        
         window_width = parent_window.width()
         label_width = 300
@@ -252,6 +296,7 @@ class SelectionWindow():
 
     def update_gui(self, file_path):
         self.update_file_path(file_path)
+        self.select_line("Blue Line") #Sets label to blue as that is the only line
         self.track_map.show()
         self.zoom_in_button.show()
         self.zoom_out_button.show()
