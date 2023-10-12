@@ -4,9 +4,13 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-import types
 
 class MainWindow(QMainWindow):
+    """
+    to be edited
+    Attributes:
+
+    """
     # engineer input variables
     uiKP = 0
     uiKI = 0
@@ -56,6 +60,11 @@ class MainWindow(QMainWindow):
     systemBaseSpeed = 1.0
 
     def __init__(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         super().__init__()
 
         # setting title
@@ -353,7 +362,7 @@ class MainWindow(QMainWindow):
         self.fastforward.setGeometry(1259, 689, 24, 24)
         self.fastforward.setStyleSheet('QPushButton{background-color: #CCCCCC}'
                                        'QPushButton::pressed{background-color: #CCCCCC; border: 1px solid #274E13}')
-        self.fastforward.clicked.connect(self.systemSpeedUp)
+        self.fastforward.clicked.connect(self.system_speed_up)
 
         self.pixmapRewind = QtGui.QPixmap('rewind.svg')
         self.pixmapRewind = self.pixmapRewind.scaled(24, 24)
@@ -363,7 +372,7 @@ class MainWindow(QMainWindow):
         self.rewind.setGeometry(885, 689, 24, 24)
         self.rewind.setStyleSheet('QPushButton{background-color: #CCCCCC}'
                                   'QPushButton::pressed{background-color: #CCCCCC; border: 1px solid #274E13}')
-        self.fastforward.clicked.connect(self.systemSlowDown)
+        self.fastforward.clicked.connect(self.system_slow_down)
 
         # black display blocks
         # current speed
@@ -521,7 +530,7 @@ class MainWindow(QMainWindow):
 
         # system clock
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.displayTime)
+        self.timer.timeout.connect(self.display_time)
         self.timer.start(1000)
 
         self.systemClock = QLabel(self)
@@ -769,12 +778,12 @@ class MainWindow(QMainWindow):
         self.pixmapChevronsDown = QtGui.QPixmap('chevrons-down.svg')
         self.pixmapChevronsDown = self.pixmapChevronsDown.scaled(48, 48)
 
-        self.ChevronsDown1 = QPushButton(self)
-        self.ChevronsDown1.setIcon(QtGui.QIcon(self.pixmapChevronsDown))
-        self.ChevronsDown1.setGeometry(473, 956, 48, 48)
-        self.ChevronsDown1.setStyleSheet('QPushButton{background-color: white; color: #085394; border: 1px solid #085394; border-radius: 24px}'
+        self.chevronsDown1 = QPushButton(self)
+        self.chevronsDown1.setIcon(QtGui.QIcon(self.pixmapChevronsDown))
+        self.chevronsDown1.setGeometry(473, 956, 48, 48)
+        self.chevronsDown1.setStyleSheet('QPushButton{background-color: white; color: #085394; border: 1px solid #085394; border-radius: 24px}'
                                          'QPushButton::pressed{background-color: #9FC5F8; color: #085394; border: 1px solid #085394; border-radius: 24px}')
-        self.ChevronsDown1.clicked.connect(self.ui_wireframe2)
+        self.chevronsDown1.clicked.connect(self.ui_wireframe2)
 
         self.driverInputP1Widgets = [self.manualButton,
                                      self.automaticButton,
@@ -785,19 +794,19 @@ class MainWindow(QMainWindow):
                                      self.setpointSpeedLabel,
                                      self.setpointSpeedVal,
                                      self.announcements,
-                                     self.ChevronsDown1]
+                                     self.chevronsDown1]
 
         """driver input p2"""
         # driver input p1
         self.pixmapChevronsUp = QtGui.QPixmap('chevrons-up.svg')
         self.pixmapChevronsUp = self.pixmapChevronsUp.scaled(48, 48)
 
-        self.ChevronsUp1 = QPushButton(self)
-        self.ChevronsUp1.setIcon(QtGui.QIcon(self.pixmapChevronsUp))
-        self.ChevronsUp1.setGeometry(473, 521, 48, 48)
-        self.ChevronsUp1.setStyleSheet('QPushButton{background-color: white; color: #085394; border: 1px solid #085394; border-radius: 24px}'
+        self.chevronsUp1 = QPushButton(self)
+        self.chevronsUp1.setIcon(QtGui.QIcon(self.pixmapChevronsUp))
+        self.chevronsUp1.setGeometry(473, 521, 48, 48)
+        self.chevronsUp1.setStyleSheet('QPushButton{background-color: white; color: #085394; border: 1px solid #085394; border-radius: 24px}'
                                        'QPushButton::pressed{background-color: #9FC5F8; color: #085394; border: 1px solid #085394; border-radius: 24px}')
-        self.ChevronsUp1.clicked.connect(self.ui_wireframe)
+        self.chevronsUp1.clicked.connect(self.ui_wireframe)
 
         # doors
         self.doorLabel = QLabel('Doors', self)
@@ -881,7 +890,7 @@ class MainWindow(QMainWindow):
         self.advertisementButton.setCheckable(True)
         self.advertisementButton.clicked.connect(self.input_driver_advertisement)
 
-        self.driverInputP2Widgets = [self.ChevronsUp1,
+        self.driverInputP2Widgets = [self.chevronsUp1,
                                      self.doorLabel,
                                      self.doorLeftButton,
                                      self.doorRightButton,
@@ -1234,6 +1243,11 @@ class MainWindow(QMainWindow):
                                  self.testbenchAdvertisementButton]
 
     def homepage(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         for w in self.actualHomeWidgets:
             w.show()
         for w in self.basicLayoutWidgets:
@@ -1252,6 +1266,11 @@ class MainWindow(QMainWindow):
             w.hide()
 
     def wireframe(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         for w in self.actualHomeWidgets:
             w.hide()
         for w in self.basicLayoutWidgets:
@@ -1270,6 +1289,11 @@ class MainWindow(QMainWindow):
             w.hide()
 
     def ui_wireframe(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.checkTrainID == False:
             print('ERROR!')
             return
@@ -1292,6 +1316,11 @@ class MainWindow(QMainWindow):
             w.hide()
 
     def ui_wireframe2(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         for w in self.actualHomeWidgets:
             w.hide()
         for w in self.basicLayoutWidgets:
@@ -1310,6 +1339,11 @@ class MainWindow(QMainWindow):
             w.hide()
 
     def testbench(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         for w in self.actualHomeWidgets:
             w.hide()
         for w in self.basicLayoutWidgets:
@@ -1328,6 +1362,11 @@ class MainWindow(QMainWindow):
             w.show()
 
     def input_train_id(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.uiTrainID = self.enterTrainID.text()
         self.trainID.setText('#' + self.uiTrainID)
         if self.uiTrainID != self.tmTrainID:
@@ -1337,14 +1376,29 @@ class MainWindow(QMainWindow):
         print('ID ENTERED: ' + self.uiTrainID)
 
     def input_engineer_kp(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.uiKP = self.kpVal.text()
         print('CHANGED KP TO: ' + self.uiKP)
 
     def input_engineer_ki(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.uiKI = self.kiVal.text()
         print('CHANGED KI TO: ' + self.uiKI)
 
     def input_driver_manual_mode(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.uiMode = 0
         self.manualButton.setDown(True)
         self.manualButton.setStyleSheet('background-color: #9FC5F8; color: #085394; border: 1px solid #085394')
@@ -1366,6 +1420,11 @@ class MainWindow(QMainWindow):
             w.setDisabled(False)
 
     def input_driver_automatic_mode(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.uiMode = 1
         self.automaticButton.setDown(True)
         self.automaticButton.setStyleSheet('background-color: #9FC5F8; color: #085394; border: 1px solid #085394')
@@ -1387,6 +1446,11 @@ class MainWindow(QMainWindow):
             w.setDisabled(True)
 
     def input_driver_emergency_brake(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.emergencyBrakeButton.isChecked():
             self.tcEmergencyBrake = 1
             self.emergencyBrakeButton.setText('ON')
@@ -1403,6 +1467,11 @@ class MainWindow(QMainWindow):
             print('EMERGENCY BRAKE: OFF')
 
     def input_driver_service_brake(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.serviceBrakeButton.isChecked():
             self.tcServiceBrake = 1
             self.serviceBrakeButton.setText('ON')
@@ -1419,10 +1488,20 @@ class MainWindow(QMainWindow):
             print('SERVICE BRAKE: OFF')
 
     def input_driver_setpoint_command(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tcSetpointCommand = self.setpointSpeedVal.value()
         print('SETPOINT SPEED CHANGED TO: ' + str(self.tcSetpointCommand))
 
     def input_driver_announcement(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.announcements.currentIndex() == 2:
             self.announcements.setEditable(True)
         else:
@@ -1438,6 +1517,11 @@ class MainWindow(QMainWindow):
             self.tcAnnouncement = ''
 
     def input_driver_left_door(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.doorLeftButton.isChecked():
             self.tcLeftDoor = 1
             self.doorLeftButton.setStyleSheet('background-color: #9FC5F8; color: #085394; border: 1px solid #085394')
@@ -1448,6 +1532,11 @@ class MainWindow(QMainWindow):
             print('LEFT DOOR: CLOSED')
 
     def input_driver_right_door(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.doorRightButton.isChecked():
             self.tcRightDoor = 1
             self.doorRightButton.setStyleSheet('background-color: #9FC5F8; color: #085394; border: 1px solid #085394')
@@ -1458,6 +1547,11 @@ class MainWindow(QMainWindow):
             print('RIGHT DOOR: CLOSED')
 
     def input_driver_external_lights(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.externalLightsButton.isChecked():
             self.tcExternalLights = 1
             self.externalLightsButton.setText('ON')
@@ -1470,6 +1564,11 @@ class MainWindow(QMainWindow):
             print('HEADLIGHTS: OFF')
 
     def input_driver_internal_lights(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.internalLightsButton.isChecked():
             self.tcInternalLights = 1
             self.internalLightsButton.setText('ON')
@@ -1482,10 +1581,20 @@ class MainWindow(QMainWindow):
             print('INTERIOR LIGHTS: OFF')
 
     def input_driver_setpoint_temp(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tcSetpointTemp = self.setpointTempVal.value()
         print('SETPOINT TEMP CHANGED TO: ' + str(self.tcSetpointTemp))
 
     def input_driver_advertisement(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.advertisementButton.isChecked():
             self.tcAdvertisement = 1
             self.advertisementButton.setText('ON')
@@ -1498,38 +1607,78 @@ class MainWindow(QMainWindow):
             print('ADS: OFF')
 
     def input_tm_train_id(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tmTrainID = self.trainInputVal.text()
         print('EXISTING TRAIN UPDATED: ' + self.tmTrainID)
 
     def input_tm_speed_limit(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tmSpeedLimit = self.testbenchSpeedLimitVal.text()
         self.speedLimitVal.setText(str(self.tmSpeedLimit))
         print('EXISTING SPEED LIMIT UPDATED: ' + self.tmSpeedLimit)
 
     def input_tm_authority(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tmAuthority = self.testbenchAuthorityVal.text()
         self.authorityVal.setText(str(self.tmAuthority))
         print('EXISTING AUTHORITY UPDATED: ' + self.tmAuthority)
 
     def input_tm_current_speed(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tmCurrentSpeed = self.testbenchCurrentSpeedVal.text()
         self.currentSpeedVal.setText(str(self.tmCurrentSpeed))
         print('EXISTING CURRENT SPEED UPDATED: ' + self.tmCurrentSpeed)
 
     def input_tm_commanded_speed(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tmCommandedSpeed = self.testbenchCommandedSpeedVal.text()
         self.suggestedSpeedVal.setText(str(self.tmCommandedSpeed))
         print('EXISTING COMMANDED SPEED UPDATED: ' + self.tmCommandedSpeed)
 
     def input_tm_beacon_data(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.testbenchBeaconButton.setText(QFileDialog.getOpenFileName())
 
     def input_tm_current_temp(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tmCurrentTemp = self.testbenchTempVal.text()
         self.internalTempVal.setText(str(self.tmCurrentTemp))
         print('EXISTING CURRENT TEMP UPDATED: ' + self.tmCurrentTemp)
 
     def input_tm_emergency_brake(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.testbenchEmergencyBrakeButton.isChecked():
             self.tmEmergencyBrake = 1
             self.testbenchEmergencyBrakeButton.setText('ON')
@@ -1551,6 +1700,11 @@ class MainWindow(QMainWindow):
             print('EMERGENCY BRAKE: OFF')
 
     def input_tm_signal_fail(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.testbenchSignalFailButton.isChecked():
             self.tmSignalFail = 1
             self.testbenchSignalFailButton.setText('ON')
@@ -1565,6 +1719,11 @@ class MainWindow(QMainWindow):
             print('SIGNAL PICKUP FAILURE: RESOLVED')
 
     def input_tm_engine_fail(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.testbenchEngineFailButton.isChecked():
             self.tmEngineFail = 1
             self.testbenchEngineFailButton.setText('ON')
@@ -1580,6 +1739,11 @@ class MainWindow(QMainWindow):
 
 
     def input_tm_brake_fail(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         if self.testbenchBrakeFailButton.isChecked():
             self.tmBrakeFail = 1
             self.testbenchBrakeFailButton.setText('ON')
@@ -1594,6 +1758,11 @@ class MainWindow(QMainWindow):
             print('BRAKE FAILURE: RESOLVED')
 
     def testbench_button(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         self.tcPowerCommand = 100
         #self.tcPowerCommand = abs(self.tmCurrentSpeed - self.tcSetpointCommand) / self.tmCurrentSpeed * (self.uiKP + self.uiKI)
         self.testbenchPowerCommandVal.setText(str(self.tcPowerCommand))
@@ -1639,16 +1808,31 @@ class MainWindow(QMainWindow):
             self.testbenchAdvertisementButton.setText('OFF')
             self.testbenchAdvertisementButton.setStyleSheet('background-color: #666666; color: white; border: 1px solid black')
 
-    def displayTime(self):
+    def display_time(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         currentTime = QTime.currentTime()
         displayText = currentTime.toString('hh:mm:ss')
         self.systemClock.setText(displayText)
 
-    def systemSpeedUp(self):
+    def system_speed_up(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         #self.systemBaseSpeed = self.systemBaseSpeed + 0.25
         #self.timer.start(1000 * self.systemBaseSpeed)
         print('SYSTEM INTERVAL: ' + str(self.systemBaseSpeed))
-    def systemSlowDown(self):
+    def system_slow_down(self):
+        """
+        to be edited
+        Attributes:
+
+        """
         #if self.systemBaseSpeed <= 0.25:
          #   return
         #self.systemBaseSpeed = self.systemBaseSpeed - 0.25
