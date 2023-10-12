@@ -1,10 +1,14 @@
 import sys
+import re
 import load_track
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 class FailureWindow():
+    selected_block = None
+    selected_failures = []
+    
     def __init__(self):
         self.failure_window = QDialog()
         self.setup_failure_popup()
@@ -54,8 +58,9 @@ class FailureWindow():
     def add_failure_selection(self):
         set_failure = QLabel("Set Failure Type:", self.failure_window)
         set_failure.setGeometry(10, 120, 230, 30)
-        set_failure.setStyleSheet("font-weight: bold; font-size: 18px; background-color: #ffd6d6;")
-    
+        set_failure.setStyleSheet("font-weight: bold; font-size: 18px; background-color: #ffd6d6")
+
+        self.failure_checkboxes = []
         failures = [
             "Track Circuit Failure",
             "Power Failure",
@@ -65,9 +70,10 @@ class FailureWindow():
         for failure in failures:
             option = QCheckBox(failure, self.failure_window)
             option.setGeometry(10, y_offset, 230, 30)
-            option.setStyleSheet("background-color: #ffd6d6;")
+            option.setStyleSheet("background-color: #ffd6d6")
+            self.failure_checkboxes.append(option)
             y_offset += 30
-    
+
     def update_exit_button_state(self):
         #Enable the button to "Set Failure Configuration" if a drop down item from the menu is selected
         is_block_selected = self.block_dropdown.currentIndex() != -1
@@ -77,9 +83,31 @@ class FailureWindow():
         self.button = QPushButton("Set Failure Configuration", self.failure_window)
         self.button.setGeometry(50, 250, 150, 30)
         self.button.setStyleSheet("background-color: #39E75F;")
-        self.button.clicked.connect(self.failure_window.close)
+        self.button.clicked.connect(self.update_failure)
         self.button.setEnabled(False) #Button is set as disabled to begin with
+    
+    def update_failure(self):
+        selected_block_index = self.block_dropdown.currentIndex()
+        selected_block = self.block_dropdown.itemText(selected_block_index)
+
+        for checkbox in self.failure_checkboxes:
+            if checkbox.isChecked():
+                self.selected_failures.append(checkbox.text())
+        self.selected_block = selected_block
+
+        self.failure_window.close()
+    
+    def get_selected_block(self):
+        #Pull block int from string
+        pattern = r'\d+'
+        search_int = re.search(pattern, self.selected_block)
+        if search_int:
+            block_num = int(search_int.group())
+            return block_num
         
+    def get_selected_failures(self):
+        return self.selected_failures
+                
 class SelectionWindow():
     simulation_speed = 1.0
     selected_line = None
@@ -338,8 +366,12 @@ class SelectionWindow():
         self.track_map.show()
         self.zoom_in_button.show()
         self.zoom_out_button.show()
+        self.zoom_in_button.setDisabled(True)
+        self.zoom_out_button.setDisabled(True)
         self.change_failures_button.setEnabled(True)
         self.go_button.setEnabled(True)
+        for checkbox in self.track_info_checkboxes.values():
+            checkbox.setDisabled(False)
         
     def import_track_data(self, parent_window):
         options = QFileDialog.Options() | QFileDialog.ReadOnly
@@ -351,6 +383,10 @@ class SelectionWindow():
             self.update_gui(file_path)
             
             self.track_data = load_track.read_track_data(file_path)
+            #Add failures, set to default "None" to begin
+            for block in self.track_data:
+                block["Failures"] = self.failures
+                
             print(self.track_data)
         
     def add_input_section(self, parent_window):
@@ -397,8 +433,10 @@ class SelectionWindow():
             checkbox.setGeometry(980, y_offset, 200, 30)
             self.block_info_checkboxes[info] = checkbox
             y_offset += 30
+            checkbox.setDisabled(True)
             checkbox.stateChanged.connect(self.update_block_info_display)
         
+        self.track_info_checkboxes = {}
         track_info = [
             "Show Occupied Blocks", "Show Switches", 
             "Show Light Signals", "Show Railway Crossings"
@@ -407,6 +445,8 @@ class SelectionWindow():
         for info in track_info:
             checkbox = QCheckBox(info, parent_window)
             checkbox.setGeometry(970, y_offset, 135, 30)
+            self.track_info_checkboxes[info] = checkbox
+            checkbox.setDisabled(True)
             if "Switch" in info:
                 switch_png = QLabel(parent_window)
                 switch_png.setGeometry(1060, y_offset, 30, 30)
@@ -432,14 +472,26 @@ class SelectionWindow():
             if block_number:
                 block_check = self.check_block_exist(block_number)
                 if block_check:
+                    #Enable checkboxes if block # entry is valid
+                    for checkbox in self.block_info_checkboxes.values():
+                        checkbox.setDisabled(False)
+                        
                     self.block_info_display.setPlainText("\n".join(block_info))
                     self.block_info_display.show()
                     self.error_label.clear()
                 else:
+                    #Disable checkboxes if block # entry is not valid
+                    for checkbox in self.block_info_checkboxes.values():
+                        checkbox.setDisabled(True)
+                        
                     self.block_info_display.clear()
                     self.block_info_display.hide()
                     self.error_label.setText(f"Block {block_number} not found.")
         else:
+            #Disable checkboxes if block # entry is not valid
+            for checkbox in self.block_info_checkboxes.values():
+                checkbox.setDisabled(True)
+                
             self.block_info_display.clear()
             self.block_info_display.hide()
             self.error_label.setText("Please enter a valid block number.")
@@ -478,7 +530,7 @@ class SelectionWindow():
                 if info == "Failures":
                     for data in self.track_data:
                         if data["Block Number"] == int(block_number):
-                            block_info.append(f"Failures: {self.failures}")
+                            block_info.append(f"Failures: {data['Failures']}")
                 if info == "Beacon":
                     for data in self.track_data:
                         if data["Block Number"] == int(block_number):
@@ -510,6 +562,16 @@ class SelectionWindow():
         failure_popup = FailureWindow()
         failure_popup.failure_window.exec()
         
+        selected_block = failure_popup.get_selected_block()
+        self.failures = failure_popup.get_selected_failures()
+
+        # Update the track_data with failures
+        for block in self.track_data:
+            if block["Block Number"] == selected_block:
+                #Convert to a string for the use of the display, but kept a list privately
+                failures_str =  ", ".join(self.failures)
+                block["Failures"] = failures_str
+        self.update_block_info_display
         
 if __name__ == '__main__':
     selection_window = SelectionWindow()
