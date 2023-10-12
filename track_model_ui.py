@@ -91,6 +91,7 @@ class FailureWindow():
         selected_block_index = self.block_dropdown.currentIndex()
         selected_block = self.block_dropdown.itemText(selected_block_index)
 
+        self.selected_failures.clear()
         for checkbox in self.failure_checkboxes:
             if checkbox.isChecked():
                 self.selected_failures.append(checkbox.text())
@@ -116,10 +117,12 @@ class SelectionWindow():
     simulation_speed = 1.0
     selected_line = None
     temperature = 65
-    allowable_directions = "EAST"
+    allowable_directions = "EAST/WEST"
     track_heater = "OFF"
     failures = "None"
     beacon = "---"
+    ticket_sales = 0
+    waiting = 0
 
     def __init__(self):
         self.setup_selection_window()
@@ -150,6 +153,7 @@ class SelectionWindow():
         self.add_map_pngs(mainWindow)
         
         self.add_block_info_display(mainWindow)
+        self.add_station_info(mainWindow)
         
         #Block Info Selection
         self.add_input_section(mainWindow)
@@ -311,6 +315,18 @@ class SelectionWindow():
         self.switch_png.setGeometry(450, 420, 30, 30)
         self.switch_png.setPixmap(QPixmap("pngs/train_track.png").scaled(25, 25))
         self.switch_png.hide()
+        
+        #Temp
+        self.occ1_png = QLabel(parent_window)
+        self.occ1_png.setGeometry(80, 422, 80, 60)
+        self.occ1_png.setPixmap(QPixmap("pngs/occ1.png"))
+        self.occ1_png.hide()
+        
+        self.occ10_png = QLabel(parent_window)
+        self.occ10_png.setGeometry(707, 213, 80, 70)
+        self.occ10_png.setPixmap(QPixmap("pngs/occ10.png"))
+        self.occ10_png.mousePressEvent = self.update_station_display
+        self.occ10_png.hide()
         #Add rest later
     
     def add_track_map(self, parent_window):
@@ -477,12 +493,40 @@ class SelectionWindow():
         #Checkbox events
         show_switches_checkbox = self.track_info_checkboxes["Show Switches"]
         show_switches_checkbox.stateChanged.connect(self.change_switches_img)
+        show_occupied_checkbox = self.track_info_checkboxes["Show Occupied Blocks"]
+        show_occupied_checkbox.stateChanged.connect(self.change_occupied_img)
+    
+    def add_station_info(self, parent_window):
+        self.station_info = QTextEdit("", parent_window)
+        self.station_info.setGeometry(760, 300, 160, 70)
+        self.station_info.setAlignment(Qt.AlignCenter)
+        self.station_info.setStyleSheet("background-color: #d0efff; color: black; font-size: 14px")
+        self.station_info.hide()
+    
+    def update_station_display(self, event):
+        if self.station_info.isHidden():
+            self.station_info.setText(
+            f"<b>Blue Line</b>"
+            f"<br>Ticket Sales/Hr: {self.ticket_sales}</br>"
+            f"<br>Waiting @ Station B: {self.waiting}</br>"
+        )
+            self.station_info.show()
+        else:
+            self.station_info.hide()
         
     def change_switches_img(self, state):
         if state == Qt.Checked:
             self.switch_png.show()
         else:
             self.switch_png.hide()
+            
+    def change_occupied_img(self, state):
+        if state == Qt.Checked:
+            self.occ1_png.show()
+            self.occ10_png.show()
+        else:
+            self.occ1_png.hide()
+            self.occ10_png.hide()
         
     def update_block_info_display(self):
         # Always display the block number
