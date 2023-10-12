@@ -141,6 +141,7 @@ class SelectionWindow():
         self.add_vline(mainWindow)
         self.add_hline(mainWindow)
         self.add_title(mainWindow)
+        self.add_tabbar(mainWindow)
         
         #Map
         self.add_line_panel(mainWindow)
@@ -622,7 +623,18 @@ class SelectionWindow():
         self.change_failures_button.setEnabled(False)
         
         self.change_failures_button.clicked.connect(self.show_failure_popup)
+    
+    def add_tabbar(self, parent_window):
+        change_failures_button = QPushButton("Home", parent_window)
+        change_failures_button.setStyleSheet("background-color: black; color: white; font-weight: bold; border: 2px solid white; border-bottom: none;")
+        change_failures_button.setGeometry(100, 70, 100, 30)
+              
+        testbench_tab = QPushButton("TestBench", parent_window)
+        testbench_tab.setStyleSheet("background-color: black; color: white; font-weight: bold; border: 2px solid white; border-bottom: none;")
+        testbench_tab.setGeometry(200, 70, 100, 30)
         
+        testbench_tab.clicked.connect(self.show_testbench)
+    
     def show_failure_popup(self):
         failure_popup = FailureWindow()
         failure_popup.failure_window.exec()
@@ -639,6 +651,48 @@ class SelectionWindow():
                     failures_str = "None"
                 block["Failures"] = failures_str
         self.update_block_info_display
+
+    def show_testbench(self):
+        testbench_window = TestbenchWindow()
+        testbench_window.testbench.exec()
+        
+class TestbenchWindow():
+    def __init__(self):
+        self.testbench = QDialog()
+        self.setup_testbench()
+        
+    def setup_testbench(self):
+        self.testbench.setWindowTitle("Change Failures")
+        self.testbench.setGeometry(450, 300, 960, 600)
+        
+        #General layout
+        self.add_mta_logo()
+        self.add_title()
+        self.add_hline()
+
+    def add_mta_logo(self):
+        mta_logo = QLabel(self.testbench)
+        mta_logo.setGeometry(0, 0, 80, 80)
+        mta_logo.setPixmap(QPixmap("pngs/MTA_logo.png").scaled(80, 80))
+        
+    def add_title(self):        
+        window_width = self.testbench.width()
+        label_width = 300
+        title_position = int((window_width - label_width) / 2)
+        
+        title_label = QLabel("Track Model- Testbench", self.testbench)
+        title_label.setGeometry(title_position, 25, label_width, 40)
+        title_label.setAlignment(Qt.AlignCenter)
+        title_font = QFont("Arial", 18, QFont.Bold)
+        title_label.setFont(title_font)
+        
+    def add_hline(self):
+        thickness = 5
+        line = QFrame(self.testbench)
+        line.setFrameShape(QFrame.HLine)
+        line.setGeometry(0, 80, 960, thickness)
+        line.setLineWidth(thickness)
+        
         
 if __name__ == '__main__':
     selection_window = SelectionWindow()
