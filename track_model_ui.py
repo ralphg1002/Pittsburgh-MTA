@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+#DONE :)
 class FailureWindow():
     selected_block = None
     selected_failures = []
@@ -98,14 +99,17 @@ class FailureWindow():
         self.failure_window.close()
     
     def get_selected_block(self):
-        #Pull block int from string
-        pattern = r'\d+'
-        search_int = re.search(pattern, self.selected_block)
-        if search_int:
-            block_num = int(search_int.group())
-            return block_num
+        if self.selected_block != None:
+            #Pull block int from string
+            pattern = r'\d+'
+            search_int = re.search(pattern, self.selected_block)
+            if search_int:
+                block_num = int(search_int.group())
+                return block_num
         
     def get_selected_failures(self):
+        if self.selected_failures == []:
+            return "None"
         return self.selected_failures
                 
 class SelectionWindow():
@@ -143,6 +147,7 @@ class SelectionWindow():
         self.display_file_path(mainWindow)
         self.add_track_map(mainWindow)
         self.add_map_zoom(mainWindow)
+        self.add_map_pngs(mainWindow)
         
         self.add_block_info_display(mainWindow)
         
@@ -301,6 +306,13 @@ class SelectionWindow():
         self.temperature_input.setPlaceholderText(str(self.temperature))
         print(self.temperature)
 
+    def add_map_pngs(self, parent_window):
+        self.switch_png = QLabel(parent_window)
+        self.switch_png.setGeometry(450, 420, 30, 30)
+        self.switch_png.setPixmap(QPixmap("pngs/train_track.png").scaled(25, 25))
+        self.switch_png.hide()
+        #Add rest later
+    
     def add_track_map(self, parent_window):
         self.map_png = QPixmap("pngs/blue_line.png")
         self.og_width, self.og_height = 950, 550
@@ -462,6 +474,16 @@ class SelectionWindow():
                 
             y_offset += 30
         
+        #Checkbox events
+        show_switches_checkbox = self.track_info_checkboxes["Show Switches"]
+        show_switches_checkbox.stateChanged.connect(self.change_switches_img)
+        
+    def change_switches_img(self, state):
+        if state == Qt.Checked:
+            self.switch_png.show()
+        else:
+            self.switch_png.hide()
+        
     def update_block_info_display(self):
         # Always display the block number
         block_number = self.entry_field.text()
@@ -538,7 +560,6 @@ class SelectionWindow():
         #Then append to display is info is selected
         self.block_info_display.setPlainText("\n".join(block_info))
 
-
     def check_block_exist(self, block_number):
         if self.track_data:
             for data in self.track_data:
@@ -570,6 +591,8 @@ class SelectionWindow():
             if block["Block Number"] == selected_block:
                 #Convert to a string for the use of the display, but kept a list privately
                 failures_str =  ", ".join(self.failures)
+                if self.failures == "None":
+                    failures_str = "None"
                 block["Failures"] = failures_str
         self.update_block_info_display
         
