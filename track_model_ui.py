@@ -81,10 +81,15 @@ class FailureWindow():
         self.button.setEnabled(False) #Button is set as disabled to begin with
         
 class SelectionWindow():
+    simulation_speed = 1.0
+    selected_line = None
+    temperature = 65
+    allowable_directions = "EAST"
+    track_heater = "OFF"
+    failures = "None"
+    beacon = "---"
+
     def __init__(self):
-        self.simulation_speed = 1.0
-        self.selected_line = None
-        self.temperature = 65
         self.setup_selection_window()
       
     def setup_selection_window(self):
@@ -110,6 +115,8 @@ class SelectionWindow():
         self.display_file_path(mainWindow)
         self.add_track_map(mainWindow)
         self.add_map_zoom(mainWindow)
+        
+        self.add_block_info_display(mainWindow)
         
         #Block Info Selection
         self.add_input_section(mainWindow)
@@ -332,6 +339,7 @@ class SelectionWindow():
         self.zoom_in_button.show()
         self.zoom_out_button.show()
         self.change_failures_button.setEnabled(True)
+        self.go_button.setEnabled(True)
         
     def import_track_data(self, parent_window):
         options = QFileDialog.Options() | QFileDialog.ReadOnly
@@ -350,19 +358,34 @@ class SelectionWindow():
         label.setGeometry(970, 120, 150, 30)
         label.setStyleSheet("font-weight: bold; font-size: 18px")
         
-        entry_field = QLineEdit(parent_window)
-        entry_field.setGeometry(970, 160, 100, 30)
-        entry_field.setPlaceholderText("Enter block #")
+        self.entry_field = QLineEdit(parent_window)
+        self.entry_field.setGeometry(970, 160, 100, 30)
+        self.entry_field.setPlaceholderText("Enter block #")
         
-        button = QPushButton("Go", parent_window)
-        button.setGeometry(1080, 160, 60, 30)
-        button.setStyleSheet("background-color: blue; color: white")
+        self.go_button = QPushButton("Go", parent_window)
+        self.go_button.setGeometry(1080, 160, 60, 30)
+        self.go_button.setStyleSheet("background-color: blue; color: white")
+        # Connect the button to the update_block_info_display method
+        self.go_button.clicked.connect(self.update_block_info_display)
+        self.go_button.setEnabled(False)  # The button is disabled initially    
+        
+        self.error_label = QLabel("", parent_window)
+        self.error_label.setGeometry(970, 185, 210, 30)
+        self.error_label.setStyleSheet("color: red; font-size: 14px")   
+
+    def add_block_info_display(self, parent_window):
+        self.block_info_display = QTextEdit(parent_window)
+        self.block_info_display.setGeometry(10, 550, 400, 160)
+        self.block_info_display.setStyleSheet("background-color: white; font-size: 14px")
+        self.block_info_display.setReadOnly(True)
+        self.block_info_display.hide()
         
     def add_selectable_block_info(self, parent_window):
         label = QLabel("Block Information:", parent_window)
         label.setGeometry(970, 210, 200, 30)
         label.setStyleSheet("font-weight: bold; font-size: 18px")
         
+        self.block_info_checkboxes = {}
         block_info = [
             "Block Length", "Speed Limit", "Elevation", "Cumulative Elevation",
             "Block Grade", "Allowed Directions of Travel", "Track Heater",
@@ -372,7 +395,9 @@ class SelectionWindow():
         for info in block_info:
             checkbox = QCheckBox(info, parent_window)
             checkbox.setGeometry(980, y_offset, 200, 30)
+            self.block_info_checkboxes[info] = checkbox
             y_offset += 30
+            checkbox.stateChanged.connect(self.update_block_info_display)
         
         track_info = [
             "Show Occupied Blocks", "Show Switches", 
@@ -396,6 +421,78 @@ class SelectionWindow():
                 railway_crossing_png.setPixmap(QPixmap("pngs/railway_crossing.png").scaled(25, 25))
                 
             y_offset += 30
+        
+    def update_block_info_display(self):
+        # Always display the block number
+        block_number = self.entry_field.text()
+        block_info = [f"Block Number: {block_number}"]
+        
+        #Check possible errors in block entry value   
+        if block_number.isdigit() and block_number:
+            if block_number:
+                block_check = self.check_block_exist(block_number)
+                if block_check:
+                    self.block_info_display.setPlainText("\n".join(block_info))
+                    self.block_info_display.show()
+                    self.error_label.clear()
+                else:
+                    self.block_info_display.clear()
+                    self.block_info_display.hide()
+                    self.error_label.setText(f"Block {block_number} not found.")
+        else:
+            self.block_info_display.clear()
+            self.block_info_display.hide()
+            self.error_label.setText("Please enter a valid block number.")
+
+        #Check for checkbox selection
+        for info, checkbox in self.block_info_checkboxes.items():
+            if checkbox.isChecked():
+                if info == "Block Length":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Block Length: {data['Block Length (m)']} m")
+                if info == "Speed Limit":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Speed Limit: {data['Speed Limit (Km/Hr)']} Km/Hr")
+                if info == "Elevation":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Elevation: {data['ELEVATION (M)']} m")
+                if info == "Cumulative Elevation":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Cumulative Elevation: {data['CUMALTIVE ELEVATION (M)']} m")
+                if info == "Block Grade":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Block Grade: {data['Block Grade (%)']}%")
+                if info == "Allowed Directions of Travel":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Allowed Directions of Travel: {self.allowable_directions}")
+                if info == "Track Heater":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Track Heater: {self.track_heater}")
+                if info == "Failures":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Failures: {self.failures}")
+                if info == "Beacon":
+                    for data in self.track_data:
+                        if data["Block Number"] == int(block_number):
+                            block_info.append(f"Beacon: {self.beacon}\n")
+        #Then append to display is info is selected
+        self.block_info_display.setPlainText("\n".join(block_info))
+
+
+    def check_block_exist(self, block_number):
+        if self.track_data:
+            for data in self.track_data:
+                if data["Block Number"] == int(block_number):
+                    return True
+        return False
     
     def add_change_failures_button(self, parent_window):
         self.change_failures_button = QPushButton("Change Failures ->", parent_window)
