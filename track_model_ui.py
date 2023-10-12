@@ -657,6 +657,17 @@ class SelectionWindow():
         testbench_window.testbench.exec()
         
 class TestbenchWindow():
+    speed = ''
+    authority = ''
+    railway_state = 0
+    switch_state = 0
+    track_heater_state = 0
+    track_state = "Open"
+    ticket_sales = ''
+    waiting = ''
+    light_state = "Green"
+    failures = []
+
     def __init__(self):
         self.testbench = QDialog()
         self.setup_testbench()
@@ -669,6 +680,14 @@ class TestbenchWindow():
         self.add_mta_logo()
         self.add_title()
         self.add_hline()
+        
+        #Inputs
+        self.setup_inputs()
+        self.setup_failure_inputs()
+        self.add_set_inputs()
+
+        #Outputs
+        self.add_outputs()
 
     def add_mta_logo(self):
         mta_logo = QLabel(self.testbench)
@@ -677,7 +696,7 @@ class TestbenchWindow():
         
     def add_title(self):        
         window_width = self.testbench.width()
-        label_width = 300
+        label_width = 350
         title_position = int((window_width - label_width) / 2)
         
         title_label = QLabel("Track Model- Testbench", self.testbench)
@@ -693,6 +712,244 @@ class TestbenchWindow():
         line.setGeometry(0, 80, 960, thickness)
         line.setLineWidth(thickness)
         
+    def setup_inputs(self):
+        blue_background = QWidget(self.testbench)
+        blue_background.setGeometry(10, 120, 400, 450)
+        blue_background.setStyleSheet("background-color: #A9D0F5;")
+
+        white_background = "background-color: white"
+
+        inputs_label = QLabel("Change Inputs:", blue_background)
+        inputs_label.setGeometry(0, 0, 400, 30)
+        inputs_label.setStyleSheet("background-color: blue; color: white; font-weight: bold")
+        inputs_label.setAlignment(Qt.AlignCenter)
+
+        select_block = QLabel("Select Block #:", blue_background)
+        select_block.setGeometry(10, 50, 150, 30)
+        self.block_input = QSpinBox(blue_background)
+        self.block_input.setGeometry(120, 50, 50, 30)
+        self.block_input.setStyleSheet(white_background)
+        self.block_input.setMinimum(1)
+        self.block_input.setMaximum(15)
+        self.block_input.setValue(1)
+        go_button = QPushButton("Go", blue_background)
+        go_button.setGeometry(220, 50, 150, 30)
+        go_button.setStyleSheet("background-color: blue; color: white")
+        # Connect the button to the update_block_info_display method
+        go_button.clicked.connect(self.update_display)
+
+        speed_label = QLabel("Set Commanded Speed (mph):", blue_background)
+        speed_label.setGeometry(10, 90, 200, 30)
+        self.speed_input = QLineEdit(blue_background)
+        self.speed_input.setGeometry(220, 90, 150, 30)
+        self.speed_input.setStyleSheet(white_background)
+        self.speed_input.setEnabled(False)
+
+        authority_label = QLabel("Set Authority (blocks):", blue_background)
+        authority_label.setGeometry(10, 130, 200, 30)
+        self.authority_input = QLineEdit(blue_background)
+        self.authority_input.setGeometry(220, 130, 150, 30)
+        self.authority_input.setStyleSheet(white_background)
+        self.authority_input.setEnabled(False)
+
+        railway_label = QLabel("Set Railway Crossing (0/1):", blue_background)
+        railway_label.setGeometry(10, 170, 200, 30)
+        self.railway_input = QSpinBox(blue_background)
+        self.railway_input.setGeometry(220, 170, 150, 30)
+        self.railway_input.setStyleSheet(white_background)
+        self.railway_input.setMinimum(0)
+        self.railway_input.setMaximum(1)
+        self.railway_input.setValue(0)
+        self.railway_input.setEnabled(False)
+
+        switch_label = QLabel("Set Switch Position (0/1):", blue_background)
+        switch_label.setGeometry(10, 210, 200, 30)
+        self.switch_input = QSpinBox(blue_background)
+        self.switch_input.setGeometry(220, 210, 150, 30)
+        self.switch_input.setStyleSheet(white_background)
+        self.switch_input.setMinimum(0)
+        self.switch_input.setMaximum(1)
+        self.switch_input.setValue(0)
+        self.switch_input.setEnabled(False)
+
+        heater_label = QLabel("Set Track Heater (0/1):", blue_background)
+        heater_label.setGeometry(10, 250, 200, 30)
+        self.heater_input = QSpinBox(blue_background)
+        self.heater_input.setGeometry(220, 250, 150, 30)
+        self.heater_input.setStyleSheet(white_background)
+        self.heater_input.setMinimum(0)
+        self.heater_input.setMaximum(1)
+        self.heater_input.setValue(0)
+        self.heater_input.setEnabled(False)
+
+        track_state_label = QLabel("Set Track State:", blue_background)
+        track_state_label.setGeometry(10, 290, 200, 30)
+        self.track_open = QRadioButton("Open", blue_background)
+        self.track_open.setGeometry(120, 290, 60, 30)
+        self.track_open.setEnabled(False)
+        self.track_occupied = QRadioButton("Occupied", blue_background)
+        self.track_occupied.setGeometry(190, 290, 80, 30)
+        self.track_occupied.setEnabled(False)
+        self.track_maintenance = QRadioButton("Maintenance", blue_background)
+        self.track_maintenance.setGeometry(280, 290, 100, 30)
+        self.track_maintenance.setEnabled(False)
+        self.track_state_buttons = QButtonGroup()
+        self.track_state_buttons.addButton(self.track_open)
+        self.track_state_buttons.addButton(self.track_occupied)
+        self.track_state_buttons.addButton(self.track_maintenance)
         
+
+        ticket_sales_label = QLabel("Set Ticket Sales/Hr:", blue_background)
+        ticket_sales_label.setGeometry(10, 330, 200, 30)
+        self.ticket_sales_input = QLineEdit(blue_background)
+        self.ticket_sales_input.setGeometry(220, 330, 150, 30)
+        self.ticket_sales_input.setStyleSheet(white_background)
+        self.ticket_sales_input.setEnabled(False)
+
+        waiting_label = QLabel("Set Waiting @ Station:", blue_background)
+        waiting_label.setGeometry(10, 370, 200, 30)
+        self.waiting_input = QLineEdit(blue_background)
+        self.waiting_input.setGeometry(220, 370, 150, 30)
+        self.waiting_input.setStyleSheet(white_background)
+        self.waiting_input.setEnabled(False)
+
+        light_label = QLabel("Set Light Color:", blue_background)
+        light_label.setGeometry(10, 410, 150, 30)
+        self.green_radio = QRadioButton("Green", blue_background)
+        self.green_radio.setGeometry(170, 410, 70, 30)
+        self.green_radio.setEnabled(False)
+        self.yellow_radio = QRadioButton("Yellow", blue_background)
+        self.yellow_radio.setGeometry(250, 410, 70, 30)
+        self.yellow_radio.setEnabled(False)
+        self.red_radio = QRadioButton("Red", blue_background)
+        self.red_radio.setGeometry(330, 410, 70, 30)
+        self.red_radio.setEnabled(False)
+        self.light_state_buttons = QButtonGroup()
+        self.light_state_buttons.addButton(self.green_radio)
+        self.light_state_buttons.addButton(self.yellow_radio)
+        self.light_state_buttons.addButton(self.red_radio)
+
+    def setup_failure_inputs(self):
+        red_background = QWidget(self.testbench)
+        red_background.setGeometry(500, 120, 350, 80)
+        red_background.setStyleSheet("background-color: #ffd6d6;")
+
+        failure_label = QLabel("Set Failure Input:", red_background)
+        failure_label.setGeometry(0, 0, 350, 30)
+        failure_label.setStyleSheet("background-color: red; color: white; font-weight: bold")
+        failure_label.setAlignment(Qt.AlignCenter)
+
+        self.failure_checkboxes = []
+        failures = [
+            "Track Circuit Failure",
+            "Power Failure",
+            "Broken Rail"
+        ]
+        x_offset = 0
+        for failure in failures:
+            option = QCheckBox(failure, red_background)
+            option.setGeometry(x_offset, 40, 150, 30)
+            if failure == "Broken Rail":
+                option.setGeometry(x_offset-40, 40, 150, 30)
+            option.setStyleSheet("background-color: #ffd6d6")
+            self.failure_checkboxes.append(option)
+            x_offset += 150
+    
+    def add_set_inputs(self):
+        # Create a green button
+        self.set_inputs_button = QPushButton("Set Inputs", self.testbench)
+        self.set_inputs_button.setGeometry(625, 210, 100, 30)
+        self.set_inputs_button.setStyleSheet("background-color: green; color: white; font-weight: bold")
+        self.set_inputs_button.setEnabled(False)
+        self.set_inputs_button.clicked.connect(self.update_outputs)
+            
+    def update_display(self):
+        self.selected_block = self.block_input.value()
+        # self.outputs.setPlainText(f"\nBlock number: {self.selected_block}")
+        # Disable all input fields and buttons at the beginning
+        self.speed_input.setEnabled(False)
+        self.authority_input.setEnabled(False)
+        self.railway_input.setEnabled(False)
+        self.switch_input.setEnabled(False)
+        self.heater_input.setEnabled(False)
+        self.ticket_sales_input.setEnabled(False)
+        self.waiting_input.setEnabled(False)
+
+        # Reset the radio button state
+        self.track_open.setEnabled(False)
+        self.track_occupied.setEnabled(False)
+        self.track_maintenance.setEnabled(False)
+
+        # Reset the radio button state
+        self.green_radio.setEnabled(False)
+        self.yellow_radio.setEnabled(False)
+        self.red_radio.setEnabled(False)
+        # Enable the relevant input fields and buttons based on the selected block
+        if self.selected_block == 5:
+            self.switch_input.setEnabled(True)
+        if self.selected_block == 10 or self.selected_block == 15:
+            self.ticket_sales_input.setEnabled(True)
+            self.waiting_input.setEnabled(True)
+
+        self.heater_input.setEnabled(True)
+        self.speed_input.setEnabled(True)
+        self.authority_input.setEnabled(True)
+        # Enable the radio buttons for track state and light state
+        self.track_open.setEnabled(True)
+        self.track_occupied.setEnabled(True)
+        self.track_maintenance.setEnabled(True)
+        self.green_radio.setEnabled(True)
+        self.yellow_radio.setEnabled(True)
+        self.red_radio.setEnabled(True)
+
+        # Enable the "Set Inputs" button
+        self.set_inputs_button.setEnabled(True)
+
+    def add_outputs(self):
+        self.outputs = QTextEdit(self.testbench)
+        self.outputs.setGeometry(500, 250, 350, 300)
+        self.outputs.setStyleSheet("background-color: white; font-size: 14px")
+        self.outputs.setReadOnly(True)
+        self.outputs.show()
+
+    def update_outputs(self):
+        self.outputs.clear()
+        self.failures = []
+        self.outputs.append(f"\nBlock Number: {self.selected_block}")
+        if self.speed_input.text() != '':
+            self.speed = int(self.speed_input.text())
+            self.outputs.append(f"Commanded Speed: {self.speed}")
+        if self.authority_input.text() != '':
+            self.authority = int(self.authority_input.text())
+            self.outputs.append(f"Authority: {self.authority}")
+        # self.railway_state = self.railway_input.value()
+        if self.selected_block == 5:
+            self.switch_state = self.switch_input.value()
+            self.outputs.append(f"Switch State: {self.switch_state}")
+        self.track_heater_state = self.heater_input.value()
+        self.outputs.append(f"Track Heater State: {self.track_heater_state}")
+        if self.selected_block == 10 or self.selected_block == 15:
+            if self.ticket_sales_input.text() != '':
+                self.ticket_sales = int(self.ticket_sales_input.text())
+                self.outputs.append(f"Authority: {self.ticket_sales}")
+            if self.waiting_input.text() != '':
+                self.waiting = int(self.waiting_input.text())
+                self.outputs.append(f"Authority: {self.waiting}")
+        #Check for track state input
+        track_state = self.track_state_buttons.checkedButton()
+        if track_state:
+            self.track_state = track_state.text()
+            self.outputs.append(f"Track State: {self.track_state}")
+        #Check for light color input
+        light_state = self.light_state_buttons.checkedButton()
+        if light_state:
+            self.light_state = light_state.text()
+            self.outputs.append(f"Light State: {self.light_state}")
+        #Failures
+        for checkbox in self.failure_checkboxes:
+            if checkbox.isChecked():
+                self.failures.append(checkbox.text())
+        self.outputs.append(f"Failures: {self.failures}")
+
 if __name__ == '__main__':
     selection_window = SelectionWindow()
