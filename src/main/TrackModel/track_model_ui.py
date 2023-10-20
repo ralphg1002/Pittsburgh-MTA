@@ -132,7 +132,7 @@ class SelectionWindow():
         mainWindow = QWidget()
         mainWindow.setGeometry(350,200,1200,750)
         mainWindow.setWindowTitle("Track Model")
-        app.setWindowIcon(QIcon("pngs/mta_logo.png"))
+        app.setWindowIcon(QIcon("MTA_logo.png"))
         
         #General layout
         self.add_mta_logo(mainWindow)
@@ -473,20 +473,20 @@ class SelectionWindow():
         y_offset += 20
         for info in track_info:
             checkbox = QCheckBox(info, parent_window)
-            checkbox.setGeometry(970, y_offset, 135, 30)
+            checkbox.setGeometry(970, y_offset, 160, 30)
             self.track_info_checkboxes[info] = checkbox
             checkbox.setDisabled(True)
             if "Switch" in info:
                 switch_png = QLabel(parent_window)
-                switch_png.setGeometry(1060, y_offset, 30, 30)
+                switch_png.setGeometry(1080, y_offset, 30, 30)
                 switch_png.setPixmap(QPixmap("pngs/train_track.png").scaled(25, 25))
             if "Light Signal" in info:
                 light_signal_png = QLabel(parent_window)
-                light_signal_png.setGeometry(1080, y_offset, 30, 30)
+                light_signal_png.setGeometry(1100, y_offset, 30, 30)
                 light_signal_png.setPixmap(QPixmap("pngs/traffic_light.png").scaled(25, 25))
             if "Railway Crossing" in info:
                 railway_crossing_png = QLabel(parent_window)
-                railway_crossing_png.setGeometry(1110, y_offset, 30, 30)
+                railway_crossing_png.setGeometry(1130, y_offset, 30, 30)
                 railway_crossing_png.setPixmap(QPixmap("pngs/railway_crossing.png").scaled(25, 25))
                 
             y_offset += 30
