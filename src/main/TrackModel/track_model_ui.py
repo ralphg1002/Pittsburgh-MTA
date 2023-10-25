@@ -132,7 +132,7 @@ class SelectionWindow():
         mainWindow = QWidget()
         mainWindow.setGeometry(350,200,1200,750)
         mainWindow.setWindowTitle("Track Model")
-        app.setWindowIcon(QIcon("MTA_logo.png"))
+        app.setWindowIcon(QIcon("src/main/TrackModel/pngs/MTA_logo.png"))
         
         #General layout
         self.add_mta_logo(mainWindow)
@@ -165,7 +165,7 @@ class SelectionWindow():
         sys.exit(app.exec_())
         
     def add_mta_logo(self, parent_window):
-        mta_png = QPixmap("pngs/mta_logo.png")
+        mta_png = QPixmap("src/main/TrackModel/pngs/mta_logo.png")
         mta_png = mta_png.scaledToWidth(90)
         mta_logo = QLabel(parent_window)
         mta_logo.setPixmap(mta_png)
@@ -314,24 +314,24 @@ class SelectionWindow():
     def add_map_pngs(self, parent_window):
         self.switch_png = QLabel(parent_window)
         self.switch_png.setGeometry(450, 420, 30, 30)
-        self.switch_png.setPixmap(QPixmap("pngs/train_track.png").scaled(25, 25))
+        self.switch_png.setPixmap(QPixmap("src/main/TrackModel/pngs/train_track.png").scaled(25, 25))
         self.switch_png.hide()
         
         #Temp
         self.occ1_png = QLabel(parent_window)
         self.occ1_png.setGeometry(80, 422, 80, 60)
-        self.occ1_png.setPixmap(QPixmap("pngs/occ1.png"))
+        self.occ1_png.setPixmap(QPixmap("src/main/TrackModel/pngs/occ1.png"))
         self.occ1_png.hide()
         
         self.occ10_png = QLabel(parent_window)
         self.occ10_png.setGeometry(707, 213, 80, 70)
-        self.occ10_png.setPixmap(QPixmap("pngs/occ10.png"))
+        self.occ10_png.setPixmap(QPixmap("src/main/TrackModel/pngs/occ10.png"))
         self.occ10_png.mousePressEvent = self.update_station_display
         self.occ10_png.hide()
         #Add rest later
     
     def add_track_map(self, parent_window):
-        self.map_png = QPixmap("pngs/blue_line.png")
+        self.map_png = QPixmap("src/main/TrackModel/pngs/blue_line.png")
         self.og_width, self.og_height = 950, 550
         self.map_width, self.map_height = self.og_width, self.og_height
         self.map_png = self.map_png.scaled(self.map_width, self.map_height)
@@ -381,7 +381,7 @@ class SelectionWindow():
     def add_import_button(self, parent_window):
         import_png = QLabel(parent_window)
         import_png.setGeometry(790, 160, 30, 30)
-        import_png.setPixmap(QPixmap("pngs/import_arrow.png").scaled(30, 30))
+        import_png.setPixmap(QPixmap("src/main/TrackModel/pngs/import_arrow.png").scaled(30, 30))
                 
         import_button = QPushButton("Import Track Data", parent_window)
         import_button.setGeometry(820, 160, 120, 30)
@@ -479,15 +479,15 @@ class SelectionWindow():
             if "Switch" in info:
                 switch_png = QLabel(parent_window)
                 switch_png.setGeometry(1080, y_offset, 30, 30)
-                switch_png.setPixmap(QPixmap("pngs/train_track.png").scaled(25, 25))
+                switch_png.setPixmap(QPixmap("src/main/TrackModel/pngs/train_track.png").scaled(25, 25))
             if "Light Signal" in info:
                 light_signal_png = QLabel(parent_window)
                 light_signal_png.setGeometry(1100, y_offset, 30, 30)
-                light_signal_png.setPixmap(QPixmap("pngs/traffic_light.png").scaled(25, 25))
+                light_signal_png.setPixmap(QPixmap("src/main/TrackModel/pngs/traffic_light.png").scaled(25, 25))
             if "Railway Crossing" in info:
                 railway_crossing_png = QLabel(parent_window)
                 railway_crossing_png.setGeometry(1130, y_offset, 30, 30)
-                railway_crossing_png.setPixmap(QPixmap("pngs/railway_crossing.png").scaled(25, 25))
+                railway_crossing_png.setPixmap(QPixmap("src/main/TrackModel/pngs/railway_crossing.png").scaled(25, 25))
                 
             y_offset += 30
         
@@ -692,7 +692,7 @@ class TestbenchWindow():
     def add_mta_logo(self):
         mta_logo = QLabel(self.testbench)
         mta_logo.setGeometry(0, 0, 80, 80)
-        mta_logo.setPixmap(QPixmap("pngs/MTA_logo.png").scaled(80, 80))
+        mta_logo.setPixmap(QPixmap("src/main/TrackModel/pngs/MTA_logo.png").scaled(80, 80))
         
     def add_title(self):        
         window_width = self.testbench.width()
