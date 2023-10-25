@@ -56,19 +56,19 @@ Now all of us are familiar with pip, or package installers, that are used to ins
 
 The following are some important commands that you guys will be using:
 
-* __Install all dependencies used in the application:__
+* __Install all dependencies used in the application: (Run this command at the root of the repo!)__
 ```
 poetry install
 ```
 _Each time you pull from github, you need to make sure that you have locally installed all the dependencies in the pyproject.toml folder. __Note: There is no need to run this command if there have been no updates to the pyproject.toml file___
 
-* __Add a dependency to the project:__
+* __Add a dependency to the project: (Run this command at the root of the repo!)__
 ```
 poetry add <dependency>
 ```
 _When adding new dependencies, run this command to add it to the project and to a virtual environment locally. You are now able to use the dependency and the dependency will automatically be added to the pyproject.toml file._
 
-## __Important__
+## __Important (Run these commands at the root of the repository!)__
 The following dependencies are used to maintain a consistent style and codinf standard. You __must__ run these exact commands before pushing your code!
 
 * __Running Black:__

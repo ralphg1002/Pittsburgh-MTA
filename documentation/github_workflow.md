@@ -32,10 +32,12 @@ git checkout -b <branch_name>
 ### __To push changes:__
 __- Run Black and Pylint__
 
-Run the following commands individually in the order displayed
+Run the following commands individually, one at a time, in the order displayed. Make sure that you run these commands at the root of the repository!!!
 > Refer to the poetry_setup markdown file for more details
 ```
 poetry run black ./src
+```
+```
 poetry run pylint --recursive=y .
 ```
 
