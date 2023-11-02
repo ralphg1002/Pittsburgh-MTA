@@ -5,6 +5,7 @@ class TrackControllerToCTC(QObject):
     occupancyState = pyqtSignal(int, int, bool)  # line, block number, state
     failureState = pyqtSignal(int, int, bool)  # line, block number, state
     switchState = pyqtSignal(int, int, bool)  # line, block number, state
+    requestSpeed = pyqtSignal(int, int) # line, block number
 
 class TrackControllerToTrackModel(QObject):
     switchState = pyqtSignal(
@@ -22,6 +23,7 @@ class TrackControllerToTrackModel(QObject):
     authority = pyqtSignal(
         int, int, int, int
     )  # line, block number, authority
+    maintenance = pyqtSignal(int, int, int, bool)
 ##########################################################################################
 class TrainModelToTrackModel(QObject):
     sendCurrentPassengers = pyqtSignal(int)
@@ -32,8 +34,8 @@ class TrainModelToTrainController(QObject):
     sendAuthority = pyqtSignal(int)
     sendLeftDoor = pyqtSignal(bool)
     sendRightDoor = pyqtSignal(bool)
-    sendNextStation = pyqtSignal("")
-    sendPrevStation = pyqtSignal("")
+    sendNextStation = pyqtSignal(str)
+    sendPrevStation = pyqtSignal(str)
     sendEnterTunnel = pyqtSignal(bool)
     sendCommandedSpeed = pyqtSignal(int)
     sendBlockLength = pyqtSignal(int)
