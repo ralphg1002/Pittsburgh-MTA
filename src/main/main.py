@@ -1,12 +1,13 @@
 import sys
 import math
+import time
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5 import QtGui
 
 from TrackController.trackcontrol import TrackControl
-
+from TrainControllerSW import tcsw_ui
 
 class MainWindow(QMainWindow):
     # font variables
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow):
 
         # Initialize all the different modules
         trackControl = TrackControl()
+        self.trainControllerSW = TrainControllerUI()
 
         # setting title
         self.setWindowTitle(self.moduleName)
@@ -101,6 +103,7 @@ class MainWindow(QMainWindow):
         self.box5 = QPushButton("Train Controller\nSW", self)
         self.box_button(self.box5, self.box1.width(), self.box1.height())
         self.set_relative_below(self.box5, self.box1, 20)
+        self.box5.clicked.connect(self.trainControllerSW.show())
 
         self.box6 = QPushButton("Train Controller\nHW", self)
         self.box_button(self.box6, self.box1.width(), self.box1.height())
