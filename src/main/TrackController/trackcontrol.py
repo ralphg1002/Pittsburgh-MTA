@@ -1,6 +1,7 @@
 import sys, re, os
 import pandas as pd
-#from PyQt5.QtCore import pyqtSignal
+
+# from PyQt5.QtCore import pyqtSignal
 from .trackcontrollersignals import TrackControllerToCTC, TrackControllerToTrackModel
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from .trackcontrolui import MainUI, modeChanged
@@ -44,6 +45,7 @@ class RunPLC:
                     insideIf = False
 
         return data
+
 
 class Block:
     def __init__(
@@ -112,6 +114,7 @@ class Block:
     def get_type(self):
         return "plain"
 
+
 class StationBlock(Block):
     def __init__(
         self,
@@ -144,6 +147,7 @@ class StationBlock(Block):
 
     def get_type(self):
         return "station"
+
 
 class JunctionWSBlock(Block):
     def __init__(
@@ -193,6 +197,7 @@ class JunctionWSBlock(Block):
     def get_connected(self):
         return [self.nextBlock0, self.nextBlock1]
 
+
 class JunctionNSBlock(Block):
     def __init__(
         self,
@@ -226,6 +231,7 @@ class JunctionNSBlock(Block):
     def get_type(self):
         return "junctionNS"
 
+
 class CrossingBlock(Block):
     def __init__(
         self,
@@ -237,7 +243,7 @@ class CrossingBlock(Block):
         maintenanceState,
         direction,
         crossingState,
-        lightState
+        lightState,
     ):
         super().__init__(
             number,
@@ -266,6 +272,7 @@ class CrossingBlock(Block):
 
     def get_type(self):
         return "crossing"
+
 
 class StationJunctionNSBlock(Block):
     def __init__(
@@ -307,6 +314,7 @@ class StationJunctionNSBlock(Block):
 
     def set_lightstate(self, newLightState):
         self.lightState = newLightState
+
 
 class StationJunctionWSBlock(Block):
     def __init__(
@@ -364,6 +372,7 @@ class StationJunctionWSBlock(Block):
     def get_connected(self):
         return [self.nextBlock0, self.nextBlock1]
 
+
 class Wayside:
     # initialize array which will hold all of the blocks
     # that the wayside controller is responsible for
@@ -390,7 +399,7 @@ class Wayside:
 
     def get_line(self):
         return self.line
-    
+
     def set_plc_state(self, mode):
         self.plcState = mode
 
@@ -403,11 +412,10 @@ class Wayside:
         self.refresh_plc()
 
     def refresh_plc(self):
-
         # check if it is in manual mode and exit the refresh if so
-        if(not self.plcState):
+        if not self.plcState:
             return
-        
+
         for item in self.plcData:
             print("Evaluating Section:", item["Section"])
             print("Condition:", item["Condition"])
@@ -484,7 +492,7 @@ class Wayside:
                             signalState = "green"
                         elif signalState == "R":
                             signalState = "red"
-                        
+
                         self.get_block(signalNumber).set_lightstate(signalState)
                         # emit that a light value has been changed
                         TrackControllerToTrackModel.sendLightStateTrackModel.emit(
@@ -504,9 +512,7 @@ class Wayside:
         patternExitRange = r"^\((\d+)->(\d+)\)$"
         patternAndNotExitRange = r"^(\d+) AND NOT\((\d+)->(\d+)\)$"
         patternAndExitRange = r"^\((\d+)->(\d+)\) AND \((\d+)->(\d+)\)$"
-        patternAndNotReverseExitRange = (
-            r"^\((\d+)->(\d+)\) AND NOT\((\d+)->(\d+)\)$"
-        )
+        patternAndNotReverseExitRange = r"^\((\d+)->(\d+)\) AND NOT\((\d+)->(\d+)\)$"
 
         if re.match(patternEntry, condition):
             entry = [int(condition)]
@@ -536,7 +542,6 @@ class Wayside:
 
         return entry, notExist, exitRange
 
-
     # This is the method that parses the operation following a condition within a PLC file
     def parse_operation(self, operationLine):
         if operationLine.startswith("SWITCH"):
@@ -565,6 +570,7 @@ class Wayside:
                 matchingBlocks.append(block)
         return matchingBlocks
 
+
 class Line:
     # initialize array which will hold all the waysides per line
     def __init__(self, trackID):
@@ -580,6 +586,7 @@ class Line:
             if wayside.get_waysidenum() == waysideNumber:
                 return wayside
         return None  # Return None if no matching Wayside is found
+
 
 class TrackControl(QMainWindow):
     def __init__(self, parent=None):
@@ -740,8 +747,8 @@ class TrackControl(QMainWindow):
         # Load the default plc programs for all wayside controllers
         self.wayside1G.run_plc("src/main/TrackController/plc_green.txt")
         self.wayside2G.run_plc("src/main/TrackController/plc_green.txt")
-        #self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
-        #self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
+        # self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
+        # self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
 
         # Connect the plc load button to its handler
         self.ui.plcImportButton.clicked.connect(lambda: self.import_plc())
@@ -750,10 +757,18 @@ class TrackControl(QMainWindow):
         self.ui.buttonMap.clicked.connect(lambda: self.handle_map())
 
         # Connect the automatic/manual mode button click to the wayside controller
-        self.ui.buttonMode.clicked.connect(lambda : self.handle_mode(self.lines[self.ui.lineSelect - 1].get_wayside(self.ui.waysideSelect).get_plc_state()))
+        self.ui.buttonMode.clicked.connect(
+            lambda: self.handle_mode(
+                self.lines[self.ui.lineSelect - 1]
+                .get_wayside(self.ui.waysideSelect)
+                .get_plc_state()
+            )
+        )
 
         # Connect the signal (currentIndexChanged) to display the proper mode in the GUI
-        self.ui.comboboxWayside.currentIndexChanged.connect(self.handle_selection_wayside)
+        self.ui.comboboxWayside.currentIndexChanged.connect(
+            self.handle_selection_wayside
+        )
 
         # Connect the signal (currentIndexChanged) to the slot (handle_selection)
         self.ui.comboboxBlockType.currentIndexChanged.connect(
@@ -765,8 +780,9 @@ class TrackControl(QMainWindow):
         )
 
         # Connect output signals to the track model to also call the switch state handler
-        TrackControllerToTrackModel.sendSwitchStateTrackModel.connect(self.set_switchstate_handler)
-
+        TrackControllerToTrackModel.sendSwitchStateTrackModel.connect(
+            self.set_switchstate_handler
+        )
 
         # connect the input signals from the test bench to the main ui page handlers
         # self.ui.testBenchWindow.setSwitchState.connect(self.set_switchstate_handler)
@@ -866,6 +882,7 @@ class TrackControl(QMainWindow):
 
     def show_gui(self):
         self.ui.show()
+
     # This method is called whenever the import plc button is clicked
     def import_plc(self):
         if self.ui.waysideSelect == 0 or self.ui.lineSelect == 0:
@@ -889,7 +906,9 @@ class TrackControl(QMainWindow):
     def handle_mode(self, mode):
         mode = not mode
         print("Button Clicked: " + str(mode))
-        self.lines[self.ui.lineSelect - 1].get_wayside(self.ui.waysideSelect).set_plc_state(mode)
+        self.lines[self.ui.lineSelect - 1].get_wayside(
+            self.ui.waysideSelect
+        ).set_plc_state(mode)
 
     # This is the method and code for the wayside device selection combo box handler
     def handle_selection_wayside(self, index):
@@ -918,9 +937,13 @@ class TrackControl(QMainWindow):
             self.ui.comboboxBlockType.addItem("Junction w/Switch")
             self.ui.comboboxBlockType.addItem("Junction w/o Switch")
             self.ui.comboboxBlockType.addItem("Plain")
-            
-        if(self.ui.waysideSelect != 0 and self.ui.waysideSelect != -1):
-            self.ui.buttonMode.set_button_style(self.lines[self.ui.lineSelect - 1].get_wayside(self.ui.waysideSelect).get_plc_state())
+
+        if self.ui.waysideSelect != 0 and self.ui.waysideSelect != -1:
+            self.ui.buttonMode.set_button_style(
+                self.lines[self.ui.lineSelect - 1]
+                .get_wayside(self.ui.waysideSelect)
+                .get_plc_state()
+            )
 
     # This is the method and code for the block type selection combo box handler
     def handle_selection_block_type(self):
@@ -1025,8 +1048,12 @@ class TrackControl(QMainWindow):
                 self.ui.junctionSwitch.set_switch_state(tempBlock.get_switchstate())
                 self.ui.lightState.set_state(tempBlock.get_lightstate())
 
-                self.ui.junctionSwitch.update_button_visibility(self.lines[self.ui.lineSelect - 1].get_wayside(self.ui.waysideSelect).get_plc_state())
-                
+                self.ui.junctionSwitch.update_button_visibility(
+                    self.lines[self.ui.lineSelect - 1]
+                    .get_wayside(self.ui.waysideSelect)
+                    .get_plc_state()
+                )
+
                 self.ui.junctionSwitch.set_text_box(
                     blockNum, tempBlock.get_connected()[0], tempBlock.get_connected()[1]
                 )
@@ -1038,8 +1065,18 @@ class TrackControl(QMainWindow):
                 self.ui.lightState.lightChanged.connect(tempBlock.set_lightstate)
 
                 # Pass signals on to the track model
-                TrackControllerToTrackModel.sendSwitchStateTrackModel.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_switchstate())
-                TrackControllerToTrackModel.sendLightStateTrackModel.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_lightstate())
+                TrackControllerToTrackModel.sendSwitchStateTrackModel.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_switchstate(),
+                )
+                TrackControllerToTrackModel.sendLightStateTrackModel.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_lightstate(),
+                )
 
             elif blockType == "junctionNS":
                 self.ui.blockStatus.show()
@@ -1049,7 +1086,12 @@ class TrackControl(QMainWindow):
                 self.ui.lightState.show()
                 self.ui.lightState.lightChanged.connect(tempBlock.set_lightstate)
                 # Pass signal on to the track model
-                TrackControllerToTrackModel.sendLightStateTrackModel.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_lightstate())
+                TrackControllerToTrackModel.sendLightStateTrackModel.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_lightstate(),
+                )
 
             elif blockType == "station":
                 # blockStatus.shift_middle()
@@ -1061,7 +1103,7 @@ class TrackControl(QMainWindow):
 
             elif blockType == "crossing":
                 # blockStatus.shift_middle()
-                #self.ui.deviceBlock.show()
+                # self.ui.deviceBlock.show()
                 self.ui.blockStatus.show()
                 self.ui.crossing.set_crossing_state(tempBlock.get_crossingstate())
                 self.ui.crossing.show_crossing()
@@ -1078,73 +1120,81 @@ class TrackControl(QMainWindow):
                 self.ui.lightState.lightChanged.connect(tempBlock.set_lightstate)
 
                 # Pass signals on to the track model
-                TrackControllerToTrackModel.sendSwitchStateTrackModel.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_switch_state())
-                TrackControllerToTrackModel.sendLightStateTrackModel.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_lightstate())
-
+                TrackControllerToTrackModel.sendSwitchStateTrackModel.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_switch_state(),
+                )
+                TrackControllerToTrackModel.sendLightStateTrackModel.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_lightstate(),
+                )
 
     # These are the handle methods for the set states
     def set_switchstate_handler(self, line, wayside, num, state):
-            self.lines[line - 1].get_wayside(wayside).get_block(num).set_switchstate(state)
-            # check if the block is currently being displayed, if so, update the display accordingly
-            blockNum = 0
-            selectedItem = self.ui.comboboxBlockNum.currentText()
-            if selectedItem != "Select State" and selectedItem != "":
-                blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
-            if blockNum == (num - 1):
-                self.ui.junctionSwitch.set_switch_state(state)
-            self.ui.testBenchWindow.refreshed.emit(True)
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_switchstate(state)
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = 0
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        if selectedItem != "Select State" and selectedItem != "":
+            blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
+        if blockNum == (num - 1):
+            self.ui.junctionSwitch.set_switch_state(state)
+        self.ui.testBenchWindow.refreshed.emit(True)
 
     def set_occupancystate_handler(self, line, wayside, num, state):
-            self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
-                state
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
+            state
+        )
+        self.lines[line - 1].get_wayside(wayside).refresh_plc()
+        # update the occupancy table
+        if state == False:
+            self.ui.occupancyBox.remove_item_by_blocknumber(num)
+        elif self.ui.occupancyBox.does_block_exist(
+            num,
+            self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate(),
+        ):
+            pass
+        elif state:
+            blockStr = "Block {}".format(num)
+            self.ui.occupancyBox.add_item(
+                blockStr,
+                self.lines[line - 1].get_wayside(wayside).get_block(num).get_type(),
+                str(
+                    self.lines[line - 1]
+                    .get_wayside(wayside)
+                    .get_block(num)
+                    .get_failurestate()
+                ),
             )
-            self.lines[line - 1].get_wayside(wayside).refresh_plc()
-            # update the occupancy table
-            if state == False:
-                self.ui.occupancyBox.remove_item_by_blocknumber(num)
-            elif self.ui.occupancyBox.does_block_exist(
-                num,
-                self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate(),
-            ):
-                pass
-            elif state:
-                blockStr = "Block {}".format(num)
-                self.ui.occupancyBox.add_item(
-                    blockStr,
-                    self.lines[line - 1].get_wayside(wayside).get_block(num).get_type(),
-                    str(
-                        self.lines[line - 1]
-                        .get_wayside(wayside)
-                        .get_block(num)
-                        .get_failurestate()
-                    ),
-                )
 
-            # check if the block is currently being displayed, if so, update the display accordingly
-            selectedItem = self.ui.comboboxBlockNum.currentText()
-            match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
-            if match:
-                blockNum = int(match.group(1))
-                print(f"Block number: {blockNum}")
-                if blockNum == num:
-                    if (
-                        self.lines[line - 1]
-                        .get_wayside(wayside)
-                        .get_block(num)
-                        .get_maintenancestate()
-                    ):
-                        pass
-                    elif state:
-                        self.ui.blockStatus.set_status("Occupied")
-                    else:
-                        self.ui.blockStatus.set_status("Unoccupied")
-            else:
-                print("Pattern not matched")
+        # check if the block is currently being displayed, if so, update the display accordingly
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
+        if match:
+            blockNum = int(match.group(1))
+            print(f"Block number: {blockNum}")
+            if blockNum == num:
+                if (
+                    self.lines[line - 1]
+                    .get_wayside(wayside)
+                    .get_block(num)
+                    .get_maintenancestate()
+                ):
+                    pass
+                elif state:
+                    self.ui.blockStatus.set_status("Occupied")
+                else:
+                    self.ui.blockStatus.set_status("Unoccupied")
+        else:
+            print("Pattern not matched")
 
-            
-            self.ui.testBenchWindow.refreshed.emit(True)
+        self.ui.testBenchWindow.refreshed.emit(True)
 
-            # This is the method and code for the block type selection combo box handler
+        # This is the method and code for the block type selection combo box handler
 
     def set_lightstate_handler(self, line, wayside, num, color):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_lightstate(color)

@@ -7,25 +7,26 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import csv
 
+
 class MainWindow(QMainWindow):
     # font variables
     textFontSize = 9
     labelFontSize = 12
     headerFontSize = 16
     titleFontSize = 22
-    fontStyle = 'Product Sans'
+    fontStyle = "Product Sans"
     # color variables
-    colorDarkBlue = '#085394'
-    colorLightRed = '#EA9999'
-    colorLightBlue = '#9FC5F8'
-    colorLightGrey = '#CCCCCC'
-    colorMediumGrey = '#DDDDDD'
-    colorDarkGrey = '#666666'
-    colorBlack = '#000000' 
+    colorDarkBlue = "#085394"
+    colorLightRed = "#EA9999"
+    colorLightBlue = "#9FC5F8"
+    colorLightGrey = "#CCCCCC"
+    colorMediumGrey = "#DDDDDD"
+    colorDarkGrey = "#666666"
+    colorBlack = "#000000"
     # dimensions
     w = 960
     h = 960
-    moduleName = 'CTC'
+    moduleName = "CTC"
 
     def __init__(self):
         super().__init__()
@@ -40,25 +41,29 @@ class MainWindow(QMainWindow):
         # body block
         self.bodyBlock = QLabel(self)
         self.bodyBlock.setGeometry(20, 20, 920, 920)
-        self.bodyBlock.setStyleSheet('background-color: white;'
-                                     'border: 1px solid black')
+        self.bodyBlock.setStyleSheet(
+            "background-color: white;" "border: 1px solid black"
+        )
 
         # header block
         self.headerBlock = QLabel(self)
         self.headerBlock.setGeometry(20, 20, 920, 70)
-        self.headerBlock.setStyleSheet('background-color:' + self.colorDarkBlue + ';'
-                                       'border: 1px solid black')
+        self.headerBlock.setStyleSheet(
+            "background-color:" + self.colorDarkBlue + ";" "border: 1px solid black"
+        )
 
         # title
-        self.titleLabel = QLabel('Pittsburgh Metropolitan Transportation Authority', self)
+        self.titleLabel = QLabel(
+            "Pittsburgh Metropolitan Transportation Authority", self
+        )
         self.titleLabel.setFont(QFont(self.fontStyle, self.titleFontSize))
         self.titleLabel.setAlignment(Qt.AlignCenter)
-        self.titleLabel.setGeometry(120,35,400,400)
+        self.titleLabel.setGeometry(120, 35, 400, 400)
         self.titleLabel.adjustSize()
-        self.titleLabel.setStyleSheet('color: white')
+        self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap('MTA_NYC_logo.svg.png')
+        self.pixmapMTALogo = QtGui.QPixmap("MTA_NYC_logo.svg.png")
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(70, 70)
         self.logo = QLabel(self)
         self.logo.setPixmap(self.pixmapMTALogo)
@@ -66,95 +71,114 @@ class MainWindow(QMainWindow):
         self.logo.adjustSize()
 
         # module
-        self.moduleLabel = QLabel('Centralized Traffic Control', self)
+        self.moduleLabel = QLabel("Centralized Traffic Control", self)
         self.moduleLabel.setFont(QFont(self.fontStyle, self.headerFontSize))
         self.moduleLabel.setAlignment(Qt.AlignCenter)
         self.moduleLabel.move(30, 100)
         self.moduleLabel.adjustSize()
-        self.moduleLabel.setStyleSheet('color:' + self.colorDarkBlue)
+        self.moduleLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # test bench icon
-        self.pixmapGear = QtGui.QPixmap('gear_icon.png')
+        self.pixmapGear = QtGui.QPixmap("gear_icon.png")
         self.pixmapGear = self.pixmapGear.scaled(25, 25)
         self.testbenchIcon = QLabel(self)
         self.testbenchIcon.setPixmap(self.pixmapGear)
         self.testbenchIcon.setGeometry(30, 140, 32, 32)
 
         # test bench button
-        self.testbenchButton = QPushButton('Test Bench', self)
+        self.testbenchButton = QPushButton("Test Bench", self)
         self.testbenchButton.setFont(QFont(self.fontStyle, self.textFontSize))
         self.testbenchButton.setGeometry(60, 140, 100, 32)
-        self.testbenchButton.setStyleSheet('color:' + self.colorDarkBlue +
-                                           ';border: 1px solid white')
+        self.testbenchButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
 
         # system time input
-        self.systemTimeInput = QLabel('00:00:00', self)
+        self.systemTimeInput = QLabel("00:00:00", self)
         self.systemTimeInput.setFont(QFont(self.fontStyle, self.headerFontSize))
-        self.systemTimeInput.setGeometry(820,67,150,100)
-        self.systemTimeInput.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemTimeInput.setGeometry(820, 67, 150, 100)
+        self.systemTimeInput.setStyleSheet("color:" + self.colorDarkBlue)
 
         # system time label
-        self.systemTimeLabel = QLabel('System Time:', self)
+        self.systemTimeLabel = QLabel("System Time:", self)
         self.systemTimeLabel.setFont(QFont(self.fontStyle, self.headerFontSize))
         self.systemTimeLabel.adjustSize()
         self.systemTimeLabel.setGeometry(650, 65, 200, 100)
-        self.systemTimeLabel.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemTimeLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # system speed label
-        self.systemSpeedLabel = QLabel('System Speed:', self)
+        self.systemSpeedLabel = QLabel("System Speed:", self)
         self.systemSpeedLabel.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.systemSpeedLabel.setGeometry(700,140,100,100)
+        self.systemSpeedLabel.setGeometry(700, 140, 100, 100)
         self.systemSpeedLabel.adjustSize()
-        self.systemSpeedLabel.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemSpeedLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # system speed input
-        self.systemSpeedInput = QLabel('x1.0', self)
+        self.systemSpeedInput = QLabel("x1.0", self)
         self.systemSpeedInput.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.systemSpeedInput.setGeometry(850,127,50,50)
-        self.systemSpeedInput.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemSpeedInput.setGeometry(850, 127, 50, 50)
+        self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
 
         # increase system speed button
-        self.pixmapFastForward = QtGui.QPixmap('fast-forward.svg')
+        self.pixmapFastForward = QtGui.QPixmap("fast-forward.svg")
         self.pixmapFastForward = self.pixmapFastForward.scaled(20, 20)
         self.speedUpButton = QPushButton(self)
         self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
         self.speedUpButton.setGeometry(890, 143, 20, 20)
-        self.speedUpButton.setStyleSheet('color:' + self.colorDarkBlue +
-                                         ';border: 1px solid white')
+        self.speedUpButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
 
         # decrease system speed button
-        self.pixmapRewind = QtGui.QPixmap('rewind.svg')
+        self.pixmapRewind = QtGui.QPixmap("rewind.svg")
         self.pixmapRewind = self.pixmapRewind.scaled(20, 20)
         self.slowDownButton = QPushButton(self)
         self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
         self.slowDownButton.setGeometry(819, 143, 20, 20)
-        self.slowDownButton.setStyleSheet('color:' + self.colorDarkBlue +
-                                          ';border: 1px solid white')
-        
-################################# MODE BUTTONS #############################################################################
+        self.slowDownButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
+
+        ################################# MODE BUTTONS #############################################################################
         self.last_clicked_button = None
         # Add an "Automatic Mode" button
         self.automatic = QPushButton("Automatic Mode", self)
-        self.automatic.setGeometry(30, 180, 130, 30)  # Set the button's position and size
+        self.automatic.setGeometry(
+            30, 180, 130, 30
+        )  # Set the button's position and size
         self.automatic.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.automatic.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkBlue + '; border: 1px solid black')
-        self.automatic.clicked.connect(self.automaticButtonClicked) 
+        self.automatic.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
+        self.automatic.clicked.connect(self.automaticButtonClicked)
 
         # Manual Button
         self.manual = QPushButton("Manual Mode", self)
         self.manual.setGeometry(165, 180, 130, 30)  # Set the button's position and size
         self.manual.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.manual.setStyleSheet('background-color: white; color:' + 
-                                  self.colorBlack + '; border: 1px solid black')
-        self.manual.clicked.connect(self.manualButtonClicked) 
-        
+        self.manual.setStyleSheet(
+            "background-color: white; color:"
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
+        self.manual.clicked.connect(self.manualButtonClicked)
+
         # Maintenance Button
         self.maintenance = QPushButton("Maintenance Mode", self)
-        self.maintenance.setGeometry(300, 180, 130, 30)  # Set the button's position and size
+        self.maintenance.setGeometry(
+            300, 180, 130, 30
+        )  # Set the button's position and size
         self.maintenance.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.maintenance.setStyleSheet('background-color: white; color:' +
-                                        self.colorBlack + '; border: 1px solid black')
-        self.maintenance.clicked.connect(self.maintenanceButtonClicked) 
+        self.maintenance.setStyleSheet(
+            "background-color: white; color:"
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
+        self.maintenance.clicked.connect(self.maintenanceButtonClicked)
 
         # Select a Line
         self.selectLine = QComboBox(self)
@@ -164,17 +188,22 @@ class MainWindow(QMainWindow):
         self.selectLine.addItem("Green Line")
         self.selectLine.addItem("Red Line")
         self.selectLine.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.selectLine.currentIndexChanged.connect(self.getSelectedLine)  
-        
+        self.selectLine.currentIndexChanged.connect(self.getSelectedLine)
+
         # CSV File Button
         self.inputSchedule = QPushButton("Import Schedule", self)
-        self.inputSchedule.setGeometry(165, 220, 130, 30)  # Set the button's position and size
+        self.inputSchedule.setGeometry(
+            165, 220, 130, 30
+        )  # Set the button's position and size
         self.inputSchedule.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.inputSchedule.setStyleSheet('background-color: white; color:' + 
-                                         self.colorBlack + '; border: 1px solid black')
-        self.inputSchedule.clicked.connect(self.load_file)    
+        self.inputSchedule.setStyleSheet(
+            "background-color: white; color:"
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
+        self.inputSchedule.clicked.connect(self.load_file)
 
-################################# Automatic ###################################################################
+        ################################# Automatic ###################################################################
         # Error text
         self.error_label = QLabel("", self)
         self.error_label.setFont(QFont(self.fontStyle, self.textFontSize))
@@ -184,29 +213,38 @@ class MainWindow(QMainWindow):
         # Schedule Table
         self.schedule_header = QLabel("Schedule:", self)
         self.schedule_header.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.schedule_header.setGeometry(30,430,500,100)
+        self.schedule_header.setGeometry(30, 430, 500, 100)
         self.schedule_table = QTableWidget(self)
         self.schedule_table.setColumnCount(6)
-        self.schedule_table.setHorizontalHeaderLabels(["Train ID", "Departing From","Stops", "Arrival Station", "Departure Time", "Arrival Time"])
-        self.schedule_table.setStyleSheet("background-color: white;")  
-        self.schedule_table.setGeometry(35,500,890,430)
-        self.schedule_table.setColumnWidth(0, 150) 
-        self.schedule_table.setColumnWidth(1, 150)  
-        self.schedule_table.setColumnWidth(2, 170) 
-        self.schedule_table.setColumnWidth(3, 150) 
-        self.schedule_table.setColumnWidth(4, 150) 
+        self.schedule_table.setHorizontalHeaderLabels(
+            [
+                "Train ID",
+                "Departing From",
+                "Stops",
+                "Arrival Station",
+                "Departure Time",
+                "Arrival Time",
+            ]
+        )
+        self.schedule_table.setStyleSheet("background-color: white;")
+        self.schedule_table.setGeometry(35, 500, 890, 430)
+        self.schedule_table.setColumnWidth(0, 150)
+        self.schedule_table.setColumnWidth(1, 150)
+        self.schedule_table.setColumnWidth(2, 170)
+        self.schedule_table.setColumnWidth(3, 150)
+        self.schedule_table.setColumnWidth(4, 150)
         self.schedule_table.setColumnWidth(5, 130)
         self.schedule_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Occupancy Table
         self.occupancy_header = QLabel("Occupied Blocks:", self)
         self.occupancy_header.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.occupancy_header.setGeometry(675,159,120,100)
+        self.occupancy_header.setGeometry(675, 159, 120, 100)
         self.occupancy_table = QTableWidget(self)
         self.occupancy_table.setColumnCount(2)
         self.occupancy_table.setHorizontalHeaderLabels(["Block", "Line"])
-        self.occupancy_table.setStyleSheet("background-color: white;")  
-        self.occupancy_table.setGeometry(675,225,252,265)
+        self.occupancy_table.setStyleSheet("background-color: white;")
+        self.occupancy_table.setGeometry(675, 225, 252, 265)
 
         # Throughput per line
         self.throughput_label = QLabel("Throughput: N/A", self)
@@ -223,15 +261,14 @@ class MainWindow(QMainWindow):
         self.authority_label.setFont(QFont(self.fontStyle, self.textFontSize))
         self.authority_label.setGeometry(50, 325, 600, 50)
 
-
-############################################## MANUAL MODE #################################################################
+        ############################################## MANUAL MODE #################################################################
         # Departing Station
         self.departingStation = QComboBox(self)
         self.departingStation.setVisible(False)
         self.departingStation.setGeometry(50, 275, 200, 55)
         self.departingStation.addItem("Select a Departing Station")
         self.selectLine.currentIndexChanged.connect(self.updateDepartingStations)
-        self.departingStation.setFont(QFont(self.fontStyle, 9)) 
+        self.departingStation.setFont(QFont(self.fontStyle, 9))
 
         # Next Station
         self.arrivalStation = QComboBox(self)
@@ -239,15 +276,21 @@ class MainWindow(QMainWindow):
         self.arrivalStation.setGeometry(50, 350, 200, 55)
         self.arrivalStation.addItem("Select Arrival Station")
         self.selectLine.currentIndexChanged.connect(self.updateArrivalStation)
-        self.arrivalStation.setFont(QFont(self.fontStyle, 9))  
+        self.arrivalStation.setFont(QFont(self.fontStyle, 9))
 
         # Send Train Button
         self.sendTrain = QPushButton("Send Train", self)
         self.sendTrain.setVisible(False)
-        self.sendTrain.setGeometry(775,537,150,50)
+        self.sendTrain.setGeometry(775, 537, 150, 50)
         self.sendTrain.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.sendTrain.setStyleSheet('background-color: ' + self.colorLightRed + '; color: ' + self.colorBlack + '; border: 1px solid black')
-        self.sendTrain.clicked.connect(self.sendTrainClicked) 
+        self.sendTrain.setStyleSheet(
+            "background-color: "
+            + self.colorLightRed
+            + "; color: "
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
+        self.sendTrain.clicked.connect(self.sendTrainClicked)
 
         # Input an arrival time
         self.arrivalTime = QLineEdit(self)
@@ -256,39 +299,51 @@ class MainWindow(QMainWindow):
         self.arrivalHeader = QLabel("Input an Arrival Time:", self)
         self.arrivalHeader.setFont(QFont(self.fontStyle, self.textFontSize))
         self.arrivalHeader.setVisible(False)
-        self.arrivalHeader.setGeometry(50,380, 200, 100)
-        self.arrivalTime.setGeometry(50,450,200,50)
+        self.arrivalHeader.setGeometry(50, 380, 200, 100)
+        self.arrivalTime.setGeometry(50, 450, 200, 50)
 
         # Add Stop Button
         self.addStopButton = QPushButton("Add Stop", self)
         self.addStopButton.setVisible(False)
         self.addStopButton.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.addStopButton.setGeometry(450, 275, 100, 50)  
-        self.addStopButton.setStyleSheet('background-color: white; color: ' + self.colorDarkBlue + '; border: 1px solid black')
+        self.addStopButton.setGeometry(450, 275, 100, 50)
+        self.addStopButton.setStyleSheet(
+            "background-color: white; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
         self.addStopButton.clicked.connect(self.addStopPressed)
         self.current_departing_station = None
 
         # Add Stop Dropdown
         self.addStopDropdown = QComboBox(self)
-        self.addStopDropdown.setGeometry(275,275,165,50)
+        self.addStopDropdown.setGeometry(275, 275, 165, 50)
         self.addStopDropdown.hide()
-        self.stops = [] 
+        self.stops = []
         self.current_stop_index = 0
         self.update_timer = QTimer(self)
-        
-        self.selectLine.currentIndexChanged.connect(self.updateStopDropDown)  # Connect the signal to update the dropdown
-        self.max_block = None 
+
+        self.selectLine.currentIndexChanged.connect(
+            self.updateStopDropDown
+        )  # Connect the signal to update the dropdown
+        self.max_block = None
 
         self.show()
 
     # function for if automatic button is pressed
-    def automaticButtonClicked(self):        
+    def automaticButtonClicked(self):
         # Unhighlight the last clicked button, if any
         if self.last_clicked_button:
             self.last_clicked_button.setStyleSheet("")
-        
+
         self.last_clicked_button = self.automatic
-        self.automatic.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkBlue + '; border: 1px solid black')
+        self.automatic.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
 
         self.throughput_label.setVisible(True)
         self.speed_label.setVisible(True)
@@ -296,9 +351,9 @@ class MainWindow(QMainWindow):
         self.occupancy_header.setVisible(True)
         self.occupancy_table.setVisible(True)
         self.schedule_table.setVisible(True)
-        self.schedule_table.setGeometry(35,500,890,430)
+        self.schedule_table.setGeometry(35, 500, 890, 430)
         self.schedule_header.setVisible(True)
-        self.schedule_header.setGeometry(30,430,500,100)
+        self.schedule_header.setGeometry(30, 430, 500, 100)
         self.selectLine.setVisible(True)
         self.inputSchedule.setVisible(True)
         self.departingStation.setVisible(False)
@@ -310,15 +365,25 @@ class MainWindow(QMainWindow):
         self.addStopDropdown.setVisible(False)
 
     # function for if manual button is pressed
-    def manualButtonClicked(self): 
-        self.automatic.setStyleSheet('background-color: white; color:' + self.colorBlack + '; border: 1px solid black')       
+    def manualButtonClicked(self):
+        self.automatic.setStyleSheet(
+            "background-color: white; color:"
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
         # Unhighlight the last clicked button, if any
         if self.last_clicked_button:
             self.last_clicked_button.setStyleSheet("")
-        
+
         self.last_clicked_button = self.manual
-        self.manual.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkBlue + '; border: 1px solid black')
-        
+        self.manual.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
+
         # Hide the elements
         self.throughput_label.setVisible(False)
         self.speed_label.setVisible(False)
@@ -326,9 +391,9 @@ class MainWindow(QMainWindow):
         self.occupancy_header.setVisible(False)
         self.occupancy_table.setVisible(False)
         self.schedule_table.setVisible(True)
-        self.schedule_table.setGeometry(35,600,890,330)
+        self.schedule_table.setGeometry(35, 600, 890, 330)
         self.schedule_header.setVisible(True)
-        self.schedule_header.setGeometry(30,528,100,100)
+        self.schedule_header.setGeometry(30, 528, 100, 100)
         self.selectLine.setVisible(True)
         self.inputSchedule.setVisible(True)
         self.departingStation.setVisible(True)
@@ -340,14 +405,24 @@ class MainWindow(QMainWindow):
         self.addStopDropdown.setVisible(True)
 
     # function for if maintenance button is pressed
-    def maintenanceButtonClicked(self):     
-        self.automatic.setStyleSheet('background-color: white; color:' + self.colorBlack + '; border: 1px solid black')      
+    def maintenanceButtonClicked(self):
+        self.automatic.setStyleSheet(
+            "background-color: white; color:"
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
         # Unhighlight the last clicked button, if any
         if self.last_clicked_button:
             self.last_clicked_button.setStyleSheet("")
-        
+
         self.last_clicked_button = self.maintenance
-        self.maintenance.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkBlue + '; border: 1px solid black')
+        self.maintenance.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
 
         self.throughput_label.setVisible(False)
         self.speed_label.setVisible(False)
@@ -372,23 +447,29 @@ class MainWindow(QMainWindow):
             # Set the error message text
             self.error_label.setText("Please select a line.")
             return
-        
+
         self.error_label.clear()
 
         options = QFileDialog.Options()
-        filePath, _ = QFileDialog.getOpenFileName(self, "Open CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        filePath, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open CSV File",
+            "",
+            "CSV Files (*.csv);;All Files (*)",
+            options=options,
+        )
 
         if filePath:
             with open(filePath, "r") as file:
                 csv_content = file.read()
 
             # Split the CSV content into rows
-            rows = csv_content.split('\n')
+            rows = csv_content.split("\n")
 
             # Determine the number of rows and columns for the table
             num_rows = len(rows)
             if num_rows > 0:
-                num_columns = len(rows[0].split(','))
+                num_columns = len(rows[0].split(","))
 
                 # Create a QTableWidget
                 self.schedule_table.setRowCount(num_rows)
@@ -396,18 +477,18 @@ class MainWindow(QMainWindow):
 
                 # Populate the table with CSV data
                 for i, row in enumerate(rows):
-                    columns = row.split(',')
+                    columns = row.split(",")
                     for j, value in enumerate(columns):
                         item = QTableWidgetItem(value)
                         self.schedule_table.setItem(i, j, item)
-            
+
         # This makes the table uneditable
         for row in range(self.schedule_table.rowCount()):
             for col in range(self.schedule_table.columnCount()):
                 item = self.schedule_table.item(row, col)
                 if item:
                     item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-    
+
     def setThroughput(self, throughput_value):
         self.throughput_label.setText("Throughput: " + str(throughput_value))
 
@@ -437,7 +518,7 @@ class MainWindow(QMainWindow):
         speed_value = speed_text.replace("Commanded Speed (mph): ", "")
         # You may want to handle potential conversion errors if needed
         return float(speed_value) if speed_value != "N/A" else None
-    
+
     def updateDepartingStations(self):
         # Clear the existing items in the departingStation ComboBox
         self.departingStation.clear()
@@ -454,14 +535,38 @@ class MainWindow(QMainWindow):
         if selected_line == "Blue Line":
             self.available_stations = ["Station B", "Station C"]
         elif selected_line == "Red Line":
-            self.available_stations = ["Shadyside", "Herron Ave", "Swissville", "Penn Station", "Steel Plaza", "First Ave", "Station Square", "South Hills Junction"]
+            self.available_stations = [
+                "Shadyside",
+                "Herron Ave",
+                "Swissville",
+                "Penn Station",
+                "Steel Plaza",
+                "First Ave",
+                "Station Square",
+                "South Hills Junction",
+            ]
         elif selected_line == "Green Line":
-            self.available_stations = ["Pioneer", "Edgebrook", "Whited", "South Bank", "Central", "IngleWood", "OverBrook", "Glenbury", "Dormont", "Mt Lebanon", "Poplar", "Castle Shannon"]
+            self.available_stations = [
+                "Pioneer",
+                "Edgebrook",
+                "Whited",
+                "South Bank",
+                "Central",
+                "IngleWood",
+                "OverBrook",
+                "Glenbury",
+                "Dormont",
+                "Mt Lebanon",
+                "Poplar",
+                "Castle Shannon",
+            ]
         else:
             self.available_stations = []
 
         # Filter out stations that are already in 'stops'
-        self.available_stations = [station for station in self.available_stations if station not in self.stops]
+        self.available_stations = [
+            station for station in self.available_stations if station not in self.stops
+        ]
 
         # Add the updated available stations to the drop-down
         self.arrivalStation.addItems(self.available_stations)
@@ -476,15 +581,31 @@ class MainWindow(QMainWindow):
         if selected_line == "Select a Line":
             QMessageBox.critical(self, "Invalid Selection", "Please select a line.")
         elif departing_station == "Select a Departing Station":
-            QMessageBox.critical(self, "Invalid Selection", "Please select a departing station.")
+            QMessageBox.critical(
+                self, "Invalid Selection", "Please select a departing station."
+            )
         elif arrival_station == "Select Arrival Station":
-            QMessageBox.critical(self, "Invalid Selection", "Please select an arrival station.")
+            QMessageBox.critical(
+                self, "Invalid Selection", "Please select an arrival station."
+            )
         elif arrival_time and (not arrival_time.isdigit() or len(arrival_time) != 4):
-            QMessageBox.critical(self, "Invalid Arrival Time", "Please enter a valid military time (HHmm).")
+            QMessageBox.critical(
+                self,
+                "Invalid Arrival Time",
+                "Please enter a valid military time (HHmm).",
+            )
         elif arrival_time and int(arrival_time) > 2359:
-            QMessageBox.critical(self, "Invalid Arrival Time", "Arrival time cannot exceed 2359.")
-        elif arrival_time and int(arrival_time) < int(QTime.currentTime().toString("HHmm")):
-            QMessageBox.critical(self, "Invalid Arrival Time", "Arrival time cannot be before the current time.")
+            QMessageBox.critical(
+                self, "Invalid Arrival Time", "Arrival time cannot exceed 2359."
+            )
+        elif arrival_time and int(arrival_time) < int(
+            QTime.currentTime().toString("HHmm")
+        ):
+            QMessageBox.critical(
+                self,
+                "Invalid Arrival Time",
+                "Arrival time cannot be before the current time.",
+            )
         else:
             arrival_stations = []
             arrival_stations.extend(self.stops)
@@ -497,21 +618,23 @@ class MainWindow(QMainWindow):
                 elif selected_line == "Blue Line":
                     print("blue line")
                 elif selected_line == "Green Line":
-                    routing = Routing('GreenLine.csv') 
+                    routing = Routing("GreenLine.csv")
                     arrival_station_to_find = arrival_station
                     station_info = routing.find_station_info(arrival_station_to_find)
 
                     if station_info:
                         # Add station and its information as a dictionary to the list
-                        station_info_list.append({"Station": arrival_station_to_find, "Info": station_info})
+                        station_info_list.append(
+                            {"Station": arrival_station_to_find, "Info": station_info}
+                        )
                     else:
                         print(f"Station '{arrival_station_to_find}' not found.")
-                
+
             # Now you have station_info_list with information for each station
             for station_info_entry in station_info_list:
                 print(f"Station: {station_info_entry['Station']}")
                 print("Block Information:")
-                for info in station_info_entry['Info']:
+                for info in station_info_entry["Info"]:
                     for key, value in info.items():
                         print(f"{key}:", value)
                     print()
@@ -519,55 +642,73 @@ class MainWindow(QMainWindow):
             if station_info_list:
                 departure_station_info = routing.find_station_info(departing_station)
                 if departure_station_info:
-                    path = routing.find_path(departing_station, arrival_stations, station_info)
+                    path = routing.find_path(
+                        departing_station, arrival_stations, station_info
+                    )
                     print("Path: ", path)
                     travel = routing.find_travel_path(path)
                     print("Travel: ", travel)
 
-            self.update_schedule_table(selected_line, departing_station, arrival_station, arrival_time)
+            self.update_schedule_table(
+                selected_line, departing_station, arrival_station, arrival_time
+            )
             # Clear the input fields and hide them
             self.departingStation.setCurrentIndex(0)
             self.arrivalStation.setCurrentIndex(0)
             self.arrivalTime.clear()
             self.stops.clear()
 
-    def update_schedule_table(self, selected_line, departing_station, arrival_station, arrival_time):
+    def update_schedule_table(
+        self, selected_line, departing_station, arrival_station, arrival_time
+    ):
         arrival_time = self.arrivalTime.text()
         current_time1 = QTime.currentTime()
         if not arrival_time:
             current_time2 = current_time1.addSecs(4 * 60)  # 4 minutes = 4 * 60 seconds
             departure_time = current_time1.toString("HHmm")
-            formatted_time = current_time2.toString("HHmm")                   
+            formatted_time = current_time2.toString("HHmm")
         else:
             departure_time = current_time1.toString("HHmm")
-            formatted_time = arrival_time      
+            formatted_time = arrival_time
 
         # create a unique train ID
-        train_id = f'{departure_time}{departing_station[0].upper()}{departing_station[-1].upper()}{arrival_station[0].upper()}{arrival_station[-1].upper()}'
+        train_id = f"{departure_time}{departing_station[0].upper()}{departing_station[-1].upper()}{arrival_station[0].upper()}{arrival_station[-1].upper()}"
 
         # Determine where to insert the new row in the schedule table
         row_position = self.schedule_table.rowCount()
 
         # Insert a new row in the schedule table
         self.schedule_table.insertRow(row_position)
-        stops_str = ', '.join(self.stops)
+        stops_str = ", ".join(self.stops)
 
         # Add the train information to the table
-        self.schedule_table.setItem(row_position, 0, QTableWidgetItem(train_id))  # Train ID
-        self.schedule_table.setItem(row_position, 1, QTableWidgetItem(departing_station))  # Departing Station
-        self.schedule_table.setItem(row_position, 2, QTableWidgetItem(stops_str))  # Stops
-        self.schedule_table.setItem(row_position, 3, QTableWidgetItem(arrival_station))  # Arrival Station
-        self.schedule_table.setItem(row_position, 4, QTableWidgetItem(departure_time))  # Departure Time
-        self.schedule_table.setItem(row_position, 5, QTableWidgetItem(formatted_time))  # Arrival Time
-        
+        self.schedule_table.setItem(
+            row_position, 0, QTableWidgetItem(train_id)
+        )  # Train ID
+        self.schedule_table.setItem(
+            row_position, 1, QTableWidgetItem(departing_station)
+        )  # Departing Station
+        self.schedule_table.setItem(
+            row_position, 2, QTableWidgetItem(stops_str)
+        )  # Stops
+        self.schedule_table.setItem(
+            row_position, 3, QTableWidgetItem(arrival_station)
+        )  # Arrival Station
+        self.schedule_table.setItem(
+            row_position, 4, QTableWidgetItem(departure_time)
+        )  # Departure Time
+        self.schedule_table.setItem(
+            row_position, 5, QTableWidgetItem(formatted_time)
+        )  # Arrival Time
+
     def setBlueSchedule(self):
         # Clear the existing items in the schedule table
         self.schedule_table.clearContents()
         self.schedule_table.setRowCount(0)
 
         blue_line_schedule = [
-            ("BlueTrain1", "Yard", "Stops","Station B", "0800", "0830"),
-            ("BlueTrain2", "Yard", "Stops","Station C", "0900", "0930"),
+            ("BlueTrain1", "Yard", "Stops", "Station B", "0800", "0830"),
+            ("BlueTrain2", "Yard", "Stops", "Station C", "0900", "0930"),
         ]
 
         # Set the number of rows in the schedule table
@@ -623,10 +764,10 @@ class MainWindow(QMainWindow):
         # Clear the existing items in the schedule table
         self.schedule_table.clearContents()
         self.schedule_table.setRowCount(0)
-        
-        # No line selected, do nothing  
+
+        # No line selected, do nothing
         if selected_line == "Select a Line":
-            return  
+            return
         elif selected_line == "Blue Line":
             self.setBlueSchedule()
         elif selected_line == "Red Line":
@@ -641,25 +782,62 @@ class MainWindow(QMainWindow):
         available_stations = []
 
         if selected_line == "Blue Line":
-            available_stations = ["Select a Station to stop at", "Station B", "Station C"]
+            available_stations = [
+                "Select a Station to stop at",
+                "Station B",
+                "Station C",
+            ]
         elif selected_line == "Red Line":
-            available_stations = ["Select a Station to stop at", "Shadyside", "Herron Ave", "Swissville", "Penn Station", "Steel Plaza", "First Ave", "Station Square", "South Hills Junction"]
+            available_stations = [
+                "Select a Station to stop at",
+                "Shadyside",
+                "Herron Ave",
+                "Swissville",
+                "Penn Station",
+                "Steel Plaza",
+                "First Ave",
+                "Station Square",
+                "South Hills Junction",
+            ]
         elif selected_line == "Green Line":
-            available_stations = ["Select a Station to stop at", "Pioneer", "Edgebrook", "Whited", "South Bank", "Central", "IngleWood", "OverBrook", "Glenbury", "Dormont", "Mt Lebanon", "Poplar", "Castle Shannon"]
+            available_stations = [
+                "Select a Station to stop at",
+                "Pioneer",
+                "Edgebrook",
+                "Whited",
+                "South Bank",
+                "Central",
+                "IngleWood",
+                "OverBrook",
+                "Glenbury",
+                "Dormont",
+                "Mt Lebanon",
+                "Poplar",
+                "Castle Shannon",
+            ]
 
         if self.arrivalStation.currentText() == "Select an Arrival Station":
             # If arrival station is not selected, add all available stations
-            QMessageBox.warning(self, "Error", "Please select an Arrival Station first.")
+            QMessageBox.warning(
+                self, "Error", "Please select an Arrival Station first."
+            )
         else:
             # Filter out stations that are already in 'stops' and remove the arrival station
-            available_stations = [station for station in available_stations if station not in self.stops and station != self.arrivalStation.currentText()]
+            available_stations = [
+                station
+                for station in available_stations
+                if station not in self.stops
+                and station != self.arrivalStation.currentText()
+            ]
             self.addStopDropdown.addItems(available_stations)
 
     def addStopPressed(self):
         print(self.arrivalStation)
         if self.arrivalStation.currentText() == "Select an Arrival Station":
             # Show an error message if arrival station is not selected
-            QMessageBox.warning(self, "Error", "Please select an Arrival Station first.")
+            QMessageBox.warning(
+                self, "Error", "Please select an Arrival Station first."
+            )
         else:
             # Get the selected station
             selected_station = self.addStopDropdown.currentText()
@@ -672,7 +850,7 @@ class MainWindow(QMainWindow):
                 # Reset the dropdown to index 0
                 self.addStopDropdown.setCurrentIndex(0)
                 print("Stops:", self.stops)
-    
+
     def setMaxBlock(self, selected_line):
         # Set the max_block based on the selected line
         if selected_line == "Red Line":
@@ -687,7 +865,8 @@ class MainWindow(QMainWindow):
         if self.max_block is None:
             self.set_max_block(selected_line)
         return self.max_block
-    
+
+
 class Routing:
     def __init__(self, filename):
         self.filename = filename
@@ -695,7 +874,7 @@ class Routing:
 
     def load_data(self):
         data = []
-        with open(self.filename, 'r') as file:
+        with open(self.filename, "r") as file:
             csv_reader = csv.reader(file)
             for line in csv_reader:
                 data.append(line)
@@ -729,13 +908,15 @@ class Routing:
                         "Station_Side": Station_Side,
                         "ELEVATION": ELEVATION,
                         "CUMALTIVE_ELEVATION": CUMALTIVE_ELEVATION,
-                        "seconds_to_traverse_block": seconds_to_traverse_block
+                        "seconds_to_traverse_block": seconds_to_traverse_block,
                     }
         return None
 
     def find_station_info(self, arrival_station):
         station_info = []
-        arrival_station = arrival_station.lower()  # Convert the input to lowercase for case-insensitive search
+        arrival_station = (
+            arrival_station.lower()
+        )  # Convert the input to lowercase for case-insensitive search
 
         for row in self.data:
             if len(row) >= 8:
@@ -748,17 +929,19 @@ class Routing:
                     Station_Side = row[7]
                     seconds_to_traverse_block = float(row[10])
 
-                    station_info.append({
-                        "Line": Line,
-                        "Block_Number": Block_Number,
-                        "Block_Length": Block_Length,
-                        "Speed_Limit": Speed_Limit,
-                        "Station": Station,
-                        "Station_Side": Station_Side,
-                        "seconds_to_traverse_block": seconds_to_traverse_block
-                    })
+                    station_info.append(
+                        {
+                            "Line": Line,
+                            "Block_Number": Block_Number,
+                            "Block_Length": Block_Length,
+                            "Speed_Limit": Speed_Limit,
+                            "Station": Station,
+                            "Station_Side": Station_Side,
+                            "seconds_to_traverse_block": seconds_to_traverse_block,
+                        }
+                    )
         return station_info
-    
+
     def find_path(self, departure_station, arrival_stations, stops):
         self.path = []
         added_stations = []
@@ -772,7 +955,9 @@ class Routing:
 
         # Check if the departing station has already been added
         if departure_station not in added_stations:
-            self.path.append((departure_station, departure_station_info[0]['Block_Number']))
+            self.path.append(
+                (departure_station, departure_station_info[0]["Block_Number"])
+            )
             added_stations.append(departure_station)
 
         for arrival_station in arrival_stations:
@@ -786,22 +971,26 @@ class Routing:
 
             # Check if the current station has already been added
             if current_station not in added_stations:
-                self.path.append((current_station, current_station_info[0]['Block_Number']))
+                self.path.append(
+                    (current_station, current_station_info[0]["Block_Number"])
+                )
                 added_stations.append(current_station)
 
             # Check if the arrival station has already been added
             if arrival_station not in added_stations:
-                self.path.append((arrival_station, arrival_station_info[0]['Block_Number']))
+                self.path.append(
+                    (arrival_station, arrival_station_info[0]["Block_Number"])
+                )
                 added_stations.append(arrival_station)
 
             # Update the current station for the next iteration
             current_station = arrival_station
 
         return self.path
-    
+
     def find_travel_path(self, path):
-        #if line == "Green Line":
-           # max_block = 150
+        # if line == "Green Line":
+        # max_block = 150
 
         # Extract the block numbers and station names from the path
         block_stations = [(block, station) for station, block in path]
@@ -834,6 +1023,8 @@ class Routing:
         travel_path.extend(third_stations)
 
         return travel_path
+
+
 # create app
 app = QApplication(sys.argv)
 # create window instance
