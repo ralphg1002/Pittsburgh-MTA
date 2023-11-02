@@ -1,11 +1,10 @@
+# importing libraries
 import sys
 import math
-from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
-from PyQt5 import QtGui
-
-from TrackController.trackcontrol import TrackControl
+from PyQt5.QtCore import *
 
 
 class MainWindow(QMainWindow):
@@ -32,10 +31,6 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
-        # Initialize all the different modules
-        trackControl = TrackControl()
-
         # setting title
         self.setWindowTitle(self.moduleName)
 
@@ -68,7 +63,7 @@ class MainWindow(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap("MTA_NYC_logo.svg.png")
+        self.pixmapMTALogo = QtGui.QPixmap("PNGs/MTA_NYC_logo.svg.png")
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(
             math.floor(1862 * 0.25), math.floor(2046 * 0.25)
         )
@@ -78,12 +73,10 @@ class MainWindow(QMainWindow):
         self.logo.move(
             20, math.floor(self.bodyBlock.height() / 2 - self.logo.height() / 2)
         )
-        self.logo.show()
 
         self.box1 = QPushButton("Track Model", self)
         self.box_button(self.box1, 200, 200)
         self.set_relative_right(self.box1, self.logo, 20)
-        # self.box1.clicked(self.trackModel.show())
 
         self.box2 = QPushButton("Train Model", self)
         self.box_button(self.box2, self.box1.width(), self.box1.height())
@@ -96,7 +89,6 @@ class MainWindow(QMainWindow):
         self.box4 = QPushButton("Track Controller", self)
         self.box_button(self.box4, self.box1.width(), self.box1.height())
         self.set_relative_right(self.box4, self.box3, 20)
-        self.box4.clicked.connect(trackControl.show_gui)
 
         self.box5 = QPushButton("Train Controller\nSW", self)
         self.box_button(self.box5, self.box1.width(), self.box1.height())

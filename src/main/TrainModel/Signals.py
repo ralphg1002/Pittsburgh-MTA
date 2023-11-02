@@ -1,8 +1,10 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
+
 class TrackModelSignals(QObject):
     sendCurrentPassengers = pyqtSignal(int)
     sendMaxPassengers = pyqtSignal(int)
+
 
 class TrainControllerSignals(QObject):
     sendLeftDoor = pyqtSignal(bool)
