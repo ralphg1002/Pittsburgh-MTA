@@ -3,7 +3,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.uic import loadUi
-#from test_bench_ui import Ui_MainWindow
+
+# from test_bench_ui import Ui_MainWindow
+
 
 class ClockWidget(QWidget):
     def __init__(self):
@@ -20,7 +22,7 @@ class ClockWidget(QWidget):
 
         # Set a larger font for the clock label
         font = QFont()
-        font.setPointSize(14)  
+        font.setPointSize(14)
         self.clock_label.setFont(font)
 
     def update_time(self):
@@ -28,10 +30,12 @@ class ClockWidget(QWidget):
         time_str = current_time.toString(Qt.DefaultLocaleLongDate)
         self.clock_label.setText(time_str)
 
+
 class TestBench(QMainWindow):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+
 
 class FileDialogButton(QWidget):
     def __init__(self):
@@ -47,7 +51,13 @@ class FileDialogButton(QWidget):
 
     def open_file_dialog(self):
         options = QFileDialog.Options()
-        filePath, _ = QFileDialog.getOpenFileName(self, "Open CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        filePath, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open CSV File",
+            "",
+            "CSV Files (*.csv);;All Files (*)",
+            options=options,
+        )
 
         if filePath:
             # Handle the selected file (e.g., display its content)
@@ -55,19 +65,22 @@ class FileDialogButton(QWidget):
                 csv_content = file.read()
                 # You can display or process the content here
 
+
 class rectangleX(QWidget):
     def __init__(self):
         super().__init__()
         self.setFixedSize(3728, 2000)
 
+
 class CustomComboBox(QComboBox):
     def __init__(self):
         super().__init__()
 
+
 class MTALogo(QLabel):
     def __init__(self):
         super().__init__()
-       
+
         image_label = QLabel(self)
         pixmap = QPixmap("MTA.png")
 
@@ -75,6 +88,7 @@ class MTALogo(QLabel):
         scaled_pixmap = pixmap.scaled(100, 100, Qt.KeepAspectRatio)
         self.setPixmap(scaled_pixmap)
         self.setGeometry(30, 110, 100, 100)
+
 
 class TabHeader(QWidget):
     def __init__(self, text):
@@ -87,7 +101,7 @@ class TabHeader(QWidget):
         font.setPointSize(16)  # Adjust the font size as needed
         font.setBold(True)
         self.label.setFont(font)
-       
+
         self.label.setAlignment(Qt.AlignCenter)
         self.line = QFrame()
         layout.addWidget(self.label)
@@ -103,6 +117,7 @@ class TabHeader(QWidget):
 
         painter.setPen(pen)
         painter.drawLine(0, self.height() - 2, self.width(), self.height() - 2)
+
 
 class TabContent1(QWidget, QObject):
     def __init__(self):
@@ -140,7 +155,7 @@ class TabContent1(QWidget, QObject):
         spacer = QSpacerItem(2300, 10, QSizePolicy.Fixed, QSizePolicy.Fixed)
         mode_button_layout.addItem(spacer)
 
- ############################## Active Trains Button ##############################################
+        ############################## Active Trains Button ##############################################
         activeTrain = QHBoxLayout()
         """self.active_button = QPushButton("View Active Trains")
         self.active_button.setStyleSheet("background-color: lightcoral;")
@@ -215,21 +230,35 @@ class TabContent1(QWidget, QObject):
         self.arrival_combobox = CustomComboBox()
 
         # Initialize the drop-down menus
-        #self.initialize_combobox(self.line_combobox, 'Select a Line', ['Green Line', 'Red Line', 'Blue Line'], 300, 70)
-        self.initialize_combobox(self.line_combobox, 'Select a Line', ['Blue Line'], 300, 70)
-        self.line_combobox.setFixedSize(300,100)
+        # self.initialize_combobox(self.line_combobox, 'Select a Line', ['Green Line', 'Red Line', 'Blue Line'], 300, 70)
+        self.initialize_combobox(
+            self.line_combobox, "Select a Line", ["Blue Line"], 300, 70
+        )
+        self.line_combobox.setFixedSize(300, 100)
 
         spacer = QSpacerItem(100, 100)
         self.dropDownLayout.addSpacerItem(spacer)
 
-        self.initialize_combobox(self.destination_combobox, 'Select a Departing Station', ['Station A', 'Station B', 'Station C'], 475, 70)
-        self.destination_combobox.setFixedSize(475,100)
+        self.initialize_combobox(
+            self.destination_combobox,
+            "Select a Departing Station",
+            ["Station A", "Station B", "Station C"],
+            475,
+            70,
+        )
+        self.destination_combobox.setFixedSize(475, 100)
 
         spacer = QSpacerItem(100, 100)
         self.dropDownLayout.addSpacerItem(spacer)
 
-        self.initialize_combobox(self.arrival_combobox, 'Select an Arrival Station', ['Station A', 'Station B', 'Station C'], 475, 70)
-        self.arrival_combobox.setFixedSize(475,100)
+        self.initialize_combobox(
+            self.arrival_combobox,
+            "Select an Arrival Station",
+            ["Station A", "Station B", "Station C"],
+            475,
+            70,
+        )
+        self.arrival_combobox.setFixedSize(475, 100)
 
         # Initialize flags for drop-down menus
         self.line_changed = False
@@ -238,7 +267,9 @@ class TabContent1(QWidget, QObject):
 
         # Connect drop-down menus to the update_send_train_button method
         self.line_combobox.currentIndexChanged.connect(self.update_send_train_button)
-        self.destination_combobox.currentIndexChanged.connect(self.update_send_train_button)
+        self.destination_combobox.currentIndexChanged.connect(
+            self.update_send_train_button
+        )
         self.arrival_combobox.currentIndexChanged.connect(self.update_send_train_button)
 
         spacer = QSpacerItem(100, 100)
@@ -248,7 +279,7 @@ class TabContent1(QWidget, QObject):
         self.send_train_button = QPushButton("Send Train")
         self.send_train_button.setStyleSheet("background-color: red; color: white;")
         self.send_train_button.setFixedSize(400, 100)
-        self.send_train_button.setGeometry(2000,2000,100,100)
+        self.send_train_button.setGeometry(2000, 2000, 100, 100)
         self.send_train_button.clicked.connect(self.send_train_clicked)
         self.send_train_button.setEnabled(False)
 
@@ -263,7 +294,7 @@ class TabContent1(QWidget, QObject):
         # Create a layout for the send train button and hide it initially
         self.send_train_layout = QHBoxLayout()
         self.dropDownLayout.addWidget(self.send_train_button)
-        #self.dropDownLayout.addWidget(self.plan_train_button)
+        # self.dropDownLayout.addWidget(self.plan_train_button)
 
         # Hide the drop-down menus initially
         for i in range(self.dropDownLayout.count()):
@@ -285,8 +316,8 @@ class TabContent1(QWidget, QObject):
         self.last_clicked_button = None
         self.manual_mode_active = False
 
-        #self.clock_widget = ClockWidget()
-        #tab1_layout.addWidget(self.clock_widget)
+        # self.clock_widget = ClockWidget()
+        # tab1_layout.addWidget(self.clock_widget)
 
         # Creating a timer for the send train button
         self.timer = QTimer(self)
@@ -295,13 +326,13 @@ class TabContent1(QWidget, QObject):
         # Create and add the "Input an arrival time" label and input field to the main layout
         self.input_label = QLabel("Input an arrival time: ")
         self.input_label.setFont(QFont("Arial", 13))
-        self.input_label.setGeometry(1400,100,1000,1000)
+        self.input_label.setGeometry(1400, 100, 1000, 1000)
         self.arrival_time_input = ""
         self.input_label.hide()
 
         self.arrival_input = QLineEdit()
         self.arrival_input.setPlaceholderText("0000 (Military Time)")
-        self.arrival_input.setGeometry(1900,560,200,75)
+        self.arrival_input.setGeometry(1900, 560, 200, 75)
         self.arrival_input.hide()
         self.arrival_input.returnPressed.connect(self.handle_arrival_time_input)
         self.input_layout = QHBoxLayout()
@@ -311,7 +342,7 @@ class TabContent1(QWidget, QObject):
         self.input_layout.setAlignment(Qt.AlignBottom)
         self.tab1_layout.addLayout(self.input_layout)
 
-    ############### CSV FILE #########################
+        ############### CSV FILE #########################
         self.file_dialog_button = QPushButton("Browse CSV")
         self.file_dialog_button.setHidden(True)
         self.tab1_layout.addWidget(self.file_dialog_button)
@@ -321,24 +352,36 @@ class TabContent1(QWidget, QObject):
         self.table_visible = False
         self.setLayout(self.tab1_layout)
 
-################# table for importing ###########################################################
+        ################# table for importing ###########################################################
         self.schedule_table = QTableWidget()
         self.schedule_table.setColumnCount(6)
-        self.schedule_table.setHorizontalHeaderLabels(["Train ID", "Destination Station", "Arrival Station", "Arrival Time", "Speed (mph)", "Delays"])
-        self.schedule_table.setStyleSheet("background-color: white;")  # White background
+        self.schedule_table.setHorizontalHeaderLabels(
+            [
+                "Train ID",
+                "Destination Station",
+                "Arrival Station",
+                "Arrival Time",
+                "Speed (mph)",
+                "Delays",
+            ]
+        )
+        self.schedule_table.setStyleSheet(
+            "background-color: white;"
+        )  # White background
         self.schedule_table.move(400, 100)
         self.schedule_table.hide()
         self.tab1_layout.addWidget(self.schedule_table)
-        
+
         self.table.hide()
         self.traffic_light_text.hide()
         self.crossing_state_text.hide()
         self.switch_state_text.hide()
         self.speed_text.hide()
         self.authority_text.hide()
+
     ################################ Updating Values ###############################
-        # Create a QLabel for displaying the number of ticket sales per hour
-        # Create a placeholder for the ticket sales value
+    # Create a QLabel for displaying the number of ticket sales per hour
+    # Create a placeholder for the ticket sales value
 
     def handle_arrival_time_input(self):
         user_input = self.arrival_input.text()
@@ -346,23 +389,31 @@ class TabContent1(QWidget, QObject):
 
     def load_csv_file(self):
         options = QFileDialog.Options()
-        filePath, _ = QFileDialog.getOpenFileName(self, "Open CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        filePath, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open CSV File",
+            "",
+            "CSV Files (*.csv);;All Files (*)",
+            options=options,
+        )
 
         if filePath:
             with open(filePath, "r") as file:
                 csv_content = file.read()
 
             # Split the CSV content into rows
-            rows = csv_content.split('\n')
+            rows = csv_content.split("\n")
 
             # Determine the number of rows and columns for the table
             num_rows = len(rows)
             if num_rows > 0:
-                num_columns = len(rows[0].split(','))
+                num_columns = len(rows[0].split(","))
 
                 # Create a QLabel for throughput and set its text
                 self.throughput_label = QLabel("Throughput (Tickets Sold/): 47")
-                self.tab1_layout.addWidget(self.throughput_label)  # Add the label to your layout
+                self.tab1_layout.addWidget(
+                    self.throughput_label
+                )  # Add the label to your layout
 
                 # Create a QTableWidget
                 self.schedule_table.setRowCount(num_rows)
@@ -371,13 +422,20 @@ class TabContent1(QWidget, QObject):
 
                 # Populate the QTableWidget with CSV data
                 for i, row in enumerate(rows):
-                    columns = row.split(',')
+                    columns = row.split(",")
                     for j, value in enumerate(columns):
                         item = QTableWidgetItem(value)
                         self.schedule_table.setItem(i, j, item)
 
                 # Set headers for columns
-                column_headers = ["Train ID", "Departing Station", "Arrival Station", "Arrival Times", "Speed (mph)", "Delays"]
+                column_headers = [
+                    "Train ID",
+                    "Departing Station",
+                    "Arrival Station",
+                    "Arrival Times",
+                    "Speed (mph)",
+                    "Delays",
+                ]
                 self.schedule_table.setHorizontalHeaderLabels(column_headers)
                 self.schedule_table.setColumnWidth(0, 400)  # Train ID
                 self.schedule_table.setColumnWidth(1, 400)  # Departing Station
@@ -396,8 +454,10 @@ class TabContent1(QWidget, QObject):
                 self.blockTable = QTableWidget()
                 self.blockTable.setRowCount(num_rows)
                 self.blockTable.setColumnCount(2)
-                self.blockTable.setHorizontalHeaderLabels(["Block Number", "Occupied"])  # Set header labels
-                self.blockTable.setFixedSize(700,200)
+                self.blockTable.setHorizontalHeaderLabels(
+                    ["Block Number", "Occupied"]
+                )  # Set header labels
+                self.blockTable.setFixedSize(700, 200)
                 item_block_number = QTableWidgetItem("2")
                 item_occupied = QTableWidgetItem("Occupied")
                 # Add the new data to the second row
@@ -411,21 +471,23 @@ class TabContent1(QWidget, QObject):
                 self.tab1_layout.addWidget(self.throughput_label)
                 self.tab1_layout.addWidget(self.blockTable)
                 self.tab1_layout.addWidget(self.schedule_table)
-    
+
     def plan_train_clicked(self):
         # Enable the "Send Train" button only when all drop-down menus have valid selections
-        if (self.line_combobox.currentIndex() > 0 and 
-            self.destination_combobox.currentIndex() > 0 and 
-            self.arrival_combobox.currentIndex() > 0 and 
-            self.arrival_time_input.text()):
-            self.plan_train_clicked.setEnabled(True)      
+        if (
+            self.line_combobox.currentIndex() > 0
+            and self.destination_combobox.currentIndex() > 0
+            and self.arrival_combobox.currentIndex() > 0
+            and self.arrival_time_input.text()
+        ):
+            self.plan_train_clicked.setEnabled(True)
             self.arrival_combobox.setStyleSheet("")
             self.destination_combobox.setStyleSheet("")
             self.line_combobox.setStyleSheet("")
 
         else:
             self.send_train_button.setEnabled(False)
-            
+
             if self.line_combobox.currentIndex() <= 0:
                 self.line_combobox.setStyleSheet("background-color: yellow;")
             else:
@@ -449,12 +511,14 @@ class TabContent1(QWidget, QObject):
 
     def send_train_clicked(self):
         # Check if all required fields are selected
-        if (self.line_combobox.currentIndex() <= 0 or
-            self.destination_combobox.currentIndex() <= 0 or
-            self.arrival_combobox.currentIndex() <= 0):
+        if (
+            self.line_combobox.currentIndex() <= 0
+            or self.destination_combobox.currentIndex() <= 0
+            or self.arrival_combobox.currentIndex() <= 0
+        ):
             # Some fields are not selected, do not proceed
             return
-        
+
         # Extract the selected values from the dropdowns
         selected_line = self.line_combobox.currentText()
         departing_station = self.destination_combobox.currentText()
@@ -463,7 +527,9 @@ class TabContent1(QWidget, QObject):
         if not arrival_time:
             arrival_time = QTime.currentTime()
         # update the schedule table with these values
-        self.update_schedule_table(selected_line, departing_station, arrival_station, arrival_time)
+        self.update_schedule_table(
+            selected_line, departing_station, arrival_station, arrival_time
+        )
 
         # If all required fields are selected, proceed with sending the train
         self.send_train_button.setEnabled(False)
@@ -479,19 +545,21 @@ class TabContent1(QWidget, QObject):
         self.destination_combobox.setStyleSheet("")
         self.line_combobox.setStyleSheet("")
 
-    def update_schedule_table(self, line, departing_station, arrival_station, arrival_time):
+    def update_schedule_table(
+        self, line, departing_station, arrival_station, arrival_time
+    ):
         arrival_time = self.arrival_input.text()
         if not arrival_time:
             current_time = QTime.currentTime()
             current_time = current_time.addSecs(4 * 60)  # 4 minutes = 4 * 60 seconds
-            formatted_time = current_time.toString("HHmm")                   
+            formatted_time = current_time.toString("HHmm")
         else:
             formatted_time = arrival_time
 
         # Format the time in HHmm (24-hour time) format
-        #formatted_time = arrival_time.toString("HHmm")        
+        # formatted_time = arrival_time.toString("HHmm")
 
-        train_id = f'{formatted_time}{departing_station[0]}{departing_station[8]}{arrival_station[0]}{arrival_station[8]}'
+        train_id = f"{formatted_time}{departing_station[0]}{departing_station[8]}{arrival_station[0]}{arrival_station[8]}"
 
         # Determine where to insert the new row in the schedule table
         row_position = self.schedule_table.rowCount()
@@ -502,18 +570,30 @@ class TabContent1(QWidget, QObject):
         speed_str = str(speed)
         delays = "on-time"
         # Add the train information to the table
-        self.schedule_table.setItem(row_position, 0, QTableWidgetItem(train_id))  # Train ID
-        self.schedule_table.setItem(row_position, 1, QTableWidgetItem(departing_station))  # Departing Station
-        self.schedule_table.setItem(row_position, 2, QTableWidgetItem(arrival_station))  # Arrival Station
-        self.schedule_table.setItem(row_position, 3, QTableWidgetItem(formatted_time))  # Arrival Time
-        self.schedule_table.setItem(row_position, 4, QTableWidgetItem(speed_str))  # speed
+        self.schedule_table.setItem(
+            row_position, 0, QTableWidgetItem(train_id)
+        )  # Train ID
+        self.schedule_table.setItem(
+            row_position, 1, QTableWidgetItem(departing_station)
+        )  # Departing Station
+        self.schedule_table.setItem(
+            row_position, 2, QTableWidgetItem(arrival_station)
+        )  # Arrival Station
+        self.schedule_table.setItem(
+            row_position, 3, QTableWidgetItem(formatted_time)
+        )  # Arrival Time
+        self.schedule_table.setItem(
+            row_position, 4, QTableWidgetItem(speed_str)
+        )  # speed
         self.schedule_table.setItem(row_position, 5, QTableWidgetItem(delays))  # delays
 
     def enable_send_train_button(self):
         # Enable the send train button if all dropdowns have valid selections
-        if (self.line_combobox.currentIndex() > 0 and
-            self.destination_combobox.currentIndex() > 0 and
-            self.arrival_combobox.currentIndex() > 0):
+        if (
+            self.line_combobox.currentIndex() > 0
+            and self.destination_combobox.currentIndex() > 0
+            and self.arrival_combobox.currentIndex() > 0
+        ):
             self.send_train_button.setEnabled(True)
         else:
             self.send_train_button.setEnabled(False)
@@ -523,7 +603,7 @@ class TabContent1(QWidget, QObject):
         self.send_train_button.setStyleSheet("background-color: red; color: white;")
         self.send_train_button.setText("Send Train")
         self.timer.stop()
-    
+
     def line_combobox_changed(self):
         # Update the flag for the line drop-down menu
         self.line_changed = True
@@ -540,22 +620,24 @@ class TabContent1(QWidget, QObject):
         # Update the flag for the arrival drop-down menu
         self.arrival_changed = True
         # Call the common method to update the button state
-        self.update_send_train_button()       
-       
+        self.update_send_train_button()
+
     def update_send_train_button(self):
         # Enable the "Send Train" button only when all drop-down menus have valid selections
-        if (self.line_combobox.currentIndex() > 0 and
-            self.destination_combobox.currentIndex() > 0 and
-            self.arrival_combobox.currentIndex() > 0):
+        if (
+            self.line_combobox.currentIndex() > 0
+            and self.destination_combobox.currentIndex() > 0
+            and self.arrival_combobox.currentIndex() > 0
+        ):
             self.send_train_button.setEnabled(True)
-            
+
             self.arrival_combobox.setStyleSheet("")
             self.destination_combobox.setStyleSheet("")
             self.line_combobox.setStyleSheet("")
 
         else:
             self.send_train_button.setEnabled(False)
-            
+
             if self.line_combobox.currentIndex() <= 0:
                 self.line_combobox.setStyleSheet("background-color: yellow;")
             else:
@@ -594,13 +676,13 @@ class TabContent1(QWidget, QObject):
             widget = self.dropDownLayout.itemAt(i).widget()
             if widget:
                 widget.hide()
-        
+
         for i in range(self.input_layout.count()):
             widget = self.input_layout.itemAt(i).widget()
             if widget:
                 widget.hide()
 
-         # Show the UI elements when the "Active Trains" button is pressed
+        # Show the UI elements when the "Active Trains" button is pressed
         self.table.hide()
         self.traffic_light_text.hide()
         self.crossing_state_text.hide()
@@ -612,7 +694,7 @@ class TabContent1(QWidget, QObject):
         # Unhighlight the last clicked button, if any
         if self.last_clicked_button:
             self.last_clicked_button.setStyleSheet("")
-        
+
         self.manual_mode_active = not self.manual_mode_active
 
         if self.manual_mode_active:
@@ -625,12 +707,11 @@ class TabContent1(QWidget, QObject):
                 widget = self.dropDownLayout.itemAt(i).widget()
                 if widget:
                     widget.show()
-            
+
             for i in range(self.lineButton_layout.count()):
                 widget = self.lineButton_layout.itemAt(i).widget()
                 if widget:
                     widget.hide()
-
 
             self.input_layout.setParent(self)
             self.input_layout.setAlignment(Qt.AlignRight)
@@ -641,9 +722,9 @@ class TabContent1(QWidget, QObject):
                     widget.show()
 
             # Add the clock widget to the layout
-            #self.clock_widget.setParent(self)
-            #self.clock_widget.setGeometry(2200, 500, 400, 100)
-            #self.clock_widget.show()
+            # self.clock_widget.setParent(self)
+            # self.clock_widget.setGeometry(2200, 500, 400, 100)
+            # self.clock_widget.show()
             self.csv_display.hide()
             self.file_dialog_button.setHidden(True)
             self.table_visible = False
@@ -658,10 +739,10 @@ class TabContent1(QWidget, QObject):
                 widget = self.dropDownLayout.itemAt(i).widget()
                 if widget:
                     widget.hide()
-            
+
             # Remove the clock widget from the layout
-            #self.clock_widget.hide()
-            #self.clock_widget.setParent(None)
+            # self.clock_widget.hide()
+            # self.clock_widget.setParent(None)
             self.arrival_input.hide()
             self.input_label.hide()
 
@@ -671,17 +752,16 @@ class TabContent1(QWidget, QObject):
         # Unhighlight the last clicked button, if any
         if self.last_clicked_button:
             self.last_clicked_button.setStyleSheet("")
-       
+
         self.maintenance.setStyleSheet("background-color: lightBlue;")
         self.last_clicked_button = self.maintenance
-
 
         # Show the line selection buttons when Maintenance Mode is clicked
         for i in range(self.lineButton_layout.count()):
             widget = self.lineButton_layout.itemAt(i).widget()
             if widget:
                 widget.hide()
-       
+
         # Hide the line selection buttons initially
         for i in range(self.dropDown.count()):
             widget = self.dropDown.itemAt(i).widget()
@@ -689,7 +769,7 @@ class TabContent1(QWidget, QObject):
                 widget.hide()
 
     def green_clicked(self):
-        #self.x_widget.draw_x = False
+        # self.x_widget.draw_x = False
         # Unhighlight the last clicked button, if any
         if self.last_clicked_button:
             self.last_clicked_button.setStyleSheet("")
@@ -714,7 +794,7 @@ class TabContent1(QWidget, QObject):
         green_layout.addLayout(self.file_input_layout)"""
 
     def red_clicked(self):
-        #self.x_widget.draw_x = False
+        # self.x_widget.draw_x = False
 
         # Unhighlight the last clicked button, if any
         if self.last_clicked_button:
@@ -728,7 +808,7 @@ class TabContent1(QWidget, QObject):
         for i in range(self.lineButton_layout.count()):
             widget = self.lineButton_layout.itemAt(i).widget()
             if widget:
-                widget.show()    
+                widget.show()
 
     def blue_clicked(self):
         self.tab1_header.show()
@@ -753,9 +833,11 @@ class TabContent1(QWidget, QObject):
         if self.table_visible:
             self.csv_display.show()
 
-        self.schedule_table.setParent(self)  # Set the parent to the current widget (or use the appropriate parent)
-        #tab1_layout.addWidget(self.schedule_table)  # Add it to the layout
-        self.schedule_table.show() 
+        self.schedule_table.setParent(
+            self
+        )  # Set the parent to the current widget (or use the appropriate parent)
+        # tab1_layout.addWidget(self.schedule_table)  # Add it to the layout
+        self.schedule_table.show()
 
     def active_train(self):
         print("active train")
@@ -768,11 +850,13 @@ class TabContent2(QWidget, QObject):
 
         # Create a layout for the main window
         main_layout = QHBoxLayout(self)
-################################## Inputs ######################################################################
+        ################################## Inputs ######################################################################
         # Create the left rectangle for "Inputs"
         input_rectangle = QWidget()
         input_layout = QVBoxLayout(input_rectangle)
-        self.first_dropdowns = []  # Create a list to store references to the first dropdowns
+        self.first_dropdowns = (
+            []
+        )  # Create a list to store references to the first dropdowns
         self.second_dropdowns = []
         self.third_dropdowns = []  # Initialize a list to store selected block failures
         self.selected_block_failures = []  # Initialize an empty list for block failures
@@ -784,15 +868,23 @@ class TabContent2(QWidget, QObject):
         input_layout.addWidget(input_header)
 
         # Create green rectangles inside the "Inputs" rectangle
-        for title in ["Set Ticket Sales (Per Station)", "Change Train Data", "Set Devices and Block States"]:
+        for title in [
+            "Set Ticket Sales (Per Station)",
+            "Change Train Data",
+            "Set Devices and Block States",
+        ]:
             green_rectangle = QWidget()
-            green_rectangle.setStyleSheet("background-color: lightgreen; border: 1px solid green; margin: 5px;")
+            green_rectangle.setStyleSheet(
+                "background-color: lightgreen; border: 1px solid green; margin: 5px;"
+            )
             self.green_layout = QVBoxLayout(green_rectangle)
 
             # Header for the green rectangle
             green_header = QLabel(title)
-            green_header.setStyleSheet("font-size: 30; border: 0")  # Increase the font size
-            green_header.setFixedSize(500,50)
+            green_header.setStyleSheet(
+                "font-size: 30; border: 0"
+            )  # Increase the font size
+            green_header.setFixedSize(500, 50)
             green_header.setAlignment(Qt.AlignCenter)  # Center align the title
 
             if title == "Set Ticket Sales (Per Station)":
@@ -803,19 +895,19 @@ class TabContent2(QWidget, QObject):
                 dropdown1.addItem("Green Line")
                 dropdown1.addItem("Blue Line")
                 dropdown1.addItem("Red Line")
-                dropdown1.setFixedSize(400,100)
+                dropdown1.setFixedSize(400, 100)
 
                 dropdown2 = QComboBox()
                 dropdown2.setStyleSheet("background-color: white;")  # White background
                 dropdown2.addItem("Select a Station")
                 dropdown2.addItem("Station 1")
                 dropdown2.addItem("Station 2")
-                dropdown2.setFixedSize(400,100)
+                dropdown2.setFixedSize(400, 100)
 
                 ticketNum = QLineEdit()
                 ticketNum.setStyleSheet("background-color: white;")
                 ticketNum.setPlaceholderText("Enter Number of Tickets")
-                ticketNum.setFixedSize(400,100)
+                ticketNum.setFixedSize(400, 100)
                 # Create a horizontal layout to place the drop-down menus side by side
                 dropdown_layout = QHBoxLayout()
                 dropdown_layout.addWidget(dropdown1)
@@ -826,40 +918,47 @@ class TabContent2(QWidget, QObject):
                 self.green_layout.addWidget(green_header)
                 self.green_layout.addLayout(dropdown_layout)
 
-                #update_ticket_sales_signal = pyqtSignal(int)  # Define a signal to update ticket sales
+                # update_ticket_sales_signal = pyqtSignal(int)  # Define a signal to update ticket sales
 
                 # Add an "Update Ticket Sales" button
                 self.update_ticket_sales_button = QPushButton("Update Ticket Sales")
-                self.update_ticket_sales_button.setFixedSize(300,100)
-                self.update_ticket_sales_button.setStyleSheet("background-color: white;")
+                self.update_ticket_sales_button.setFixedSize(300, 100)
+                self.update_ticket_sales_button.setStyleSheet(
+                    "background-color: white;"
+                )
 
-                #self.update_ticket_sales_button.setGeometry(300,300,500,500)
-                #self.update_ticket_sales_button.clicked.connect(self.update_ticket_sales)  # Connect the button to a function to handle the update
+                # self.update_ticket_sales_button.setGeometry(300,300,500,500)
+                # self.update_ticket_sales_button.clicked.connect(self.update_ticket_sales)  # Connect the button to a function to handle the update
 
                 self.green_layout.addWidget(self.update_ticket_sales_button)
-                #self.update_ticket_sales_signal.connect(tab_content1.update_ticket_sales_slot)
-
+                # self.update_ticket_sales_signal.connect(tab_content1.update_ticket_sales_slot)
 
             elif title == "Change Train Data":
                 self.horizontal_layout = QHBoxLayout()
                 # Create three drop-down menus stacked vertically
                 select_line_dropdown = QComboBox()
-                select_line_dropdown.setStyleSheet("background-color: white;")  # White background
+                select_line_dropdown.setStyleSheet(
+                    "background-color: white;"
+                )  # White background
                 select_line_dropdown.addItem("Select a Line")
                 select_line_dropdown.addItem("Line 1")
-                select_line_dropdown.setFixedSize(400,100)
+                select_line_dropdown.setFixedSize(400, 100)
 
                 train_id_dropdown = QComboBox()
-                train_id_dropdown.setStyleSheet("background-color: white;")  # White background
+                train_id_dropdown.setStyleSheet(
+                    "background-color: white;"
+                )  # White background
                 train_id_dropdown.addItem("Train ID")
                 train_id_dropdown.addItem("Train A")
-                train_id_dropdown.setFixedSize(400,100)
+                train_id_dropdown.setFixedSize(400, 100)
 
                 delays_dropdown = QComboBox()
-                delays_dropdown.setStyleSheet("background-color: white;")  # White background
+                delays_dropdown.setStyleSheet(
+                    "background-color: white;"
+                )  # White background
                 delays_dropdown.addItem("Delays")
                 delays_dropdown.addItem("No Delays")
-                delays_dropdown.setFixedSize(400,100)
+                delays_dropdown.setFixedSize(400, 100)
 
                 # Add the header and the drop-down menus to the green rectangle
                 self.horizontal_layout.addWidget(green_header)
@@ -869,25 +968,34 @@ class TabContent2(QWidget, QObject):
 
                 self.green_layout.addLayout(self.horizontal_layout)
             elif title == "Set Devices and Block States":
-
                 custom_titles = [
                     "Set Switch State",
                     "Set Crossing State",
                     "Set Light State",
                     "Set Block Failure",
                     "Set Maintenance",
-                    "Set Occupation"
+                    "Set Occupation",
                 ]
-                
-                custom_first_dropdown_options = ["Select a Line", "Green", "Red", "Blue"]
-                custom_second_dropdown_options = ["Select a Block", "Block 1", "Block 2", "Block 3"]
+
+                custom_first_dropdown_options = [
+                    "Select a Line",
+                    "Green",
+                    "Red",
+                    "Blue",
+                ]
+                custom_second_dropdown_options = [
+                    "Select a Block",
+                    "Block 1",
+                    "Block 2",
+                    "Block 3",
+                ]
                 custom_third_dropdown_options = [
-                ["Select State", "Option A", "Option B", "Option C"],
-                ["Select State", "Choice X", "Choice Y", "Choice Z"],
-                ["Select State", "Value 1", "Value 2", "Value 3"],
-                ["Select State", "Shut Down", "Reopen"],
-                ["Select State", "Maintain 1", "Maintain 2", "Maintain 3"],
-                ["Select State", "Occupied", "Not Occupied"]
+                    ["Select State", "Option A", "Option B", "Option C"],
+                    ["Select State", "Choice X", "Choice Y", "Choice Z"],
+                    ["Select State", "Value 1", "Value 2", "Value 3"],
+                    ["Select State", "Shut Down", "Reopen"],
+                    ["Select State", "Maintain 1", "Maintain 2", "Maintain 3"],
+                    ["Select State", "Occupied", "Not Occupied"],
                 ]
 
                 # Create 6 rows with the specified titles and different options for the first and second drop-downs
@@ -896,7 +1004,9 @@ class TabContent2(QWidget, QObject):
 
                     # Create a title label for the first box in the row
                     title_label = QLabel(custom_title)
-                    title_label.setStyleSheet("font-size: 30px; background-color: white;")  # White background for the title
+                    title_label.setStyleSheet(
+                        "font-size: 30px; background-color: white;"
+                    )  # White background for the title
                     row_layout.addWidget(title_label)
 
                     # Add the first drop-down menu with custom options
@@ -906,7 +1016,7 @@ class TabContent2(QWidget, QObject):
                         self.first_dropdown.addItem(option)
                     row_layout.addWidget(self.first_dropdown)
                     self.first_dropdowns.append(self.first_dropdown)
-                    
+
                     # Add the second drop-down menu with custom options
                     self.second_dropdown = QComboBox()
                     self.second_dropdown.setStyleSheet("background-color: white;")
@@ -922,23 +1032,27 @@ class TabContent2(QWidget, QObject):
                         self.third_dropdown.addItem(option)
                     row_layout.addWidget(self.third_dropdown)
                     self.third_dropdowns.append(self.third_dropdown)
-                    self.third_dropdown.currentIndexChanged.connect(self.update_block_failures)
+                    self.third_dropdown.currentIndexChanged.connect(
+                        self.update_block_failures
+                    )
                     self.green_layout.addLayout(row_layout)
 
                 # Add the header and content to the green rectangle
                 self.green_layout.addWidget(green_header)
-                #green_layout.addWidget(content_label)
+                # green_layout.addWidget(content_label)
                 # Create a button to update the selections
                 self.update_button = QPushButton("Update")
                 self.green_layout.addWidget(self.update_button)
                 self.update_button.setStyleSheet("background-color: white;")
-                self.update_button.setFixedSize(300,100)
-                self.update_button.clicked.connect(self.update_right_side_table_with_selected_data)
+                self.update_button.setFixedSize(300, 100)
+                self.update_button.clicked.connect(
+                    self.update_right_side_table_with_selected_data
+                )
 
             # Add the green rectangle to the input layout
             input_layout.addWidget(green_rectangle)
 
-############################### OUTPUTS #################################################################
+        ############################### OUTPUTS #################################################################
         # Create the right rectangle for "Outputs"
         output_rectangle = QWidget()
         output_layout = QVBoxLayout(output_rectangle)
@@ -950,37 +1064,47 @@ class TabContent2(QWidget, QObject):
 
         # Create a light red rectangle for "View Train Data" section
         view_train_data_rectangle = QFrame()
-        view_train_data_rectangle.setStyleSheet("background-color: lightcoral; margin: 0 auto;")
+        view_train_data_rectangle.setStyleSheet(
+            "background-color: lightcoral; margin: 0 auto;"
+        )
 
         # Header for the "View Train Data" section with larger font
         view_train_data_header = QLabel("View Train Data:")
         view_train_data_header.setAlignment(Qt.AlignLeft)  # Center align the title
-        view_train_data_header.setStyleSheet("font-size: 30px; color: black;")  # Larger font size and black text color
+        view_train_data_header.setStyleSheet(
+            "font-size: 30px; color: black;"
+        )  # Larger font size and black text color
 
         # Create drop-down menus with white backgrounds
         self.select_line_dropdown = QComboBox()
-        self.select_line_dropdown.setStyleSheet("background-color: white;")  # White background
-        self.select_line_dropdown.setFixedSize(500,75)
+        self.select_line_dropdown.setStyleSheet(
+            "background-color: white;"
+        )  # White background
+        self.select_line_dropdown.setFixedSize(500, 75)
         self.select_line_dropdown.addItem("Select a Line")
         self.select_line_dropdown.addItem("Blue Line")
 
         self.train_id_dropdown = QComboBox()
-        self.train_id_dropdown.setStyleSheet("background-color: white;")  # White background
-        self.train_id_dropdown.setFixedSize(500,75)
+        self.train_id_dropdown.setStyleSheet(
+            "background-color: white;"
+        )  # White background
+        self.train_id_dropdown.setFixedSize(500, 75)
         self.train_id_dropdown.addItem("Train ID")
         self.train_id_dropdown.addItem("1200SBSC")
         self.train_id_dropdown.addItem("1000SCSA")
 
         self.data_box1 = QLabel("Commanded Speed:")
-        self.data_box1.setFixedSize(500,75)
+        self.data_box1.setFixedSize(500, 75)
         self.data_box1.setStyleSheet("background-color: white;")  # White background
         self.data_box2 = QLabel("Authority:")
-        self.data_box2.setFixedSize(500,75)
+        self.data_box2.setFixedSize(500, 75)
         self.data_box2.setStyleSheet("background-color: white;")  # White background
 
         disabled_blocks_label = QLabel("Current Shut Down Blocks:")
         disabled_blocks_label.setAlignment(Qt.AlignCenter)  # Center align the label
-        disabled_blocks_label.setStyleSheet("font-size: 30px; color: black; background-color: lightgreen;")
+        disabled_blocks_label.setStyleSheet(
+            "font-size: 30px; color: black; background-color: lightgreen;"
+        )
         disabled_blocks_label.setFixedSize(500, 100)
 
         self.table = QTableWidget()
@@ -1001,14 +1125,17 @@ class TabContent2(QWidget, QObject):
         self.train_id_dropdown.currentIndexChanged.connect(self.update_train_data)
 
         output_layout.addWidget(view_train_data_rectangle)
-        output_rectangle.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred))
-        input_rectangle.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred))
+        output_rectangle.setSizePolicy(
+            QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        )
+        input_rectangle.setSizePolicy(
+            QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        )
         main_layout.addWidget(input_rectangle)
         main_layout.addWidget(output_rectangle)
 
-        self.setLayout(main_layout) 
+        self.setLayout(main_layout)
 
-        
     def update_train_data(self):
         selected_line = self.select_line_dropdown.currentText()
         selected_train_id = self.train_id_dropdown.currentText()
@@ -1039,13 +1166,12 @@ class TabContent2(QWidget, QObject):
             if (line, block) in self.selected_block_failures:
                 self.selected_block_failures.remove((line, block))
 
-
         # Update the right-side table with the selected block failures
         self.update_right_side_table(self.selected_block_failures)
 
     def update_right_side_table(self, selected_data):
         # Assuming you have a QTableWidget named 'table' on the right side
-        #table = self.findChild(QTableWidget, "table")  # Use the actual name of your table
+        # table = self.findChild(QTableWidget, "table")  # Use the actual name of your table
 
         if self.table is not None:
             # Add selected data to the table
@@ -1071,7 +1197,10 @@ class TabContent2(QWidget, QObject):
 
             # Handle adding/removing block failures based on the selected state
             if selected_state == "Shut down":
-                if selected_line != "Select a Line" and selected_block != "Select a Block":
+                if (
+                    selected_line != "Select a Line"
+                    and selected_block != "Select a Block"
+                ):
                     self.selected_block_failures.append((selected_line, selected_block))
             elif selected_state == "Reopen":
                 try:
@@ -1114,6 +1243,7 @@ class MyWindow(QMainWindow):
 
         tab_widget.showMaximized()
 
+
 def main():
     app = QApplication(sys.argv)
     window = MyWindow()
@@ -1124,15 +1254,13 @@ def main():
     image_label = QLabel()
     image_label.setPixmap(mta_logo)
     image_label.setGeometry(600, 600, 100, 100)
-    
+
     # Display MTA Logo
     mta_logo = MTALogo()  # Create an instance of MTALogo
     mta_logo.setParent(window)
     window.showMaximized()
     sys.exit(app.exec_())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
-
-
-

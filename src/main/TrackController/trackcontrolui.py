@@ -285,7 +285,7 @@ class MapButton(QPushButton):
                 self.mapWindow.windowFlags() | Qt.WindowStaysOnTopHint
             )
             self.mapWindow.set_map(line)
-        
+
         self.mapWindow.show()
 
 
@@ -311,7 +311,7 @@ class MapWindow(QMainWindow):
         self.setCentralWidget(centralWidget)
 
     def set_map(self, line):
-        if(line == 1):
+        if line == 1:
             self.mapLabel.setPixmap(self.scaledPixmapGreenLine)
         else:
             self.mapLabel.setPixmap(self.scaledPixmapRedLine)
@@ -479,8 +479,8 @@ class JunctionWS(QWidget):
         self.labelRight.setText("block " + str(blockRight))
         self.labelUpright.setText("block " + str(blockUpright))
 
-    #def update_button_visibility(self):
-        #self.junctionToggleButton.update_button_visibility(self.buttonMode)
+    # def update_button_visibility(self):
+    # self.junctionToggleButton.update_button_visibility(self.buttonMode)
 
     def update_button_visibility(self, mode):
         self.junctionToggleButton.update_button_visibility(mode)
@@ -560,7 +560,7 @@ class JunctionToggle(QWidget):
         if mode:
             self.toggleSwitch.hide()
         else:
-            #if self.parentBox.isVisible():
+            # if self.parentBox.isVisible():
             self.toggleSwitch.show()
 
     def on_button_click(self):
@@ -797,7 +797,9 @@ class Crossing(QWidget):
         if self.crossingToggleState:
             # If the crossing is closed
             closedPixmap = QPixmap("src/main/TrackController/images/cross_closed.png")
-            closedPixmap = closedPixmap.scaled(int(450*.6), int(225*.6), Qt.KeepAspectRatio)
+            closedPixmap = closedPixmap.scaled(
+                int(450 * 0.6), int(225 * 0.6), Qt.KeepAspectRatio
+            )
             self.closed.setPixmap(closedPixmap)
             self.closed.setGeometry(90, 26, 450, 225)
             self.closed.setParent(self)
@@ -806,7 +808,9 @@ class Crossing(QWidget):
         else:
             # if the crossing is open
             openPixmap = QPixmap("src/main/TrackController/images/cross_open.png")
-            openPixmap = openPixmap.scaled(int(450*.65), int(225*.65), Qt.KeepAspectRatio)
+            openPixmap = openPixmap.scaled(
+                int(450 * 0.65), int(225 * 0.65), Qt.KeepAspectRatio
+            )
             self.open.setPixmap(openPixmap)
             self.open.setGeometry(90, 3, 450, 250)
             self.open.setParent(self)
@@ -1523,5 +1527,3 @@ class MainUI(QMainWindow):
             self.comboboxWayside.addItem("Wayside 1 (A - H), (R - T)")
             self.comboboxWayside.addItem("Wayside 2 (H - Q)")
             self.lineSelect = 2
-
-    

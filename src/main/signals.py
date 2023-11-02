@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
+
 ##########################################################################################
 class TrackControllerToCTC(QObject):
     occupancyState = pyqtSignal(int, int, bool)  # line, block number, state
@@ -7,16 +8,11 @@ class TrackControllerToCTC(QObject):
     switchState = pyqtSignal(int, int, bool)  # line, block number, state
     requestSpeed = pyqtSignal(int, int) # line, block number
 
+
 class TrackControllerToTrackModel(QObject):
-    switchState = pyqtSignal(
-        int, int, int, bool
-    )  # line, block number, state
-    lightState = pyqtSignal(
-        int, int, int, str
-    )  # line, block number, state
-    crossingState = pyqtSignal(
-        int, int, int, bool
-    )  # line, block number, state
+    switchState = pyqtSignal(int, int, int, bool)  # line, block number, state
+    lightState = pyqtSignal(int, int, int, str)  # line, block number, state
+    crossingState = pyqtSignal(int, int, int, bool)  # line, block number, state
     suggestedSpeed = pyqtSignal(
         int, int, int, float
     )  # line, block number, suggested speed
@@ -24,10 +20,13 @@ class TrackControllerToTrackModel(QObject):
         int, int, int, int
     )  # line, block number, authority
     maintenance = pyqtSignal(int, int, int, bool)
+
+
 ##########################################################################################
 class TrainModelToTrackModel(QObject):
     sendCurrentPassengers = pyqtSignal(int)
     sendMaxPassengers = pyqtSignal(int)
+
 
 class TrainModelToTrainController(QObject):
     sendSpeedLimit = pyqtSignal(int)
@@ -47,6 +46,8 @@ class TrainModelToTrainController(QObject):
     sendEngineFailure = pyqtSignal(bool)
     sendSignalPickupFailure = pyqtSignal(bool)
     sendBrakeFailure = pyqtSignal(bool)
+
+
 ##########################################################################################
 
 
@@ -59,6 +60,6 @@ trackControllerToCTC = TrackControllerToCTC()
 trackControllerToTrackModel = TrackControllerToTrackModel()
 
 
-# Instantiation for signals sent from Train Model 
+# Instantiation for signals sent from Train Model
 trainModelToTrackModel = TrainModelToTrackModel()
 trainModelToTrainController = TrainModelToTrainController()
