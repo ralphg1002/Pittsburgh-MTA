@@ -1,0 +1,51 @@
+SW1:
+IF
+    Condition: 1 AND NOT(29->12)
+    Operation: SWITCH(1)
+    Operation: 29 G
+    Operation: 12 R
+    Operation: 1 R
+END
+
+SW2:
+IF
+    Condition: 150 AND NOT(12->29)
+    Operation: SWITCH(1)
+    Operation: 150 G
+    Operation: 30 R
+    Operation: 29 R
+END
+
+SW3:
+IF
+    Condition: 57
+    Operation: SWITCH(1)
+    Operation: 57 G
+    Operation: 58 R
+END
+
+SW4:
+IF
+    Condition: 0
+    Operation: SWITCH(1)
+    Operation: 62 R
+    Operation: 63 R
+END
+
+SW5:
+IF
+    Condition: (85->77)
+    Operation: SWITCH(1)
+    Operation: 76 R
+    Operation: 77 G
+    Operation: 101 R
+END
+
+SW6:
+IF
+    Condition: 100 AND NOT(77->85)
+    Operation: SWITCH(1)
+    Operation: 85 R
+    Operation: 86 R
+    Operation: 106 G
+END
