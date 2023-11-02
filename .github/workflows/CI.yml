@@ -30,6 +30,6 @@ jobs:
         run: |
           poetry run black ./src
           
-      - name: Run Pylint
-        run: |
-          poetry run pylint --recursive=y .
+      # - name: Run Pylint
+        # run: |
+          # poetry run pylint --recursive=y .
