@@ -1,9 +1,9 @@
 import sys, re, os
 import pandas as pd
 #from PyQt5.QtCore import pyqtSignal
-from trackcontrollersignals import TrackControllerToCTC, TrackControllerToTrackModel
+from .trackcontrollersignals import TrackControllerToCTC, TrackControllerToTrackModel
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
-from trackcontrolui import MainUI, modeChanged
+from .trackcontrolui import MainUI, modeChanged
 
 
 # plcSwitchChange = pyqtSignal(int, int, int, bool)
@@ -587,7 +587,7 @@ class TrackControl(QMainWindow):
 
         self.ui = MainUI()
         self.ui.setGeometry(0, 0, 960, 960)
-        self.ui.show()
+        self.ui.hide()
 
         # Instantiate the track information for the Green Line
         self.greenLine = Line(1)
@@ -864,6 +864,8 @@ class TrackControl(QMainWindow):
             )
         )
 
+    def show_gui(self):
+        self.ui.show()
     # This method is called whenever the import plc button is clicked
     def import_plc(self):
         if self.ui.waysideSelect == 0 or self.ui.lineSelect == 0:
@@ -1242,10 +1244,10 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     app = QApplication(sys.argv)
     # window = MainUI()
     # window.setGeometry(0,0,960,970)
     # window.show()
     main_window = TrackControl()
-    sys.exit(app.exec_())  # Start the application event loop
+    sys.exit(app.exec_())  # Start the application event loop"""

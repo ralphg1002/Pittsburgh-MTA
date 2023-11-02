@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # QPainter, QPen, QColor, QFont, QPixmap, QLine
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QDateTime
 from PyQt5.uic import loadUi
-from testbench import UiMainWindow
+from .testbench import UiMainWindow
 
 app = QApplication(sys.argv)
 
