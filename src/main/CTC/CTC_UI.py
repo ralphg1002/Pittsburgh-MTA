@@ -8,9 +8,9 @@ from PyQt5.QtCore import *
 import csv
 from datetime import datetime, timedelta
 
-#from signals import CTCtoTrackController, TrackControllerToCTC
+#from .signals import CTCtoTrackController, TrackControllerToCTC
 
-class MainWindow(QMainWindow):
+class CTCWindow(QMainWindow):
     # font variables
     textFontSize = 9
     labelFontSize = 12
@@ -295,6 +295,9 @@ class MainWindow(QMainWindow):
         self.stopsTable.hide()
 
         self.show()
+
+    def show_gui(self):
+        self.ui.show()
 
 """class SignalHandlers:
     def __init__(self):
@@ -585,7 +588,7 @@ class Scheduler:
                 elif selected_line == "Blue Line":
                     print("blue line")
                 elif selected_line == "Green Line":
-                    routing = Routing('src/main/CTC/GreenLine.csv', main_window) 
+                    routing = Routing('src/main/CTC/GreenLine.csv', CTC_Window) 
                     arrival_station_to_find = arrival_station
                     station_info = routing.find_station_info(arrival_station_to_find)
 
@@ -1067,7 +1070,7 @@ class Routing:
         #print(total_time)
         return lastStopTime
 
-    def suggestedSpeed(self, line, blockNum, occupancy):
+    def checkPosition(self, line, blockNum, occupancy):
         print("comparing current block of" + str(blockNum) + " with destination at " + str(self.routeQ[1]))
         line = self.scheduler.getSelectedLine
         if (occupancy == True and blockNum == self.routeQ[1] and line == line):
@@ -1127,6 +1130,8 @@ class Train:
         self.trainStops = stops 
         self.authority = 0
         trainNum = trainNum + 1
+        
+        #self.signals.occupancy.connect(self.routing.checkPosition)
 
         if (line == "Green Line"):
             self.trainID = f'{"Green"}{trainNum}'
@@ -1187,18 +1192,10 @@ class Block:
 
  
 # create app
-app = QApplication([])
+#app = QApplication([])
 #SignalHandlers()
-main_window = MainWindow()
-mode_handler = ModeHandler(main_window)  # Initialize the ModeHandler with the MainWindow instance
+#CTC_Window = CTCWindow()
+#mode_handler = ModeHandler(CTC_Window)  # Initialize the ModeHandler with the MainWindow instance
 
-# Set references in both directions
-main_window.mode_handler = mode_handler
-mode_handler.main_window = main_window
-
-# Connect buttons' clicked signals to the appropriate functions in the mode_handler
-main_window.automatic.clicked.connect(mode_handler.automaticButtonClicked)
-main_window.manual.clicked.connect(mode_handler.manualButtonClicked)
-main_window.maintenance.clicked.connect(mode_handler.maintenanceButtonClicked)
 # run app
-app.exec()
+#app.exec()
