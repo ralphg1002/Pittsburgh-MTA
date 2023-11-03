@@ -7,6 +7,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from .tcsw_tb import *
 from .tcsw_functions import *
+
 # from tcsw_time import *
 from .tcsw_train_attributes import *
 
@@ -60,7 +61,7 @@ class TrainControllerUI(QMainWindow):
 
         # some variables
         self.tcVariables = {
-            'samplePeriod': 1,
+            "samplePeriod": 1,
             "period": 1000,
             "trainID": "",
             "line": "",
@@ -105,7 +106,9 @@ class TrainControllerUI(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/MTA_NYC_logo.svg.png")
+        self.pixmapMTALogo = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/MTA_NYC_logo.svg.png"
+        )
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(70, 70)
         self.logo = QLabel(self)
         self.logo.setPixmap(self.pixmapMTALogo)
@@ -163,7 +166,9 @@ class TrainControllerUI(QMainWindow):
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
 
         # increase system speed button
-        self.pixmapFastForward = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/forward.svg")
+        self.pixmapFastForward = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/forward.svg"
+        )
         self.pixmapFastForward = self.pixmapFastForward.scaled(32, 32)
         self.speedUpButton = QPushButton(self)
         self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
@@ -174,7 +179,9 @@ class TrainControllerUI(QMainWindow):
         self.speedUpButton.clicked.connect(lambda: self.speed_up())
 
         # decrease system speed button
-        self.pixmapRewind = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/backward.svg")
+        self.pixmapRewind = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/backward.svg"
+        )
         self.pixmapRewind = self.pixmapRewind.scaled(32, 32)
         self.slowDownButton = QPushButton(self)
         self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
@@ -185,7 +192,13 @@ class TrainControllerUI(QMainWindow):
         self.slowDownButton.clicked.connect(lambda: self.slow_down())
 
         self.set_relative_right(self.speedUpButton, self.systemSpeedInput, 20)
-        self.speedUpButton.move(self.bodyBlock.x() + self.bodyBlock.width() - self.speedUpButton.width() - 10, self.speedUpButton.y())
+        self.speedUpButton.move(
+            self.bodyBlock.x()
+            + self.bodyBlock.width()
+            - self.speedUpButton.width()
+            - 10,
+            self.speedUpButton.y(),
+        )
         self.set_relative_left(self.systemSpeedInput, self.speedUpButton, 5)
         self.set_relative_left(self.slowDownButton, self.systemSpeedInput, 5)
         self.set_relative_left(self.systemSpeedLabel, self.slowDownButton, 5)
@@ -196,34 +209,54 @@ class TrainControllerUI(QMainWindow):
         self.divider1.setStyleSheet("background-color:" + self.colorLightGrey)
 
         """ui layout"""
-        self.pixmapCircleCheck = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/circle-check.svg")
+        self.pixmapCircleCheck = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/circle-check.svg"
+        )
         self.pixmapCircleCheck = self.pixmapCircleCheck.scaled(32, 32)
 
-        self.pixmapCircleX = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/circle-x.svg")
+        self.pixmapCircleX = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/circle-x.svg"
+        )
         self.pixmapCircleX = self.pixmapCircleX.scaled(32, 32)
 
-        self.pixmapForward = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/forward.svg")
+        self.pixmapForward = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/forward.svg"
+        )
         self.pixmapForward = self.pixmapForward.scaled(32, 32)
 
-        self.pixmapBackward = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/backward.svg")
+        self.pixmapBackward = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/backward.svg"
+        )
         self.pixmapBackward = self.pixmapBackward.scaled(32, 32)
 
-        self.pixmapLDoorOpen = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ldoor-open.png")
+        self.pixmapLDoorOpen = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/ldoor-open.png"
+        )
         self.pixmapLDoorOpen = self.pixmapLDoorOpen.scaled(32, 32)
 
-        self.pixmapLDoorClosed = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ldoor-closed.png")
+        self.pixmapLDoorClosed = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/ldoor-closed.png"
+        )
         self.pixmapLDoorClosed = self.pixmapLDoorClosed.scaled(32, 32)
 
-        self.pixmapRDoorOpen = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/rdoor-open.png")
+        self.pixmapRDoorOpen = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/rdoor-open.png"
+        )
         self.pixmapRDoorOpen = self.pixmapRDoorOpen.scaled(32, 32)
 
-        self.pixmapRDoorClosed = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/rdoor-closed.png")
+        self.pixmapRDoorClosed = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/rdoor-closed.png"
+        )
         self.pixmapRDoorClosed = self.pixmapRDoorClosed.scaled(32, 32)
 
-        self.pixmapToggleOff = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/toggle-off.svg")
+        self.pixmapToggleOff = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/toggle-off.svg"
+        )
         self.pixmapToggleOff = self.pixmapToggleOff.scaled(32, 32)
 
-        self.pixmapToggleOn = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/toggle-on.svg")
+        self.pixmapToggleOn = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/toggle-on.svg"
+        )
         self.pixmapToggleOn = self.pixmapToggleOn.scaled(32, 32)
 
         self.pixmapTrain = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/train.png")
@@ -231,17 +264,23 @@ class TrainControllerUI(QMainWindow):
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
 
-        self.pixmapTrainHlt = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/train-hlt.png")
+        self.pixmapTrainHlt = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/train-hlt.png"
+        )
         self.pixmapTrainHlt = self.pixmapTrainHlt.scaled(
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
 
-        self.pixmapTrainIlt = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/train-ilt.png")
+        self.pixmapTrainIlt = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/train-ilt.png"
+        )
         self.pixmapTrainIlt = self.pixmapTrainIlt.scaled(
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
 
-        self.pixmapTrainLts = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/train-lts.png")
+        self.pixmapTrainLts = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/train-lts.png"
+        )
         self.pixmapTrainLts = self.pixmapTrainLts.scaled(
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
@@ -848,7 +887,9 @@ class TrainControllerUI(QMainWindow):
         self.timer.timeout.connect(
             self.update
         )  # Connect the timer to the update_text function
-        self.timer.start(self.tcVariables['period'])  # Update the text every 1000 milliseconds (1 second)
+        self.timer.start(
+            self.tcVariables["period"]
+        )  # Update the text every 1000 milliseconds (1 second)
 
         self.sysTime = QDateTime.currentDateTime()
         self.sysTime.setTime(QTime(0, 0, 0))
@@ -1042,29 +1083,33 @@ class TrainControllerUI(QMainWindow):
 
                 # system time
                 self.sysTime = self.sysTime.addSecs(1)
-                self.timer.setInterval(self.tcVariables['period'])
+                self.timer.setInterval(self.tcVariables["period"])
 
                 self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
-                self.systemSpeedInput.setText("x" + format(1 / (self.tcVariables['period'] / 1000), '.3f'))
+                self.systemSpeedInput.setText(
+                    "x" + format(1 / (self.tcVariables["period"] / 1000), ".3f")
+                )
 
-                hours, minutes, seconds = map(int, self.systemTimeInput.text().split(':'))
+                hours, minutes, seconds = map(
+                    int, self.systemTimeInput.text().split(":")
+                )
                 self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
-                self.tcFunctions.set_samplePeriod(self.tcVariables['samplePeriod'])
+                self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 
                 print(self.systemTimeInput.text())
                 print(self.tcFunctions.time)
-                print(self.tcFunctions.piVariables['samplePeriod'])
+                print(self.tcFunctions.piVariables["samplePeriod"])
 
     def speed_up(self):
-        self.tcVariables['period'] = int(self.tcVariables['period'] / 10)
-        if self.tcVariables['period'] == 0:
-            self.tcVariables['period'] = 1
+        self.tcVariables["period"] = int(self.tcVariables["period"] / 10)
+        if self.tcVariables["period"] == 0:
+            self.tcVariables["period"] = 1
         return
 
     def slow_down(self):
-        self.tcVariables['period'] = int(self.tcVariables['period'] * 10)
-        if self.tcVariables['period'] >= 10000:
-            self.tcVariables['period'] = 10000
+        self.tcVariables["period"] = int(self.tcVariables["period"] * 10)
+        if self.tcVariables["period"] >= 10000:
+            self.tcVariables["period"] = 10000
         return
 
     def change_train(self):

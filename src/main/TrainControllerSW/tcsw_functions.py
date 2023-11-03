@@ -65,7 +65,7 @@ class TCFunctions:
         if trainObject.beacon["isTunnel"]:
             trainObject.set_headlights(True)
             trainObject.set_interiorLights(True)
-        #elif self.time >= 21600 or self.time <= 64800:
+        # elif self.time >= 21600 or self.time <= 64800:
         #    trainObject.set_headlights(False)
         #    trainObject.set_interiorLights(True)
         else:

@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from .tcsw_functions import *
+
 # from tcsw_time import *
 from .tcsw_train_attributes import *
 
@@ -85,7 +86,10 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.addTrainLabel, self.selectTrainLabel, 20)
 
         self.sendLabel = QPushButton(self)
-        self.png_button(self.sendLabel, QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send.svg").scaled(32, 32))
+        self.png_button(
+            self.sendLabel,
+            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send.svg").scaled(32, 32),
+        )
         self.sendLabel.adjustSize()
         self.set_relative_below(self.sendLabel, self.addTrainLabel, 10)
         self.set_relative_before_right_end(self.sendLabel, self.trainBox, 10)
