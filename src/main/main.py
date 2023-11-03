@@ -7,7 +7,7 @@ from PyQt5.QtGui import *
 from PyQt5 import QtGui
 
 from TrackController.trackcontrol import TrackControl
-from TrainControllerSW import tcsw_ui
+from TrainControllerSW.tcsw_ui import *
 
 class MainWindow(QMainWindow):
     # font variables
@@ -103,7 +103,7 @@ class MainWindow(QMainWindow):
         self.box5 = QPushButton("Train Controller\nSW", self)
         self.box_button(self.box5, self.box1.width(), self.box1.height())
         self.set_relative_below(self.box5, self.box1, 20)
-        self.box5.clicked.connect(self.trainControllerSW.show())
+        self.box5.clicked.connect(lambda: self.trainControllerSW.show())
 
         self.box6 = QPushButton("Train Controller\nHW", self)
         self.box_button(self.box6, self.box1.width(), self.box1.height())

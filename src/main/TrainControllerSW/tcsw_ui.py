@@ -5,10 +5,10 @@ from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from tcsw_tb import *
-from tcsw_functions import *
-from tcsw_time import *
-from tcsw_train_attributes import *
+from .tcsw_tb import *
+from .tcsw_functions import *
+# from tcsw_time import *
+from .tcsw_train_attributes import *
 
 
 class TrainControllerUI(QMainWindow):
@@ -121,7 +121,7 @@ class TrainControllerUI(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap("PNGs/MTA_NYC_logo.svg.png")
+        self.pixmapMTALogo = QtGui.QPixmap("TrainControllerSW/PNGs/MTA_NYC_logo.svg.png")
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(70, 70)
         self.logo = QLabel(self)
         self.logo.setPixmap(self.pixmapMTALogo)
@@ -137,7 +137,7 @@ class TrainControllerUI(QMainWindow):
         self.moduleLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # test bench icon
-        self.pixmapGear = QtGui.QPixmap("PNGs/gear.svg")
+        self.pixmapGear = QtGui.QPixmap("TrainControllerSW/PNGs/gear.svg")
         self.pixmapGear = self.pixmapGear.scaled(25, 25)
         self.testbenchIcon = QLabel(self)
         self.testbenchIcon.setPixmap(self.pixmapGear)
@@ -179,7 +179,7 @@ class TrainControllerUI(QMainWindow):
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
 
         # increase system speed button
-        self.pixmapFastForward = QtGui.QPixmap("PNGs/forward.svg")
+        self.pixmapFastForward = QtGui.QPixmap("TrainControllerSW/PNGs/forward.svg")
         self.pixmapFastForward = self.pixmapFastForward.scaled(32, 32)
         self.speedUpButton = QPushButton(self)
         self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
@@ -189,7 +189,7 @@ class TrainControllerUI(QMainWindow):
         )
 
         # decrease system speed button
-        self.pixmapRewind = QtGui.QPixmap("PNGs/backward.svg")
+        self.pixmapRewind = QtGui.QPixmap("TrainControllerSW/PNGs/backward.svg")
         self.pixmapRewind = self.pixmapRewind.scaled(32, 32)
         self.slowDownButton = QPushButton(self)
         self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
@@ -204,63 +204,63 @@ class TrainControllerUI(QMainWindow):
         self.divider1.setStyleSheet("background-color:" + self.colorLightGrey)
 
         """ui layout"""
-        self.pixmapCircleCheck = QtGui.QPixmap("PNGs/circle-check.svg")
+        self.pixmapCircleCheck = QtGui.QPixmap("TrainControllerSW/PNGs/circle-check.svg")
         self.pixmapCircleCheck = self.pixmapCircleCheck.scaled(32, 32)
 
-        self.pixmapCircleX = QtGui.QPixmap("PNGs/circle-x.svg")
+        self.pixmapCircleX = QtGui.QPixmap("TrainControllerSW/PNGs/circle-x.svg")
         self.pixmapCircleX = self.pixmapCircleX.scaled(32, 32)
 
-        self.pixmapForward = QtGui.QPixmap("PNGs/forward.svg")
+        self.pixmapForward = QtGui.QPixmap("TrainControllerSW/PNGs/forward.svg")
         self.pixmapForward = self.pixmapForward.scaled(32, 32)
 
-        self.pixmapBackward = QtGui.QPixmap("PNGs/backward.svg")
+        self.pixmapBackward = QtGui.QPixmap("TrainControllerSW/PNGs/backward.svg")
         self.pixmapBackward = self.pixmapBackward.scaled(32, 32)
 
-        self.pixmapLDoorOpen = QtGui.QPixmap("PNGs/ldoor-open.png")
+        self.pixmapLDoorOpen = QtGui.QPixmap("TrainControllerSW/PNGs/ldoor-open.png")
         self.pixmapLDoorOpen = self.pixmapLDoorOpen.scaled(32, 32)
 
-        self.pixmapLDoorClosed = QtGui.QPixmap("PNGs/ldoor-closed.png")
+        self.pixmapLDoorClosed = QtGui.QPixmap("TrainControllerSW/PNGs/ldoor-closed.png")
         self.pixmapLDoorClosed = self.pixmapLDoorClosed.scaled(32, 32)
 
-        self.pixmapRDoorOpen = QtGui.QPixmap("PNGs/rdoor-open.png")
+        self.pixmapRDoorOpen = QtGui.QPixmap("TrainControllerSW/PNGs/rdoor-open.png")
         self.pixmapRDoorOpen = self.pixmapRDoorOpen.scaled(32, 32)
 
-        self.pixmapRDoorClosed = QtGui.QPixmap("PNGs/rdoor-closed.png")
+        self.pixmapRDoorClosed = QtGui.QPixmap("TrainControllerSW/PNGs/rdoor-closed.png")
         self.pixmapRDoorClosed = self.pixmapRDoorClosed.scaled(32, 32)
 
-        self.pixmapToggleOff = QtGui.QPixmap("PNGs/toggle-off.svg")
+        self.pixmapToggleOff = QtGui.QPixmap("TrainControllerSW/PNGs/toggle-off.svg")
         self.pixmapToggleOff = self.pixmapToggleOff.scaled(32, 32)
 
-        self.pixmapToggleOn = QtGui.QPixmap("PNGs/toggle-on.svg")
+        self.pixmapToggleOn = QtGui.QPixmap("TrainControllerSW/PNGs/toggle-on.svg")
         self.pixmapToggleOn = self.pixmapToggleOn.scaled(32, 32)
 
-        self.pixmapTrain = QtGui.QPixmap("PNGs/train.png")
+        self.pixmapTrain = QtGui.QPixmap("TrainControllerSW/PNGs/train.png")
         self.pixmapTrain = self.pixmapTrain.scaled(
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
 
-        self.pixmapTrainHlt = QtGui.QPixmap("PNGs/train-hlt.png")
+        self.pixmapTrainHlt = QtGui.QPixmap("TrainControllerSW/PNGs/train-hlt.png")
         self.pixmapTrainHlt = self.pixmapTrainHlt.scaled(
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
 
-        self.pixmapTrainIlt = QtGui.QPixmap("PNGs/train-ilt.png")
+        self.pixmapTrainIlt = QtGui.QPixmap("TrainControllerSW/PNGs/train-ilt.png")
         self.pixmapTrainIlt = self.pixmapTrainIlt.scaled(
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
 
-        self.pixmapTrainLts = QtGui.QPixmap("PNGs/train-lts.png")
+        self.pixmapTrainLts = QtGui.QPixmap("TrainControllerSW/PNGs/train-lts.png")
         self.pixmapTrainLts = self.pixmapTrainLts.scaled(
             math.floor(48 / 532 * 532), math.floor(48 / 532 * 444)
         )
 
-        self.pixmapChange = QtGui.QPixmap("PNGs/change.svg")
+        self.pixmapChange = QtGui.QPixmap("TrainControllerSW/PNGs/change.svg")
         self.pixmapChange = self.pixmapChange.scaled(32, 32)
 
-        self.pixmapSend = QtGui.QPixmap("PNGs/send.svg")
+        self.pixmapSend = QtGui.QPixmap("TrainControllerSW/PNGs/send.svg")
         self.pixmapSend = self.pixmapSend.scaled(32, 32)
 
-        self.movieMoneyAd = QMovie("PNGs/giphy1.gif")
+        self.movieMoneyAd = QMovie("TrainControllerSW/PNGs/giphy1.gif")
 
         # Train change section
         self.trainChangeBox = QLabel("", self)
@@ -850,8 +850,6 @@ class TrainControllerUI(QMainWindow):
         self.failBox.setFixedHeight(
             self.brakeFailStatus.y() + 32 + 20 - self.failBox.y()
         )
-
-        self.show()
 
         self.changeButton.clicked.connect(lambda: self.change_train())
         self.timer = QTimer(self)

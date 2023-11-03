@@ -6,7 +6,6 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import time
-from tcsw_train_attributes import *
 
 
 class TCFunctions:
