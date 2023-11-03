@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap("MTA_NYC_logo.svg.png")
+        self.pixmapMTALogo = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/MTA_NYC_logo.svg.png")
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(
             math.floor(1862 * 0.25), math.floor(2046 * 0.25)
         )

@@ -32,7 +32,7 @@ class SystemTime:
                 self.currentTime += 0
             else:
                 self.currentTime += 1
-
+            print(self.convert_to_military())
             # delay based on time increment
             time.sleep(self.timeIncrement)
 
@@ -48,3 +48,8 @@ class SystemTime:
 
     def set_freeze(self, freeze):
         self.freeze = freeze
+
+
+sysTime = SystemTime()
+sysTime.set_timeIncrement(10)
+sysTime.start()
