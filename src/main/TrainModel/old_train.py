@@ -1,19 +1,7 @@
 import sys
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import (
-    QCoreApplication,
-    QRect,
-    QSize,
-    Qt,
-    QTimer,
-    QTime,
-    pyqtSignal
-)
-from PyQt5.QtGui import (
-    QCursor,
-    QFont,
-    QPixmap, QIcon
-)
+from PyQt5.QtCore import QCoreApplication, QRect, QSize, Qt, QTimer, QTime, pyqtSignal
+from PyQt5.QtGui import QCursor, QFont, QPixmap, QIcon
 from PyQt5.QtWidgets import (
     QApplication,
     QFrame,
@@ -23,9 +11,11 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QWidget,
     QVBoxLayout,
-    QHBoxLayout, QComboBox,
+    QHBoxLayout,
+    QComboBox,
 )
 from qtwidgets import AnimatedToggle
+
 
 class VehicleStatusWindow(QMainWindow):
     def __init__(self):
@@ -37,7 +27,7 @@ class VehicleStatusWindow(QMainWindow):
 
         # Title Left Line
         self.LeftLine = QFrame(self.central_widget)
-        self.LeftLine.setObjectName(u"TitleLeftLine")
+        self.LeftLine.setObjectName("TitleLeftLine")
         self.LeftLine.setGeometry(QRect(0, 138, self.width() // 2, 3))
         self.LeftLine.setMaximumSize(QSize(720, 1280))
         self.LeftLine.setFrameShape(QFrame.HLine)
@@ -45,7 +35,7 @@ class VehicleStatusWindow(QMainWindow):
 
         # Title Right Line
         self.RightLine = QFrame(self.central_widget)
-        self.RightLine.setObjectName(u"TitleRightLine")
+        self.RightLine.setObjectName("TitleRightLine")
         self.RightLine.setGeometry(QRect(self.width() // 2, 138, self.width() // 2, 3))
         self.RightLine.setMaximumSize(QSize(720, 1280))
         self.RightLine.setFrameShape(QFrame.HLine)
@@ -53,12 +43,14 @@ class VehicleStatusWindow(QMainWindow):
 
         # Title
         self.Title = QLabel("Vehicle Status", self.central_widget)
-        self.Title.setObjectName(u"Title")
+        self.Title.setObjectName("Title")
         font = QFont()
-        font.setFamilies([u"Arial"])
+        font.setFamilies(["Arial"])
         font.setPointSize(32)
         self.Title.setFont(font)
-        self.Title.setText(QCoreApplication.translate("TrainModel", u"Vehicle Status", None))
+        self.Title.setText(
+            QCoreApplication.translate("TrainModel", "Vehicle Status", None)
+        )
         title_width = self.Title.sizeHint().width()
         title_height = self.Title.sizeHint().height()
         title_x = self.width() // 2 - title_width // 2
@@ -67,10 +59,10 @@ class VehicleStatusWindow(QMainWindow):
 
         # MTA Logo
         self.mtaLogo = QLabel(self.central_widget)
-        self.mtaLogo.setObjectName(u"mtaLogo")
+        self.mtaLogo.setObjectName("mtaLogo")
         self.mtaLogo.setGeometry(QRect(0, 0, 128, 128))
         self.mtaLogo.setMaximumSize(QSize(1280, 720))
-        self.mtaLogo.setPixmap(QPixmap(u"MTA_Logo.png"))
+        self.mtaLogo.setPixmap(QPixmap("MTA_Logo.png"))
         self.mtaLogo.setScaledContents(True)
 
         # Create a QLabel for the first rectangle
@@ -103,10 +95,17 @@ class VehicleStatusWindow(QMainWindow):
         self.white_background_layout.setSpacing(10)
 
         # Create QLabel widgets for the list of words
-        word_list_1 = ["Speed Limit: {speed_limit}", "Current Speed: {current_speed}",
-                       "Setpoint Speed: {setpoint_speed}", "Commanded Speed: {commanded_speed}",
-                       "Acceleration: {acceleration}", "Deceleration: {deceleration}", "Brakes: {brakes}",
-                       "Power: {power}", "Power Limit: {power_limit}"]
+        word_list_1 = [
+            "Speed Limit: {speed_limit}",
+            "Current Speed: {current_speed}",
+            "Setpoint Speed: {setpoint_speed}",
+            "Commanded Speed: {commanded_speed}",
+            "Acceleration: {acceleration}",
+            "Deceleration: {deceleration}",
+            "Brakes: {brakes}",
+            "Power: {power}",
+            "Power Limit: {power_limit}",
+        ]
 
         # Defines a dictionary with actual values
         values = {
@@ -118,18 +117,22 @@ class VehicleStatusWindow(QMainWindow):
             "deceleration": 2.0,
             "brakes": "On",
             "power": 75.0,
-            "power_limit": 100.0
+            "power_limit": 100.0,
         }
 
         # Create and add QLabel widgets for each word to the layout
         for word_placeholders in word_list_1:
             word = word_placeholders.format(**values)
             self.word_label = QLabel(word, self.white_background_label)
-            self.word_label.setStyleSheet("color: #000000; background-color: transparent; border: none;")
+            self.word_label.setStyleSheet(
+                "color: #000000; background-color: transparent; border: none;"
+            )
             self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             self.word_label.setContentsMargins(10, 5, 10, 5)
             self.word_label.setFont(QFont("Arial", 10))
-            self.white_background_layout.addWidget(self.word_label, alignment=Qt.AlignTop)
+            self.white_background_layout.addWidget(
+                self.word_label, alignment=Qt.AlignTop
+            )
 
         self.white_background_layout.addStretch(1)
 
@@ -141,7 +144,9 @@ class VehicleStatusWindow(QMainWindow):
         self.title_label.setFont(self.font)
         self.title_label.setStyleSheet("color: #FFFFFF; background-color: transparent;")
         self.title_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        self.title_label.setGeometry(QRect(0, 0, self.background_widget.width(), self.background_widget.height()))
+        self.title_label.setGeometry(
+            QRect(0, 0, self.background_widget.width(), self.background_widget.height())
+        )
 
         # Create the line separator
         self.line_separator = QFrame(self.rectangle_label)
@@ -186,7 +191,7 @@ class VehicleStatusWindow(QMainWindow):
         values_2 = {
             "engine_failure": False,
             "signal_pickup_failure": False,
-            "brake_failure": False
+            "brake_failure": False,
         }
 
         # Create a vertical layout to place each pair of label and toggle switch
@@ -198,19 +203,31 @@ class VehicleStatusWindow(QMainWindow):
             widget.setStyleSheet("background-color: transparent; border: none;")
 
             status_label = QLabel(word_placeholder, widget)
-            status_label.setStyleSheet("background: transparent; border: none;")  # Remove background and border
+            status_label.setStyleSheet(
+                "background: transparent; border: none;"
+            )  # Remove background and border
             status_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             status_label.setFont(QFont("Arial", 10))
 
             # Check if the word_placeholder is in the values_2 dictionary and is a boolean value
-            if word_placeholder.lower().replace(":", "").replace(" ", "_") in values_2 and isinstance(
-                    values_2[word_placeholder.lower().replace(":", "").replace(" ", "_")], bool):
+            if word_placeholder.lower().replace(":", "").replace(
+                " ", "_"
+            ) in values_2 and isinstance(
+                values_2[word_placeholder.lower().replace(":", "").replace(" ", "_")],
+                bool,
+            ):
                 # Create a custom toggle switch for the value
                 toggle_switch = AnimatedToggle(checked_color="red")
-                toggle_switch.setChecked(values_2[word_placeholder.lower().replace(":", "").replace(" ", "_")])
+                toggle_switch.setChecked(
+                    values_2[
+                        word_placeholder.lower().replace(":", "").replace(" ", "_")
+                    ]
+                )
                 toggle_switch.setStyleSheet("background: transparent; border: none;")
                 toggle_switch.setFixedSize(60, 30)  # Adjust the size as needed
-                toggle_switch.setContentsMargins(5, 0, 5, 0)  # Adjust margins to remove spacing
+                toggle_switch.setContentsMargins(
+                    5, 0, 5, 0
+                )  # Adjust margins to remove spacing
 
                 # Set the layout for the widget
                 layout = QHBoxLayout()
@@ -221,8 +238,14 @@ class VehicleStatusWindow(QMainWindow):
                 widget.setLayout(layout)
             else:
                 # For other options, use a QLabel to display the value
-                value = "On" if values_2.get(word_placeholder.lower().replace(":", "").replace(" ", "_"),
-                                             False) else "Off"
+                value = (
+                    "On"
+                    if values_2.get(
+                        word_placeholder.lower().replace(":", "").replace(" ", "_"),
+                        False,
+                    )
+                    else "Off"
+                )
                 value_label = QLabel(value, widget)
                 value_label.setStyleSheet("background: transparent; border: none;")
                 value_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
@@ -247,9 +270,13 @@ class VehicleStatusWindow(QMainWindow):
         self.font.setPointSize(16)
         self.font.setBold(True)
         self.title_label_2.setFont(self.font)
-        self.title_label_2.setStyleSheet("color: #FFFFFF; background-color: transparent;")
+        self.title_label_2.setStyleSheet(
+            "color: #FFFFFF; background-color: transparent;"
+        )
         self.title_label_2.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        self.title_label_2.setGeometry(QRect(0, 0, self.background_widget.width(), self.background_widget.height()))
+        self.title_label_2.setGeometry(
+            QRect(0, 0, self.background_widget.width(), self.background_widget.height())
+        )
 
         # Create the line separator
         self.line_separator_2 = QFrame(self.rectangle_label_2)
@@ -273,7 +300,7 @@ class PassengerStatusWindows(QMainWindow):
         self.font = QFont()
         self.font.setPointSize(20)
         self.clock_label = QLabel(self.central_widget)
-        self.clock_label.setObjectName(u"clock_label")
+        self.clock_label.setObjectName("clock_label")
         self.clock_label.setFont(self.font)
         self.clock_label.setAlignment(Qt.AlignRight | Qt.AlignTop)
 
@@ -292,7 +319,7 @@ class PassengerStatusWindows(QMainWindow):
 
         # Title Left Line
         self.LeftLine = QFrame(self.central_widget)
-        self.LeftLine.setObjectName(u"TitleLeftLine")
+        self.LeftLine.setObjectName("TitleLeftLine")
         self.LeftLine.setGeometry(QRect(0, 138, self.width() // 2, 3))
         self.LeftLine.setMaximumSize(QSize(720, 1280))
         self.LeftLine.setFrameShape(QFrame.HLine)
@@ -300,7 +327,7 @@ class PassengerStatusWindows(QMainWindow):
 
         # Title Right Line
         self.RightLine = QFrame(self.central_widget)
-        self.RightLine.setObjectName(u"TitleRightLine")
+        self.RightLine.setObjectName("TitleRightLine")
         self.RightLine.setGeometry(QRect(self.width() // 2, 138, self.width() // 2, 3))
         self.RightLine.setMaximumSize(QSize(720, 1280))
         self.RightLine.setFrameShape(QFrame.HLine)
@@ -308,12 +335,14 @@ class PassengerStatusWindows(QMainWindow):
 
         # Title
         self.Title = QLabel("Passenger Status", self.central_widget)
-        self.Title.setObjectName(u"Title")
+        self.Title.setObjectName("Title")
         font = QFont()
-        font.setFamilies([u"Arial"])
+        font.setFamilies(["Arial"])
         font.setPointSize(32)
         self.Title.setFont(font)
-        self.Title.setText(QCoreApplication.translate("TrainModel", u"Passenger Status", None))
+        self.Title.setText(
+            QCoreApplication.translate("TrainModel", "Passenger Status", None)
+        )
         title_width = self.Title.sizeHint().width()
         title_height = self.Title.sizeHint().height()
         title_x = self.width() // 2 - title_width // 2
@@ -322,10 +351,10 @@ class PassengerStatusWindows(QMainWindow):
 
         # MTA Logo
         self.mtaLogo = QLabel(self.central_widget)
-        self.mtaLogo.setObjectName(u"mtaLogo")
+        self.mtaLogo.setObjectName("mtaLogo")
         self.mtaLogo.setGeometry(QRect(0, 0, 128, 128))
         self.mtaLogo.setMaximumSize(QSize(1280, 720))
-        self.mtaLogo.setPixmap(QPixmap(u"MTA_Logo.png"))
+        self.mtaLogo.setPixmap(QPixmap("MTA_Logo.png"))
         self.mtaLogo.setScaledContents(True)
 
         # Create a QLabel for the rectangle
@@ -358,10 +387,17 @@ class PassengerStatusWindows(QMainWindow):
         self.white_background_layout.setSpacing(10)
 
         # Create QLabel widgets for the list of words
-        word_list = ["Passengers: {passengers}", "Passenger Limit: {passenger_limit}", "Left Door: {left_door}",
-                     "Right Door: {right_door}", "Lights Status: {lights_status}", "Announcements: {announcements}",
-                     "Temperature: {temperature}", "Air Conditioning: {air_conditioning}",
-                     "Advertisements: {advertisements}"]
+        word_list = [
+            "Passengers: {passengers}",
+            "Passenger Limit: {passenger_limit}",
+            "Left Door: {left_door}",
+            "Right Door: {right_door}",
+            "Lights Status: {lights_status}",
+            "Announcements: {announcements}",
+            "Temperature: {temperature}",
+            "Air Conditioning: {air_conditioning}",
+            "Advertisements: {advertisements}",
+        ]
 
         # Defines a dictionary with actual values
         values = {
@@ -373,18 +409,22 @@ class PassengerStatusWindows(QMainWindow):
             "announcements": "On",
             "temperature": "72°F",
             "air_conditioning": "Off",
-            "advertisements": "Buy our signature drink"
+            "advertisements": "Buy our signature drink",
         }
 
         # Create and add QLabel widgets for each word to the layout
         for word_placeholders in word_list:
             word = word_placeholders.format(**values)
             self.word_label = QLabel(word, self.white_background_label)
-            self.word_label.setStyleSheet("color: #000000; background-color: transparent; border: none;")
+            self.word_label.setStyleSheet(
+                "color: #000000; background-color: transparent; border: none;"
+            )
             self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             self.word_label.setContentsMargins(10, 5, 10, 5)
             self.word_label.setFont(QFont("Arial", 10))
-            self.white_background_layout.addWidget(self.word_label, alignment=Qt.AlignTop)
+            self.white_background_layout.addWidget(
+                self.word_label, alignment=Qt.AlignTop
+            )
 
         self.white_background_layout.addStretch(1)
 
@@ -396,7 +436,9 @@ class PassengerStatusWindows(QMainWindow):
         self.title_label.setFont(self.font)
         self.title_label.setStyleSheet("color: #FFFFFF; background-color: transparent;")
         self.title_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        self.title_label.setGeometry(QRect(0, 0, self.background_widget.width(), self.background_widget.height()))
+        self.title_label.setGeometry(
+            QRect(0, 0, self.background_widget.width(), self.background_widget.height())
+        )
 
         # Create the line separator
         self.line_separator = QFrame(self.rectangle_label)
@@ -408,6 +450,7 @@ class PassengerStatusWindows(QMainWindow):
     def update_clock_label(self):
         time_text = self.clock.elapsed_time.toString("HH:mm:ss")
         self.clock_label.setText(time_text)
+
 
 class NavigationStatusWindow(QMainWindow):
     def __init__(self, clock):
@@ -422,7 +465,7 @@ class NavigationStatusWindow(QMainWindow):
         self.font = QFont()
         self.font.setPointSize(20)
         self.clock_label = QLabel(self.central_widget)
-        self.clock_label.setObjectName(u"clock_label")
+        self.clock_label.setObjectName("clock_label")
         self.clock_label.setFont(self.font)
         self.clock_label.setAlignment(Qt.AlignRight | Qt.AlignTop)
 
@@ -441,7 +484,7 @@ class NavigationStatusWindow(QMainWindow):
 
         # Title Left Line
         self.LeftLine = QFrame(self.central_widget)
-        self.LeftLine.setObjectName(u"TitleLeftLine")
+        self.LeftLine.setObjectName("TitleLeftLine")
         self.LeftLine.setGeometry(QRect(0, 138, self.width() // 2, 3))
         self.LeftLine.setMaximumSize(QSize(720, 1280))
         self.LeftLine.setFrameShape(QFrame.HLine)
@@ -449,7 +492,7 @@ class NavigationStatusWindow(QMainWindow):
 
         # Title Right Line
         self.RightLine = QFrame(self.central_widget)
-        self.RightLine.setObjectName(u"TitleRightLine")
+        self.RightLine.setObjectName("TitleRightLine")
         self.RightLine.setGeometry(QRect(self.width() // 2, 138, self.width() // 2, 3))
         self.RightLine.setMaximumSize(QSize(720, 1280))
         self.RightLine.setFrameShape(QFrame.HLine)
@@ -457,12 +500,14 @@ class NavigationStatusWindow(QMainWindow):
 
         # Title
         self.Title = QLabel("Navigation Status", self.central_widget)
-        self.Title.setObjectName(u"Title")
+        self.Title.setObjectName("Title")
         font = QFont()
-        font.setFamilies([u"Arial"])
+        font.setFamilies(["Arial"])
         font.setPointSize(32)
         self.Title.setFont(font)
-        self.Title.setText(QCoreApplication.translate("TrainModel", u"Navigation Status", None))
+        self.Title.setText(
+            QCoreApplication.translate("TrainModel", "Navigation Status", None)
+        )
         title_width = self.Title.sizeHint().width()
         title_height = self.Title.sizeHint().height()
         title_x = self.width() // 2 - title_width // 2
@@ -471,10 +516,10 @@ class NavigationStatusWindow(QMainWindow):
 
         # MTA Logo
         self.mtaLogo = QLabel(self.central_widget)
-        self.mtaLogo.setObjectName(u"mtaLogo")
+        self.mtaLogo.setObjectName("mtaLogo")
         self.mtaLogo.setGeometry(QRect(0, 0, 128, 128))
         self.mtaLogo.setMaximumSize(QSize(1280, 720))
-        self.mtaLogo.setPixmap(QPixmap(u"MTA_Logo.png"))
+        self.mtaLogo.setPixmap(QPixmap("MTA_Logo.png"))
         self.mtaLogo.setScaledContents(True)
 
         # Create a QLabel for the rectangle
@@ -507,9 +552,14 @@ class NavigationStatusWindow(QMainWindow):
         self.white_background_layout.setSpacing(0)
 
         # Create QLabel widgets for the list of words
-        word_list = ["Authority: {authority}", "Beacon: {beacon}", "Next Station: {next_station}",
-                     "Previous Station: {prev_station}", "Headlights: {headlights}",
-                     "Passenger Emergency Brake: {passenger_emergency_brake}"]
+        word_list = [
+            "Authority: {authority}",
+            "Beacon: {beacon}",
+            "Next Station: {next_station}",
+            "Previous Station: {prev_station}",
+            "Headlights: {headlights}",
+            "Passenger Emergency Brake: {passenger_emergency_brake}",
+        ]
 
         # Defines a dictionary with actual values
         values = {
@@ -518,18 +568,22 @@ class NavigationStatusWindow(QMainWindow):
             "next_station": "Block 9",
             "prev_station": "Block 5",
             "headlights": "On",
-            "passenger_emergency_brake": "Off"
+            "passenger_emergency_brake": "Off",
         }
 
         # Create and add QLabel widgets for each word to the layout
         for word_placeholders in word_list:
             word = word_placeholders.format(**values)
             self.word_label = QLabel(word, self.white_background_label)
-            self.word_label.setStyleSheet("color: #000000; background-color: transparent; border: none;")
+            self.word_label.setStyleSheet(
+                "color: #000000; background-color: transparent; border: none;"
+            )
             self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             self.word_label.setContentsMargins(10, 5, 10, 5)
             self.word_label.setFont(QFont("Arial", 10))
-            self.white_background_layout.addWidget(self.word_label, alignment=Qt.AlignTop)
+            self.white_background_layout.addWidget(
+                self.word_label, alignment=Qt.AlignTop
+            )
 
         self.white_background_layout.addStretch(1)
 
@@ -541,7 +595,9 @@ class NavigationStatusWindow(QMainWindow):
         self.title_label.setFont(self.font)
         self.title_label.setStyleSheet("color: #FFFFFF; background-color: transparent;")
         self.title_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-        self.title_label.setGeometry(QRect(0, 0, self.background_widget.width(), self.background_widget.height()))
+        self.title_label.setGeometry(
+            QRect(0, 0, self.background_widget.width(), self.background_widget.height())
+        )
 
         # Create the line separator
         self.line_separator = QFrame(self.rectangle_label)
@@ -553,4 +609,3 @@ class NavigationStatusWindow(QMainWindow):
     def update_clock_label(self):
         time_text = self.clock.elapsed_time.toString("HH:mm:ss")
         self.clock_label.setText(time_text)
-

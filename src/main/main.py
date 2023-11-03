@@ -1,11 +1,13 @@
 import sys
 import math
+import time
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5 import QtGui
 
 from TrackController.trackcontrol import TrackControl
+from TrainControllerSW.tcsw_ui import *
 
 
 class MainWindow(QMainWindow):
@@ -35,6 +37,7 @@ class MainWindow(QMainWindow):
 
         # Initialize all the different modules
         trackControl = TrackControl()
+        self.trainControllerSW = TrainControllerUI()
 
         # setting title
         self.setWindowTitle(self.moduleName)
@@ -68,7 +71,9 @@ class MainWindow(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap("MTA_NYC_logo.svg.png")
+        self.pixmapMTALogo = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/MTA_NYC_logo.svg.png"
+        )
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(
             math.floor(1862 * 0.25), math.floor(2046 * 0.25)
         )
@@ -101,6 +106,7 @@ class MainWindow(QMainWindow):
         self.box5 = QPushButton("Train Controller\nSW", self)
         self.box_button(self.box5, self.box1.width(), self.box1.height())
         self.set_relative_below(self.box5, self.box1, 20)
+        self.box5.clicked.connect(lambda: self.trainControllerSW.show())
 
         self.box6 = QPushButton("Train Controller\nHW", self)
         self.box_button(self.box6, self.box1.width(), self.box1.height())
