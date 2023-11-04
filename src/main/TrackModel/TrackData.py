@@ -1,5 +1,5 @@
 import pandas as pd
-from Station import Station
+from .Station import Station
 
 class TrackData:
     redTrackData = []

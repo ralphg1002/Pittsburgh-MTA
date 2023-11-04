@@ -1,7 +1,7 @@
 import sys
 import re
-from TrackData import TrackData
-from Station import Station
+from .TrackData import TrackData
+from .Station import Station
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -342,12 +342,12 @@ class TrackModel:
         self.setup_selection_window()
 
     def setup_selection_window(self):
-        app = QApplication(sys.argv)
+        # app = QApplication(sys.argv) #Don't need for main.py
         self.mainWindow = QMainWindow()
         self.mainWindow.setGeometry(960, 35, 960, 1045)
         self.mainWindow.setWindowTitle(self.moduleName)
         self.mainWindow.setStyleSheet('background-color: white')
-        app.setWindowIcon(QIcon("src/main/TrackModel/pngs/MTA_logo.png"))
+        # app.setWindowIcon(QIcon("src/main/TrackModel/pngs/MTA_logo.png"))
 
         # General layout
         self.set_clock()
@@ -385,8 +385,8 @@ class TrackModel:
         self.map_toggle()
 
         #Hide by default
-        self.mainWindow.show()
-        sys.exit(app.exec_())
+        # self.mainWindow.show()
+        # sys.exit(app.exec_())
         
     def load_data(self):
         #Preload track data
