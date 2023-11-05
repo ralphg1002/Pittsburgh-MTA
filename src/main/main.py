@@ -1,11 +1,14 @@
 import sys
 import math
+import time
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5 import QtGui
 
 from TrackController.trackcontrol import TrackControl
+from TrainControllerSW.tcsw_ui import *
+from TrackModel.track_model import TrackModel
 
 
 class MainWindow(QMainWindow):
@@ -35,6 +38,8 @@ class MainWindow(QMainWindow):
 
         # Initialize all the different modules
         trackControl = TrackControl()
+        self.trainControllerSW = TrainControllerUI()
+        trackModel = TrackModel()
 
         # setting title
         self.setWindowTitle(self.moduleName)
@@ -68,7 +73,9 @@ class MainWindow(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap("MTA_NYC_logo.svg.png")
+        self.pixmapMTALogo = QtGui.QPixmap(
+            "src/main/MTA_NYC_logo.png"
+        )
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(
             math.floor(1862 * 0.25), math.floor(2046 * 0.25)
         )
@@ -83,7 +90,7 @@ class MainWindow(QMainWindow):
         self.box1 = QPushButton("Track Model", self)
         self.box_button(self.box1, 200, 200)
         self.set_relative_right(self.box1, self.logo, 20)
-        # self.box1.clicked(self.trackModel.show())
+        self.box1.clicked.connect(lambda: trackModel.mainWindow.show())
 
         self.box2 = QPushButton("Train Model", self)
         self.box_button(self.box2, self.box1.width(), self.box1.height())
@@ -101,6 +108,7 @@ class MainWindow(QMainWindow):
         self.box5 = QPushButton("Train Controller\nSW", self)
         self.box_button(self.box5, self.box1.width(), self.box1.height())
         self.set_relative_below(self.box5, self.box1, 20)
+        self.box5.clicked.connect(lambda: self.trainControllerSW.show())
 
         self.box6 = QPushButton("Train Controller\nHW", self)
         self.box_button(self.box6, self.box1.width(), self.box1.height())
@@ -152,6 +160,8 @@ app = QApplication(sys.argv)
 
 # create window instance
 window = MainWindow()
+
+app.setWindowIcon(QIcon("src/main/MTA_NYC_logo.png"))
 
 # run app
 app.exec()

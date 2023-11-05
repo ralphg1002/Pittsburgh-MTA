@@ -207,6 +207,9 @@ class OccupancyBox(QWidget):
 
         return False
 
+    def clear_table(self):
+        self.tableWidget.clearContents()
+
 
 class ModeButton(QPushButton):
     modeChanged = pyqtSignal(bool)  # Custom signal to indicate mode change

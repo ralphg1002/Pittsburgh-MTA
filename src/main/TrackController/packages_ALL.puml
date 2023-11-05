@@ -1,0 +1,11 @@
+@startuml packages_ALL
+set namespaceSeparator none
+
+class "CTCToTrackController" as signals.TrackControllerToCTC {
+  suggestedAuthority
+  suggestedSpeed
+}
+
+
+
+@enduml

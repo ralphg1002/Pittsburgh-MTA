@@ -1,0 +1,529 @@
+@startuml classes_ALL
+!pragma page max 800x600
+!pragma margin 10
+set namespaceSeparator none
+class "Block" as trackcontrol.Block {
+  authority
+  ctcAuthority : NoneType
+  direction
+  failureState
+  maintenanceState
+  nextOccupiedBlockAuthority : NoneType
+  nextRedAuthority : NoneType
+  number
+  occupancyState
+  speed
+  suggestedSpeed
+  get_authority()
+  get_direction()
+  get_failurestate()
+  get_maintenancestate()
+  get_number()
+  get_occupancystate()
+  get_speed()
+  get_suggestedspeed()
+  get_type()
+  set_authority(newAuthority)
+  set_direction(newDirection)
+  set_failurestate(newFailureState)
+  set_maintenancestate(newMaintenanceState)
+  set_occupancystate(newOccupancyState)
+  set_speed(newSpeed)
+  set_suggestedspeed(newSpeed)
+}
+class "BlockStatus" as trackcontrolui.BlockStatus {
+  frame
+  label
+  labelStatus
+  status : str
+  statusColors : dict
+  get_status()
+  init_ui()
+  paintEvent(event)
+  set_status(newStatus)
+  update_status()
+}
+class "Crossing" as trackcontrolui.Crossing {
+  buttonMode
+  closed
+  crossingToggleState : bool
+  open
+  switchCrossChanged
+  toggleCrossing
+  get_crossing_state()
+  hide_crossing()
+  on_button_click()
+  set_crossing_state(state)
+  show_crossing()
+  update_button_visibility(mode)
+  update_crossing_display()
+}
+class "CrossingBlock" as trackcontrol.CrossingBlock {
+  crossingState
+  lightState
+  get_crossingstate()
+  get_lightstate()
+  get_type()
+  set_crossingstate(newSwitchState)
+  set_lightstate(newLightState)
+}
+class "DeviceBox" as trackcontrolui.DeviceBox {
+  paintEvent(event)
+}
+class "JunctionNSBlock" as trackcontrol.JunctionNSBlock {
+  lightState
+  get_lightstate()
+  get_type()
+  set_lightstate(newLightState)
+}
+class "JunctionRectangles" as trackcontrolui.JunctionRectangles {
+  rectColor
+  rectHeight : int
+  rectWidth : int
+  paintEvent(event)
+}
+class "JunctionToggle" as trackcontrolui.JunctionToggle {
+  buttonMode
+  parentBox
+  sidearrow
+  switchCrossChanged
+  switchToggleState : bool
+  toggleSwitch
+  uparrow
+  get_switch_state()
+  hide_switch()
+  on_button_click()
+  set_switch_state(state)
+  update_button_visibility(mode)
+  update_switch_display()
+}
+class "JunctionWS" as trackcontrolui.JunctionWS {
+  buttonMode
+  junctionBlocks
+  junctionToggleButton
+  labelLeft
+  labelRight
+  labelUpright
+  get_signal()
+  get_switch_state()
+  hide_junction()
+  set_switch_state(state)
+  set_text_box(blockLeft, blockRight, blockUpright)
+  update_button_visibility(mode)
+}
+class "JunctionWSBlock" as trackcontrol.JunctionWSBlock {
+  lightState
+  nextBlock0
+  nextBlock1
+  switchState
+  get_connected()
+  get_lightstate()
+  get_switchstate()
+  get_type()
+  set_lightstate(newLightState)
+  set_switchstate(newSwitchState)
+}
+class "LightStates" as trackcontrolui.LightStates {
+  buttonMode
+  currentColor
+  greenLight
+  lightChanged
+  redLight
+  setGreenButton
+  setRedButton
+  setYellowButton
+  settrafficlightcolor
+  yellowLight
+  get_state()
+  paintEvent(event)
+  set_state(newState)
+  setup_buttons()
+  update_button_visibility(mode)
+}
+class "Line" as trackcontrol.Line {
+  trackID
+  waysides : list
+  add_wayside(wayside)
+  get_wayside(waysideNumber)
+}
+class "MainBox" as trackcontrolui.MainBox {
+  paintEvent(event)
+}
+class "MainUI" as trackcontrolui.MainUI {
+  blockStatus
+  blockTypeSelect : str
+  bodyBlock
+  buttonMap
+  buttonMode
+  colorBlack : str
+  colorDarkBlue : str
+  colorDarkGrey : str
+  colorLightBlue : str
+  colorLightGrey : str
+  colorLightRed : str
+  colorMediumGrey : str
+  comboboxBlockNum
+  comboboxBlockType
+  comboboxLine
+  comboboxWayside
+  crossing
+  deviceBlock
+  fontStyle : str
+  h : int
+  headerBlock
+  headerFontSize : int
+  junctionSwitch
+  labelFontSize : int
+  lightState
+  lineSelect : int
+  logo
+  mainBox
+  moduleLabel
+  moduleName : str
+  occupancyBox
+  occupiedBlockFailure
+  occupiedBlockNumber
+  occupiedBlockType
+  occupiedBlocks
+  pixmapFastForward
+  pixmapGear
+  pixmapMTALogo
+  pixmapRewind
+  plcImportButton
+  slowDownButton
+  speedUpButton
+  station
+  systemSpeedInput
+  systemSpeedLabel
+  systemTimeInput
+  systemTimeLabel
+  testBenchWindow
+  testbenchButton
+  testbenchIcon
+  textFontSize : int
+  titleFontSize : int
+  titleLabel
+  w : int
+  waysideSelect : int
+  handle_selection_line(index)
+  hide_devices()
+}
+class "MapButton" as trackcontrolui.MapButton {
+  defaultColor
+  mapWindow : NoneType
+  on_button_click(line)
+}
+class "MapWindow" as trackcontrolui.MapWindow {
+  mapLabel
+  scaledPixmapGreenLine
+  scaledPixmapRedLine
+  set_map(line)
+}
+class "ModeButton" as trackcontrolui.ModeButton {
+  clickedColor
+  defaultColor
+  defaultText : str
+  mode : bool
+  modeChanged
+  change_button_style(clicked)
+  get_mode()
+  on_button_click()
+  set_button_style(newMode)
+}
+class "OccupancyBox" as trackcontrolui.OccupancyBox {
+  tableWidget
+  add_item(blockNumber, blockType, failure)
+  clear_table()
+  does_block_and_state_exist(blockNumber, blockState)
+  does_block_exist(blockNumber, blockState)
+  paintEvent(event)
+  populate_table(data)
+  remove_item_by_blocknumber(blockNumber)
+}
+class "RunPLC" as trackcontrol.RunPLC {
+  parse_text_file(filename)
+}
+class "Station" as trackcontrolui.Station {
+  fontSize : int
+  label
+  station
+  hide_station()
+  set_station_name(text)
+  show_station()
+}
+class "StationBlock" as trackcontrol.StationBlock {
+  stationName
+  get_stationname()
+  get_type()
+  set_stationname(newStationName)
+}
+class "StationJunctionNSBlock" as trackcontrol.StationJunctionNSBlock {
+  lightState
+  stationName
+  get_lightstate()
+  get_stationname()
+  get_type()
+  set_lightstate(newLightState)
+  set_stationname(newStationName)
+}
+class "StationJunctionWSBlock" as trackcontrol.StationJunctionWSBlock {
+  lightState
+  nextBlock0
+  nextBlock1
+  stationName
+  switchState
+  get_connected()
+  get_lightstate()
+  get_stationname()
+  get_switchstate()
+  get_type()
+  set_lightstate(newLightState)
+  set_stationname(newStationName)
+  set_switchstate(newSwitchState)
+}
+class "TestWindow" as trackcontrolui.TestWindow {
+  refreshed
+  requestViewAuthority
+  requestViewDirection
+  requestViewFailureState
+  requestViewLightState
+  requestViewMaintenanceState
+  requestViewOccupancyState
+  requestViewSpeed
+  requestViewSwitchState
+  returnViewAuthority
+  returnViewDirection
+  returnViewFailureState
+  returnViewLightState
+  returnViewMaintenanceState
+  returnViewOccupancyState
+  returnViewSpeed
+  returnViewSwitchState
+  setAuthority
+  setDirection
+  setFailureState
+  setLightState
+  setMaintenanceState
+  setOccupancyState
+  setSpeed
+  setSwitchState
+  handle_selection_set_authority(index)
+  handle_selection_set_block_failure(index)
+  handle_selection_set_direction(index)
+  handle_selection_set_light(index)
+  handle_selection_set_maintenance(index)
+  handle_selection_set_occupancy(index)
+  handle_selection_set_speed(index)
+  handle_selection_set_switch(index)
+  handle_selection_view_authority(index)
+  handle_selection_view_block_failure(index)
+  handle_selection_view_direction(index)
+  handle_selection_view_light(index)
+  handle_selection_view_maintenance(index)
+  handle_selection_view_occupancy(index)
+  handle_selection_view_speed(index)
+  handle_selection_view_switch(index)
+}
+class "TrackControl" as trackcontrol.TrackControl {
+  filePath
+  greenLine
+  lines : list
+  redLine
+  ui
+  wayside1G
+  wayside1R
+  wayside2G
+  wayside2R
+  handle_mode(mode)
+  handle_selection_block_type()
+  handle_selection_blocknum()
+  handle_selection_wayside(index)
+  import_plc()
+  set_authoritystate_handler(line, wayside, num, authority)
+  set_crossingstate_handler(line, wayside, num, state)
+  set_direction_handler(line, wayside, num, direction)
+  set_failurestate_handler(line, wayside, num, state)
+  set_lightstate_handler(line, wayside, num, color)
+  set_maintenancestate_handler(line, wayside, num, state)
+  set_occupancystate_handler(line, wayside, num, state)
+  set_speed_handler(line, wayside, num, speed)
+  {abstract}set_suggested_authority_handler(line, wayside, num, suggestedAuthority)
+  set_switchstate_handler(line, wayside, num, state)
+  show_gui()
+}
+class "TrackControllerToCTC" as signals.TrackControllerToCTC {
+  failureState
+  occupancyState
+  requestSpeed
+  switchState
+}
+class "TrackControllerToTrackModel" as signals.TrackControllerToTrackModel {
+  authority
+  crossingState
+  lightState
+  maintenance
+  suggestedSpeed
+  switchState
+}
+
+class "UiMainWindow" as testbench.UiMainWindow {
+  centralwidget
+  getAuthoritySelectWayside
+  getBlockSelectWayside
+  getCrossSelectWayside
+  getDirectionSelectWayside
+  getLightSelectWayside
+  getMaintenanceSelectWayside
+  getSwitchSelectWayside
+  inputHeader
+  inputHorizontalLine
+  inputTitle
+  inputframe
+  outputHeader
+  outputHorizontalLine
+  outputTitle
+  outputframe
+  setAuthSelectLine
+  setAuthorityRow
+  setAuthoritySelectBlock
+  setAuthoritySelectWayside
+  setAuthoritySetState
+  setBlockFailureRow
+  setBlockFailureSelectBlock
+  setBlockFailureSelectLine
+  setBlockFailureSelectState
+  setBlockSelectWayside
+  setCr
+  setCrossSelectBlock
+  setCrossSelectLine
+  setCrossSelectState
+  setCrossSelectWayside
+  setDirectionRow
+  setDirectionSelectBlock
+  setDirectionSelectLine
+  setDirectionSelectState
+  setDirectionSelectWayside
+  setLightRow
+  setLightSelectBlock
+  setLightSelectLine
+  setLightSelectState
+  setLightSelectWayside
+  setMaintenanceRow
+  setMaintenanceSelectBlock
+  setMaintenanceSelectLine
+  setMaintenanceSelectState
+  setMaintenanceSelectWayside
+  setOccupancyRow
+  setOccupancySelectBlock
+  setOccupancySelectLine
+  setOccupancySelectState
+  setOccupancySelectWayside
+  setOccupancySelectWayside2
+  setSpeedRow
+  setSpeedSelectBlock
+  setSpeedSelectLine
+  setSpeedSelectWayside
+  setSpeedSelectWayside2
+  setSpeedSetState
+  setSwitchRow
+  setSwitchSelectBlock
+  setSwitchSelectLine
+  setSwitchSelectState
+  setSwitchSelectWayside
+  statusbar
+  testBenchTitle
+  viewAuthorityRow
+  viewAuthoritySelectBlock
+  viewAuthoritySelectLine
+  viewAuthorityState
+  viewBlockFailureRow
+  viewBlockFailureSelectBlock
+  viewBlockFailureSelectLine
+  viewBlockFailureState
+  viewCrossingRow
+  viewCrossingSelectBlock
+  viewCrossingSelectLine
+  viewCrossingState
+  viewDirectionRow
+  viewDirectionSelectBlock
+  viewDirectionSelectLine
+  viewDirectionSelectState
+  viewLightRow
+  viewLightSelectBlock
+  viewLightSelectLine
+  viewLightState
+  viewMaintenanceRow
+  viewMaintenanceSelectBlock
+  viewMaintenanceSelectLine
+  viewMaintenanceState
+  viewOccupancyRow
+  viewOccupancySelectBlock
+  viewOccupancySelectLine
+  viewOccupancyState
+  viewSpeedRow
+  viewSpeedSelectBlock
+  viewSpeedSelectLien
+  viewSpeedState
+  viewSwitchRow
+  viewSwitchSelectBlock
+  viewSwitchSelectLine
+  viewSwitchState
+  retranslate_ui(mainWindow)
+  setup_ui(mainWindow)
+}
+class "Wayside" as trackcontrol.Wayside {
+  blocks : list
+  line
+  plc
+  plcData : NoneType, list
+  plcState : bool
+  switches : dict
+  waysideNum
+  add_block(block)
+  get_block(blockNumber)
+  get_blocks_by_type(blockType)
+  get_line()
+  get_occupied_blocks()
+  get_plc_state()
+  get_waysidenum()
+  parse_condition(condition)
+  parse_operation(operationLine)
+  refresh_plc()
+  run_plc(plcFilepath)
+  set_plc_state(mode)
+  switches_init(switchDictionary)
+}
+trackcontrol.CrossingBlock --|> trackcontrol.Block
+trackcontrol.JunctionNSBlock --|> trackcontrol.Block
+trackcontrol.JunctionWSBlock --|> trackcontrol.Block
+trackcontrol.StationBlock --|> trackcontrol.Block
+trackcontrol.StationJunctionNSBlock --|> trackcontrol.Block
+trackcontrol.StationJunctionWSBlock --|> trackcontrol.Block
+testbench.UiMainWindow --|> trackcontrolui.MainUI
+trackcontrolui.MainUI --|> trackcontrol.TrackControl
+trackcontrol.Block --|> trackcontrol.Wayside
+trackcontrol.TrackControl <|-- signals.TrackControllerToCTC
+trackcontrol.TrackControl <|-- signals.TrackControllerToTrackModel
+trackcontrol.Line --* trackcontrol.TrackControl : greenLine
+trackcontrol.Line --* trackcontrol.TrackControl : redLine
+trackcontrol.RunPLC --* trackcontrol.Wayside : plc
+trackcontrol.Wayside --* trackcontrol.TrackControl : wayside1G
+trackcontrol.Wayside --* trackcontrol.TrackControl : wayside2G
+trackcontrol.Wayside --* trackcontrol.TrackControl : wayside1R
+trackcontrol.Wayside --* trackcontrol.TrackControl : wayside2R
+trackcontrolui.BlockStatus --* trackcontrolui.MainUI : blockStatus
+trackcontrolui.Crossing --* trackcontrolui.MainUI : crossing
+trackcontrolui.DeviceBox --* trackcontrolui.MainUI : deviceBlock
+trackcontrolui.JunctionRectangles --* trackcontrolui.JunctionWS : junctionBlocks
+trackcontrolui.JunctionToggle --* trackcontrolui.JunctionWS : junctionToggleButton
+trackcontrolui.JunctionWS --* trackcontrolui.MainUI : junctionSwitch
+trackcontrolui.LightStates --* trackcontrolui.MainUI : lightState
+trackcontrolui.MainBox --* trackcontrolui.MainUI : mainBox
+trackcontrolui.MapButton --* trackcontrolui.MainUI : buttonMap
+trackcontrolui.MapWindow --* trackcontrolui.MapButton : mapWindow
+trackcontrolui.ModeButton --* trackcontrolui.MainUI : buttonMode
+trackcontrolui.OccupancyBox --* trackcontrolui.MainUI : occupancyBox
+trackcontrolui.Station --* trackcontrolui.MainUI : station
+trackcontrolui.TestWindow --* trackcontrolui.MainUI : testBenchWindow
+
+@enduml

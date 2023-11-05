@@ -6,12 +6,12 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import time
-from tcsw_train_attributes import *
 
 
 class TCFunctions:
     def __init__(self):
         self.trainList = []
+        self.time = 0
         self.piVariables = {
             "powerLimit": 120000,
             "uk": 0,
@@ -61,11 +61,16 @@ class TCFunctions:
             trainObject.set_rightDoor(False)
             trainObject.set_announcement("")
 
-    def tunnel_operations(self, trainObject):
+    def light_operations(self, trainObject):
         if trainObject.beacon["isTunnel"]:
             trainObject.set_headlights(True)
+            trainObject.set_interiorLights(True)
+        # elif self.time >= 21600 or self.time <= 64800:
+        #    trainObject.set_headlights(False)
+        #    trainObject.set_interiorLights(True)
         else:
             trainObject.set_headlights(False)
+            trainObject.set_interiorLights(False)
 
     def advertisement_rotation(self, trainObject):
         if self.advertisementCounter == 1:
@@ -129,7 +134,7 @@ class TCFunctions:
 
     def automatic_operations(self, trainObject):
         self.station_operations(trainObject)
-        self.tunnel_operations(trainObject)
+        self.light_operations(trainObject)
         self.advertisement_rotation(trainObject)
         trainObject.set_setpointSpeed(trainObject.get_commandedSpeed())
         trainObject.set_setpointTemp(70)
