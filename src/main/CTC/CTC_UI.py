@@ -294,10 +294,30 @@ class CTCWindow(QMainWindow):
         self.stopsTable.setGeometry(278,350,275,200)
         self.stopsTable.hide()
 
-        self.show()
+        """self.block = Block()
 
-    def show_gui(self):
-        self.ui.show()
+        # select block numbers
+        self.blockDropDown = QComboBox(self)
+        self.blockDropDown.setGeometry(275,275,165,50)
+        self.blockDropDown = self.block.updateBlockDropDown
+        self.blockDropDown.hide()
+        self.blocks = [] 
+        self.blockDropDown.currentIndexChanged.connect(self.block.showBlockStatus)  # Connect the signal to update the dropdown
+        
+        # toggleEnableButton
+        self.toggleEnableButton = QPushButton("Enable", self)
+        self.toggleEnableButton.setVisible(False)
+        self.toggleEnableButton.setFont(QFont(self.fontStyle, self.textFontSize))
+        self.toggleEnableButton.setGeometry(450, 275, 100, 50)  
+        self.toggleEnableButton.setStyleSheet('background-color: white; color: ' + self.colorDarkBlue + '; border: 1px solid black')
+        self.toggleEnableButton.clicked.connect(self.scheduler.toggleEnableButton)
+        
+        # isplaying the occupancy status
+        self.status_label = QLabel("Block Status: Not Occupied") 
+        self.status_label.setStyleSheet("font-size: 16px; color: green;")
+        self.status_label.block.showBlockStatus(self.status_label)  # Pass the status_label as an argument"""
+
+        self.show()
 
 """class SignalHandlers:
     def __init__(self):
@@ -447,6 +467,7 @@ class ModeHandler:
         main_window.addStopDropdown.setVisible(False)
         main_window.stopsQueueHeader.setVisible(False)
         main_window.stopsTable.setVisible(False)
+        
 
 class Scheduler:
     def __init__(self, main_window):
@@ -457,7 +478,8 @@ class Scheduler:
         self.trainID = None
 
     def load_file(self):
-        selected_line = self.main_window.selectLine.currentText()
+        selected_line = self.getSelectedLine()
+        #self.main_window.selectLine.currentText()
         if selected_line == "Select a Line":
             # Set the error message text
             self.main_window.error_label.setText("Please select a line.")
@@ -1185,17 +1207,54 @@ class Block:
         self.occupancy = 0
         self.enable = 1
     
+        self.mode_handler = ModeHandler()
     def setEnable(self, blockEnable):
         self.enable = blockEnable
+
     def setOccupancy(self, occupancy):
         self.occupancy = occupancy
 
- 
+    def updateBlockDropDown(self):
+        self.main_window.blockDropDown.clear()
+        selected_line = self.main_window.selectLine.currentText()
+
+        if selected_line == "Blue Line":
+            self.mode_handler.blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        
+        elif selected_line == "Red Line":
+            self.mode_handler.blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+        elif selected_line == "Green Line":
+            self.mode_handler.blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    
+    def setSelectedBlock(self):
+        selected_block = self.main_window.blockDropDown.currentText()
+        return selected_block
+    
+    def showBlockStatus(self):
+        selected_block_name = self.setSelectedBlock()
+
+        # Find the selected block based on its name or identifier
+        selected_block = None
+        for block in self.mode_handler.blocks:
+            if block.blockNumber == selected_block_name:
+                selected_block = block
+                break
+
+        if selected_block is not None:
+            occupancy_status = "Block Status: Occupied" if selected_block.occupancy else "Block Status: Not Occupied"
+            self.main_window.status_label.setText(occupancy_status)  # Update the status label
+        else:
+            self.main_window.status_label.setText("Block Status: Block not found")
+        
+    def showBlockStatus(self):
+        block = self.setSelectedBlock()
+        
+
 # create app
-#app = QApplication([])
+app = QApplication([])
 #SignalHandlers()
-#CTC_Window = CTCWindow()
-#mode_handler = ModeHandler(CTC_Window)  # Initialize the ModeHandler with the MainWindow instance
+CTC_Window = CTCWindow()
 
 # run app
-#app.exec()
+app.exec()
