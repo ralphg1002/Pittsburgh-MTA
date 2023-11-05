@@ -9,6 +9,7 @@ from PyQt5 import QtGui
 from TrackController.trackcontrol import TrackControl
 from TrainControllerSW.tcsw_ui import *
 from TrackModel.track_model import TrackModel
+from CTC.CTC_UI import *
 
 
 class MainWindow(QMainWindow):
@@ -73,9 +74,7 @@ class MainWindow(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap(
-            "src/main/MTA_NYC_logo.png"
-        )
+        self.pixmapMTALogo = QtGui.QPixmap("src/main/MTA_NYC_logo.png")
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(
             math.floor(1862 * 0.25), math.floor(2046 * 0.25)
         )
@@ -99,6 +98,7 @@ class MainWindow(QMainWindow):
         self.box3 = QPushButton("CTC", self)
         self.box_button(self.box3, self.box1.width(), self.box1.height())
         self.set_relative_below(self.box3, self.box1, -20 - self.box1.height() * 2)
+        self.box3.clicked.connect(lambda: CTCWindow().show())
 
         self.box4 = QPushButton("Track Controller", self)
         self.box_button(self.box4, self.box1.width(), self.box1.height())

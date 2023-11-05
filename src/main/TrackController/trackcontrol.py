@@ -1372,6 +1372,7 @@ class TrackControl(QMainWindow):
     def set_suggested_authority_handler(self, line, wayside, num, suggestedAuthority):
         pass
 
+
 """if __name__ == "__main__":
     app = QApplication(sys.argv)
     # window = MainUI()
