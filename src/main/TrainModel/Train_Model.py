@@ -140,6 +140,26 @@ class TrainModel(QMainWindow):
         self.systemSpeedInput.setGeometry(850, 127, 50, 50)
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
 
+        # Increase system speed button
+        self.pixmapFastForward = QtGui.QPixmap("src/main/TrainModel/fast-forward.svg")
+        self.pixmapFastForward = self.pixmapFastForward.scaled(20, 20)
+        self.speedUpButton = QPushButton(self)
+        self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
+        self.speedUpButton.setGeometry(890, 143, 20, 20)
+        self.speedUpButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
+
+        # Decrease system speed button
+        self.pixmapRewind = QtGui.QPixmap("src/main/TrainModel/rewind.svg")
+        self.pixmapRewind = self.pixmapRewind.scaled(20, 20)
+        self.slowDownButton = QPushButton(self)
+        self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
+        self.slowDownButton.setGeometry(819, 143, 20, 20)
+        self.slowDownButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
+
         """ Drop-down Menu """
 
         # Calculate the position of the QComboBox
@@ -337,6 +357,26 @@ class ResultsWindow(QMainWindow):
         self.systemSpeedInput.setFont(QFont(self.fontStyle, self.textFontSize))
         self.systemSpeedInput.setGeometry(850, 127, 50, 50)
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
+
+        # Increase system speed button
+        self.pixmapFastForward = QtGui.QPixmap("src/main/TrainModel/fast-forward.svg")
+        self.pixmapFastForward = self.pixmapFastForward.scaled(20, 20)
+        self.speedUpButton = QPushButton(self)
+        self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
+        self.speedUpButton.setGeometry(890, 143, 20, 20)
+        self.speedUpButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
+
+        # Decrease system speed button
+        self.pixmapRewind = QtGui.QPixmap("src/main/TrainModel/rewind.svg")
+        self.pixmapRewind = self.pixmapRewind.scaled(20, 20)
+        self.slowDownButton = QPushButton(self)
+        self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
+        self.slowDownButton.setGeometry(819, 143, 20, 20)
+        self.slowDownButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
 
         # Create a QLabel to display the drop-down text
         current_train = QLabel(self)
@@ -2628,12 +2668,12 @@ class Calculations:
         return total_distance
 
 
-def main():
-    app = QApplication(sys.argv)
-    ui = TrainModel()
-    ui.show_gui()
-    sys.exit(app.exec_())
+# def main():
+#     app = QApplication(sys.argv)
+#     ui = TrainModel()
+#     ui.show_gui()
+#     sys.exit(app.exec_())
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
