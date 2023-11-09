@@ -8,7 +8,8 @@ from PyQt5.QtCore import *
 import csv
 from datetime import datetime, timedelta
 
-#from .signals import CTCtoTrackController, TrackControllerToCTC
+# from .signals import CTCtoTrackController, TrackControllerToCTC
+
 
 class CTCWindow(QMainWindow):
     # font variables
@@ -16,19 +17,19 @@ class CTCWindow(QMainWindow):
     labelFontSize = 12
     headerFontSize = 16
     titleFontSize = 22
-    fontStyle = 'Product Sans'
+    fontStyle = "Product Sans"
     # color variables
-    colorDarkBlue = '#085394'
-    colorLightRed = '#EA9999'
-    colorLightBlue = '#9FC5F8'
-    colorLightGrey = '#CCCCCC'
-    colorMediumGrey = '#DDDDDD'
-    colorDarkGrey = '#666666'
-    colorBlack = '#000000' 
+    colorDarkBlue = "#085394"
+    colorLightRed = "#EA9999"
+    colorLightBlue = "#9FC5F8"
+    colorLightGrey = "#CCCCCC"
+    colorMediumGrey = "#DDDDDD"
+    colorDarkGrey = "#666666"
+    colorBlack = "#000000"
     # dimensions
     w = 960
     h = 960
-    moduleName = 'CTC'
+    moduleName = "CTC"
 
     def __init__(self):
         super().__init__()
@@ -44,25 +45,29 @@ class CTCWindow(QMainWindow):
         # body block
         self.bodyBlock = QLabel(self)
         self.bodyBlock.setGeometry(20, 20, 920, 920)
-        self.bodyBlock.setStyleSheet('background-color: white;'
-                                     'border: 1px solid black')
+        self.bodyBlock.setStyleSheet(
+            "background-color: white;" "border: 1px solid black"
+        )
 
         # header block
         self.headerBlock = QLabel(self)
         self.headerBlock.setGeometry(20, 20, 920, 70)
-        self.headerBlock.setStyleSheet('background-color:' + self.colorDarkBlue + ';'
-                                       'border: 1px solid black')
+        self.headerBlock.setStyleSheet(
+            "background-color:" + self.colorDarkBlue + ";" "border: 1px solid black"
+        )
 
         # title
-        self.titleLabel = QLabel('Pittsburgh Metropolitan Transportation Authority', self)
+        self.titleLabel = QLabel(
+            "Pittsburgh Metropolitan Transportation Authority", self
+        )
         self.titleLabel.setFont(QFont(self.fontStyle, self.titleFontSize))
         self.titleLabel.setAlignment(Qt.AlignCenter)
-        self.titleLabel.setGeometry(120,35,400,400)
+        self.titleLabel.setGeometry(120, 35, 400, 400)
         self.titleLabel.adjustSize()
-        self.titleLabel.setStyleSheet('color: white')
+        self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap('src/main/CTC/MTA_NYC_logo.svg.png')
+        self.pixmapMTALogo = QtGui.QPixmap("src/main/CTC/MTA_NYC_logo.svg.png")
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(70, 70)
         self.logo = QLabel(self)
         self.logo.setPixmap(self.pixmapMTALogo)
@@ -70,88 +75,114 @@ class CTCWindow(QMainWindow):
         self.logo.adjustSize()
 
         # module
-        self.moduleLabel = QLabel('Centralized Traffic Control', self)
+        self.moduleLabel = QLabel("Centralized Traffic Control", self)
         self.moduleLabel.setFont(QFont(self.fontStyle, self.headerFontSize))
         self.moduleLabel.setAlignment(Qt.AlignCenter)
         self.moduleLabel.move(30, 100)
         self.moduleLabel.adjustSize()
-        self.moduleLabel.setStyleSheet('color:' + self.colorDarkBlue)
+        self.moduleLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # test bench icon
-        self.pixmapGear = QtGui.QPixmap('src/main/CTC/gear_icon.png')
+        self.pixmapGear = QtGui.QPixmap("src/main/CTC/gear_icon.png")
         self.pixmapGear = self.pixmapGear.scaled(25, 25)
         self.testbenchIcon = QLabel(self)
         self.testbenchIcon.setPixmap(self.pixmapGear)
         self.testbenchIcon.setGeometry(30, 140, 32, 32)
 
         # test bench button
-        self.testbenchButton = QPushButton('Test Bench', self)
+        self.testbenchButton = QPushButton("Test Bench", self)
         self.testbenchButton.setFont(QFont(self.fontStyle, self.textFontSize))
         self.testbenchButton.setGeometry(60, 140, 100, 32)
-        self.testbenchButton.setStyleSheet('color:' + self.colorDarkBlue +
-                                           ';border: 1px solid white')
+        self.testbenchButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
 
         # system time input
-        self.systemTimeInput = QLabel('00:00:00', self)
+        self.systemTimeInput = QLabel("00:00:00", self)
         self.systemTimeInput.setFont(QFont(self.fontStyle, self.headerFontSize))
-        self.systemTimeInput.setGeometry(820,67,150,100)
-        self.systemTimeInput.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemTimeInput.setGeometry(820, 67, 150, 100)
+        self.systemTimeInput.setStyleSheet("color:" + self.colorDarkBlue)
 
         # system time label
-        self.systemTimeLabel = QLabel('System Time:', self)
+        self.systemTimeLabel = QLabel("System Time:", self)
         self.systemTimeLabel.setFont(QFont(self.fontStyle, self.headerFontSize))
         self.systemTimeLabel.adjustSize()
         self.systemTimeLabel.setGeometry(650, 65, 200, 100)
-        self.systemTimeLabel.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemTimeLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # system speed label
-        self.systemSpeedLabel = QLabel('System Speed:', self)
+        self.systemSpeedLabel = QLabel("System Speed:", self)
         self.systemSpeedLabel.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.systemSpeedLabel.setGeometry(700,140,100,100)
+        self.systemSpeedLabel.setGeometry(700, 140, 100, 100)
         self.systemSpeedLabel.adjustSize()
-        self.systemSpeedLabel.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemSpeedLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # system speed input
-        self.systemSpeedInput = QLabel('x1.0', self)
+        self.systemSpeedInput = QLabel("x1.0", self)
         self.systemSpeedInput.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.systemSpeedInput.setGeometry(850,127,50,50)
-        self.systemSpeedInput.setStyleSheet('color:' + self.colorDarkBlue)
+        self.systemSpeedInput.setGeometry(850, 127, 50, 50)
+        self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
 
         # increase system speed button
-        self.pixmapFastForward = QtGui.QPixmap('src/main/CTC/fast-forward.svg')
+        self.pixmapFastForward = QtGui.QPixmap("src/main/CTC/fast-forward.svg")
         self.pixmapFastForward = self.pixmapFastForward.scaled(20, 20)
         self.speedUpButton = QPushButton(self)
         self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
         self.speedUpButton.setGeometry(890, 143, 20, 20)
-        self.speedUpButton.setStyleSheet('color:' + self.colorDarkBlue +
-                                         ';border: 1px solid white')
+        self.speedUpButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
 
         # decrease system speed button
-        self.pixmapRewind = QtGui.QPixmap('src/main/CTC/rewind.svg')
+        self.pixmapRewind = QtGui.QPixmap("src/main/CTC/rewind.svg")
         self.pixmapRewind = self.pixmapRewind.scaled(20, 20)
         self.slowDownButton = QPushButton(self)
         self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
         self.slowDownButton.setGeometry(819, 143, 20, 20)
-        self.slowDownButton.setStyleSheet('color:' + self.colorDarkBlue +
-                                          ';border: 1px solid white')
-        
-################################# MODE BUTTONS #############################################################################
+        self.slowDownButton.setStyleSheet(
+            "color:" + self.colorDarkBlue + ";border: 1px solid white"
+        )
+
+        self.speedUpButton.clicked.connect(self.increase_speed)
+        self.slowDownButton.clicked.connect(self.decrease_speed)
+
+        self.current_time = QTime(0, 0, 0)
+        self.system_speed = 1.0
+        self.timer_interval = 1000
+
+        self.systemTimeInput.setText(self.current_time.toString("hh:mm:ss"))
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_time)
+        self.timer.start(self.timer_interval)
+
+        ################################# MODE BUTTONS #############################################################################
         self.last_clicked_button = None
         # Add an "Automatic Mode" button
         self.automatic = QPushButton("Automatic Mode", self)
-        self.automatic.setGeometry(30, 180, 130, 30)  # Set the button's position and size
+        self.automatic.setGeometry(
+            30, 180, 130, 30
+        )  # Set the button's position and size
         self.automatic.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.automatic.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkBlue + '; border: 1px solid black')
+        self.automatic.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
         self.automatic.clicked.connect(self.mode_handler.automaticButtonClicked)
 
         # Manual Button
         self.manual = QPushButton("Manual Mode", self)
         self.manual.setGeometry(165, 180, 130, 30)  # Set the button's position and size
         self.manual.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.manual.setStyleSheet('background-color: white; color:' + 
-                                  self.colorBlack + '; border: 1px solid black')
-        self.manual.clicked.connect(self.mode_handler.manualButtonClicked) 
-        
+        self.manual.setStyleSheet(
+            "background-color: white; color:"
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
+        self.manual.clicked.connect(self.mode_handler.manualButtonClicked)
+
         # Maintenance Button
         """self.maintenance = QPushButton("Maintenance Mode", self)
         self.maintenance.setGeometry(300, 180, 130, 30)  # Set the button's position and size
@@ -168,18 +199,23 @@ class CTCWindow(QMainWindow):
         self.selectLine.addItem("Green Line")
         self.selectLine.addItem("Red Line")
         self.selectLine.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.selectLine.currentIndexChanged.connect(self.scheduler.getSelectedLine)  
-        
+        self.selectLine.currentIndexChanged.connect(self.scheduler.getSelectedLine)
+
         # CSV File Button
         self.inputSchedule = QPushButton("Import Schedule", self)
-        self.inputSchedule.setGeometry(165, 220, 130, 30)  # Set the button's position and size
+        self.inputSchedule.setGeometry(
+            165, 220, 130, 30
+        )  # Set the button's position and size
         self.inputSchedule.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.inputSchedule.setStyleSheet('background-color: white; color:' + 
-                                         self.colorBlack + '; border: 1px solid black')
+        self.inputSchedule.setStyleSheet(
+            "background-color: white; color:"
+            + self.colorBlack
+            + "; border: 1px solid black"
+        )
         self.inputSchedule.setEnabled(True)
-        self.inputSchedule.clicked.connect(self.scheduler.load_file)    
+        self.inputSchedule.clicked.connect(self.scheduler.load_file)
 
-################################# Automatic ###################################################################
+        ################################# Automatic ###################################################################
         # Error text
         self.error_label = QLabel("", self)
         self.error_label.setFont(QFont(self.fontStyle, self.textFontSize))
@@ -189,44 +225,52 @@ class CTCWindow(QMainWindow):
         # Schedule Table
         self.schedule_header = QLabel("Schedule:", self)
         self.schedule_header.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.schedule_header.setGeometry(30,610,100,100)
+        self.schedule_header.setGeometry(30, 610, 100, 100)
         self.schedule_table = QTableWidget(self)
         self.schedule_table.setColumnCount(5)
-        self.schedule_table.setHorizontalHeaderLabels(["Train ID", "Departing From","Stops", "Departure Time", "Arrival Time"])
-        self.schedule_table.setStyleSheet("background-color: white;")  
-        self.schedule_table.setGeometry(35,680,890,240)
-        self.schedule_table.setColumnWidth(0, 150) 
-        self.schedule_table.setColumnWidth(1, 150)  
-        self.schedule_table.setColumnWidth(2, 250) 
-        self.schedule_table.setColumnWidth(3, 130) 
+        self.schedule_table.setHorizontalHeaderLabels(
+            ["Train ID", "Departing From", "Stops", "Departure Time", "Arrival Time"]
+        )
+        self.schedule_table.setStyleSheet("background-color: white;")
+        self.schedule_table.setGeometry(35, 680, 890, 240)
+        self.schedule_table.setColumnWidth(0, 150)
+        self.schedule_table.setColumnWidth(1, 150)
+        self.schedule_table.setColumnWidth(2, 250)
+        self.schedule_table.setColumnWidth(3, 130)
         self.schedule_table.setColumnWidth(4, 130)
         self.schedule_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # Occupancy Table
         self.occupancy_header = QLabel("Occupied Blocks:", self)
         self.occupancy_header.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.occupancy_header.setGeometry(360,460,110,80)
+        self.occupancy_header.setGeometry(360, 460, 110, 80)
         self.occupancy_table = QTableWidget(self)
         self.occupancy_table.setColumnCount(2)
         self.occupancy_table.setHorizontalHeaderLabels(["Block", "Line"])
-        self.occupancy_table.setStyleSheet("background-color: white;")  
-        self.occupancy_table.setGeometry(360,510,252,100)
+        self.occupancy_table.setStyleSheet("background-color: white;")
+        self.occupancy_table.setGeometry(360, 510, 252, 100)
 
         # Throughput per line
         self.throughput_label = QLabel("Throughput: N/A", self)
         self.throughput_label.setFont(QFont(self.fontStyle, self.textFontSize + 5))
         self.throughput_label.setGeometry(350, 170, 400, 50)
 
-
-############################################## MANUAL MODE #################################################################
+        ############################################## MANUAL MODE #################################################################
         # Departing Station
         self.departingStation = QComboBox(self)
         self.departingStation.setGeometry(650, 175, 200, 55)
         self.departingStation.addItem("Select a Departing Station")
-        self.selectLine.currentIndexChanged.connect(self.scheduler.updateDepartingStations)
-        self.departingStation.setFont(QFont(self.fontStyle, 9)) 
+        self.selectLine.currentIndexChanged.connect(
+            self.scheduler.updateDepartingStations
+        )
+        self.departingStation.setFont(QFont(self.fontStyle, 9))
         self.departingStation.setEnabled(False)
-        self.departingStation.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkGrey)
+        self.departingStation.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkGrey
+        )
 
         # Next Station
         """self.arrivalStation = QComboBox(self)
@@ -238,18 +282,22 @@ class CTCWindow(QMainWindow):
 
         # Send Train Button
         self.sendTrain = QPushButton("Add Train to Schedule", self)
-        self.sendTrain.setGeometry(650,625,275,50)
+        self.sendTrain.setGeometry(650, 625, 275, 50)
         self.sendTrain.setFont(QFont(self.fontStyle, self.textFontSize + 4))
-        self.sendTrain.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorBlack)
-        self.sendTrain.clicked.connect(self.scheduler.sendTrainClicked) 
+        self.sendTrain.setStyleSheet(
+            "background-color: " + self.colorLightGrey + "; color: " + self.colorBlack
+        )
+        self.sendTrain.clicked.connect(self.scheduler.sendTrainClicked)
         self.sendTrain.setEnabled(False)
 
         # Set schedule
         self.setSchedule = QPushButton("Set Schedule", self)
         self.setSchedule.setGeometry(350, 625, 275, 50)
         self.setSchedule.setFont(QFont(self.fontStyle, self.textFontSize + 4))
-        self.setSchedule.setStyleSheet('background-color: ' + self.colorLightRed + '; color: ' + self.colorBlack)
-        #self.setSchedule.clicked.connect(self.scheduler.sendTrainClicked) 
+        self.setSchedule.setStyleSheet(
+            "background-color: " + self.colorLightRed + "; color: " + self.colorBlack
+        )
+        # self.setSchedule.clicked.connect(self.scheduler.sendTrainClicked)
         self.setSchedule.setEnabled(True)
 
         # Input an arrival time
@@ -258,112 +306,184 @@ class CTCWindow(QMainWindow):
         self.arrivalHeader = QLabel("Input an Arrival Time:", self)
         self.arrivalHeader.setFont(QFont(self.fontStyle, self.textFontSize))
         self.arrivalHeader.setGeometry(650, 270, 200, 100)
-        self.arrivalTime.setGeometry(650,335,200,50)
+        self.arrivalTime.setGeometry(650, 335, 200, 50)
         self.arrivalTime.setEnabled(False)
-        self.arrivalTime.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkGrey)
+        self.arrivalTime.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkGrey
+        )
 
         # Input a train ID
         self.trainIDInput = QLineEdit(self)
         self.trainIDInput.setPlaceholderText("Optional")
         self.trainIDHeader = QLabel("Input a Train ID:", self)
         self.trainIDHeader.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.trainIDHeader.setGeometry(650,190, 200, 100)
-        self.trainIDInput.setGeometry(650,255,100,50)
+        self.trainIDHeader.setGeometry(650, 190, 200, 100)
+        self.trainIDInput.setGeometry(650, 255, 100, 50)
         self.trainIDInput.setEnabled(False)
-        self.trainIDInput.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkGrey)
+        self.trainIDInput.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkGrey
+        )
 
         # Input a suggested speed
         self.suggSpeedInput = QLineEdit(self)
-        self.suggSpeedInput.setPlaceholderText("Optional")
+        self.suggSpeedInput.setPlaceholderText("mph - Optional")
         self.suggSpeedHeader = QLabel("Suggested speed:", self)
         self.suggSpeedHeader.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.suggSpeedHeader.setGeometry(785,190, 200, 100)
-        self.suggSpeedInput.setGeometry(785,255,100,50)
+        self.suggSpeedHeader.setGeometry(785, 190, 200, 100)
+        self.suggSpeedInput.setGeometry(785, 255, 100, 50)
         self.suggSpeedInput.setEnabled(False)
-        self.suggSpeedInput.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkGrey)
+        self.suggSpeedInput.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkGrey
+        )
 
         # Add Stop Button
         self.addStopButton = QPushButton("Add Stop", self)
         self.addStopButton.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.addStopButton.setGeometry(825, 395, 100, 50)  
-        self.addStopButton.setStyleSheet('background-color: white; color: ' + self.colorDarkBlue + '; border: 1px solid black')
+        self.addStopButton.setGeometry(825, 395, 100, 50)
+        self.addStopButton.setStyleSheet(
+            "background-color: white; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
         self.addStopButton.clicked.connect(self.scheduler.addStopPressed)
         self.current_departing_station = None
         self.addStopButton.setEnabled(False)
-        self.addStopButton.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkGrey)
+        self.addStopButton.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkGrey
+        )
 
         # Add Stop Dropdown
         self.addStopDropdown = QComboBox(self)
-        self.addStopDropdown.setGeometry(650,395,165,50)
+        self.addStopDropdown.setGeometry(650, 395, 165, 50)
         self.addStopDropdown.setEnabled(False)
-        self.addStopDropdown.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkGrey)
-        self.stops = [] 
+        self.addStopDropdown.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkGrey
+        )
+        self.stops = []
         self.current_stop_index = 0
         self.update_timer = QTimer(self)
-        
-        self.selectLine.currentIndexChanged.connect(self.scheduler.updateStopDropDown)  # Connect the signal to update the dropdown
-        self.max_block = None 
+
+        self.selectLine.currentIndexChanged.connect(
+            self.scheduler.updateStopDropDown
+        )  # Connect the signal to update the dropdown
+        self.max_block = None
 
         # Selected Stops Table
         self.stopsQueueHeader = QLabel("Selected Stops:", self)
         self.stopsQueueHeader.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.stopsQueueHeader.setGeometry(650,410,120,100)
+        self.stopsQueueHeader.setGeometry(650, 410, 120, 100)
         self.stopsTable = QTableWidget(self)
         self.stopsTable.setColumnCount(2)
         self.stopsTable.setHorizontalHeaderLabels(["Station", "Dwell Time"])
-        self.stopsTable.setStyleSheet("background-color: white;")  
-        self.stopsTable.setGeometry(650,470,275,150)
-        self.stopsTable.setStyleSheet('background-color: ' + self.colorLightGrey + '; color: ' + self.colorDarkGrey)
+        self.stopsTable.setStyleSheet("background-color: white;")
+        self.stopsTable.setGeometry(650, 470, 275, 150)
+        self.stopsTable.setStyleSheet(
+            "background-color: "
+            + self.colorLightGrey
+            + "; color: "
+            + self.colorDarkGrey
+        )
 
-        #self.block = Block()
+        # self.block = Block()
 
         # select block numbers
         self.blockDropDown = QComboBox(self)
-        self.blockDropDown.setGeometry(35,500,100,50)
-        #self.blockDropDown = self.block.updateBlockDropDown()
-        #self.blockDropDown.hide()
-        self.blocks = [] 
-        #self.blockDropDown.currentIndexChanged.connect(self.block.showBlockStatus)  # Connect the signal to update the dropdown
-        
+        self.blockDropDown.setGeometry(35, 500, 100, 50)
+
+        # self.blocks = []
+        # self.blockDropDown.currentIndexChanged.connect(self.block.showBlockStatus)  # Connect the signal to update the dropdown
+
         # repair block button
         self.repairBlockButton = QPushButton("Repair Block", self)
-        #self.repairBlockButton.setVisible(False)
+        # self.repairBlockButton.setVisible(False)
         self.repairBlockButton.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.repairBlockButton.setGeometry(35, 560, 100, 50)  
-        self.repairBlockButton.setStyleSheet('background-color: white; color: ' + self.colorDarkBlue + '; border: 1px solid black')
-        #self.repairBlockButton.clicked.connect(self.scheduler.repairBlockButton)
+        self.repairBlockButton.setGeometry(35, 560, 100, 50)
+        self.repairBlockButton.setStyleSheet(
+            "background-color: white; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
+        # self.repairBlockButton.clicked.connect(self.scheduler.repairBlockButton)
 
         # close block button
         self.closeBlockButton = QPushButton("Close Block", self)
-        #self.closeBlockButton.setVisible(False)
+        # self.closeBlockButton.setVisible(False)
         self.closeBlockButton.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.closeBlockButton.setGeometry(150, 560, 100, 50)  
-        self.closeBlockButton.setStyleSheet('background-color: white; color: ' + self.colorDarkBlue + '; border: 1px solid black')
-        #self.closeBlockButton.clicked.connect(self.scheduler.closeBlockButton)
-        
+        self.closeBlockButton.setGeometry(150, 560, 100, 50)
+        self.closeBlockButton.setStyleSheet(
+            "background-color: white; color: "
+            + self.colorDarkBlue
+            + "; border: 1px solid black"
+        )
+        # self.closeBlockButton.clicked.connect(self.scheduler.closeBlockButton)
+
         # Displaying the occupancy status
-        self.status_label = QLabel("Status: ", self) 
+        self.status_label = QLabel("Status: ", self)
         self.status_label.setGeometry(165, 475, 100, 100)
         self.status_label.setStyleSheet("font-size: 16px; color: black;")
         self.status_label.setVisible(True)
 
-        self.blockStatus = QLabel("Occupied", self) 
+        self.blockStatus = QLabel("Occupied", self)
         self.blockStatus.setGeometry(220, 475, 100, 100)
         self.blockStatus.setStyleSheet("font-size: 16px; color: green;")
         self.blockStatus.setVisible(True)
-        #self.status_label.block.showBlockStatus(self.status_label)  # Pass the status_label as an argument
+        # self.status_label.block.showBlockStatus(self.status_label)  # Pass the status_label as an argument
 
         # Dispatched Trains Table
         self.dispatchHeader = QLabel("Dispatched Trains:", self)
         self.dispatchHeader.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.dispatchHeader.setGeometry(35,220,120,100)
+        self.dispatchHeader.setGeometry(35, 220, 120, 100)
         self.dispatchTable = QTableWidget(self)
         self.dispatchTable.setColumnCount(5)
-        self.dispatchTable.setHorizontalHeaderLabels(["Train ID", "Location", "Next Stop", "Suggested Speed", "Authority"])
-        self.dispatchTable.setStyleSheet("background-color: white;")  
-        self.dispatchTable.setGeometry(35,280,600,200)
+        self.dispatchTable.setHorizontalHeaderLabels(
+            ["Train ID", "Location", "Next Stop", "Suggested Speed", "Authority"]
+        )
+        self.dispatchTable.setStyleSheet("background-color: white;")
+        self.dispatchTable.setGeometry(35, 280, 600, 200)
 
-        self.show()
+        self.selectLine.currentIndexChanged.connect(self.some_method)
+        self.blockDropDown.currentIndexChanged.connect(Block.updateStatusLabel)
+
+        # self.show()
+
+    def some_method(self):
+        Block.updateBlockDropDown(self)
+
+    def update_time(self):
+        self.current_time = self.current_time.addSecs(1)  # Update the time by 1 second
+        self.systemTimeInput.setText(self.current_time.toString("hh:mm:ss"))
+
+    def increase_speed(self):
+        self.system_speed += 2.0
+        self.systemSpeedInput.setText(f"x{self.system_speed:.1f}")
+
+        # Convert system_speed to an interval in milliseconds
+        self.timer_interval = int(1000 / self.system_speed)
+        self.timer.setInterval(self.timer_interval)
+
+    def decrease_speed(self):
+        self.system_speed -= 2.0
+        self.systemSpeedInput.setText(f"x{self.system_speed:.1f}")
+
+        # Convert system_speed to an interval in milliseconds
+        self.timer_interval = int(1000 / self.system_speed)
+        self.timer.setInterval(self.timer_interval)
+
 
 """class SignalHandlers:
     def __init__(self):
@@ -410,75 +530,138 @@ class CTCWindow(QMainWindow):
         status = "disabled" if disabled else "enabled"
         print(f"Received Maintenance Signal: Line {line}, Block {block_number}, Status {status}")
 """
-    
+
+
 class ModeHandler:
     def __init__(self, main_window):
         self.main_window = main_window
 
     # function for if automatic button is pressed
-    def automaticButtonClicked(self):   
+    def automaticButtonClicked(self):
         main_window = self.main_window
-     
+
         # Unhighlight the last clicked button, if any
         if main_window.last_clicked_button:
             main_window.last_clicked_button.setStyleSheet("")
-        
+
         main_window.last_clicked_button = main_window.automatic
-        main_window.automatic.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkBlue + '; border: 1px solid black')
+        main_window.automatic.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkBlue
+            + "; border: 1px solid black"
+        )
 
         main_window.throughput_label.setVisible(True)
         main_window.occupancy_header.setVisible(True)
         main_window.occupancy_table.setVisible(True)
         main_window.schedule_table.setVisible(True)
-        #main_window.schedule_table.setGeometry(35,625,890,300)
+        # main_window.schedule_table.setGeometry(35,625,890,300)
         main_window.schedule_header.setVisible(True)
-        #main_window.schedule_header.setGeometry(30,560,100,100)
+        # main_window.schedule_header.setGeometry(30,560,100,100)
         main_window.selectLine.setVisible(True)
         main_window.inputSchedule.setVisible(True)
-        main_window.departingStation.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkGrey)
+        main_window.departingStation.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
         main_window.sendTrain.setEnabled(True)
         main_window.arrivalHeader.setVisible(True)
         main_window.arrivalTime.setVisible(True)
         main_window.arrivalTime.setEnabled(False)
-        main_window.arrivalTime.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkGrey) 
+        main_window.arrivalTime.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
         main_window.addStopButton.setEnabled(False)
-        main_window.addStopButton.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkGrey) 
+        main_window.addStopButton.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
         main_window.addStopDropdown.setEnabled(False)
-        main_window.addStopDropdown.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkGrey)
+        main_window.addStopDropdown.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
         main_window.stopsQueueHeader.setVisible(False)
-        main_window.stopsTable.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkGrey) 
+        main_window.stopsTable.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
         main_window.trainIDInput.setEnabled(False)
-        main_window.trainIDInput.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkGrey)
+        main_window.trainIDInput.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
         main_window.suggSpeedInput.setEnabled(False)
-        main_window.suggSpeedInput.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkGrey)
-        main_window.sendTrain.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorBlack)
+        main_window.suggSpeedInput.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
+        main_window.sendTrain.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorBlack
+        )
         main_window.sendTrain.setEnabled(False)
+        main_window.setSchedule.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightRed
+            + "; color: "
+            + main_window.colorBlack
+        )
 
     # function for if manual button is pressed
-    def manualButtonClicked(self): 
+    def manualButtonClicked(self):
         main_window = self.main_window
 
-        main_window.automatic.setStyleSheet('background-color: white; color:' + main_window.colorBlack + '; border: 1px solid black')       
+        main_window.automatic.setStyleSheet(
+            "background-color: white; color:"
+            + main_window.colorBlack
+            + "; border: 1px solid black"
+        )
         # Unhighlight the last clicked button, if any
         if main_window.last_clicked_button:
             main_window.last_clicked_button.setStyleSheet("")
-        
+
         main_window.last_clicked_button = main_window.manual
-        main_window.manual.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkBlue + '; border: 1px solid black')
-        
+        main_window.manual.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkBlue
+            + "; border: 1px solid black"
+        )
+
         # Hide the elements
         """main_window.throughput_label.setVisible(False)
         main_window.speed_label.setVisible(False)
         main_window.authority_label.setVisible(False)
         main_window.occupancy_header.setVisible(False)
-        main_window.occupancy_table.setVisible(False)"""  
+        main_window.occupancy_table.setVisible(False)"""
         main_window.schedule_table.setVisible(True)
         main_window.schedule_table.setRowCount(0)
-        main_window.schedule_table.setGeometry(35,680,890,240)
+        main_window.schedule_table.setGeometry(35, 680, 890, 240)
         main_window.schedule_header.setVisible(True)
-        main_window.schedule_header.setGeometry(30,610,100,100)
+        main_window.schedule_header.setGeometry(30, 610, 100, 100)
         main_window.selectLine.setVisible(True)
-        main_window.selectLine.setCurrentIndex(0)
+        # main_window.selectLine.setCurrentIndex(0)
         main_window.inputSchedule.setVisible(True)
         main_window.departingStation.setEnabled(True)
         main_window.departingStation.setStyleSheet("background-color: white")
@@ -486,31 +669,53 @@ class ModeHandler:
         main_window.arrivalHeader.setVisible(True)
         main_window.arrivalTime.setVisible(True)
         main_window.arrivalTime.setEnabled(True)
-        main_window.arrivalTime.setStyleSheet("background-color: white;")  
+        main_window.arrivalTime.setStyleSheet("background-color: white;")
         main_window.addStopButton.setEnabled(True)
-        main_window.addStopButton.setStyleSheet("background-color: white;")  
+        main_window.addStopButton.setStyleSheet("background-color: white;")
         main_window.addStopDropdown.setEnabled(True)
-        main_window.addStopDropdown.setStyleSheet("background-color: white;")  
+        main_window.addStopDropdown.setStyleSheet("background-color: white;")
         main_window.stopsQueueHeader.setVisible(True)
-        main_window.stopsTable.setStyleSheet("background-color: white;")  
+        main_window.stopsTable.setStyleSheet("background-color: white;")
         main_window.trainIDInput.setEnabled(True)
         main_window.trainIDInput.setStyleSheet("background-color: white")
         main_window.suggSpeedInput.setEnabled(True)
         main_window.suggSpeedInput.setStyleSheet("background-color: white")
-        main_window.sendTrain.setStyleSheet('background-color: ' + main_window.colorLightRed + '; color: ' + main_window.colorBlack)
+        main_window.sendTrain.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightRed
+            + "; color: "
+            + main_window.colorBlack
+        )
         main_window.sendTrain.setEnabled(True)
+        main_window.setSchedule.setEnabled(False)
+        main_window.setSchedule.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkGrey
+        )
 
     # function for if maintenance button is pressed
-    def maintenanceButtonClicked(self):   
+    def maintenanceButtonClicked(self):
         main_window = self.main_window
 
-        main_window.automatic.setStyleSheet('background-color: white; color:' + main_window.colorBlack + '; border: 1px solid black')      
+        main_window.automatic.setStyleSheet(
+            "background-color: white; color:"
+            + main_window.colorBlack
+            + "; border: 1px solid black"
+        )
         # Unhighlight the last clicked button, if any
         if main_window.last_clicked_button:
             main_window.last_clicked_button.setStyleSheet("")
-        
+
         main_window.last_clicked_button = main_window.self.maintenance
-        main_window.maintenance.setStyleSheet('background-color: ' + main_window.colorLightGrey + '; color: ' + main_window.colorDarkBlue + '; border: 1px solid black')
+        main_window.maintenance.setStyleSheet(
+            "background-color: "
+            + main_window.colorLightGrey
+            + "; color: "
+            + main_window.colorDarkBlue
+            + "; border: 1px solid black"
+        )
 
         main_window.throughput_label.setVisible(False)
         main_window.speed_label.setVisible(False)
@@ -522,7 +727,7 @@ class ModeHandler:
         main_window.selectLine.setVisible(False)
         main_window.inputSchedule.setVisible(False)
         main_window.departingStation.setVisible(False)
-        #main_window.arrivalStation.setVisible(False)
+        # main_window.arrivalStation.setVisible(False)
         main_window.sendTrain.setVisible(False)
         main_window.arrivalHeader.setVisible(False)
         main_window.arrivalTime.setVisible(False)
@@ -530,39 +735,48 @@ class ModeHandler:
         main_window.addStopDropdown.setVisible(False)
         main_window.stopsQueueHeader.setVisible(False)
         main_window.stopsTable.setVisible(False)
-        
+
+
 class Scheduler:
     def __init__(self, main_window):
         self.main_window = main_window
         self.trainList = []
         self.numTrains = 0
-        self.routing = Routing('src/main/CTC/GreenLine.csv', main_window)  # Create an instance of the Routing class
+        self.routing = Routing(
+            "src/main/CTC/GreenLine.csv", main_window
+        )  # Create an instance of the Routing class
         self.trainID = None
 
     def load_file(self):
         selected_line = self.getSelectedLine()
-        #self.main_window.selectLine.currentText()
+        # self.main_window.selectLine.currentText()
         if selected_line == "Select a Line":
             # Set the error message text
             self.main_window.error_label.setText("Please select a line.")
             return
-        
+
         self.main_window.error_label.clear()
 
         options = QFileDialog.Options()
-        filePath, _ = QFileDialog.getOpenFileName(self.main_window, "Open CSV File", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        filePath, _ = QFileDialog.getOpenFileName(
+            self.main_window,
+            "Open CSV File",
+            "",
+            "CSV Files (*.csv);;All Files (*)",
+            options=options,
+        )
 
         if filePath:
             with open(filePath, "r") as file:
                 csv_content = file.read()
 
             # Split the CSV content into rows
-            rows = csv_content.split('\n')
+            rows = csv_content.split("\n")
 
             # Determine the number of rows and columns for the table
             num_rows = len(rows)
             if num_rows > 0:
-                num_columns = len(rows[0].split(','))
+                num_columns = len(rows[0].split(","))
 
                 # Create a QTableWidget
                 self.main_window.schedule_table.setRowCount(num_rows)
@@ -570,20 +784,22 @@ class Scheduler:
 
                 # Populate the table with CSV data
                 for i, row in enumerate(rows):
-                    columns = row.split(',')
+                    columns = row.split(",")
                     for j, value in enumerate(columns):
                         item = QTableWidgetItem(value)
                         self.main_window.schedule_table.setItem(i, j, item)
-            
+
         # This makes the table uneditable
         for row in range(self.main_window.schedule_table.rowCount()):
             for col in range(self.main_window.schedule_table.columnCount()):
                 item = self.main_window.schedule_table.item(row, col)
                 if item:
                     item.setFlags(item.flags() & ~Qt.ItemIsEditable)
-    
+
     def setThroughput(self, throughput_value):
-        self.main_window.throughput_label.setText("Throughput: " + str(throughput_value))
+        self.main_window.throughput_label.setText(
+            "Throughput: " + str(throughput_value)
+        )
 
     def getThroughput(self):
         throughput_text = self.main_window.throughput_label.text()
@@ -603,7 +819,9 @@ class Scheduler:
         return float(authority_value) if authority_value != "N/A" else None
 
     def setCommandedSpeed(self, speed_value):
-        self.main_window.speed_label.setText("Suggested Speed (mph): " + str(speed_value))
+        self.main_window.speed_label.setText(
+            "Suggested Speed (mph): " + str(speed_value)
+        )
 
     def getCommandedSpeed(self):
         speed_text = self.main_window.speed_label.text()
@@ -611,7 +829,7 @@ class Scheduler:
         speed_value = speed_text.replace("Suggested Speed (mph): ", "")
         # You may want to handle potential conversion errors if needed
         return float(speed_value) if speed_value != "N/A" else None
-    
+
     def updateDepartingStations(self):
         # Clear the existing items in the departingStation ComboBox
         self.main_window.departingStation.clear()
@@ -643,27 +861,60 @@ class Scheduler:
     def sendTrainClicked(self):
         selected_line = self.main_window.selectLine.currentText()
         departing_station = self.main_window.departingStation.currentText()
-        #arrival_station = self.main_window.arrivalStation.currentText()
+        # arrival_station = self.main_window.arrivalStation.currentText()
         arrival_time = self.main_window.arrivalTime.text()
-        print("Arrival Time: ", {arrival_time})
-        current_time = QTime.currentTime()
+        # print("Arrival Time: ", {arrival_time})
+        # current_time = QTime.currentTime()
+
+        current_time = self.main_window.systemTimeInput.text()
+        current_time_qtime = QTime.fromString(current_time, "hh:mm:ss")
+
+        if current_time_qtime.second() > 0:
+            current_time_qtime = current_time_qtime.addSecs(
+                60 - current_time_qtime.second()
+            )
+        else:
+            current_time_qtime = current_time_qtime.addSecs(60)
+
+        train_id = self.main_window.trainIDInput.text()
+        suggested_speed = self.main_window.suggSpeedInput.text()
 
         if selected_line == "Select a Line":
-            QMessageBox.critical(self.main_window, "Invalid Selection", "Please select a line.")
+            QMessageBox.critical(
+                self.main_window, "Invalid Selection", "Please select a line."
+            )
         elif departing_station == "Select a Departing Station":
-            QMessageBox.critical(self.main_window, "Invalid Selection", "Please select a departing station.")
-        #elif arrival_station == "Select Arrival Station":
-            #QMessageBox.critical(self.main_window, "Invalid Selection", "Please select an arrival station.")
+            QMessageBox.critical(
+                self.main_window,
+                "Invalid Selection",
+                "Please select a departing station.",
+            )
         elif arrival_time and (not arrival_time.isdigit() or len(arrival_time) != 4):
-            QMessageBox.critical(self.main_window, "Invalid Arrival Time", "Please enter a valid military time (HHmm).")
+            QMessageBox.critical(
+                self.main_window,
+                "Invalid Arrival Time",
+                "Please enter a valid military time (HHmm).",
+            )
         elif arrival_time and int(arrival_time) > 2359:
-            QMessageBox.critical(self.main_window, "Invalid Arrival Time", "Arrival time cannot exceed 2359.")
-        elif arrival_time and int(arrival_time) < int(QTime.currentTime().toString("HHmm")):
-            QMessageBox.critical(self.main_window, "Invalid Arrival Time", "Arrival time cannot be before the current time.")
+            QMessageBox.critical(
+                self.main_window,
+                "Invalid Arrival Time",
+                "Arrival time cannot exceed 2359.",
+            )
+            """
+        elif arrival_time and int(arrival_time) < int(
+            QTime.currentTime().toString("HHmm")
+        ):
+            QMessageBox.critical(
+                self.main_window,
+                "Invalid Arrival Time",
+                "Arrival time cannot be before the current time.",
+            )"""
+
         else:
             arrival_stations = []
             arrival_stations.extend(self.main_window.stops)
-            #arrival_stations.append(arrival_station)
+            # arrival_stations.append(arrival_station)
             station_info_list = []
             print(arrival_stations)
             for arrival_station in arrival_stations:
@@ -672,29 +923,37 @@ class Scheduler:
                 elif selected_line == "Blue Line":
                     print("blue line")
                 elif selected_line == "Green Line":
-                    routing = Routing('src/main/CTC/GreenLine.csv', CTCWindow) 
+                    routing = Routing("src/main/CTC/GreenLine.csv", CTCWindow)
                     arrival_station_to_find = arrival_station
                     station_info = routing.find_station_info(arrival_station_to_find)
 
                     if station_info:
                         # Add station and its information as a dictionary to the list
-                        station_info_list.append({"Station": arrival_station_to_find, "Info": station_info})
+                        station_info_list.append(
+                            {"Station": arrival_station_to_find, "Info": station_info}
+                        )
                     else:
                         print(f"Station '{arrival_station_to_find}' not found.")
 
             if station_info_list:
                 departure_station_info = routing.find_station_info(departing_station)
                 if departure_station_info:
-                    self.path = self.routing.find_path(departing_station, arrival_stations, station_info)
+                    self.path = self.routing.find_path(
+                        departing_station, arrival_stations, station_info
+                    )
                     print("Path: ", self.path)
                     self.travel = self.routing.find_travel_path(self.path)
                     print("Travel: ", self.travel)
-            
+
             # case if no arrival time is input, needs to be calculated
             if arrival_time == "":
-                travelTime = self.routing.computeTravelTime(self.travel)
-                arrivalTimeBefore = self.routing.calculateArrivalTime(travelTime, current_time)
-                
+                travelTime = self.routing.computeTravelTime(
+                    self.travel, suggested_speed
+                )
+                arrivalTimeBefore = self.routing.calculateArrivalTime(
+                    travelTime, current_time_qtime
+                )
+
                 arrival_hours = arrivalTimeBefore.hour()
                 arrival_minutes = arrivalTimeBefore.minute()
 
@@ -702,25 +961,49 @@ class Scheduler:
                 arrivalTime = f"{arrival_hours:02d}{arrival_minutes:02d}"
                 print("Arrival Time:", arrivalTime)
 
-                # sug speed
-                # initial authority
+                current_hours = current_time_qtime.hour()
+                current_minutes = current_time_qtime.minute()
 
-                train = Train(self.numTrains, selected_line, arrivalTime, current_time, self.main_window.stops)
-                self.trainList.append(train)
-                trainID = train.getTrainID()
-                print(trainID)
-                self.update_schedule_table(departing_station, current_time, arrivalTime, trainID)
+                # Format as "HHmm"
+                current_time_str = f"{current_hours:02d}{current_minutes:02d}"
+                departureTime = current_time_str
+            else:
+                travelTime = self.routing.computeTravelTime(
+                    self.travel, suggested_speed
+                )
+                arrivalTime = arrival_time
+                departureTime = self.routing.calculateDepartureTime(
+                    arrivalTime, travelTime
+                )
 
-            # case if an arrival time is input, error check
-                #departureTime = Routing.calculateDepartureTime(self, departing_station, arrivalTime)
+            train = Train(
+                self,
+                self.main_window,
+                self.numTrains,
+                selected_line,
+                arrivalTime,
+                departureTime,
+                self.main_window.stops,
+                train_id,
+                suggested_speed,
+            )
 
-            # case if trainID is input
+            self.trainList.append(train)
+            # Print the information of all trains in the trainList
+            for train in self.trainList:
+                print("Train ID:", train.train_id)
+                print("Line:", train.trackLine)
+                print("Arrival Time:", train.timeArrival)
+                print("Departure Time:", train.trainDeparture)
+                print("Stops:", train.trainStops)
+                print("Authority:", train.authority)
+                print("Suggested Speed:", train.sugg_speed)
+                print("-----------")  # Add a separator between trains
 
-            # case if suggested speed is input
+            self.update_schedule_table(
+                departing_station, departureTime, arrivalTime, train.train_id
+            )
 
-            #self.trainList.append(Train(trainID, departing_station, selected_line, arrivalTime, departureTime, main_window.stops))
-            #self.update_schedule_table(selected_line, departing_station, arrival_station, arrival_time, trainID)
-            
             # Clear the input fields and hide them
             self.numTrains += 1
             self.main_window.departingStation.setCurrentIndex(0)
@@ -729,33 +1012,45 @@ class Scheduler:
             self.updateStopDropDown()
             self.main_window.stopsTable.setRowCount(0)
 
-    def update_schedule_table(self, departing_station, departure_time, arrival_time, trainID):
+    def update_schedule_table(
+        self, departing_station, departure_time, arrival_time, trainID
+    ):
         # Determine where to insert the new row in the schedule table
         row_position = self.main_window.schedule_table.rowCount()
-        departure_time_str = departure_time.toString("HHmm")
+        # departure_time_str = departure_time.toString("HHmm")
         # Insert a new row in the schedule table
         self.main_window.schedule_table.insertRow(row_position)
-        stops_str = ', '.join(self.main_window.stops)
+        stops_str = ", ".join(self.main_window.stops)
 
         # Add the train information to the table
-        self.main_window.schedule_table.setItem(row_position, 0, QTableWidgetItem(trainID))  # Train ID
-        self.main_window.schedule_table.setItem(row_position, 1, QTableWidgetItem(departing_station))  # Departing Station
-        self.main_window.schedule_table.setItem(row_position, 2, QTableWidgetItem(stops_str))  # Stops
-        self.main_window.schedule_table.setItem(row_position, 3, QTableWidgetItem(departure_time_str))  # Departure Time
-        self.main_window.schedule_table.setItem(row_position, 4, QTableWidgetItem(arrival_time))  # Arrival Time
-        
+        self.main_window.schedule_table.setItem(
+            row_position, 0, QTableWidgetItem(trainID)
+        )  # Train ID
+        self.main_window.schedule_table.setItem(
+            row_position, 1, QTableWidgetItem(departing_station)
+        )  # Departing Station
+        self.main_window.schedule_table.setItem(
+            row_position, 2, QTableWidgetItem(stops_str)
+        )  # Stops
+        self.main_window.schedule_table.setItem(
+            row_position, 3, QTableWidgetItem(departure_time)
+        )  # Departure Time
+        self.main_window.schedule_table.setItem(
+            row_position, 4, QTableWidgetItem(arrival_time)
+        )  # Arrival Time
+
     def AutomaticSchedule(self):
         self.main_window.schedule_table.clearContents()
-        self.main_window.schedule_table.setRowCount(0)    
-    
+        self.main_window.schedule_table.setRowCount(0)
+
     def setBlueSchedule(self):
         # Clear the existing items in the schedule table
         self.main_window.schedule_table.clearContents()
         self.main_window.schedule_table.setRowCount(0)
 
         blue_line_schedule = [
-            ("BlueTrain1", "Yard", "Stops","Station B", "0800", "0830"),
-            ("BlueTrain2", "Yard", "Stops","Station C", "0900", "0930"),
+            ("BlueTrain1", "Yard", "Stops", "Station B", "0800", "0830"),
+            ("BlueTrain2", "Yard", "Stops", "Station C", "0900", "0930"),
         ]
 
         # Set the number of rows in the schedule table
@@ -829,18 +1124,50 @@ class Scheduler:
         available_stations = []
 
         if selected_line == "Blue Line":
-            available_stations = ["Select a Station to stop at", "Station B", "Station C"]
+            available_stations = [
+                "Select a Station to stop at",
+                "Station B",
+                "Station C",
+            ]
         elif selected_line == "Red Line":
-            available_stations = ["Select a Station to stop at", "Shadyside", "Herron Ave", "Swissville", "Penn Station", "Steel Plaza", "First Ave", "Station Square", "South Hills Junction"]
+            available_stations = [
+                "Select a Station to stop at",
+                "Shadyside",
+                "Herron Ave",
+                "Swissville",
+                "Penn Station",
+                "Steel Plaza",
+                "First Ave",
+                "Station Square",
+                "South Hills Junction",
+            ]
         elif selected_line == "Green Line":
-            available_stations = ["Select a Station to stop at", "Pioneer", "Edgebrook", "Whited", "South Bank", "Central", "IngleWood", "OverBrook", "Glenbury", "Dormont", "Mt Lebanon", "Poplar", "Castle Shannon"]
+            available_stations = [
+                "Select a Station to stop at",
+                "Pioneer",
+                "Edgebrook",
+                "Whited",
+                "South Bank",
+                "Central",
+                "IngleWood",
+                "OverBrook",
+                "Glenbury",
+                "Dormont",
+                "Mt Lebanon",
+                "Poplar",
+                "Castle Shannon",
+            ]
 
-        #if self.main_window.arrivalStation.currentText() == "Select an Arrival Station":
-            # If arrival station is not selected, add all available stations
-           # QMessageBox.warning(self, "Error", "Please select an Arrival Station first.")
-       # else:
-            # Filter out stations that are already in 'stops' and remove the arrival station
-        available_stations = [station for station in available_stations if station not in self.main_window.stops]
+        # if self.main_window.arrivalStation.currentText() == "Select an Arrival Station":
+        # If arrival station is not selected, add all available stations
+        # QMessageBox.warning(self, "Error", "Please select an Arrival Station first.")
+        # else:
+        # Filter out stations that are already in 'stops' and remove the arrival station
+        available_stations = [
+            station
+            for station in available_stations
+            if station not in self.main_window.stops
+        ]
         self.main_window.addStopDropdown.addItems(available_stations)
 
     """def addStopPressed(self):
@@ -865,10 +1192,10 @@ class Scheduler:
             # Reset the dropdown to index 0
             self.main_window.addStopDropdown.setCurrentIndex(0)
             print("Stops:", self.main_window.stops)"""
-    
+
     def addStopPressed(self):
         selected_station = self.main_window.addStopDropdown.currentText()
-        
+
         if selected_station != "Select a Station to stop at":
             # Add the selected station to the 'stops' array
             self.main_window.stops.append(selected_station)
@@ -877,15 +1204,19 @@ class Scheduler:
             dwellTime = "1 minute"
             rowPosition = self.main_window.stopsTable.rowCount()
             self.main_window.stopsTable.insertRow(rowPosition)
-            self.main_window.stopsTable.setItem(rowPosition, 0, QTableWidgetItem(selected_station))
-            self.main_window.stopsTable.setItem(rowPosition, 1, QTableWidgetItem(dwellTime))
+            self.main_window.stopsTable.setItem(
+                rowPosition, 0, QTableWidgetItem(selected_station)
+            )
+            self.main_window.stopsTable.setItem(
+                rowPosition, 1, QTableWidgetItem(dwellTime)
+            )
 
             # Update the dropdown to exclude the newly added stop
             self.updateStopDropDown()
             # Reset the dropdown to index 0
             self.main_window.addStopDropdown.setCurrentIndex(0)
             print("Stops:", self.main_window.stops)
-    
+
     def setMaxBlock(self, selected_line):
         # Set the max_block based on the selected line
         if selected_line == "Red Line":
@@ -900,7 +1231,8 @@ class Scheduler:
         if self.max_block is None:
             self.setMaxBlock(selected_line)
         return self.max_block
-    
+
+
 class Routing:
     def __init__(self, filename, main_window):
         self.filename = filename
@@ -909,7 +1241,7 @@ class Routing:
 
     def load_data(self):
         data = []
-        with open(self.filename, 'r') as file:
+        with open(self.filename, "r") as file:
             csv_reader = csv.reader(file)
             for line in csv_reader:
                 data.append(line)
@@ -931,16 +1263,24 @@ class Routing:
                 speedLimit = float(row[5])
                 stationName = row[6]
                 seconds_to_traverse_block = float(row[10])
-
                 # Create a Block object for each block and append it to blockList
-                block = Block(blockNumber, trackSection, blockLength, speedLimit, stationName, seconds_to_traverse_block)
+                block = Block(
+                    blockNumber,
+                    trackSection,
+                    blockLength,
+                    speedLimit,
+                    stationName,
+                    seconds_to_traverse_block,
+                )
                 blockList.append(block)
 
         return blockList
 
     def find_station_info(self, arrival_station):
         station_info = []
-        arrival_station = arrival_station.lower()  # Convert the input to lowercase for case-insensitive search
+        arrival_station = (
+            arrival_station.lower()
+        )  # Convert the input to lowercase for case-insensitive search
 
         for row in self.data:
             if len(row) >= 8:
@@ -953,18 +1293,20 @@ class Routing:
                     Station_Side = row[7]
                     self.seconds_to_traverse_block = float(row[10])
 
-                    station_info.append({
-                        "Line": Line,
-                        "Block_Number": Block_Number,
-                        "Block_Length": Block_Length,
-                        "Speed_Limit": Speed_Limit,
-                        "Station": Station,
-                        "Station_Side": Station_Side,
-                        "seconds_to_traverse_block": self.seconds_to_traverse_block
-                    })
-        
+                    station_info.append(
+                        {
+                            "Line": Line,
+                            "Block_Number": Block_Number,
+                            "Block_Length": Block_Length,
+                            "Speed_Limit": Speed_Limit,
+                            "Station": Station,
+                            "Station_Side": Station_Side,
+                            "seconds_to_traverse_block": self.seconds_to_traverse_block,
+                        }
+                    )
+
         return station_info
-    
+
     """def find_path(self, departure_station, arrival_stations, stops):
         self.path = []
         added_stations = []
@@ -1004,7 +1346,7 @@ class Routing:
             current_station = arrival_station
 
         return self.path"""
-    
+
     def find_path(self, departure_station, arrival_stations, stops):
         self.path = []
         added_stations = []
@@ -1021,14 +1363,16 @@ class Routing:
 
             # Check if the arrival station has already been added
             if arrival_station not in added_stations:
-                self.path.append((arrival_station, arrival_station_info[0]['Block_Number']))
+                self.path.append(
+                    (arrival_station, arrival_station_info[0]["Block_Number"])
+                )
                 added_stations.append(arrival_station)
 
             # Update the current station for the next iteration
             current_station = arrival_station
 
         return self.path
-    
+
     def find_travel_path(self, path):
         max_block = 0
         if self.main_window.selectLine == "Green Line":
@@ -1047,14 +1391,15 @@ class Routing:
             first_stop = f"Stop at block {first_block}: {first_station}"
             self.stations_to_stop.append((first_block, first_station))
 
-
         # Categorize other stations based on their block numbers
         first_stations = []
         second_stations = []
         third_stations = []
         stop_blocks = []
 
-        for block, station in block_stations[1:]:  # Exclude the first station from categorization
+        for block, station in block_stations[
+            1:
+        ]:  # Exclude the first station from categorization
             if 62 < block < max_block:
                 first_stations.append((block, station))
                 stop_blocks.append(block)
@@ -1076,7 +1421,7 @@ class Routing:
         self.stations_to_stop.extend(third_stations)
 
         self.routeQ = []
-        #if self.main_window.selectLine == "Green Line":
+        # if self.main_window.selectLine == "Green Line":
         self.routeQ = self.travelGreenBlocks()
 
         # Use stop_blocks to check if the train should stop at a block
@@ -1117,14 +1462,14 @@ class Routing:
         self.routeQ.append(0)
 
         return self.routeQ
-    
+
     def closeBlock(self, blockNumber):
         self.blockList[blockNumber].setEnable(0)
 
     def openBlock(self, blockNumber):
         self.blockList[blockNumber].setEnable(1)
 
-    def computeTravelTime(self, travel_path):
+    def computeTravelTime(self, travel_path, suggested_speed):
         total_time = 0  # Initialize total time to zero
         lastStopTime = 0
 
@@ -1137,13 +1482,33 @@ class Routing:
 
             elif isinstance(block, int):
                 # Find the time to traverse the block using the find_block_info function
-                self.block_info_list = self.find_block_info()  # Call the function to get all block information
+                self.block_info_list = (
+                    self.find_block_info()
+                )  # Call the function to get all block information
 
-                block_info = next((info for info in self.block_info_list if info.blockNumber == block), None)
+                block_info = next(
+                    (
+                        info
+                        for info in self.block_info_list
+                        if info.blockNumber == block
+                    ),
+                    None,
+                )
                 if block_info:
-                    seconds_to_traverse_block = block_info.seconds_to_traverse_block
+                    if suggested_speed == "":
+                        seconds_to_traverse_block = block_info.seconds_to_traverse_block
+                    else:
+                        distance = block_info.length
+                        sugg_speed = int(suggested_speed)
+                        if sugg_speed > 0:
+                            seconds_to_traverse_block = distance / (
+                                sugg_speed * 0.44704
+                            )
+                        else:
+                            seconds_to_traverse_block = 0
+
                     total_time += seconds_to_traverse_block
-                    #print(f"Block: {block}, Seconds: {seconds_to_traverse_block}")
+                    # print(f"Block: {block}, Seconds: {seconds_to_traverse_block}")
                 else:
                     print(f"Block {block} not found in block_list.")
 
@@ -1151,99 +1516,152 @@ class Routing:
         print(lastStopTime)
         print("Total travel time is ")
         print(total_time)
-        #print(total_time)
+        # print(total_time)
         return lastStopTime
 
     def checkPosition(self, line, blockNum, occupancy):
-        print("comparing current block of" + str(blockNum) + " with destination at " + str(self.routeQ[1]))
+        print(
+            "comparing current block of"
+            + str(blockNum)
+            + " with destination at "
+            + str(self.routeQ[1])
+        )
         line = self.scheduler.getSelectedLine
-        if (occupancy == True and blockNum == self.routeQ[1] and line == line):
+        if occupancy == True and blockNum == self.routeQ[1] and line == line:
             self.routeQ.pop(0)
 
-            if (self.stations_to_stop[0] == self.routeQ[3]):
-                suggestedSpeed = int(0.75*self.block_info_list[self.routeQ[0]-1].speedLimit)*3.60
+            if self.stations_to_stop[0] == self.routeQ[3]:
+                suggestedSpeed = (
+                    int(0.75 * self.block_info_list[self.routeQ[0] - 1].speedLimit)
+                    * 3.60
+                )
                 print(suggestedSpeed)
-                #signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
-            elif (self.stations_to_stop[0] == self.routeQ[2]):
-                suggestedSpeed = int(0.50*self.block_info_list[self.routeQ[0]-1].speedLimit)*3.60
+                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
+            elif self.stations_to_stop[0] == self.routeQ[2]:
+                suggestedSpeed = (
+                    int(0.50 * self.block_info_list[self.routeQ[0] - 1].speedLimit)
+                    * 3.60
+                )
                 print(suggestedSpeed)
-                #signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
-            elif (self.stations_to_stop[0] == self.routeQ[1]):
-                suggestedSpeed = int(0.25*self.block_info_list[self.routeQ[0]-1].speedLimit)*3.60
+                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
+            elif self.stations_to_stop[0] == self.routeQ[1]:
+                suggestedSpeed = (
+                    int(0.25 * self.block_info_list[self.routeQ[0] - 1].speedLimit)
+                    * 3.60
+                )
                 print(suggestedSpeed)
-                #signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
-            elif (self.stations_to_stop[0] == self.routeQ[0]):
+                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
+            elif self.stations_to_stop[0] == self.routeQ[0]:
                 suggestedSpeed = 0
                 print(suggestedSpeed)
-                #signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
-                #signals.sendAuthority.emit(WaysideNum, line, self.stations_to_stop[0], 0)
+                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
+                # signals.sendAuthority.emit(WaysideNum, line, self.stations_to_stop[0], 0)
                 QTimer.singleShot(60, self.leaveStop)
             else:
-                suggestedSpeed = (self.block_info_list[self.routeQ[0]-1].speedLimit)*3.60
-                #signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ[0], suggestedSpeed)
-   
+                suggestedSpeed = (
+                    self.block_info_list[self.routeQ[0] - 1].speedLimit
+                ) * 3.60
+                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ[0], suggestedSpeed)
+
     def leaveStop(self):
         if self.stations_to_stop:
             departing_station = self.stations_to_stop.pop()
             # Continue with your existing code for leaving the stop
-            suggestedSpeed = (self.block_info_list[self.routeQ[0]-1].speedLimit) * 3.60
+            suggestedSpeed = (
+                self.block_info_list[self.routeQ[0] - 1].speedLimit
+            ) * 3.60
             # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ[0], suggestedSpeed)
             current_time = QTime.currentTime()
-            self.update_schedule_table(departing_station, current_time, "Dwelling", "N/A")
+            self.update_schedule_table(
+                departing_station, current_time, "Dwelling", "N/A"
+            )
         else:
             # No more stations to stop, update the schedule with "Returning to yard"
             current_time = QTime.currentTime()
             self.update_schedule_table("Returning to yard", current_time, "N/A", "N/A")
 
-    def calculateDepartureTime(arrival_time, travelTime):
-        # Calculate departure time by subtracting travel time from arrival time
-        departure_time = arrival_time.addSecs(int(-travelTime))
-        return departure_time
+    def calculateDepartureTime(self, arrival_time, travelTime):
+        arrivalTime = QTime.fromString(arrival_time, "HHmm")
+        departure_time = arrivalTime.addSecs(int(-travelTime))
+
+        depHour = departure_time.hour()
+        depMin = departure_time.minute()
+
+        # Format as "HHmm"
+        current_time_str = f"{depHour:02d}{depMin:02d}"
+        departureTime = current_time_str
+
+        return departureTime
 
     def calculateArrivalTime(self, travelTime, current_time):
         arrival_time = current_time.addSecs(int(travelTime))
         return arrival_time
-        
+
+
 class Train:
     train_count = 0
-    def __init__(self, trainNum, line, arrivalTime, departureTime, stops):
+
+    def __init__(
+        self,
+        scheduler,
+        CTCwindow,
+        trainNum,
+        line,
+        arrivalTime,
+        departureTime,
+        stops,
+        trainID,
+        suggested_speed,
+    ):
+        self.scheduler = scheduler
+        self.main_window = CTCwindow
+
         Train.train_count += 1
         self.trackLine = line
         self.timeArrival = arrivalTime
         self.trainDeparture = departureTime
-        self.trainStops = stops 
-        self.authority = 0
+        self.trainStops = stops
+        self.authority = 1
         trainNum = trainNum + 1
-        
-        #self.signals.occupancy.connect(self.routing.checkPosition)
 
-        if (line == "Green Line"):
-            self.trainID = f'{"Green"}{trainNum}'
+        self.sugg_speed = int(suggested_speed) if suggested_speed else 70
+
+        if trainID:
+            self.train_id = trainID
+        elif line == "Green Line":
+            self.train_id = f'{"Green"}{trainNum}'
+
+        self.dispatchTrainsList = []
+        # self.signals.occupancy.connect(self.routing.checkPosition)
+
+        self.departure_timer = QTimer()
+        self.departure_timer.timeout.connect(self.checkDepartureTime)
+        self.departure_timer.start(1000)
 
     def getTrainID(self):
         return self.trainID
-    
+
     def getDestination(self):
         return self.destination
-    
+
     def getTrackLine(self):
         return self.trackLine
-    
+
     def getArrivalTime(self):
         return self.timeArrival
-    
+
     def getDepartureTime(self):
         return self.trainDeparture
-    
+
     def getStops(self):
         return self.trainStops
-    
+
     def getSuggestedSpeed(self):
         return self.suggestedSpeed
-    
+
     def getAuthoriy(self):
         return self.authority
-    
+
     def setAuthority(self, trainAuthority):
         self.authority = trainAuthority
 
@@ -1252,14 +1670,60 @@ class Train:
 
     def setSuggestedSpeed(self, trainSpeed):
         self.suggestedSpeed = trainSpeed
-    
-    def setTrainID(self, newID):
-        self.trainID = newID
-    
-    #def leaveStation()    
-    
+
+    def setTrainID(self, train_id):
+        self.trainID = train_id
+
+    def checkDepartureTime(self):
+        current_time = self.main_window.systemTimeInput.text()
+        current_time_str = current_time.replace(":", "")[:4]
+        print(current_time_str)
+        # Iterate through your list of trains and check their departure times
+        for train in self.scheduler.trainList:
+            departureTime = train.trainDeparture
+            print(departureTime)
+            if departureTime == current_time_str:
+                # Add the train to the dispatched_trains list
+                self.dispatchTrainsList.append(train)
+
+                # Add the train's information to the dispatched trains table
+                row_position = self.main_window.dispatchTable.rowCount()
+                self.main_window.dispatchTable.insertRow(row_position)
+                self.main_window.dispatchTable.setItem(
+                    row_position, 0, QTableWidgetItem(train.train_id)
+                )
+                self.main_window.dispatchTable.setItem(
+                    row_position, 1, QTableWidgetItem(train.trainDeparture)
+                )
+
+                self.scheduler.trainList.remove(train)
+
+                # Get the number of rows in the schedule_table
+                num_rows = self.main_window.schedule_table.rowCount()
+
+                # Loop through the rows and search for the departure time
+                for row_index in range(num_rows):
+                    departure_time_item = self.main_window.schedule_table.item(
+                        row_index, 3
+                    )
+                    if departure_time_item.text() == departureTime:
+                        # Remove the row with the matching departure time
+                        self.main_window.schedule_table.removeRow(row_index)
+                        break  # Stop searching once the row is removed
+
+    # def leaveStation()
+
+
 class Block:
-    def __init__(self, blockNumber, trackSection, blockLength, speedLimit, stationName, seconds_to_traverse_block):
+    def __init__(
+        self,
+        blockNumber,
+        trackSection,
+        blockLength,
+        speedLimit,
+        stationName,
+        seconds_to_traverse_block,
+    ):
         self.blockNumber = blockNumber
         self.section = trackSection
         self.length = blockLength
@@ -1268,54 +1732,47 @@ class Block:
         self.seconds_to_traverse_block = seconds_to_traverse_block
         self.occupancy = 0
         self.enable = 1
-    
-        #self.mode_handler = ModeHandler()
+
+        # self.mode_handler = ModeHandler()
+
     def setEnable(self, blockEnable):
         self.enable = blockEnable
 
     def setOccupancy(self, occupancy):
         self.occupancy = occupancy
 
-    def updateBlockDropDown(self):
-        self.main_window.blockDropDown.clear()
-        selected_line = self.main_window.selectLine.currentText()
+    @staticmethod
+    def updateBlockDropDown(main_window):
+        main_window.blockDropDown.clear()
+        selected_line = main_window.selectLine.currentText()
 
-        if selected_line == "Blue Line":
-            self.mode_handler.blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-        
-        elif selected_line == "Red Line":
-            self.mode_handler.blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        if selected_line == "Green Line":
+            block_items = [
+                str(i) for i in range(1, 151)
+            ]  # Generating block numbers 1-150
+            main_window.blockDropDown.addItems(block_items)
 
-        elif selected_line == "Green Line":
-            self.mode_handler.blocks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-    
+    @staticmethod
+    def updateStatusLabel(self, main_window):
+        selected_block = main_window.blockDropDown.currentText()
+
+        # Assuming you have a method in the Block class to get the block status
+        block_status = self.getBlockStatus(selected_block)
+
+        # Update the status label
+        main_window.status_label.setText(f"Status: {block_status}")
+
+    # def getBlockStatus(self, blockNum):
+
     def setSelectedBlock(self):
         selected_block = self.main_window.blockDropDown.currentText()
         return selected_block
-    
-    def showBlockStatus(self):
-        selected_block_name = self.setSelectedBlock()
 
-        # Find the selected block based on its name or identifier
-        selected_block = None
-        for block in self.mode_handler.blocks:
-            if block.blockNumber == selected_block_name:
-                selected_block = block
-                break
 
-        if selected_block is not None:
-            occupancy_status = "Block Status: Occupied" if selected_block.occupancy else "Block Status: Not Occupied"
-            self.main_window.status_label.setText(occupancy_status)  # Update the status label
-        else:
-            self.main_window.status_label.setText("Block Status: Block not found")
-        
-    def showBlockStatus(self):
-        block = self.setSelectedBlock()
-        
-if __name__ == "__main__":
-    CTC_Window = CTCWindow()
-    mode_handler = ModeHandler(CTC_Window)  # Initialize the ModeHandler with the MainWindow instance
+# if __name__ == "__main__":
+# CTC_Window = CTCWindow()
+# mode_handler = ModeHandler(CTC_Window)  # Initialize the ModeHandler with the MainWindow instance
 
-    # Set references in both directions
-    CTC_Window.mode_handler = mode_handler
-    mode_handler.main_window = CTC_Window
+# Set references in both directions
+# CTC_Window.mode_handler = mode_handler
+# mode_handler.main_window = CTC_Window

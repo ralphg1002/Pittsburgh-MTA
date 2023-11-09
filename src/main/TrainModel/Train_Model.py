@@ -15,7 +15,8 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QCheckBox,
 )
-from qtwidgets import AnimatedToggle
+
+# from qtwidgets import AnimatedToggle
 
 # from Signals import TrackModelSignals, TrainControllerSignals
 
