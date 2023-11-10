@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>191</width>
+    <height>408</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTextEdit" name="inputTitle">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>20</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="html">
+     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Inputs&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="outputTitle">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>210</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="html">
+     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Outputs&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="inputSelectLine">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>100</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Select Line</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Green Line</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red Line</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="inputSelectAction">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>70</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Select Action</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Switch State</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Crossing State</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Light State</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Maintenance</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Occupancy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Authority</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Suggested Speed</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Direction</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="inputSelectBlock">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>130</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Input Block #</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="inputSelectState">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>160</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Input State</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="outputSelectAction">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>260</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Select Action</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Switch State</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Crossing State</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Light State</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Maintenance</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Occupancy</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Authority</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Suggested Speed</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Set Direction</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="outputSelectBlock">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>320</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Input Block #</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="outputSelectLine">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>290</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Select Line</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Green Line</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red Line</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="outputState">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>350</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

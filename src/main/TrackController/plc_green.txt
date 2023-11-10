@@ -1,15 +1,36 @@
+CRX:
+IF
+    Condition: (14->24)
+    Operation: CROSS(1)
+IF
+    Condition: (24->14)
+    Operation: CROSS(1)
+END
+
 SW1:
 IF
-    Condition: 1 AND NOT(29->12)
+    Condition: (17->12)
+    Operation: SWITCH(0)
+    Operation 11 R
+    Operation 12 G
+    Operation 1 R
+IF
+    Condition: (6->1) AND NOT(29->12)
     Operation: SWITCH(1)
-    Operation: 29 G
+    Operation: 11 R
     Operation: 12 R
-    Operation: 1 R
+    Operation: 1 G
 END
 
 SW2:
 IF
-    Condition: 150 AND NOT(12->29)
+    Condition: (24->29)
+    Operation SWITCH(0)
+    Operation: 150 R
+    Operation: 30 R
+    Operation: 29 G
+IF  
+    Condition: (145->150) AND NOT(12->29)
     Operation: SWITCH(1)
     Operation: 150 G
     Operation: 30 R
@@ -18,13 +39,19 @@ END
 
 SW3:
 IF
-    Condition: 57
+    Condition: (52->57)
     Operation: SWITCH(1)
     Operation: 57 G
     Operation: 58 R
 END
 
 SW4:
+IF
+    Condition: (57->62)
+    Operation: SWITCH(0)
+    Operation: 62 G
+    Operation: 63 R
+    Operation: 0 R
 IF
     Condition: 0
     Operation: SWITCH(1)
@@ -33,6 +60,12 @@ IF
 END
 
 SW5:
+IF
+    Condition: (71->76) AND NOT(85->77)
+    Operation: SWITCH(0)
+    Operation: 76 G
+    Operation: 77 R
+    Operation: 101 R
 IF
     Condition: (85->77)
     Operation: SWITCH(1)
@@ -43,9 +76,17 @@ END
 
 SW6:
 IF
-    Condition: 100 AND NOT(77->85)
+    Condition: (80->85)
+    Operation: SWITCH(0)
+    Operation: 85 G
+    Operation: 86 R
+    Operation: 100 R
+IF
+    Condition: (95->100) AND NOT(77->85)
     Operation: SWITCH(1)
     Operation: 85 R
     Operation: 86 R
-    Operation: 106 G
+    Operation: 100 G
 END
+
+
