@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtGui
-from PyQt5.QtCore import QCoreApplication, QRect, QSize, Qt, QTimer, QTime
+from PyQt5.QtCore import (QCoreApplication, QRect, QSize, 
+                          Qt, QTimer, QTime)
 from PyQt5.QtGui import QCursor, QFont, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
@@ -15,6 +16,7 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QCheckBox,
 )
+from numpy import true_divide
 from qtwidgets import AnimatedToggle
 
 # from Signals import TrackModelSignals, TrainControllerSignals
@@ -541,43 +543,40 @@ class ResultsWindow(QMainWindow):
             train_data = self.trains.trains[selected_train_name]
             failure_status = train_data.get("failure_status", {})
 
-            # Create and add QLabel widgets for each word the layout in failure status
+            # Iterate through the failure_word_list
             for word_placeholders in failure_word_list:
-                word_key = (
-                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
-                )
-                word_value = failure_status.get(word_key, "N/A")
-
-                # Create the QLabel widget
-                if (
-                    "{}" in word_placeholders
-                    and "{}" in word_placeholders[word_placeholders.find("{}") + 2 :]
-                ):
-                    word = word_placeholders.format(selected_train_name, word_value)
-                else:
-                    word = word_placeholders.format(word_value)
-
-                self.word_label = QLabel(word, self.failure_white_background_label)
-                self.word_label.setStyleSheet(
+                word_key = word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+                
+                # Create the QLabel widget for failure name
+                failure_label_text = word_placeholders.format("")
+                failure_label = QLabel(failure_label_text, self.failure_white_background_label)
+                failure_label.setStyleSheet(
                     "color: #000000; background-color: transparent; border: none;"
                 )
-                self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                self.word_label.setContentsMargins(0, 0, 0, 0)
-                self.word_label.setFont(QFont("Arial", 9))
+                failure_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                failure_label.setContentsMargins(5, 5, 5, 30)
+                failure_label.setFont(QFont("Arial", 9))
 
+                # Create the QCheckBox widget
                 check = QCheckBox()
-                if check.isChecked():
-                    self.trains.set_value(
-                        selected_train_name, "failure_status", word_key, True
-                    )
-                else:
-                    self.trains.set_value(
-                        selected_train_name, "failure_status", word_key, False
-                    )
 
-                self.failure_white_background_layout.addWidget(
-                    self.word_label, alignment=Qt.AlignTop
+                # Set the checkbox state based on the value in failure_status
+                # check.setChecked(self.trains.get_value(selected_train_name, "failure_status", word_key))
+
+                # Connect the checkbox state change to a function/slot
+                check.stateChanged.connect(
+                    lambda state, key=word_key: self.update_failure_status(selected_train_name, word_key, check.isChecked())
                 )
+
+                # Create a QHBoxLayout for each failure and add QLabel and QCheckBox to it
+                failure_layout = QHBoxLayout()
+                failure_layout.addWidget(failure_label)
+                failure_layout.addWidget(check)
+                failure_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+                failure_layout.setContentsMargins(0, 0, 0, 0)
+                
+                # Add the QHBoxLayout to the main layout
+                self.failure_white_background_layout.addLayout(failure_layout)
 
         self.failure_white_background_layout.addStretch(1)
 
@@ -812,6 +811,11 @@ class ResultsWindow(QMainWindow):
         time_text = time.toString("hh:mm:ss")
         self.systemTimeInput.setText(time_text)
 
+    def update_failure_status(self, train_name, key, state):
+        # Sets the value of the dictionary value for the failure variables
+        self.trains.set_value(train_name, "failure_status", key, state)
+        print(self.trains.trains["Train 1"]["failure_status"])
+        print(train_name, key, state)
 
 class SharedData:
     def __init__(self):
@@ -856,167 +860,166 @@ class SharedData:
                     "passenger_emergency_brake": False,
                 },
             },
-            "Train 2": {
-                "vehicle_status": {
-                    "speed_limit": 45,
-                    "current_speed": 45,
-                    "setpoint_speed": 55,
-                    "commanded_speed": 40,
-                    "acceleration": 3.5,
-                    "deceleration": 2.0,
-                    "brakes": True,
-                    "power": 75.0,
-                    "power_limit": 100.0,
-                },
-                "failure_status": {
-                    "engine_failure": False,
-                    "signal_pickup_failure": False,
-                    "brake_failure": False,
-                    "emergency_brake": False,
-                },
-                "passenger_status": {
-                    "passengers": 42,
-                    "passenger_limit": 50,
-                    "left_door": False,
-                    "right_door": True,
-                    "lights_status": True,
-                    "announcements": True,
-                    "temperature": 72,
-                    "air_conditioning": False,
-                    "advertisements": "Buy Drinks",
-                },
-                "navigation_status": {
-                    "authority": 5,
-                    "beacon": 6,
-                    "block_length": 2,
-                    "block_grade": 15,
-                    "next_station": 9,
-                    "prev_station": 5,
-                    "headlights": True,
-                    "passenger_emergency_brake": False,
-                },
-            },
-            "Train 3": {
-                "vehicle_status": {
-                    "speed_limit": 35,
-                    "current_speed": 45,
-                    "setpoint_speed": 55,
-                    "commanded_speed": 40,
-                    "acceleration": 3.5,
-                    "deceleration": 2.0,
-                    "brakes": True,
-                    "power": 75.0,
-                    "power_limit": 100.0,
-                },
-                "failure_status": {
-                    "engine_failure": False,
-                    "signal_pickup_failure": False,
-                    "brake_failure": False,
-                    "emergency_brake": False,
-                },
-                "passenger_status": {
-                    "passengers": 42,
-                    "passenger_limit": 50,
-                    "left_door": False,
-                    "right_door": True,
-                    "lights_status": True,
-                    "announcements": True,
-                    "temperature": 72,
-                    "air_conditioning": False,
-                    "advertisements": "Buy Drinks",
-                },
-                "navigation_status": {
-                    "authority": 5,
-                    "beacon": 6,
-                    "block_length": 2,
-                    "block_grade": 15,
-                    "next_station": 9,
-                    "prev_station": 5,
-                    "headlights": True,
-                    "passenger_emergency_brake": False,
-                },
-            },
-            "Train 4": {
-                "vehicle_status": {
-                    "speed_limit": 35,
-                    "current_speed": 45,
-                    "setpoint_speed": 55,
-                    "commanded_speed": 40,
-                    "acceleration": 3.5,
-                    "deceleration": 2.0,
-                    "brakes": True,
-                    "power": 75.0,
-                    "power_limit": 100.0,
-                },
-                "failure_status": {
-                    "engine_failure": False,
-                    "signal_pickup_failure": False,
-                    "brake_failure": False,
-                    "emergency_brake": False,
-                },
-                "passenger_status": {
-                    "passengers": 42,
-                    "passenger_limit": 50,
-                    "left_door": False,
-                    "right_door": True,
-                    "lights_status": True,
-                    "announcements": True,
-                    "temperature": 72,
-                    "air_conditioning": False,
-                    "advertisements": "Buy Drinks",
-                },
-                "navigation_status": {
-                    "authority": 5,
-                    "beacon": 6,
-                    "block_length": 2,
-                    "block_grade": 15,
-                    "next_station": 9,
-                    "prev_station": 5,
-                    "headlights": True,
-                    "passenger_emergency_brake": False,
-                },
-            },
-            "Train 5": {
-                "vehicle_status": {
-                    "speed_limit": 35,
-                    "current_speed": 45,
-                    "setpoint_speed": 55,
-                    "commanded_speed": 40,
-                    "acceleration": 3.5,
-                    "deceleration": 2.0,
-                    "brakes": True,
-                    "power": 75.0,
-                    "power_limit": 100.0,
-                },
-                "failure_status": {
-                    "engine_failure": False,
-                    "signal_pickup_failure": False,
-                    "brake_failure": False,
-                    "emergency_brake": False,
-                },
-                "passenger_status": {
-                    "passengers": 42,
-                    "passenger_limit": 50,
-                    "left_door": False,
-                    "right_door": True,
-                    "lights_status": True,
-                    "announcements": True,
-                    "temperature": 72,
-                    "air_conditioning": False,
-                    "advertisements": "Buy Drinks",
-                },
-                "navigation_status": {
-                    "authority": 5,
-                    "beacon": 6,
-                    "block_length": 2,
-                    "block_grade": 15,
-                    "next_station": 9,
-                    "prev_station": 5,
-                    "headlights": True,
-                    "passenger_emergency_brake": False,
-                },
-            },
         }
+        # "Train 2": {
+        #     "vehicle_status": {
+        #         "speed_limit": 45,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
+        # },
+        # "Train 3": {
+        #     "vehicle_status": {
+        #         "speed_limit": 35,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
+        # },
+        # "Train 4": {
+        #     "vehicle_status": {
+        #         "speed_limit": 35,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
+        # },
+        # "Train 5": {
+        #     "vehicle_status": {
+        #         "speed_limit": 35,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
 
     def get_value(self, train_name, category, key):
         return self.trains.get(train_name, {}).get(category, {}).get(key)
@@ -2385,9 +2388,6 @@ class OutputTrackModel:
     currentPassengers = train.get_value("Train 1", "passenger_status", 1)
     # TrackModelSignals.sendCurrentPassengers(currentPassengers)
 
-    maxPassengers = train.get_value("Train 1", "passenger_status", 2)
-    # TrackModelSignals.sendMaxPassengers(maxPassengers)
-
 
 # Output to train controller module
 class OutputTrainController:
@@ -2471,6 +2471,7 @@ class InputsTrainController:
 class Calculations:
     # Calculates current speed of train in automatic mode
     def Current_speed_auto():
+        # Define variables for calculatons
         train = SharedData()
         acceleration = 5.0
         deceleration = -5.0
@@ -2661,19 +2662,20 @@ class Calculations:
     def Occupancy():
         total_distance = 100
         block_distance = InputsTrackModel()["Block_Length"]
+        curr_block = InputsTrackModel()["Block_Name"]
 
         if total_distance == block_distance:
-            OutputTrackModel.occupancy = True
+            OutputTrackModel.occupancy = curr_block
 
         return total_distance
 
 
-# def main():
-#     app = QApplication(sys.argv)
-#     ui = TrainModel()
-#     ui.show_gui()
-#     sys.exit(app.exec_())
+def main():
+    app = QApplication(sys.argv)
+    ui = TrainModel()
+    ui.show_gui()
+    sys.exit(app.exec_())
 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
