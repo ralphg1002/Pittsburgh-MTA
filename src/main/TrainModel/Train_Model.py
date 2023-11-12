@@ -1,7 +1,6 @@
 import sys
 from PyQt5 import QtGui
-from PyQt5.QtCore import (QCoreApplication, QRect, QSize, 
-                          Qt, QTimer, QTime)
+from PyQt5.QtCore import QCoreApplication, QRect, QSize, Qt, QTimer, QTime
 from PyQt5.QtGui import QCursor, QFont, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
@@ -545,38 +544,48 @@ class ResultsWindow(QMainWindow):
 
             # Iterate through the failure_word_list
             for word_placeholders in failure_word_list:
-                word_key = word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
-                
+                word_key = (
+                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+                )
+
                 # Create the QLabel widget for failure name
                 failure_label_text = word_placeholders.format("")
-                failure_label = QLabel(failure_label_text, self.failure_white_background_label)
+                failure_label = QLabel(
+                    failure_label_text, self.failure_white_background_label
+                )
                 failure_label.setStyleSheet(
                     "color: #000000; background-color: transparent; border: none;"
                 )
                 failure_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                failure_label.setContentsMargins(5, 5, 5, 30)
+                failure_label.setContentsMargins(10, 10, 10, 10)
                 failure_label.setFont(QFont("Arial", 9))
 
                 # Create the QCheckBox widget
                 check = QCheckBox()
 
                 # Set the checkbox state based on the value in failure_status
-                # check.setChecked(self.trains.get_value(selected_train_name, "failure_status", word_key))
-
-                # Connect the checkbox state change to a function/slot
-                check.stateChanged.connect(
-                    lambda state, key=word_key: self.update_failure_status(selected_train_name, word_key, check.isChecked())
+                check.setChecked(
+                    self.trains.get_value(
+                        selected_train_name, "failure_status", word_key
+                    )
                 )
 
                 # Create a QHBoxLayout for each failure and add QLabel and QCheckBox to it
                 failure_layout = QHBoxLayout()
                 failure_layout.addWidget(failure_label)
                 failure_layout.addWidget(check)
-                failure_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-                failure_layout.setContentsMargins(0, 0, 0, 0)
-                
+                failure_layout.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
+                failure_layout.setContentsMargins(10, 10, 10, 10)
+
                 # Add the QHBoxLayout to the main layout
                 self.failure_white_background_layout.addLayout(failure_layout)
+
+                # Connect the checkbox state change to a function/slot
+                check.stateChanged.connect(
+                    lambda state, train=selected_train_name, key=word_key, checkbox=check: self.update_failure_status(
+                        train, key, checkbox.isChecked()
+                    )
+                )
 
         self.failure_white_background_layout.addStretch(1)
 
@@ -816,6 +825,7 @@ class ResultsWindow(QMainWindow):
         self.trains.set_value(train_name, "failure_status", key, state)
         print(self.trains.trains["Train 1"]["failure_status"])
         print(train_name, key, state)
+
 
 class SharedData:
     def __init__(self):
@@ -2670,12 +2680,12 @@ class Calculations:
         return total_distance
 
 
-def main():
-    app = QApplication(sys.argv)
-    ui = TrainModel()
-    ui.show_gui()
-    sys.exit(app.exec_())
+# def main():
+#     app = QApplication(sys.argv)
+#     ui = TrainModel()
+#     ui.show_gui()
+#     sys.exit(app.exec_())
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
