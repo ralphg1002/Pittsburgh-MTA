@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QCheckBox,
 )
-from numpy import true_divide
+
 from qtwidgets import AnimatedToggle
 
 # from Signals import TrackModelSignals, TrainControllerSignals

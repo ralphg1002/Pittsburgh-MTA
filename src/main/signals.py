@@ -47,7 +47,20 @@ class TrainModelToTrainController(QObject):
 
 
 ##########################################################################################
+class TrainControllerSWToTrainModel(QObject):
+    sendPower = pyqtSignal(str, int)
+    sendDriverEmergencyBrake = pyqtSignal(str, int)
+    sendDriverServiceBrake = pyqtSignal(str, float)
+    sendAnnouncement = pyqtSignal(str, str)
+    sendHeadlightState = pyqtSignal(str, bool)
+    sendInteriorLightState = pyqtSignal(str, bool)
+    sendLeftDoorState = pyqtSignal(str, bool)
+    sendRightDoorState = pyqtSignal(str, bool)
+    sendSetpointTemperature = pyqtSignal(str, int)
+    sendAdvertisement = pyqtSignal(str, int)
 
+
+##########################################################################################
 
 # Instantiate timing signals
 timingMultiplier = pyqtSignal(float)
@@ -61,3 +74,6 @@ trackControllerToTrackModel = TrackControllerToTrackModel()
 # Instantiation for signals sent from Train Model
 trainModelToTrackModel = TrainModelToTrackModel()
 trainModelToTrainController = TrainModelToTrainController()
+
+# Instantiation for signals sent from Train Controller (SW)
+trainControllerSWToTrainModel = TrainControllerSWToTrainModel()
