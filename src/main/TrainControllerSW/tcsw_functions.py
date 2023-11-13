@@ -19,28 +19,14 @@ class TCFunctions:
             "ek": 0,
             "samplePeriod": 1,
         }
-        self.power1 = {
-            "powerValue": 0,
-            "uk": 0,
-            "prevError": 0
-        }
-        self.power2 = {
-            "powerValue": 0,
-            "uk": 0,
-            "prevError": 0
-        }
-        self.power3 = {
-            "powerValue": 0,
-            "uk": 0,
-            "prevError": 0
-        }
+        self.power1 = {"powerValue": 0, "uk": 0, "prevError": 0}
+        self.power2 = {"powerValue": 0, "uk": 0, "prevError": 0}
+        self.power3 = {"powerValue": 0, "uk": 0, "prevError": 0}
         self.advertisementCounter = 1
-        self.blockDict = {"block1": {"stationName": "station1",
-                                     "blockNumber": 1,
-                                     "blockLength": 50},
-                          "block2": {"stationName": "station2",
-                                     "blockNumber": 1,
-                                     "blockLength": 50}}
+        self.blockDict = {
+            "block1": {"stationName": "station1", "blockNumber": 1, "blockLength": 50},
+            "block2": {"stationName": "station2", "blockNumber": 1, "blockLength": 50},
+        }
 
     def set_samplePeriod(self, samplePeriod):
         self.piVariables["samplePeriod"] = samplePeriod
@@ -114,21 +100,33 @@ class TCFunctions:
                 trainObject.nextStop = trainObject.beacon["nextStop"][1]
         trainObject.prevStop = trainObject.beacon["currStop"]
 
-        if trainObject.stationDistance == 0 or trainObject.prevStop == "" or trainObject.nextStop == "":
+        if (
+            trainObject.stationDistance == 0
+            or trainObject.prevStop == ""
+            or trainObject.nextStop == ""
+        ):
             trainObject.distanceRatio = 0
             return
 
-        trainObject.stationDistance = self.distance_between(self.blockDict,
-                                                            self.find_block(self.blockDict, trainObject.prevStop),
-                                                            self.find_block(self.blockDict, trainObject.nextStop))
-        trainObject.distanceTravelled = self.distance_between(self.blockDict,
-                                                              self.find_block(self.blockDict, trainObject.prevStop),
-                                                              trainObject.block["blockNumber"])
-        trainObject.distanceRatio = trainObject.distanceTravelled / trainObject.stationDistance
+        trainObject.stationDistance = self.distance_between(
+            self.blockDict,
+            self.find_block(self.blockDict, trainObject.prevStop),
+            self.find_block(self.blockDict, trainObject.nextStop),
+        )
+        trainObject.distanceTravelled = self.distance_between(
+            self.blockDict,
+            self.find_block(self.blockDict, trainObject.prevStop),
+            trainObject.block["blockNumber"],
+        )
+        trainObject.distanceRatio = (
+            trainObject.distanceTravelled / trainObject.stationDistance
+        )
 
     def update_block_info(self, blockDict, trainObject):
         if trainObject.prevPolarity != trainObject.polarity:
-            if self.find_block(self.blockDict, trainObject.prevStop) < self.find_block(self.blockDict, trainObject.nextStop):
+            if self.find_block(self.blockDict, trainObject.prevStop) < self.find_block(
+                self.blockDict, trainObject.nextStop
+            ):
                 trainObject.block["blockNumber"] += 1
             else:
                 trainObject.block["blockNumber"] -= 1
@@ -168,7 +166,7 @@ class TCFunctions:
 
         # calculate new uk
         if newError == 0 and self.piVariables["prevError"] == 0:
-            #trainObject.set_powerCommand(0)
+            # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
             return
         elif trainObject.get_powerCommand() < self.piVariables["powerLimit"]:
@@ -183,18 +181,18 @@ class TCFunctions:
 
         # bounds
         if newPowerCommand < 0:
-            #trainObject.set_powerCommand(0)
+            # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
         elif newPowerCommand > self.piVariables["powerLimit"]:
-            #trainObject.set_powerCommand(self.piVariables["powerLimit"])
+            # trainObject.set_powerCommand(self.piVariables["powerLimit"])
             powerDict["powerValue"] = self.piVariables["powerLimit"]
         else:
-            #trainObject.set_powerCommand(newPowerCommand)
+            # trainObject.set_powerCommand(newPowerCommand)
             powerDict["powerValue"] = newPowerCommand
 
         # update uk and velocity error variables
-        #self.piVariables["uk"] = newUk
-        #self.piVariables["prevError"] = newError
+        # self.piVariables["uk"] = newUk
+        # self.piVariables["prevError"] = newError
         powerDict["uk"] = newUk
         powerDict["prevError"] = newError
 
@@ -238,7 +236,6 @@ class TCFunctions:
         if trainObject.get_driverEbrake():
             trainObject.set_powerCommand(0)
 
-
     def automatic_operations(self, trainObject):
         self.station_operations(trainObject)
         self.light_operations(trainObject)
@@ -254,4 +251,3 @@ class TCFunctions:
         self.pi_control(trainObject)
         self.sbrake_operations(trainObject)
         self.ebrake_operations(trainObject)
-

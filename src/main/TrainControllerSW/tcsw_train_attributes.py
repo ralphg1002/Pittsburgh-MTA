@@ -15,7 +15,7 @@ class Train:
             "blockNumber": 0,
             "blockLength": 0,
             "isStation": False,
-            "isTunnel": False
+            "isTunnel": False,
         }
 
         # train model inputs

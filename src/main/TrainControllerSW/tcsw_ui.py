@@ -919,7 +919,7 @@ class TrainControllerUI(QMainWindow):
         )
         for train in self.testWindow.tcObject.trainList:
             if train.get_trainID() == self.testWindow.testbenchVariables["trainID"]:
-            # TRAIN MODEL INPUTS
+                # TRAIN MODEL INPUTS
                 # current temp
                 self.currentTempLabel.setText(str(train.get_currentTemp()) + " °F")
 
@@ -929,11 +929,24 @@ class TrainControllerUI(QMainWindow):
 
                 # authority
                 if not train.get_authority:
-                    self.authorityVal.setText(str(math.floor(self.tcFunctions.distance_between(self.tcFunctions.blockDict,
-                                                                                    train.block["blockNumber"],
-                                                                                    self.tcFunctions.find_block(self.tcFunctions.blockDict, train.nextStop)) / 1609)))
+                    self.authorityVal.setText(
+                        str(
+                            math.floor(
+                                self.tcFunctions.distance_between(
+                                    self.tcFunctions.blockDict,
+                                    train.block["blockNumber"],
+                                    self.tcFunctions.find_block(
+                                        self.tcFunctions.blockDict, train.nextStop
+                                    ),
+                                )
+                                / 1609
+                            )
+                        )
+                    )
                 else:
-                    self.authorityVal.setText(str(math.floor(train.block["blockLength"] / 1609)))
+                    self.authorityVal.setText(
+                        str(math.floor(train.block["blockLength"] / 1609))
+                    )
                 self.authorityVal.setAlignment(Qt.AlignCenter)
 
                 # commanded speed
@@ -969,11 +982,11 @@ class TrainControllerUI(QMainWindow):
                 # setpoint speed range
                 self.setpointSpeedValue.setRange(0, train.get_speedLimit())
 
-            # ENGINEER INPUTS
+                # ENGINEER INPUTS
                 train.set_kp(self.kpEdit.value())
                 train.set_ki(self.kiEdit.value())
 
-            # TRAIN DRIVER INPUTS
+                # TRAIN DRIVER INPUTS
                 if self.modeCombo.currentIndex() == 0:
                     train.set_auto(True)
                 else:
@@ -1022,7 +1035,7 @@ class TrainControllerUI(QMainWindow):
                     else:
                         self.rightDoorButton.setChecked(False)
 
-            # manual
+                # manual
                 else:
                     self.serviceBrakeSlider.setDisabled(False)
                     self.setpointSpeedValue.setDisabled(False)
@@ -1034,7 +1047,7 @@ class TrainControllerUI(QMainWindow):
                     self.setpointTempVal.setDisabled(False)
                     self.adCombo.setDisabled(False)
 
-                # an individual automatic
+                    # an individual automatic
                     if self.announcementCombo.currentIndex() == 0:
                         self.announcementEdit.setDisabled(True)
                         self.sendLabel.setDisabled(True)
@@ -1042,7 +1055,7 @@ class TrainControllerUI(QMainWindow):
                         self.announcementEdit.setDisabled(False)
                         self.sendLabel.setDisabled(False)
 
-                # updating train object driver inputs
+                    # updating train object driver inputs
                     train.set_driverSbrake(self.serviceBrakeSlider.value() * 0.01)
 
                     train.set_setpointSpeed(self.setpointSpeedValue.value())
@@ -1084,7 +1097,7 @@ class TrainControllerUI(QMainWindow):
                     else:
                         train.set_advertisement(self.adCombo.currentIndex())
 
-            # regardless of automatic
+                # regardless of automatic
                 self.tcFunctions.regular_operations(self.tcFunctions.blockDict, train)
 
                 if self.emergencyBrakeButton.isChecked():
@@ -1093,9 +1106,7 @@ class TrainControllerUI(QMainWindow):
                     train.set_driverEbrake(False)
 
                 # updating display
-                self.nextStopLabel.setText(
-                    "Next Stop:\n" + train.nextStop
-                )
+                self.nextStopLabel.setText("Next Stop:\n" + train.nextStop)
                 self.nextStopLabel.setAlignment(Qt.AlignRight)
                 self.nextStopLabel.adjustSize()
 
@@ -1115,7 +1126,12 @@ class TrainControllerUI(QMainWindow):
                 self.commandedPowerVal.setText(str(train.get_powerCommand()))
                 self.commandedPowerVal.setAlignment(Qt.AlignCenter)
 
-                self.travelledLine.setFixedWidth(math.floor((self.destinationCircle.x() - self.originCircle.x()) * train.distanceRatio))
+                self.travelledLine.setFixedWidth(
+                    math.floor(
+                        (self.destinationCircle.x() - self.originCircle.x())
+                        * train.distanceRatio
+                    )
+                )
                 print("Ratio: " + str(train.distanceRatio))
                 print("Distance: " + str(train.stationDistance))
                 self.set_relative_right(
@@ -1138,23 +1154,25 @@ class TrainControllerUI(QMainWindow):
                 self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 
                 print(self.systemTimeInput.text())
-                #print(self.tcFunctions.time)
-                #print(self.tcFunctions.piVariables["samplePeriod"])
+                # print(self.tcFunctions.time)
+                # print(self.tcFunctions.piVariables["samplePeriod"])
 
                 # SIGNAL INTEGRATION
-                trainControllerSWToTrainModel.sendPower.emit(train.get_trainID(), train.get_powerCommand())
+                trainControllerSWToTrainModel.sendPower.emit(
+                    train.get_trainID(), train.get_powerCommand()
+                )
                 trainControllerSWToTrainModel.sendPower.connect(self.test_display)
 
-                #hypothetitical
-                #trainModelToTrainController.sendAuthority.connect(self.set_authority)
+                # hypothetitical
+                # trainModelToTrainController.sendAuthority.connect(self.set_authority)
 
-                #def set_authority(self, id, authority):
-                    #train.set_authority(authority)
-                    #train.set_train(id)
+                # def set_authority(self, id, authority):
+                # train.set_authority(authority)
+                # train.set_train(id)
+
     def test_display(self, id, power):
-        #print(f"ID: {id} Power: {power}")
+        # print(f"ID: {id} Power: {power}")
         return
-
 
     def speed_up(self):
         self.tcVariables["period"] = int(self.tcVariables["period"] / 10)

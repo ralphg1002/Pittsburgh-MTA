@@ -158,9 +158,6 @@
 #         """
 
 
-
-
-
 #     # This is the method that parses the condition of a section within a PLC file
 #     def parse_condition(self, condition):
 #         entry = []
@@ -214,7 +211,6 @@
 #             return {"Type": "SIGNAL", "Number": operationLine.split()[0], "State": "G"}
 #         elif operationLine.endswith(" R"):
 #             return {"Type": "SIGNAL", "Number": operationLine.split()[0], "State": "R"}
-        
 
 
 # The PLC code is as follows:
@@ -240,7 +236,7 @@
 #     Operation: 150 R
 #     Operation: 30 R
 #     Operation: 29 G
-# IF  
+# IF
 #     Condition: (145->150) AND NOT(12->29)
 #     Operation: SWITCH(1)
 #     Operation: 150 G
