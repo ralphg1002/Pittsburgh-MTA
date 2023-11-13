@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import *
 
 
 ##########################################################################################
@@ -61,10 +61,11 @@ class TrainControllerSWToTrainModel(QObject):
 
 
 ##########################################################################################
+class Master(QObject):
+    # Instantiate timing signals
+    timingMultiplier = pyqtSignal(int)
+    clockSignal = pyqtSignal(QTime)
 
-# Instantiate timing signals
-timingMultiplier = pyqtSignal(float)
-clockSignal = pyqtSignal(str)
 
 # Instantiation for signals sent from Track Controller
 trackControllerToCTC = TrackControllerToCTC()
@@ -77,3 +78,6 @@ trainModelToTrainController = TrainModelToTrainController()
 
 # Instantiation for signals sent from Train Controller (SW)
 trainControllerSWToTrainModel = TrainControllerSWToTrainModel()
+
+# Instantiation of signals shared by multiple classes
+masterSignals = Master()

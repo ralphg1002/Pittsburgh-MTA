@@ -9,6 +9,8 @@ import csv
 from datetime import datetime, timedelta
 
 # from .signals import CTCtoTrackController, TrackControllerToCTC
+sys.path.append("../../main")
+from signals import masterSignals
 
 
 class CTCWindow(QMainWindow):
@@ -118,27 +120,28 @@ class CTCWindow(QMainWindow):
         self.systemSpeedLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
         # system speed input
-        self.systemSpeedInput = QLabel("x1.0", self)
+        self.systemSpeedInput = QLabel("x1.000", self)
         self.systemSpeedInput.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.systemSpeedInput.setGeometry(850, 127, 50, 50)
+        self.systemSpeedInput.setGeometry(850, 140, 50, 50)
+        self.systemSpeedInput.adjustSize()
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
 
         # increase system speed button
-        self.pixmapFastForward = QtGui.QPixmap("src/main/CTC/fast-forward.svg")
+        self.pixmapFastForward = QtGui.QPixmap("src/main/CTC/forward.svg")
         self.pixmapFastForward = self.pixmapFastForward.scaled(20, 20)
         self.speedUpButton = QPushButton(self)
         self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
-        self.speedUpButton.setGeometry(890, 143, 20, 20)
+        self.speedUpButton.setGeometry(910, 140, 20, 20)
         self.speedUpButton.setStyleSheet(
             "color:" + self.colorDarkBlue + ";border: 1px solid white"
         )
 
         # decrease system speed button
-        self.pixmapRewind = QtGui.QPixmap("src/main/CTC/rewind.svg")
+        self.pixmapRewind = QtGui.QPixmap("src/main/CTC/backward.svg")
         self.pixmapRewind = self.pixmapRewind.scaled(20, 20)
         self.slowDownButton = QPushButton(self)
         self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
-        self.slowDownButton.setGeometry(819, 143, 20, 20)
+        self.slowDownButton.setGeometry(820, 140, 20, 20)
         self.slowDownButton.setStyleSheet(
             "color:" + self.colorDarkBlue + ";border: 1px solid white"
         )
@@ -146,7 +149,8 @@ class CTCWindow(QMainWindow):
         self.speedUpButton.clicked.connect(self.increase_speed)
         self.slowDownButton.clicked.connect(self.decrease_speed)
 
-        self.current_time = QTime(0, 0, 0)
+        self.current_time = QDateTime.currentDateTime()
+        self.current_time.setTime(QTime(0, 0, 0))
         self.system_speed = 1.0
         self.timer_interval = 1000
 
@@ -467,22 +471,30 @@ class CTCWindow(QMainWindow):
     def update_time(self):
         self.current_time = self.current_time.addSecs(1)  # Update the time by 1 second
         self.systemTimeInput.setText(self.current_time.toString("hh:mm:ss"))
+        masterSignals.timingMultiplier.emit(self.timer_interval)
+        masterSignals.clockSignal.emit(self.current_time.time())
 
     def increase_speed(self):
-        self.system_speed += 2.0
-        self.systemSpeedInput.setText(f"x{self.system_speed:.1f}")
-
         # Convert system_speed to an interval in milliseconds
-        self.timer_interval = int(1000 / self.system_speed)
+        self.timer_interval = int(self.timer_interval / 10)
+        if self.timer_interval == 0:
+            self.timer_interval = 1
         self.timer.setInterval(self.timer_interval)
+
+        self.systemSpeedInput.setText(
+            "x" + format(1 / (self.timer_interval / 1000), ".3f")
+        )
 
     def decrease_speed(self):
-        self.system_speed -= 2.0
-        self.systemSpeedInput.setText(f"x{self.system_speed:.1f}")
-
         # Convert system_speed to an interval in milliseconds
-        self.timer_interval = int(1000 / self.system_speed)
+        self.timer_interval = int(self.timer_interval * 10)
+        if self.timer_interval >= 10000:
+            self.timer_interval = 10000
         self.timer.setInterval(self.timer_interval)
+
+        self.systemSpeedInput.setText(
+            "x" + format(1 / (self.timer_interval / 1000), ".3f")
+        )
 
 
 """class SignalHandlers:

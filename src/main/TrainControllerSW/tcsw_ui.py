@@ -12,7 +12,11 @@ from .tcsw_functions import *
 from .tcsw_train_attributes import *
 
 sys.path.append("../../main")
-from signals import trainControllerSWToTrainModel, trainModelToTrainController
+from signals import (
+    trainControllerSWToTrainModel,
+    trainModelToTrainController,
+    masterSignals,
+)
 
 
 class TrainControllerUI(QMainWindow):
@@ -296,6 +300,11 @@ class TrainControllerUI(QMainWindow):
         self.pixmapSend = self.pixmapSend.scaled(32, 32)
 
         self.movieMoneyAd = QMovie("src/main/TrainControllerSW/PNGs/giphy1.gif")
+        self.movieMoneyAd.setScaledSize(QSize(330, 93))
+
+        self.pixmapAd1 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad1.png")
+        self.pixmapAd2 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad2.png")
+        self.pixmapAd3 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad3.png")
 
         # Train change section
         self.trainChangeBox = QLabel("", self)
@@ -894,6 +903,7 @@ class TrainControllerUI(QMainWindow):
         )
 
         self.changeButton.clicked.connect(lambda: self.change_train())
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(
             self.update
@@ -917,6 +927,30 @@ class TrainControllerUI(QMainWindow):
         self.trainIDLabel.setText(
             "Train #: " + self.testWindow.testbenchVariables["trainID"]
         )
+
+        # SIGNAL INTEGRATION: TM -> TCSW
+        trainModelToTrainController.sendSpeedLimit.connect(self.signal_speedLimit)
+        trainModelToTrainController.sendAuthority.connect(self.signal_authority)
+        trainModelToTrainController.sendLeftDoor.connect(self.signal_leftDoor)
+        trainModelToTrainController.sendRightDoor.connect(self.signal_rightDoor)
+        trainModelToTrainController.sendNextStation1.connect(self.signal_nextStation1)
+        trainModelToTrainController.sendNextStation2.connect(self.signal_nextStation2)
+        trainModelToTrainController.sendCurrStation.connect(self.signal_currStation)
+        trainModelToTrainController.sendCommandedSpeed.connect(
+            self.signal_commandedSpeed
+        )
+        trainModelToTrainController.sendCurrentSpeed.connect(self.signal_currSpeed)
+        trainModelToTrainController.sendTemperature.connect(self.signal_currTemp)
+        trainModelToTrainController.sendPassengerEmergencyBrake.connect(
+            self.signal_paxEbrake
+        )
+        trainModelToTrainController.sendEngineFailure.connect(self.signal_engineFail)
+        trainModelToTrainController.sendSignalPickupFailure.connect(
+            self.signal_signalFail
+        )
+        trainModelToTrainController.sendBrakeFailure.connect(self.signal_brakeFail)
+        trainModelToTrainController.sendPolarity.connect(self.signal_polarity)
+
         for train in self.testWindow.tcObject.trainList:
             if train.get_trainID() == self.testWindow.testbenchVariables["trainID"]:
                 # TRAIN MODEL INPUTS
@@ -1015,23 +1049,31 @@ class TrainControllerUI(QMainWindow):
 
                     if train.get_headlights():
                         self.hltToggle.setChecked(True)
+                        self.png_button(self.hltToggle, self.pixmapToggleOn)
                     else:
                         self.hltToggle.setChecked(False)
+                        self.png_button(self.hltToggle, self.pixmapToggleOff)
 
                     if train.get_interiorLights():
                         self.iltToggle.setChecked(True)
+                        self.png_button(self.iltToggle, self.pixmapToggleOn)
                     else:
                         self.iltToggle.setChecked(False)
+                        self.png_button(self.iltToggle, self.pixmapToggleOff)
 
                     if train.get_leftDoor():
                         self.leftDoorButton.setChecked(True)
+                        self.png_button(self.leftDoorButton, self.pixmapLDoorOpen)
                     else:
                         self.leftDoorButton.setChecked(False)
+                        self.png_button(self.leftDoorButton, self.pixmapLDoorClosed)
 
                     if train.get_rightDoor():
                         self.rightDoorButton.setChecked(True)
+                        self.png_button(self.rightDoorButton, self.pixmapRDoorOpen)
                     else:
                         self.rightDoorButton.setChecked(False)
+                        self.png_button(self.rightDoorButton, self.pixmapRDoorClosed)
 
                     # disable some stuff
                     self.serviceBrakeSlider.setDisabled(True)
@@ -1146,42 +1188,166 @@ class TrainControllerUI(QMainWindow):
                         * train.distanceRatio
                     )
                 )
-                print("Ebrake Status: " + str(train.driverEbrake))
+
                 self.set_relative_right(
                     self.trainLabel, self.travelledLine, -1 * math.floor(48 / 532 * 532)
                 )
 
-                # system time
-                self.sysTime = self.sysTime.addSecs(1)
-                self.timer.setInterval(self.tcVariables["period"])
+                if self.adCombo.currentIndex() == 0:
+                    self.tcFunctions.advertisement_rotation(train)
 
-                self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
-                self.systemSpeedInput.setText(
-                    "x" + format(1 / (self.tcVariables["period"] / 1000), ".3f")
-                )
+                if train.get_advertisement() == 1:
+                    self.png_label(self.adDisplay, self.pixmapAd1)
+                elif train.get_advertisement() == 2:
+                    self.png_label(self.adDisplay, self.pixmapAd2)
+                elif train.get_advertisement() == 3:
+                    self.png_label(self.adDisplay, self.pixmapAd3)
 
-                hours, minutes, seconds = map(
-                    int, self.systemTimeInput.text().split(":")
-                )
-                self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
-                self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
-
-                print(self.systemTimeInput.text())
-                # print(self.tcFunctions.time)
-                # print(self.tcFunctions.piVariables["samplePeriod"])
-
-                # SIGNAL INTEGRATION
+                # SIGNAL INTEGRATION: TCSW -> TM
                 trainControllerSWToTrainModel.sendPower.emit(
                     train.get_trainID(), train.get_powerCommand()
                 )
+                trainControllerSWToTrainModel.sendDriverEmergencyBrake.emit(
+                    train.get_trainID(), train.get_driverEbrake()
+                )
+                trainControllerSWToTrainModel.sendDriverServiceBrake.emit(
+                    train.get_trainID(), train.get_driverSbrake()
+                )
+                trainControllerSWToTrainModel.sendAnnouncement.emit(
+                    train.get_trainID(), train.get_announcement()
+                )
+                trainControllerSWToTrainModel.sendHeadlightState.emit(
+                    train.get_trainID(), train.get_headlights()
+                )
+                trainControllerSWToTrainModel.sendInteriorLightState.emit(
+                    train.get_trainID(), train.get_interiorLights()
+                )
+                trainControllerSWToTrainModel.sendLeftDoorState.emit(
+                    train.get_trainID(), train.get_leftDoor()
+                )
+                trainControllerSWToTrainModel.sendRightDoorState.emit(
+                    train.get_trainID(), train.get_rightDoor()
+                )
+                trainControllerSWToTrainModel.sendSetpointTemperature.emit(
+                    train.get_trainID(), train.get_setpointTemp()
+                )
+                trainControllerSWToTrainModel.sendAdvertisement.emit(
+                    train.get_trainID(), train.get_advertisement()
+                )
+
+                # test emit
                 trainControllerSWToTrainModel.sendPower.connect(self.test_display)
 
-                # hypothetitical
-                # trainModelToTrainController.sendAuthority.connect(self.set_authority)
+        # system time
+        # self.sysTime = self.sysTime.addSecs(1)
+        masterSignals.timingMultiplier.connect(self.signal_period)
+        masterSignals.clockSignal.connect(self.sysTime.setTime)
+        self.timer.setInterval(self.tcVariables["period"])
 
-                # def set_authority(self, id, authority):
-                # train.set_authority(authority)
-                # train.set_train(id)
+        self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
+        self.systemSpeedInput.setText(
+            "x" + format(1 / (self.tcVariables["period"] / 1000), ".3f")
+        )
+
+        hours, minutes, seconds = map(int, self.systemTimeInput.text().split(":"))
+        self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
+        self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
+
+        print(self.sysTime.toString("HH:mm:ss"))
+
+    def signal_period(self, period):
+        self.tcVariables["period"] = period
+        return
+
+    def signal_speedLimit(self, id, speedLimit):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_speedLimit(speedLimit)
+        return
+
+    def signal_authority(self, id, authority):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_authority(authority)
+        return
+
+    def signal_leftDoor(self, id, leftStation):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.beacon["leftStation"] = leftStation
+        return
+
+    def signal_rightDoor(self, id, rightStation):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.beacon["rightStation"] = rightStation
+        return
+
+    def signal_nextStation1(self, id, nextStation):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.beacon["nextStop"][0] = nextStation
+        return
+
+    def signal_nextStation2(self, id, nextStation):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.beacon["nextStop"][1] = nextStation
+        return
+
+    def signal_currStation(self, id, currStation):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.beacon["currStop"] = currStation
+        return
+
+    def signal_commandedSpeed(self, id, commandedSpeed):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_commandedSpeed(commandedSpeed)
+        return
+
+    def signal_currSpeed(self, id, currSpeed):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_currentSpeed(currSpeed)
+        return
+
+    def signal_currTemp(self, id, currTemp):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_currentTemp(currTemp)
+        return
+
+    def signal_paxEbrake(self, id, status):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_paxEbrake(status)
+        return
+
+    def signal_engineFail(self, id, status):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_engineFailure(status)
+        return
+
+    def signal_signalFail(self, id, status):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_signalFailure(status)
+        return
+
+    def signal_brakeFail(self, id, status):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.set_brakeFailure(status)
+        return
+
+    def signal_polarity(self, id, state):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == id:
+                train.polarity = state
+        return
 
     def test_display(self, id, power):
         # print(f"ID: {id} Power: {power}")
