@@ -11,6 +11,9 @@ from .tcsw_functions import *
 # from tcsw_time import *
 from .tcsw_train_attributes import *
 
+sys.path.append("../../main")
+from signals import trainControllerSWToTrainModel, trainModelToTrainController
+
 
 class TrainControllerUI(QMainWindow):
     """
@@ -164,6 +167,7 @@ class TrainControllerUI(QMainWindow):
         self.systemSpeedInput.move(855, 145)
         self.systemSpeedInput.adjustSize()
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
+        self.systemSpeedInput.setText("x" + str(1.000))
 
         # increase system speed button
         self.pixmapFastForward = QtGui.QPixmap(
@@ -723,8 +727,10 @@ class TrainControllerUI(QMainWindow):
         )
 
         self.commandedPowerVal = QLabel(self)
-        self.commandedPowerVal.setText("  ")
+        self.commandedPowerVal.setText("120000.000")
         self.regular_label(self.commandedPowerVal)
+        self.commandedPowerVal.setAlignment(Qt.AlignCenter)
+        self.commandedPowerVal.setText("0")
         self.set_relative_below_center(
             self.commandedPowerVal, self.commandedPowerBox, 10
         )
@@ -740,6 +746,7 @@ class TrainControllerUI(QMainWindow):
         self.regular_label(self.commandedPowerLabel)
         self.commandedPowerLabel.setAlignment(Qt.AlignCenter)
         self.set_relative_below_center(self.commandedPowerLabel, self.wattsLabel, 10)
+        self.set_relative_below_center(self.commandedPowerLabel, self.wattsLabel, 10)
 
         self.commandedPowerBox.setFixedHeight(
             self.commandedPowerLabel.y()
@@ -753,8 +760,10 @@ class TrainControllerUI(QMainWindow):
         self.set_relative_below(self.currentSpeedBox, self.commandedPowerBox, 20)
 
         self.currentSpeedVal = QLabel(self)
-        self.currentSpeedVal.setText("  ")
+        self.currentSpeedVal.setText("8888")
         self.regular_label(self.currentSpeedVal)
+        self.currentSpeedVal.setText("0")
+        self.currentSpeedVal.setAlignment(Qt.AlignCenter)
         self.set_relative_below_center(self.currentSpeedVal, self.currentSpeedBox, 10)
         self.currentSpeedVal.move(
             self.currentSpeedVal.x(), self.currentSpeedBox.y() + 10
@@ -795,8 +804,10 @@ class TrainControllerUI(QMainWindow):
         self.set_relative_below(self.authorityBox, self.currentSpeedBox, 20)
 
         self.authorityVal = QLabel(self)
-        self.authorityVal.setText("  ")
+        self.authorityVal.setText("888888888")
         self.regular_label(self.authorityVal)
+        self.authorityVal.setText("0")
+        self.authorityVal.setAlignment(Qt.AlignCenter)
         self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
         self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 10)
 
@@ -908,23 +919,33 @@ class TrainControllerUI(QMainWindow):
         )
         for train in self.testWindow.tcObject.trainList:
             if train.get_trainID() == self.testWindow.testbenchVariables["trainID"]:
-                # TRAIN MODEL INPUTS
+            # TRAIN MODEL INPUTS
                 # current temp
                 self.currentTempLabel.setText(str(train.get_currentTemp()) + " °F")
+
                 # speed limit
                 self.speedLimitLabel.setText("Limit: " + str(train.get_speedLimit()))
                 self.speedLimitLabel.adjustSize()
+
                 # authority
-                self.authorityVal.setText(str(train.get_authority()))
-                self.authorityVal.adjustSize()
+                if not train.get_authority:
+                    self.authorityVal.setText(str(math.floor(self.tcFunctions.distance_between(self.tcFunctions.blockDict,
+                                                                                    train.block["blockNumber"],
+                                                                                    self.tcFunctions.find_block(self.tcFunctions.blockDict, train.nextStop)) / 1609)))
+                else:
+                    self.authorityVal.setText(str(math.floor(train.block["blockLength"] / 1609)))
+                self.authorityVal.setAlignment(Qt.AlignCenter)
+
                 # commanded speed
                 self.suggestedSpeedLabel.setText(
                     "Suggested: " + str(train.get_commandedSpeed())
                 )
                 self.suggestedSpeedLabel.adjustSize()
+
                 # current speed
                 self.currentSpeedVal.setText(str(train.get_currentSpeed()))
-                self.currentSpeedVal.adjustSize()
+                self.currentSpeedVal.setAlignment(Qt.AlignCenter)
+
                 # failures
                 if train.get_engineFailure():
                     self.png_label(self.engineFailStatus, self.pixmapCircleX)
@@ -940,6 +961,7 @@ class TrainControllerUI(QMainWindow):
                     self.png_label(self.signalFailStatus, self.pixmapCircleX)
                 else:
                     self.png_label(self.signalFailStatus, self.pixmapCircleCheck)
+
                 # passenger brake
                 if train.get_paxEbrake():
                     self.emergencyBrakeButton.setChecked(True)
@@ -947,11 +969,11 @@ class TrainControllerUI(QMainWindow):
                 # setpoint speed range
                 self.setpointSpeedValue.setRange(0, train.get_speedLimit())
 
-                # ENGINEER INPUTS
+            # ENGINEER INPUTS
                 train.set_kp(self.kpEdit.value())
                 train.set_ki(self.kiEdit.value())
 
-                # TRAIN DRIVER INPUTS
+            # TRAIN DRIVER INPUTS
                 if self.modeCombo.currentIndex() == 0:
                     train.set_auto(True)
                 else:
@@ -959,7 +981,6 @@ class TrainControllerUI(QMainWindow):
 
                 # automatic
                 if train.get_auto():
-                    self.tcFunctions.automatic_operations(train)
                     # disable some stuff
                     self.serviceBrakeSlider.setDisabled(True)
                     self.setpointSpeedValue.setDisabled(True)
@@ -975,26 +996,33 @@ class TrainControllerUI(QMainWindow):
 
                     self.tcFunctions.automatic_operations(train)
 
+                    self.announcementCombo.setCurrentIndex(0)
+
+                    self.setpointTempVal.setValue(train.get_setpointTemp())
+
+                    self.adCombo.setCurrentIndex(0)
+
                     if train.get_headlights():
                         self.hltToggle.setChecked(True)
                     else:
                         self.hltToggle.setChecked(False)
+
                     if train.get_interiorLights():
                         self.iltToggle.setChecked(True)
                     else:
                         self.iltToggle.setChecked(False)
+
                     if train.get_leftDoor():
                         self.leftDoorButton.setChecked(True)
                     else:
                         self.leftDoorButton.setChecked(False)
+
                     if train.get_rightDoor():
                         self.rightDoorButton.setChecked(True)
                     else:
                         self.rightDoorButton.setChecked(False)
-                    self.announcementCombo.setCurrentIndex(0)
-                    self.setpointTempVal.setValue(train.get_setpointTemp())
-                    self.adCombo.setCurrentIndex(0)
-                # manual
+
+            # manual
                 else:
                     self.serviceBrakeSlider.setDisabled(False)
                     self.setpointSpeedValue.setDisabled(False)
@@ -1005,7 +1033,8 @@ class TrainControllerUI(QMainWindow):
                     self.announcementCombo.setDisabled(False)
                     self.setpointTempVal.setDisabled(False)
                     self.adCombo.setDisabled(False)
-                    # an individual automatic
+
+                # an individual automatic
                     if self.announcementCombo.currentIndex() == 0:
                         self.announcementEdit.setDisabled(True)
                         self.sendLabel.setDisabled(True)
@@ -1013,58 +1042,64 @@ class TrainControllerUI(QMainWindow):
                         self.announcementEdit.setDisabled(False)
                         self.sendLabel.setDisabled(False)
 
-                    # updating train object driver inputs
+                # updating train object driver inputs
                     train.set_driverSbrake(self.serviceBrakeSlider.value() * 0.01)
+
                     train.set_setpointSpeed(self.setpointSpeedValue.value())
+
                     if self.hltToggle.isChecked():
                         train.set_headlights(True)
                     else:
                         train.set_headlights(False)
+
                     if self.iltToggle.isChecked():
                         train.set_interiorLights(True)
                     else:
                         train.set_interiorLights(False)
+
                     if self.leftDoorButton.isChecked():
                         train.set_leftDoor(True)
                     else:
                         train.set_leftDoor(False)
+
                     if self.rightDoorButton.isChecked():
                         train.set_rightDoor(True)
                     else:
                         train.set_rightDoor(False)
+
                     if self.announcementCombo.currentIndex() == 0:
-                        train.set_announcement(
-                            "This is " + train.beacon["currStop"] + "."
-                        )
+                        if train.block["isStation"] and train.get_currentSpeed == 0:
+                            train.set_announcement(
+                                "This is " + train.beacon["currStop"] + "."
+                            )
+                        else:
+                            train.set_announcement("")
                     else:
                         train.set_announcement(self.tcVariables["customAnnouncement"])
+
                     train.set_setpointTemp(self.setpointTempVal.value())
+
                     if self.adCombo.currentIndex() == 0:
                         self.tcFunctions.advertisement_rotation(train)
                     else:
                         train.set_advertisement(self.adCombo.currentIndex())
 
-                # regardless of automatic
-                self.tcFunctions.regular_operations(train)
+            # regardless of automatic
+                self.tcFunctions.regular_operations(self.tcFunctions.blockDict, train)
+
                 if self.emergencyBrakeButton.isChecked():
                     train.set_driverEbrake(True)
                 else:
                     train.set_driverEbrake(False)
 
                 # updating display
-                if train.beacon["nextStop"][0] == train.beacon["prevStop"]:
-                    self.nextStopLabel.setText(
-                        "Next Stop:\n" + train.beacon["nextStop"][1]
-                    )
-                else:
-                    self.nextStopLabel.setText(
-                        "Next Stop:\n" + train.beacon["nextStop"][0]
-                    )
+                self.nextStopLabel.setText(
+                    "Next Stop:\n" + train.nextStop
+                )
                 self.nextStopLabel.setAlignment(Qt.AlignRight)
                 self.nextStopLabel.adjustSize()
 
-                self.prevStopLabel.setText("Prev Stop:\n" + train.beacon["currStop"])
-                train.beacon["prevStop"] = train.beacon["currStop"]
+                self.prevStopLabel.setText("Prev Stop:\n" + train.prevStop)
                 self.prevStopLabel.setAlignment(Qt.AlignLeft)
                 self.prevStopLabel.adjustSize()
 
@@ -1078,8 +1113,14 @@ class TrainControllerUI(QMainWindow):
                     self.png_label(self.trainLabel, self.pixmapTrain)
 
                 self.commandedPowerVal.setText(str(train.get_powerCommand()))
-                self.commandedPowerVal.adjustSize()
                 self.commandedPowerVal.setAlignment(Qt.AlignCenter)
+
+                self.travelledLine.setFixedWidth(math.floor((self.destinationCircle.x() - self.originCircle.x()) * train.distanceRatio))
+                print("Ratio: " + str(train.distanceRatio))
+                print("Distance: " + str(train.stationDistance))
+                self.set_relative_right(
+                    self.trainLabel, self.travelledLine, -1 * math.floor(48 / 532 * 532)
+                )
 
                 # system time
                 self.sysTime = self.sysTime.addSecs(1)
@@ -1097,8 +1138,23 @@ class TrainControllerUI(QMainWindow):
                 self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 
                 print(self.systemTimeInput.text())
-                print(self.tcFunctions.time)
-                print(self.tcFunctions.piVariables["samplePeriod"])
+                #print(self.tcFunctions.time)
+                #print(self.tcFunctions.piVariables["samplePeriod"])
+
+                # SIGNAL INTEGRATION
+                trainControllerSWToTrainModel.sendPower.emit(train.get_trainID(), train.get_powerCommand())
+                trainControllerSWToTrainModel.sendPower.connect(self.test_display)
+
+                #hypothetitical
+                #trainModelToTrainController.sendAuthority.connect(self.set_authority)
+
+                #def set_authority(self, id, authority):
+                    #train.set_authority(authority)
+                    #train.set_train(id)
+    def test_display(self, id, power):
+        #print(f"ID: {id} Power: {power}")
+        return
+
 
     def speed_up(self):
         self.tcVariables["period"] = int(self.tcVariables["period"] / 10)

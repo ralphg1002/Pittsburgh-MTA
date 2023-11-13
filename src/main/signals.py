@@ -48,7 +48,7 @@ class TrainModelToTrainController(QObject):
 
 ##########################################################################################
 class TrainControllerSWToTrainModel(QObject):
-    sendPower = pyqtSignal(str, int)
+    sendPower = pyqtSignal(str, float)
     sendDriverEmergencyBrake = pyqtSignal(str, int)
     sendDriverServiceBrake = pyqtSignal(str, float)
     sendAnnouncement = pyqtSignal(str, str)
