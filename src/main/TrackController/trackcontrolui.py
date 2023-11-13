@@ -206,7 +206,7 @@ class OccupancyBox(QWidget):
                     return True
 
         return False
-    
+
     def clear_table(self):
         self.tableWidget.clearContents()
 
