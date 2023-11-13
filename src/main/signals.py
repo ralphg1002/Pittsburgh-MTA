@@ -34,9 +34,9 @@ class TrainModelToTrainController(QObject):
     sendNextStation1 = pyqtSignal(str, str)
     sendNextStation2 = pyqtSignal(str, str)
     sendCurrStation = pyqtSignal(str, str)
-    sendEnterTunnel = pyqtSignal(bool) # Check, can be in block dictionary
+    sendEnterTunnel = pyqtSignal(bool)  # Check, can be in block dictionary
     sendCommandedSpeed = pyqtSignal(str, int)
-    sendBlockLength = pyqtSignal(int) # Check
+    sendBlockLength = pyqtSignal(int)  # Check
     sendCurrentSpeed = pyqtSignal(str, int)
     sendTemperature = pyqtSignal(str, int)
     sendPassengerEmergencyBrake = pyqtSignal(str, bool)
