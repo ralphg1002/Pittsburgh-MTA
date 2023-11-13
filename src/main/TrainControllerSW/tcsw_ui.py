@@ -994,18 +994,16 @@ class TrainControllerUI(QMainWindow):
 
                 # automatic
                 if train.get_auto():
-                    # disable some stuff
-                    self.serviceBrakeSlider.setDisabled(True)
-                    self.setpointSpeedValue.setDisabled(True)
-                    self.hltToggle.setDisabled(True)
-                    self.iltToggle.setDisabled(True)
-                    self.leftDoorButton.setDisabled(True)
-                    self.rightDoorButton.setDisabled(True)
-                    self.announcementCombo.setDisabled(True)
-                    self.announcementEdit.setDisabled(True)
-                    self.sendLabel.setDisabled(True)
-                    self.setpointTempVal.setDisabled(True)
-                    self.adCombo.setDisabled(True)
+                    # temporary re-enable
+                    self.serviceBrakeSlider.setDisabled(False)
+                    self.setpointSpeedValue.setDisabled(False)
+                    self.hltToggle.setDisabled(False)
+                    self.iltToggle.setDisabled(False)
+                    self.leftDoorButton.setDisabled(False)
+                    self.rightDoorButton.setDisabled(False)
+                    self.announcementCombo.setDisabled(False)
+                    self.setpointTempVal.setDisabled(False)
+                    self.adCombo.setDisabled(False)
 
                     self.tcFunctions.automatic_operations(train)
 
@@ -1034,6 +1032,19 @@ class TrainControllerUI(QMainWindow):
                         self.rightDoorButton.setChecked(True)
                     else:
                         self.rightDoorButton.setChecked(False)
+
+                    # disable some stuff
+                    self.serviceBrakeSlider.setDisabled(True)
+                    self.setpointSpeedValue.setDisabled(True)
+                    self.hltToggle.setDisabled(True)
+                    self.iltToggle.setDisabled(True)
+                    self.leftDoorButton.setDisabled(True)
+                    self.rightDoorButton.setDisabled(True)
+                    self.announcementCombo.setDisabled(True)
+                    self.announcementEdit.setDisabled(True)
+                    self.sendLabel.setDisabled(True)
+                    self.setpointTempVal.setDisabled(True)
+                    self.adCombo.setDisabled(True)
 
                 # manual
                 else:
@@ -1105,6 +1116,9 @@ class TrainControllerUI(QMainWindow):
                 else:
                     train.set_driverEbrake(False)
 
+                # reset passenger ebrake
+                train.set_paxEbrake(False)
+
                 # updating display
                 self.nextStopLabel.setText("Next Stop:\n" + train.nextStop)
                 self.nextStopLabel.setAlignment(Qt.AlignRight)
@@ -1132,8 +1146,7 @@ class TrainControllerUI(QMainWindow):
                         * train.distanceRatio
                     )
                 )
-                print("Ratio: " + str(train.distanceRatio))
-                print("Distance: " + str(train.stationDistance))
+                print("Ebrake Status: " + str(train.driverEbrake))
                 self.set_relative_right(
                     self.trainLabel, self.travelledLine, -1 * math.floor(48 / 532 * 532)
                 )
