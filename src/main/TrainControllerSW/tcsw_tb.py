@@ -29,7 +29,7 @@ class TestWindow(QMainWindow):
 
     # dimensions
     w = 770
-    h = 420
+    h = 470
 
     # variables
     tcObject = TCFunctions()
@@ -57,19 +57,19 @@ class TestWindow(QMainWindow):
         self.set_relative_below_right(self.testBenchLabel, self.headerBlock, 20)
 
         self.trainBox = QLabel(self)
-        self.box_label(self.trainBox, 230, 432 - self.headerBlock.height() - 40)
+        self.box_label(self.trainBox, 230, 492 - self.headerBlock.height() - 40)
         self.set_relative_below_right(self.trainBox, self.headerBlock, 20)
         self.trainBox.move(
             self.trainBox.x(), self.headerBlock.y() + self.headerBlock.height() + 10
         )
 
         self.editBox = QLabel(self)
-        self.box_label(self.editBox, 230, 432 - self.headerBlock.height() - 40)
+        self.box_label(self.editBox, 230, 492 - self.headerBlock.height() - 40)
         self.set_relative_below_right(self.editBox, self.headerBlock, 20)
         self.set_relative_right(self.editBox, self.trainBox, 20)
 
         self.buttonBox = QLabel(self)
-        self.box_label(self.buttonBox, 230, 432 - self.headerBlock.height() - 40)
+        self.box_label(self.buttonBox, 230, 492 - self.headerBlock.height() - 40)
         self.set_relative_right(self.buttonBox, self.editBox, 20)
 
         self.selectTrainLabel = QLabel("Select a Train", self)
@@ -109,19 +109,9 @@ class TestWindow(QMainWindow):
         self.speedLimitVal.setFixedWidth(60)
         self.set_relative_before_right_end(self.speedLimitVal, self.editBox, 10)
 
-        self.authorityLabel = QLabel("Authority", self)
-        self.text_label(self.authorityLabel)
-        self.set_relative_below(self.authorityLabel, self.speedLimitLabel, 10)
-
-        self.authorityVal = QSpinBox(self)
-        self.text_label(self.authorityVal)
-        self.set_relative_right(self.authorityVal, self.authorityLabel, 10)
-        self.authorityVal.setFixedWidth(60)
-        self.set_relative_before_right_end(self.authorityVal, self.editBox, 10)
-
         self.commandedSpeedLabel = QLabel("Commanded Speed", self)
         self.text_label(self.commandedSpeedLabel)
-        self.set_relative_below(self.commandedSpeedLabel, self.authorityLabel, 10)
+        self.set_relative_below(self.commandedSpeedLabel, self.speedLimitLabel, 10)
 
         self.commandedSpeedVal = QSpinBox(self)
         self.text_label(self.commandedSpeedVal)
@@ -184,10 +174,20 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.isStationButton, self.currStopLabel, 10)
         self.isStationButton.setCheckable(True)
 
+        self.authorityButton = QPushButton("Authority", self)
+        self.text_label(self.authorityButton)
+        self.authorityButton.setCheckable(True)
+        self.set_relative_below(self.authorityButton, self.currentTempLabel, 10)
+
+        self.polarityButton = QPushButton("Polarity", self)
+        self.text_label(self.polarityButton)
+        self.polarityButton.setCheckable(True)
+        self.set_relative_below(self.polarityButton, self.authorityButton, 10)
+
         self.engineFailButton = QPushButton("Engine Failure", self)
         self.text_label(self.engineFailButton)
         self.engineFailButton.setCheckable(True)
-        self.set_relative_below(self.engineFailButton, self.currentTempLabel, 10)
+        self.set_relative_below(self.engineFailButton, self.polarityButton, 10)
 
         self.brakeFailButton = QPushButton("Brake Failure", self)
         self.text_label(self.brakeFailButton)
@@ -234,7 +234,7 @@ class TestWindow(QMainWindow):
         self.sendLabel.clicked.connect(lambda: self.add_train())
         self.trainCombo.currentTextChanged.connect(lambda: self.select_train())
         self.speedLimitVal.valueChanged.connect(lambda: self.speed_limit())
-        self.authorityVal.valueChanged.connect(lambda: self.authority_val())
+        self.authorityButton.clicked.connect(lambda: self.authority_val())
         self.commandedSpeedVal.valueChanged.connect(lambda: self.commanded_speed())
         self.currentSpeedVal.valueChanged.connect(lambda: self.current_speed())
         self.currentTempVal.valueChanged.connect(lambda: self.current_temp())
@@ -242,17 +242,23 @@ class TestWindow(QMainWindow):
         self.signalFailButton.clicked.connect(lambda: self.signal_failure())
         self.brakeFailButton.clicked.connect(lambda: self.brake_failure())
         self.beaconButton.clicked.connect(lambda: self.send_beacon())
+        self.polarityButton.clicked.connect(lambda: self.send_polarity())
+
+    def send_polarity(self):
+        for train in self.tcObject.trainList:
+            if train.get_trainID() == self.testbenchVariables["trainID"]:
+                train.polarity = self.polarityButton.isChecked()
 
     def send_beacon(self):
         for train in self.tcObject.trainList:
             if train.get_trainID() == self.testbenchVariables["trainID"]:
                 train.beacon["nextStop"][0] = self.prevStopVal.text()
                 train.beacon["nextStop"][1] = self.nextStopVal.text()
-                train.beacon["isStation"] = self.isStationButton.isChecked()
-                train.beacon["isTunnel"] = self.tunnelButton.isChecked()
                 train.beacon["leftStation"] = self.leftSideButton.isChecked()
                 train.beacon["rightStation"] = self.rightSideButton.isChecked()
                 train.beacon["currStop"] = self.currStopVal.text()
+                train.block["isStation"] = self.isStationButton.isChecked()
+                train.block["isTunnel"] = self.tunnelButton.isChecked()
 
     def brake_failure(self):
         for train in self.tcObject.trainList:
@@ -287,7 +293,11 @@ class TestWindow(QMainWindow):
     def authority_val(self):
         for train in self.tcObject.trainList:
             if train.get_trainID() == self.testbenchVariables["trainID"]:
-                train.set_authority(self.authorityVal.value())
+                train.set_authority(not self.authorityButton.isChecked())
+        if self.authorityButton.isChecked():
+            self.authorityButton.setStyleSheet("color: " + self.colorDarkRed)
+        else:
+            self.authorityButton.setStyleSheet("color: " + self.colorDarkBlue)
 
     def speed_limit(self):
         for train in self.tcObject.trainList:

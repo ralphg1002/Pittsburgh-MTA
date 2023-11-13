@@ -9,12 +9,18 @@ import time
 
 class Train:
     def __init__(self, trainID):
-        # train identifier
+        # system inputs
         self.trainID = trainID
+        self.block = {
+            "blockNumber": 0,
+            "blockLength": 0,
+            "isStation": False,
+            "isTunnel": False,
+        }
 
         # train model inputs
         self.speedLimit = 0
-        self.authority = 0
+        self.authority = False
         self.commandedSpeed = 0
         self.currentSpeed = 0
         self.engineFailure = False
@@ -23,14 +29,12 @@ class Train:
         self.currentTemp = 0
         self.paxEbrake = False
         self.beacon = {
-            "prevStop": "",
             "currStop": "",
             "nextStop": ["", ""],
             "leftStation": False,
             "rightStation": False,
-            "isStation": False,
-            "isTunnel": False,
         }
+        self.polarity = False
 
         # train controller inputs
         self.auto = True
@@ -49,6 +53,12 @@ class Train:
 
         # train controller internal inputs
         self.powerCommand = 0
+        self.prevStop = ""
+        self.nextStop = ""
+        self.prevPolarity = False
+        self.stationDistance = 0
+        self.distanceTravelled = 0
+        self.distanceRatio = 0
 
     # setters and getters
     def get_trainID(self):
