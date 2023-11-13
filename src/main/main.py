@@ -8,6 +8,9 @@ from PyQt5 import QtGui
 
 from TrackController.trackcontrol import TrackControl
 from TrainControllerSW.tcsw_ui import *
+from TrackModel.track_model import TrackModel
+from CTC.CTC_UI import *
+from TrainModel.Train_Model import TrainModel
 
 
 class MainWindow(QMainWindow):
@@ -38,6 +41,8 @@ class MainWindow(QMainWindow):
         # Initialize all the different modules
         trackControl = TrackControl()
         self.trainControllerSW = TrainControllerUI()
+        trackModel = TrackModel()
+        ctc = CTCWindow()
 
         # setting title
         self.setWindowTitle(self.moduleName)
@@ -71,9 +76,7 @@ class MainWindow(QMainWindow):
         self.titleLabel.setStyleSheet("color: white")
 
         # logo
-        self.pixmapMTALogo = QtGui.QPixmap(
-            "src/main/TrainControllerSW/PNGs/MTA_NYC_logo.svg.png"
-        )
+        self.pixmapMTALogo = QtGui.QPixmap("src/main/MTA_NYC_logo.png")
         self.pixmapMTALogo = self.pixmapMTALogo.scaled(
             math.floor(1862 * 0.25), math.floor(2046 * 0.25)
         )
@@ -88,15 +91,17 @@ class MainWindow(QMainWindow):
         self.box1 = QPushButton("Track Model", self)
         self.box_button(self.box1, 200, 200)
         self.set_relative_right(self.box1, self.logo, 20)
-        # self.box1.clicked(self.trackModel.show())
+        self.box1.clicked.connect(lambda: trackModel.mainWindow.show())
 
         self.box2 = QPushButton("Train Model", self)
         self.box_button(self.box2, self.box1.width(), self.box1.height())
         self.set_relative_right(self.box2, self.box1, 20)
+        self.box2.clicked.connect(lambda: TrainModel().show_gui())
 
         self.box3 = QPushButton("CTC", self)
         self.box_button(self.box3, self.box1.width(), self.box1.height())
         self.set_relative_below(self.box3, self.box1, -20 - self.box1.height() * 2)
+        self.box3.clicked.connect(lambda: ctc.show())
 
         self.box4 = QPushButton("Track Controller", self)
         self.box_button(self.box4, self.box1.width(), self.box1.height())
@@ -158,6 +163,8 @@ app = QApplication(sys.argv)
 
 # create window instance
 window = MainWindow()
+
+app.setWindowIcon(QIcon("src/main/MTA_NYC_logo.png"))
 
 # run app
 app.exec()
