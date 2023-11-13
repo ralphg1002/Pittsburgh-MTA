@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 sys.path.append("../../main")
 from signals import masterSignals
 
+
 class CTCWindow(QMainWindow):
     # font variables
     textFontSize = 9

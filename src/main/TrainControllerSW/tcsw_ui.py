@@ -12,7 +12,11 @@ from .tcsw_functions import *
 from .tcsw_train_attributes import *
 
 sys.path.append("../../main")
-from signals import trainControllerSWToTrainModel, trainModelToTrainController, masterSignals
+from signals import (
+    trainControllerSWToTrainModel,
+    trainModelToTrainController,
+    masterSignals,
+)
 
 
 class TrainControllerUI(QMainWindow):
@@ -932,12 +936,18 @@ class TrainControllerUI(QMainWindow):
         trainModelToTrainController.sendNextStation1.connect(self.signal_nextStation1)
         trainModelToTrainController.sendNextStation2.connect(self.signal_nextStation2)
         trainModelToTrainController.sendCurrStation.connect(self.signal_currStation)
-        trainModelToTrainController.sendCommandedSpeed.connect(self.signal_commandedSpeed)
+        trainModelToTrainController.sendCommandedSpeed.connect(
+            self.signal_commandedSpeed
+        )
         trainModelToTrainController.sendCurrentSpeed.connect(self.signal_currSpeed)
         trainModelToTrainController.sendTemperature.connect(self.signal_currTemp)
-        trainModelToTrainController.sendPassengerEmergencyBrake.connect(self.signal_paxEbrake)
+        trainModelToTrainController.sendPassengerEmergencyBrake.connect(
+            self.signal_paxEbrake
+        )
         trainModelToTrainController.sendEngineFailure.connect(self.signal_engineFail)
-        trainModelToTrainController.sendSignalPickupFailure.connect(self.signal_signalFail)
+        trainModelToTrainController.sendSignalPickupFailure.connect(
+            self.signal_signalFail
+        )
         trainModelToTrainController.sendBrakeFailure.connect(self.signal_brakeFail)
         trainModelToTrainController.sendPolarity.connect(self.signal_polarity)
 
@@ -1197,15 +1207,33 @@ class TrainControllerUI(QMainWindow):
                 trainControllerSWToTrainModel.sendPower.emit(
                     train.get_trainID(), train.get_powerCommand()
                 )
-                trainControllerSWToTrainModel.sendDriverEmergencyBrake.emit(train.get_trainID(), train.get_driverEbrake())
-                trainControllerSWToTrainModel.sendDriverServiceBrake.emit(train.get_trainID(), train.get_driverSbrake())
-                trainControllerSWToTrainModel.sendAnnouncement.emit(train.get_trainID(), train.get_announcement())
-                trainControllerSWToTrainModel.sendHeadlightState.emit(train.get_trainID(), train.get_headlights())
-                trainControllerSWToTrainModel.sendInteriorLightState.emit(train.get_trainID(), train.get_interiorLights())
-                trainControllerSWToTrainModel.sendLeftDoorState.emit(train.get_trainID(), train.get_leftDoor())
-                trainControllerSWToTrainModel.sendRightDoorState.emit(train.get_trainID(), train.get_rightDoor())
-                trainControllerSWToTrainModel.sendSetpointTemperature.emit(train.get_trainID(), train.get_setpointTemp())
-                trainControllerSWToTrainModel.sendAdvertisement.emit(train.get_trainID(), train.get_advertisement())
+                trainControllerSWToTrainModel.sendDriverEmergencyBrake.emit(
+                    train.get_trainID(), train.get_driverEbrake()
+                )
+                trainControllerSWToTrainModel.sendDriverServiceBrake.emit(
+                    train.get_trainID(), train.get_driverSbrake()
+                )
+                trainControllerSWToTrainModel.sendAnnouncement.emit(
+                    train.get_trainID(), train.get_announcement()
+                )
+                trainControllerSWToTrainModel.sendHeadlightState.emit(
+                    train.get_trainID(), train.get_headlights()
+                )
+                trainControllerSWToTrainModel.sendInteriorLightState.emit(
+                    train.get_trainID(), train.get_interiorLights()
+                )
+                trainControllerSWToTrainModel.sendLeftDoorState.emit(
+                    train.get_trainID(), train.get_leftDoor()
+                )
+                trainControllerSWToTrainModel.sendRightDoorState.emit(
+                    train.get_trainID(), train.get_rightDoor()
+                )
+                trainControllerSWToTrainModel.sendSetpointTemperature.emit(
+                    train.get_trainID(), train.get_setpointTemp()
+                )
+                trainControllerSWToTrainModel.sendAdvertisement.emit(
+                    train.get_trainID(), train.get_advertisement()
+                )
 
                 # test emit
                 trainControllerSWToTrainModel.sendPower.connect(self.test_display)
@@ -1221,9 +1249,7 @@ class TrainControllerUI(QMainWindow):
             "x" + format(1 / (self.tcVariables["period"] / 1000), ".3f")
         )
 
-        hours, minutes, seconds = map(
-            int, self.systemTimeInput.text().split(":")
-        )
+        hours, minutes, seconds = map(int, self.systemTimeInput.text().split(":"))
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
         self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 

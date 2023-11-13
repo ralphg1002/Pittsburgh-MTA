@@ -142,7 +142,7 @@ class TCFunctions:
         if trainObject.block["isTunnel"]:
             trainObject.set_headlights(True)
             trainObject.set_interiorLights(True)
-        elif not(21600 <= self.time <= 64800):
+        elif not (21600 <= self.time <= 64800):
             trainObject.set_headlights(False)
             trainObject.set_interiorLights(True)
         else:
