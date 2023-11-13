@@ -296,6 +296,11 @@ class TrainControllerUI(QMainWindow):
         self.pixmapSend = self.pixmapSend.scaled(32, 32)
 
         self.movieMoneyAd = QMovie("src/main/TrainControllerSW/PNGs/giphy1.gif")
+        self.movieMoneyAd.setScaledSize(QSize(330, 93))
+
+        self.pixmapAd1 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad1.png")
+        self.pixmapAd2 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad2.png")
+        self.pixmapAd3 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad3.png")
 
         # Train change section
         self.trainChangeBox = QLabel("", self)
@@ -894,6 +899,7 @@ class TrainControllerUI(QMainWindow):
         )
 
         self.changeButton.clicked.connect(lambda: self.change_train())
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(
             self.update
@@ -1015,23 +1021,31 @@ class TrainControllerUI(QMainWindow):
 
                     if train.get_headlights():
                         self.hltToggle.setChecked(True)
+                        self.png_button(self.hltToggle, self.pixmapToggleOn)
                     else:
                         self.hltToggle.setChecked(False)
+                        self.png_button(self.hltToggle, self.pixmapToggleOff)
 
                     if train.get_interiorLights():
                         self.iltToggle.setChecked(True)
+                        self.png_button(self.iltToggle, self.pixmapToggleOn)
                     else:
                         self.iltToggle.setChecked(False)
+                        self.png_button(self.iltToggle, self.pixmapToggleOff)
 
                     if train.get_leftDoor():
                         self.leftDoorButton.setChecked(True)
+                        self.png_button(self.leftDoorButton, self.pixmapLDoorOpen)
                     else:
                         self.leftDoorButton.setChecked(False)
+                        self.png_button(self.leftDoorButton, self.pixmapLDoorClosed)
 
                     if train.get_rightDoor():
                         self.rightDoorButton.setChecked(True)
+                        self.png_button(self.rightDoorButton, self.pixmapRDoorOpen)
                     else:
                         self.rightDoorButton.setChecked(False)
+                        self.png_button(self.rightDoorButton, self.pixmapRDoorClosed)
 
                     # disable some stuff
                     self.serviceBrakeSlider.setDisabled(True)
@@ -1146,10 +1160,20 @@ class TrainControllerUI(QMainWindow):
                         * train.distanceRatio
                     )
                 )
-                print("Ebrake Status: " + str(train.driverEbrake))
+
                 self.set_relative_right(
                     self.trainLabel, self.travelledLine, -1 * math.floor(48 / 532 * 532)
                 )
+
+                if self.adCombo.currentIndex() == 0:
+                    self.tcFunctions.advertisement_rotation(train)
+
+                if train.get_advertisement() == 1:
+                    self.png_label(self.adDisplay, self.pixmapAd1)
+                elif train.get_advertisement() == 2:
+                    self.png_label(self.adDisplay, self.pixmapAd2)
+                elif train.get_advertisement() == 3:
+                    self.png_label(self.adDisplay, self.pixmapAd3)
 
                 # system time
                 self.sysTime = self.sysTime.addSecs(1)
@@ -1166,11 +1190,12 @@ class TrainControllerUI(QMainWindow):
                 self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
                 self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 
-                print(self.systemTimeInput.text())
+                print(self.sysTime.toString("HH:mm:ss"))
+
                 # print(self.tcFunctions.time)
                 # print(self.tcFunctions.piVariables["samplePeriod"])
 
-                # SIGNAL INTEGRATION
+                # SIGNAL INTEGRATION: TCSW -> TM
                 trainControllerSWToTrainModel.sendPower.emit(
                     train.get_trainID(), train.get_powerCommand()
                 )

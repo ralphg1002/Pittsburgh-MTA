@@ -61,7 +61,7 @@ class TCFunctions:
                 trainObject.set_speedLimit(15)
 
     def station_operations(self, trainObject):
-        if trainObject.block["isStation"] and trainObject.get_currentSpeed == 0:
+        if (trainObject.block["isStation"]) and (trainObject.get_currentSpeed() == 0):
             trainObject.set_interiorLights(True)
             trainObject.set_leftDoor(trainObject.beacon["leftStation"])
             trainObject.set_rightDoor(trainObject.beacon["rightStation"])
@@ -142,7 +142,7 @@ class TCFunctions:
         if trainObject.block["isTunnel"]:
             trainObject.set_headlights(True)
             trainObject.set_interiorLights(True)
-        elif 21600 <= self.time <= 64800:
+        elif not(21600 <= self.time <= 64800):
             trainObject.set_headlights(False)
             trainObject.set_interiorLights(True)
         else:
@@ -153,12 +153,15 @@ class TCFunctions:
         if self.advertisementCounter == 1:
             trainObject.set_advertisement(1)
             self.advertisementCounter = 2
+            return
         if self.advertisementCounter == 2:
             trainObject.set_advertisement(2)
             self.advertisementCounter = 3
+            return
         if self.advertisementCounter == 3:
             trainObject.set_advertisement(3)
             self.advertisementCounter = 1
+            return
 
     def pi_calculation(self, trainObject, powerDict):
         # calculate new velocity error
@@ -239,7 +242,6 @@ class TCFunctions:
     def automatic_operations(self, trainObject):
         self.station_operations(trainObject)
         self.light_operations(trainObject)
-        self.advertisement_rotation(trainObject)
         trainObject.set_setpointSpeed(trainObject.get_commandedSpeed())
         trainObject.set_setpointTemp(70)
 
