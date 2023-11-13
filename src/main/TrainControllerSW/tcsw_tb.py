@@ -243,6 +243,13 @@ class TestWindow(QMainWindow):
         self.brakeFailButton.clicked.connect(lambda: self.brake_failure())
         self.beaconButton.clicked.connect(lambda: self.send_beacon())
         self.polarityButton.clicked.connect(lambda: self.send_polarity())
+        self.passengerBrakeButton.clicked.connect(lambda: self.set_paxEbrake())
+
+    def set_paxEbrake(self):
+        for train in self.tcObject.trainList:
+            if train.get_trainID() == self.testbenchVariables["trainID"]:
+                train.set_paxEbrake(self.passengerBrakeButton.isChecked())
+                self.passengerBrakeButton.setChecked(False)
 
     def send_polarity(self):
         for train in self.tcObject.trainList:
