@@ -919,6 +919,7 @@ class TrainControllerUI(QMainWindow):
 
     def update(self):
         # Update Train ID list
+        # from test bench
         for train in self.testWindow.testbenchVariables["trainList"]:
             idCheck = False
             for i in self.tcVariables["trainList"]:
@@ -926,6 +927,9 @@ class TrainControllerUI(QMainWindow):
                     idCheck = True
             if not idCheck:
                 self.tcVariables["trainList"].append(train)
+
+        # from CTC
+        masterSignals.addTrain.connect(lambda: self.signal_addTrain)
 
         if self.trainLineCombo.currentText() == "red":
             self.trainNumberCombo.clear()
@@ -1287,6 +1291,15 @@ class TrainControllerUI(QMainWindow):
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
 
         print(self.sysTime.toString("HH:mm:ss"))
+
+    def signal_addTrain(self, line, id):
+        train = {line: id}
+        idCheck = False
+        for i in self.tcVariables["trainList"]:
+            if i == train:
+                idCheck = True
+        if not idCheck:
+            self.tcVariables["trainList"].append(train)
 
     def signal_period(self, period):
         self.tcVariables["samplePeriod"] = period
