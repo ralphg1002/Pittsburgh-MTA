@@ -1133,7 +1133,7 @@ class TrackModel:
         self.add_mta_logo()
         # self.add_tabbar(mainWindow)
         self.add_module_name()
-        self.add_testbench_button()
+        # self.add_testbench_button()
 
         # Map
         # self.add_line_panel(mainWindow)
@@ -1224,24 +1224,24 @@ class TrackModel:
         moduleLabel.setGeometry(30, 80, 150, 60)
         moduleLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
-    def add_testbench_button(self):
-        # icon
-        gearPng = QPixmap("src/main/TrackModel/pngs/MTA_logo.png")
-        gearPng = gearPng.scaledToWidth(25, 25)
-        testbenchIcon = QLabel(self.mainWindow)
-        testbenchIcon.setPixmap(gearPng)
-        testbenchIcon.setGeometry(30, 130, gearPng.width(), gearPng.height())
+    # def add_testbench_button(self):
+    #     # icon
+    #     gearPng = QPixmap("src/main/TrackModel/pngs/MTA_logo.png")
+    #     gearPng = gearPng.scaledToWidth(25, 25)
+    #     testbenchIcon = QLabel(self.mainWindow)
+    #     testbenchIcon.setPixmap(gearPng)
+    #     testbenchIcon.setGeometry(30, 130, gearPng.width(), gearPng.height())
 
-        # button
-        testbenchButton = QPushButton("Test Bench", self.mainWindow)
-        testbenchFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
-        testbenchButton.setFont(testbenchFont)
-        testbenchButton.setGeometry(60, 130, 100, 30)
-        testbenchButton.setStyleSheet(
-            f'color: {MTA_STYLING["darkBlue"]}; border: 1px solid white'
-        )
+    #     # button
+    #     testbenchButton = QPushButton("Test Bench", self.mainWindow)
+    #     testbenchFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
+    #     testbenchButton.setFont(testbenchFont)
+    #     testbenchButton.setGeometry(60, 130, 100, 30)
+    #     testbenchButton.setStyleSheet(
+    #         f'color: {MTA_STYLING["darkBlue"]}; border: 1px solid white'
+    #     )
 
-        testbenchButton.clicked.connect(self.show_testbench)
+    #     testbenchButton.clicked.connect(self.show_testbench)
 
     def control_temperature(self):
         setTemperature = QLabel("Set Temperature:", self.mainWindow)
@@ -2196,307 +2196,307 @@ class TrackModel:
     #             block["Failures"] = failuresStr
     #     self.update_block_info_display
 
-    def show_testbench(self):
-        testbenchWindow = TestbenchWindow()
-        testbenchWindow.testbench.exec()
+#     def show_testbench(self):
+#         testbenchWindow = TestbenchWindow()
+#         testbenchWindow.testbench.exec()
 
 
-class TestbenchWindow:
-    speed = ""
-    authority = ""
-    railwayState = 0
-    switchState = 0
-    trackHeaterState = 0
-    trackState = "Open"
-    ticketSales = ""
-    waiting = ""
-    lightState = "Green"
-    failures = []
+# class TestbenchWindow:
+#     speed = ""
+#     authority = ""
+#     railwayState = 0
+#     switchState = 0
+#     trackHeaterState = 0
+#     trackState = "Open"
+#     ticketSales = ""
+#     waiting = ""
+#     lightState = "Green"
+#     failures = []
 
-    def __init__(self):
-        self.testbench = QDialog()
-        self.setup_testbench()
+#     def __init__(self):
+#         self.testbench = QDialog()
+#         self.setup_testbench()
 
-    def setup_testbench(self):
-        self.testbench.setWindowTitle("Change Failures")
-        self.testbench.setGeometry(450, 300, 960, 600)
+#     def setup_testbench(self):
+#         self.testbench.setWindowTitle("Change Failures")
+#         self.testbench.setGeometry(450, 300, 960, 600)
 
-        # General layout
-        self.add_mta_logo()
-        self.add_title()
-        self.add_hline()
+#         # General layout
+#         self.add_mta_logo()
+#         self.add_title()
+#         self.add_hline()
 
-        # Inputs
-        self.setup_inputs()
-        self.setup_failure_inputs()
-        self.add_set_inputs()
+#         # Inputs
+#         self.setup_inputs()
+#         self.setup_failure_inputs()
+#         self.add_set_inputs()
 
-        # Outputs
-        self.add_outputs()
+#         # Outputs
+#         self.add_outputs()
 
-    def add_mta_logo(self):
-        mtaLogo = QLabel(self.testbench)
-        mtaLogo.setGeometry(0, 0, 80, 80)
-        mtaLogo.setPixmap(
-            QPixmap("src/main/TrackModel/pngs/MTA_logo.png").scaled(80, 80)
-        )
+#     def add_mta_logo(self):
+#         mtaLogo = QLabel(self.testbench)
+#         mtaLogo.setGeometry(0, 0, 80, 80)
+#         mtaLogo.setPixmap(
+#             QPixmap("src/main/TrackModel/pngs/MTA_logo.png").scaled(80, 80)
+#         )
 
-    def add_title(self):
-        windowWidth = self.testbench.width()
-        labelWidth = 350
-        titlePosition = int((windowWidth - labelWidth) / 2)
+#     def add_title(self):
+#         windowWidth = self.testbench.width()
+#         labelWidth = 350
+#         titlePosition = int((windowWidth - labelWidth) / 2)
 
-        titleLabel = QLabel("Track Model- Testbench", self.testbench)
-        titleLabel.setGeometry(titlePosition, 25, labelWidth, 40)
-        titleLabel.setAlignment(Qt.AlignCenter)
-        titleFont = QFont("Arial", 18, QFont.Bold)
-        titleLabel.setFont(titleFont)
+#         titleLabel = QLabel("Track Model- Testbench", self.testbench)
+#         titleLabel.setGeometry(titlePosition, 25, labelWidth, 40)
+#         titleLabel.setAlignment(Qt.AlignCenter)
+#         titleFont = QFont("Arial", 18, QFont.Bold)
+#         titleLabel.setFont(titleFont)
 
-    def add_hline(self):
-        thickness = 5
-        line = QFrame(self.testbench)
-        line.setFrameShape(QFrame.HLine)
-        line.setGeometry(0, 80, 960, thickness)
-        line.setLineWidth(thickness)
+#     def add_hline(self):
+#         thickness = 5
+#         line = QFrame(self.testbench)
+#         line.setFrameShape(QFrame.HLine)
+#         line.setGeometry(0, 80, 960, thickness)
+#         line.setLineWidth(thickness)
 
-    def setup_inputs(self):
-        blueBackground = QWidget(self.testbench)
-        blueBackground.setGeometry(10, 120, 400, 450)
-        blueBackground.setStyleSheet("background-color: #A9D0F5;")
+#     def setup_inputs(self):
+#         blueBackground = QWidget(self.testbench)
+#         blueBackground.setGeometry(10, 120, 400, 450)
+#         blueBackground.setStyleSheet("background-color: #A9D0F5;")
 
-        whiteBackground = "background-color: white"
+#         whiteBackground = "background-color: white"
 
-        inputsLabel = QLabel("Change Inputs:", blueBackground)
-        inputsLabel.setGeometry(0, 0, 400, 30)
-        inputsLabel.setStyleSheet(
-            "background-color: blue; color: white; font-weight: bold"
-        )
-        inputsLabel.setAlignment(Qt.AlignCenter)
+#         inputsLabel = QLabel("Change Inputs:", blueBackground)
+#         inputsLabel.setGeometry(0, 0, 400, 30)
+#         inputsLabel.setStyleSheet(
+#             "background-color: blue; color: white; font-weight: bold"
+#         )
+#         inputsLabel.setAlignment(Qt.AlignCenter)
 
-        selectBlock = QLabel("Select Block #:", blueBackground)
-        selectBlock.setGeometry(10, 50, 150, 30)
-        self.blockInput = QSpinBox(blueBackground)
-        self.blockInput.setGeometry(120, 50, 50, 30)
-        self.blockInput.setStyleSheet(whiteBackground)
-        self.blockInput.setMinimum(1)
-        self.blockInput.setMaximum(15)
-        self.blockInput.setValue(1)
-        goButton = QPushButton("Go", blueBackground)
-        goButton.setGeometry(220, 50, 150, 30)
-        goButton.setStyleSheet("background-color: blue; color: white")
-        # Connect the button to the update_block_info_display method
-        goButton.clicked.connect(self.update_display)
+#         selectBlock = QLabel("Select Block #:", blueBackground)
+#         selectBlock.setGeometry(10, 50, 150, 30)
+#         self.blockInput = QSpinBox(blueBackground)
+#         self.blockInput.setGeometry(120, 50, 50, 30)
+#         self.blockInput.setStyleSheet(whiteBackground)
+#         self.blockInput.setMinimum(1)
+#         self.blockInput.setMaximum(15)
+#         self.blockInput.setValue(1)
+#         goButton = QPushButton("Go", blueBackground)
+#         goButton.setGeometry(220, 50, 150, 30)
+#         goButton.setStyleSheet("background-color: blue; color: white")
+#         # Connect the button to the update_block_info_display method
+#         goButton.clicked.connect(self.update_display)
 
-        speedLabel = QLabel("Set Commanded Speed (mph):", blueBackground)
-        speedLabel.setGeometry(10, 90, 200, 30)
-        self.speedInput = QLineEdit(blueBackground)
-        self.speedInput.setGeometry(220, 90, 150, 30)
-        self.speedInput.setStyleSheet(whiteBackground)
-        self.speedInput.setEnabled(False)
+#         speedLabel = QLabel("Set Commanded Speed (mph):", blueBackground)
+#         speedLabel.setGeometry(10, 90, 200, 30)
+#         self.speedInput = QLineEdit(blueBackground)
+#         self.speedInput.setGeometry(220, 90, 150, 30)
+#         self.speedInput.setStyleSheet(whiteBackground)
+#         self.speedInput.setEnabled(False)
 
-        authorityLabel = QLabel("Set Authority (blocks):", blueBackground)
-        authorityLabel.setGeometry(10, 130, 200, 30)
-        self.authorityInput = QLineEdit(blueBackground)
-        self.authorityInput.setGeometry(220, 130, 150, 30)
-        self.authorityInput.setStyleSheet(whiteBackground)
-        self.authorityInput.setEnabled(False)
+#         authorityLabel = QLabel("Set Authority (blocks):", blueBackground)
+#         authorityLabel.setGeometry(10, 130, 200, 30)
+#         self.authorityInput = QLineEdit(blueBackground)
+#         self.authorityInput.setGeometry(220, 130, 150, 30)
+#         self.authorityInput.setStyleSheet(whiteBackground)
+#         self.authorityInput.setEnabled(False)
 
-        railwayLabel = QLabel("Set Railway Crossing (0/1):", blueBackground)
-        railwayLabel.setGeometry(10, 170, 200, 30)
-        self.railwayInput = QSpinBox(blueBackground)
-        self.railwayInput.setGeometry(220, 170, 150, 30)
-        self.railwayInput.setStyleSheet(whiteBackground)
-        self.railwayInput.setMinimum(0)
-        self.railwayInput.setMaximum(1)
-        self.railwayInput.setValue(0)
-        self.railwayInput.setEnabled(False)
+#         railwayLabel = QLabel("Set Railway Crossing (0/1):", blueBackground)
+#         railwayLabel.setGeometry(10, 170, 200, 30)
+#         self.railwayInput = QSpinBox(blueBackground)
+#         self.railwayInput.setGeometry(220, 170, 150, 30)
+#         self.railwayInput.setStyleSheet(whiteBackground)
+#         self.railwayInput.setMinimum(0)
+#         self.railwayInput.setMaximum(1)
+#         self.railwayInput.setValue(0)
+#         self.railwayInput.setEnabled(False)
 
-        switchLabel = QLabel("Set Switch Position (0/1):", blueBackground)
-        switchLabel.setGeometry(10, 210, 200, 30)
-        self.switchInput = QSpinBox(blueBackground)
-        self.switchInput.setGeometry(220, 210, 150, 30)
-        self.switchInput.setStyleSheet(whiteBackground)
-        self.switchInput.setMinimum(0)
-        self.switchInput.setMaximum(1)
-        self.switchInput.setValue(0)
-        self.switchInput.setEnabled(False)
+#         switchLabel = QLabel("Set Switch Position (0/1):", blueBackground)
+#         switchLabel.setGeometry(10, 210, 200, 30)
+#         self.switchInput = QSpinBox(blueBackground)
+#         self.switchInput.setGeometry(220, 210, 150, 30)
+#         self.switchInput.setStyleSheet(whiteBackground)
+#         self.switchInput.setMinimum(0)
+#         self.switchInput.setMaximum(1)
+#         self.switchInput.setValue(0)
+#         self.switchInput.setEnabled(False)
 
-        heaterLabel = QLabel("Set Track Heater (0/1):", blueBackground)
-        heaterLabel.setGeometry(10, 250, 200, 30)
-        self.heaterInput = QSpinBox(blueBackground)
-        self.heaterInput.setGeometry(220, 250, 150, 30)
-        self.heaterInput.setStyleSheet(whiteBackground)
-        self.heaterInput.setMinimum(0)
-        self.heaterInput.setMaximum(1)
-        self.heaterInput.setValue(0)
-        self.heaterInput.setEnabled(False)
+#         heaterLabel = QLabel("Set Track Heater (0/1):", blueBackground)
+#         heaterLabel.setGeometry(10, 250, 200, 30)
+#         self.heaterInput = QSpinBox(blueBackground)
+#         self.heaterInput.setGeometry(220, 250, 150, 30)
+#         self.heaterInput.setStyleSheet(whiteBackground)
+#         self.heaterInput.setMinimum(0)
+#         self.heaterInput.setMaximum(1)
+#         self.heaterInput.setValue(0)
+#         self.heaterInput.setEnabled(False)
 
-        trackStateLabel = QLabel("Set Track State:", blueBackground)
-        trackStateLabel.setGeometry(10, 290, 200, 30)
-        self.trackOpen = QRadioButton("Open", blueBackground)
-        self.trackOpen.setGeometry(120, 290, 60, 30)
-        self.trackOpen.setEnabled(False)
-        self.trackOccupied = QRadioButton("Occupied", blueBackground)
-        self.trackOccupied.setGeometry(190, 290, 80, 30)
-        self.trackOccupied.setEnabled(False)
-        self.trackMaintenance = QRadioButton("Maintenance", blueBackground)
-        self.trackMaintenance.setGeometry(280, 290, 100, 30)
-        self.trackMaintenance.setEnabled(False)
-        self.trackStateButtons = QButtonGroup()
-        self.trackStateButtons.addButton(self.trackOpen)
-        self.trackStateButtons.addButton(self.trackOccupied)
-        self.trackStateButtons.addButton(self.trackMaintenance)
+#         trackStateLabel = QLabel("Set Track State:", blueBackground)
+#         trackStateLabel.setGeometry(10, 290, 200, 30)
+#         self.trackOpen = QRadioButton("Open", blueBackground)
+#         self.trackOpen.setGeometry(120, 290, 60, 30)
+#         self.trackOpen.setEnabled(False)
+#         self.trackOccupied = QRadioButton("Occupied", blueBackground)
+#         self.trackOccupied.setGeometry(190, 290, 80, 30)
+#         self.trackOccupied.setEnabled(False)
+#         self.trackMaintenance = QRadioButton("Maintenance", blueBackground)
+#         self.trackMaintenance.setGeometry(280, 290, 100, 30)
+#         self.trackMaintenance.setEnabled(False)
+#         self.trackStateButtons = QButtonGroup()
+#         self.trackStateButtons.addButton(self.trackOpen)
+#         self.trackStateButtons.addButton(self.trackOccupied)
+#         self.trackStateButtons.addButton(self.trackMaintenance)
 
-        ticketSalesLabel = QLabel("Set Ticket Sales/Hr:", blueBackground)
-        ticketSalesLabel.setGeometry(10, 330, 200, 30)
-        self.ticketSalesInput = QLineEdit(blueBackground)
-        self.ticketSalesInput.setGeometry(220, 330, 150, 30)
-        self.ticketSalesInput.setStyleSheet(whiteBackground)
-        self.ticketSalesInput.setEnabled(False)
+#         ticketSalesLabel = QLabel("Set Ticket Sales/Hr:", blueBackground)
+#         ticketSalesLabel.setGeometry(10, 330, 200, 30)
+#         self.ticketSalesInput = QLineEdit(blueBackground)
+#         self.ticketSalesInput.setGeometry(220, 330, 150, 30)
+#         self.ticketSalesInput.setStyleSheet(whiteBackground)
+#         self.ticketSalesInput.setEnabled(False)
 
-        waitingLabel = QLabel("Set Waiting @ Station:", blueBackground)
-        waitingLabel.setGeometry(10, 370, 200, 30)
-        self.waitingInput = QLineEdit(blueBackground)
-        self.waitingInput.setGeometry(220, 370, 150, 30)
-        self.waitingInput.setStyleSheet(whiteBackground)
-        self.waitingInput.setEnabled(False)
+#         waitingLabel = QLabel("Set Waiting @ Station:", blueBackground)
+#         waitingLabel.setGeometry(10, 370, 200, 30)
+#         self.waitingInput = QLineEdit(blueBackground)
+#         self.waitingInput.setGeometry(220, 370, 150, 30)
+#         self.waitingInput.setStyleSheet(whiteBackground)
+#         self.waitingInput.setEnabled(False)
 
-        lightLabel = QLabel("Set Light Color:", blueBackground)
-        lightLabel.setGeometry(10, 410, 150, 30)
-        self.greenRadio = QRadioButton("Green", blueBackground)
-        self.greenRadio.setGeometry(170, 410, 70, 30)
-        self.greenRadio.setEnabled(False)
-        self.yellowRadio = QRadioButton("Yellow", blueBackground)
-        self.yellowRadio.setGeometry(250, 410, 70, 30)
-        self.yellowRadio.setEnabled(False)
-        self.redRadio = QRadioButton("Red", blueBackground)
-        self.redRadio.setGeometry(330, 410, 70, 30)
-        self.redRadio.setEnabled(False)
-        self.lightStateButtons = QButtonGroup()
-        self.lightStateButtons.addButton(self.greenRadio)
-        self.lightStateButtons.addButton(self.yellowRadio)
-        self.lightStateButtons.addButton(self.redRadio)
+#         lightLabel = QLabel("Set Light Color:", blueBackground)
+#         lightLabel.setGeometry(10, 410, 150, 30)
+#         self.greenRadio = QRadioButton("Green", blueBackground)
+#         self.greenRadio.setGeometry(170, 410, 70, 30)
+#         self.greenRadio.setEnabled(False)
+#         self.yellowRadio = QRadioButton("Yellow", blueBackground)
+#         self.yellowRadio.setGeometry(250, 410, 70, 30)
+#         self.yellowRadio.setEnabled(False)
+#         self.redRadio = QRadioButton("Red", blueBackground)
+#         self.redRadio.setGeometry(330, 410, 70, 30)
+#         self.redRadio.setEnabled(False)
+#         self.lightStateButtons = QButtonGroup()
+#         self.lightStateButtons.addButton(self.greenRadio)
+#         self.lightStateButtons.addButton(self.yellowRadio)
+#         self.lightStateButtons.addButton(self.redRadio)
 
-    def setup_failure_inputs(self):
-        redBackground = QWidget(self.testbench)
-        redBackground.setGeometry(500, 120, 350, 80)
-        redBackground.setStyleSheet("background-color: #ffd6d6;")
+#     def setup_failure_inputs(self):
+#         redBackground = QWidget(self.testbench)
+#         redBackground.setGeometry(500, 120, 350, 80)
+#         redBackground.setStyleSheet("background-color: #ffd6d6;")
 
-        failureLabel = QLabel("Set Failure Input:", redBackground)
-        failureLabel.setGeometry(0, 0, 350, 30)
-        failureLabel.setStyleSheet(
-            "background-color: red; color: white; font-weight: bold"
-        )
-        failureLabel.setAlignment(Qt.AlignCenter)
+#         failureLabel = QLabel("Set Failure Input:", redBackground)
+#         failureLabel.setGeometry(0, 0, 350, 30)
+#         failureLabel.setStyleSheet(
+#             "background-color: red; color: white; font-weight: bold"
+#         )
+#         failureLabel.setAlignment(Qt.AlignCenter)
 
-        self.failureCheckboxes = []
-        failures = ["Track Circuit Failure", "Power Failure", "Broken Rail"]
-        xOffset = 0
-        for failure in failures:
-            option = QCheckBox(failure, redBackground)
-            option.setGeometry(xOffset, 40, 150, 30)
-            if failure == "Broken Rail":
-                option.setGeometry(xOffset - 40, 40, 150, 30)
-            option.setStyleSheet("background-color: #ffd6d6")
-            self.failureCheckboxes.append(option)
-            xOffset += 150
+#         self.failureCheckboxes = []
+#         failures = ["Track Circuit Failure", "Power Failure", "Broken Rail"]
+#         xOffset = 0
+#         for failure in failures:
+#             option = QCheckBox(failure, redBackground)
+#             option.setGeometry(xOffset, 40, 150, 30)
+#             if failure == "Broken Rail":
+#                 option.setGeometry(xOffset - 40, 40, 150, 30)
+#             option.setStyleSheet("background-color: #ffd6d6")
+#             self.failureCheckboxes.append(option)
+#             xOffset += 150
 
-    def add_set_inputs(self):
-        # Create a green button
-        self.setInputsbutton = QPushButton("Set Inputs", self.testbench)
-        self.setInputsbutton.setGeometry(625, 210, 100, 30)
-        self.setInputsbutton.setStyleSheet(
-            "background-color: green; color: white; font-weight: bold"
-        )
-        self.setInputsbutton.setEnabled(False)
-        self.setInputsbutton.clicked.connect(self.update_outputs)
+#     def add_set_inputs(self):
+#         # Create a green button
+#         self.setInputsbutton = QPushButton("Set Inputs", self.testbench)
+#         self.setInputsbutton.setGeometry(625, 210, 100, 30)
+#         self.setInputsbutton.setStyleSheet(
+#             "background-color: green; color: white; font-weight: bold"
+#         )
+#         self.setInputsbutton.setEnabled(False)
+#         self.setInputsbutton.clicked.connect(self.update_outputs)
 
-    def update_display(self):
-        self.selectedBlock = self.blockInput.value()
-        # Disable all input fields and buttons at the beginning
-        self.speedInput.setEnabled(False)
-        self.authorityInput.setEnabled(False)
-        self.railwayInput.setEnabled(False)
-        self.switchInput.setEnabled(False)
-        self.heaterInput.setEnabled(False)
-        self.ticketSalesInput.setEnabled(False)
-        self.waitingInput.setEnabled(False)
+#     def update_display(self):
+#         self.selectedBlock = self.blockInput.value()
+#         # Disable all input fields and buttons at the beginning
+#         self.speedInput.setEnabled(False)
+#         self.authorityInput.setEnabled(False)
+#         self.railwayInput.setEnabled(False)
+#         self.switchInput.setEnabled(False)
+#         self.heaterInput.setEnabled(False)
+#         self.ticketSalesInput.setEnabled(False)
+#         self.waitingInput.setEnabled(False)
 
-        # Reset the radio button state
-        self.trackOpen.setEnabled(False)
-        self.trackOccupied.setEnabled(False)
-        self.trackMaintenance.setEnabled(False)
+#         # Reset the radio button state
+#         self.trackOpen.setEnabled(False)
+#         self.trackOccupied.setEnabled(False)
+#         self.trackMaintenance.setEnabled(False)
 
-        # Reset the radio button state
-        self.greenRadio.setEnabled(False)
-        self.yellowRadio.setEnabled(False)
-        self.redRadio.setEnabled(False)
-        # Enable the relevant input fields and buttons based on the selected block
-        if self.selectedBlock == 5:
-            self.switchInput.setEnabled(True)
-        if self.selectedBlock == 10 or self.selectedBlock == 15:
-            self.ticketSalesInput.setEnabled(True)
-            self.waitingInput.setEnabled(True)
+#         # Reset the radio button state
+#         self.greenRadio.setEnabled(False)
+#         self.yellowRadio.setEnabled(False)
+#         self.redRadio.setEnabled(False)
+#         # Enable the relevant input fields and buttons based on the selected block
+#         if self.selectedBlock == 5:
+#             self.switchInput.setEnabled(True)
+#         if self.selectedBlock == 10 or self.selectedBlock == 15:
+#             self.ticketSalesInput.setEnabled(True)
+#             self.waitingInput.setEnabled(True)
 
-        self.heaterInput.setEnabled(True)
-        self.speedInput.setEnabled(True)
-        self.authorityInput.setEnabled(True)
-        # Enable the radio buttons for track state and light state
-        self.trackOpen.setEnabled(True)
-        self.trackOccupied.setEnabled(True)
-        self.trackMaintenance.setEnabled(True)
-        self.greenRadio.setEnabled(True)
-        self.yellowRadio.setEnabled(True)
-        self.redRadio.setEnabled(True)
+#         self.heaterInput.setEnabled(True)
+#         self.speedInput.setEnabled(True)
+#         self.authorityInput.setEnabled(True)
+#         # Enable the radio buttons for track state and light state
+#         self.trackOpen.setEnabled(True)
+#         self.trackOccupied.setEnabled(True)
+#         self.trackMaintenance.setEnabled(True)
+#         self.greenRadio.setEnabled(True)
+#         self.yellowRadio.setEnabled(True)
+#         self.redRadio.setEnabled(True)
 
-        # Enable the "Set Inputs" button
-        self.setInputsbutton.setEnabled(True)
+#         # Enable the "Set Inputs" button
+#         self.setInputsbutton.setEnabled(True)
 
-    def add_outputs(self):
-        self.outputs = QTextEdit(self.testbench)
-        self.outputs.setGeometry(500, 250, 350, 300)
-        self.outputs.setStyleSheet("background-color: white; font-size: 14px")
-        self.outputs.setReadOnly(True)
-        self.outputs.show()
+#     def add_outputs(self):
+#         self.outputs = QTextEdit(self.testbench)
+#         self.outputs.setGeometry(500, 250, 350, 300)
+#         self.outputs.setStyleSheet("background-color: white; font-size: 14px")
+#         self.outputs.setReadOnly(True)
+#         self.outputs.show()
 
-    def update_outputs(self):
-        self.outputs.clear()
-        self.failures = []
-        self.outputs.append(f"\nBlock Number: {self.selectedBlock}")
-        if self.speedInput.text() != "":
-            self.speed = int(self.speedInput.text())
-            self.outputs.append(f"Commanded Speed: {self.speed}")
-        if self.authorityInput.text() != "":
-            self.authority = int(self.authorityInput.text())
-            self.outputs.append(f"Authority: {self.authority}")
-        # self.railwayState = self.railwayInput.value()
-        if self.selectedBlock == 5:
-            self.switchState = self.switchInput.value()
-            self.outputs.append(f"Switch State: {self.switchState}")
-        self.trackHeaterState = self.heaterInput.value()
-        self.outputs.append(f"Track Heater State: {self.trackHeaterState}")
-        if self.selectedBlock == 10 or self.selectedBlock == 15:
-            if self.ticketSalesInput.text() != "":
-                self.ticketSales = int(self.ticketSalesInput.text())
-                self.outputs.append(f"Authority: {self.ticketSales}")
-            if self.waitingInput.text() != "":
-                self.waiting = int(self.waitingInput.text())
-                self.outputs.append(f"Authority: {self.waiting}")
-        # Check for track state input
-        trackState = self.trackStateButtons.checkedButton()
-        if trackState:
-            self.trackState = trackState.text()
-            self.outputs.append(f"Track State: {self.trackState}")
-        # Check for light color input
-        lightState = self.lightStateButtons.checkedButton()
-        if lightState:
-            self.lightState = lightState.text()
-            self.outputs.append(f"Light State: {self.lightState}")
-        # Failures
-        for checkbox in self.failureCheckboxes:
-            if checkbox.isChecked():
-                self.failures.append(checkbox.text())
-        self.outputs.append(f"Failures: {self.failures}")
+#     def update_outputs(self):
+#         self.outputs.clear()
+#         self.failures = []
+#         self.outputs.append(f"\nBlock Number: {self.selectedBlock}")
+#         if self.speedInput.text() != "":
+#             self.speed = int(self.speedInput.text())
+#             self.outputs.append(f"Commanded Speed: {self.speed}")
+#         if self.authorityInput.text() != "":
+#             self.authority = int(self.authorityInput.text())
+#             self.outputs.append(f"Authority: {self.authority}")
+#         # self.railwayState = self.railwayInput.value()
+#         if self.selectedBlock == 5:
+#             self.switchState = self.switchInput.value()
+#             self.outputs.append(f"Switch State: {self.switchState}")
+#         self.trackHeaterState = self.heaterInput.value()
+#         self.outputs.append(f"Track Heater State: {self.trackHeaterState}")
+#         if self.selectedBlock == 10 or self.selectedBlock == 15:
+#             if self.ticketSalesInput.text() != "":
+#                 self.ticketSales = int(self.ticketSalesInput.text())
+#                 self.outputs.append(f"Authority: {self.ticketSales}")
+#             if self.waitingInput.text() != "":
+#                 self.waiting = int(self.waitingInput.text())
+#                 self.outputs.append(f"Authority: {self.waiting}")
+#         # Check for track state input
+#         trackState = self.trackStateButtons.checkedButton()
+#         if trackState:
+#             self.trackState = trackState.text()
+#             self.outputs.append(f"Track State: {self.trackState}")
+#         # Check for light color input
+#         lightState = self.lightStateButtons.checkedButton()
+#         if lightState:
+#             self.lightState = lightState.text()
+#             self.outputs.append(f"Light State: {self.lightState}")
+#         # Failures
+#         for checkbox in self.failureCheckboxes:
+#             if checkbox.isChecked():
+#                 self.failures.append(checkbox.text())
+#         self.outputs.append(f"Failures: {self.failures}")
 
 
 if __name__ == "__main__":
