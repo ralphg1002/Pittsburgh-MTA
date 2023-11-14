@@ -19,9 +19,14 @@ from PyQt5.QtWidgets import (
 )
 
 from qtwidgets import AnimatedToggle
-from signals import masterSignals, trainControllerSWToTrainModel, trainModelToTrainController
+from signals import (
+    masterSignals,
+    trainControllerSWToTrainModel,
+    trainModelToTrainController,
+)
 
 # from Signals import TrackModelSignals, TrainControllerSignals
+
 
 class TrainModel(QMainWindow):
     # Font variables
@@ -240,10 +245,10 @@ class TrainModel(QMainWindow):
 
     def show_gui(self):
         self.show()
-        
+
     def signal_period(self, period):
         self.time_interval = period
-    
+
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
@@ -252,9 +257,9 @@ class TrainModel(QMainWindow):
         self.timer.setInterval(self.time_interval)
 
         self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
-        self.systemSpeedInput.setText("x" + format(1 / (self.time_interval / 1000), ".3f"))
-        
-    
+        self.systemSpeedInput.setText(
+            "x" + format(1 / (self.time_interval / 1000), ".3f")
+        )
 
 
 class ResultsWindow(QMainWindow):
@@ -862,56 +867,47 @@ class ResultsWindow(QMainWindow):
         self.trains.set_value(train_name, "failure_status", key, state)
 
     def update_ui(self):
-            if self.vehicle_word_list:
-                # Update each UI element with the corresponding variable from the SharedData dictionary class
-                for i, word_placeholders in enumerate(self.vehicle_word_list):
-                    word_key = (
-                        word_placeholders.split(":")[0]
-                        .strip()
-                        .lower()
-                        .replace(" ", "_")
-                    )
-                    word_value = SharedData.data.get(word_key, "N/A")
+        if self.vehicle_word_list:
+            # Update each UI element with the corresponding variable from the SharedData dictionary class
+            for i, word_placeholders in enumerate(self.vehicle_word_list):
+                word_key = (
+                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+                )
+                word_value = SharedData.data.get(word_key, "N/A")
 
-                    label_text = word_placeholders.format(word_value)
+                label_text = word_placeholders.format(word_value)
 
-                    # Update the text of the QLabel
-                    self.vehicle_labels[i].setText(label_text)
+                # Update the text of the QLabel
+                self.vehicle_labels[i].setText(label_text)
 
-            if self.passenger_word_list:
-                for i, word_placeholders in enumerate(self.passenger_word_list):
-                    word_key = (
-                        word_placeholders.split(":")[0]
-                        .strip()
-                        .lower()
-                        .replace(" ", "_")
-                    )
-                    print("SharedData.data:", SharedData.data)
-                    word_value = SharedData.data.get(word_key, "N/A")
+        if self.passenger_word_list:
+            for i, word_placeholders in enumerate(self.passenger_word_list):
+                word_key = (
+                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+                )
+                print("SharedData.data:", SharedData.data)
+                word_value = SharedData.data.get(word_key, "N/A")
 
-                    label_text = word_placeholders.format(word_value)
+                label_text = word_placeholders.format(word_value)
 
-                    # Update the text of the QLabel
-                    self.passenger_labels[i].setText(label_text)
+                # Update the text of the QLabel
+                self.passenger_labels[i].setText(label_text)
 
-            if self.navigation_word_list:
-                for i, word_placeholders in enumerate(self.navigation_word_list):
-                    word_key = (
-                        word_placeholders.split(":")[0]
-                        .strip()
-                        .lower()
-                        .replace(" ", "_")
-                    )
-                    word_value = SharedData.data.get(word_key, "N/A")
+        if self.navigation_word_list:
+            for i, word_placeholders in enumerate(self.navigation_word_list):
+                word_key = (
+                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+                )
+                word_value = SharedData.data.get(word_key, "N/A")
 
-                    label_text = word_placeholders.format(word_value)
+                label_text = word_placeholders.format(word_value)
 
-                    # Update the text of the QLabel
-                    self.navigation_labels[i].setText(label_text)
-    
+                # Update the text of the QLabel
+                self.navigation_labels[i].setText(label_text)
+
     def signal_period(self, period):
         self.time_interval = period
-    
+
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
@@ -920,54 +916,60 @@ class ResultsWindow(QMainWindow):
         self.timer.setInterval(self.time_interval)
 
         self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
-        self.systemSpeedInput.setText("x" + format(1 / (self.time_interval / 1000), ".3f"))
-        
+        self.systemSpeedInput.setText(
+            "x" + format(1 / (self.time_interval / 1000), ".3f")
+        )
+
         # Signals that connect from the train controller to the train model
         trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
-        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(self.signal_emergency_brake)
+        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(
+            self.signal_emergency_brake
+        )
         trainControllerSWToTrainModel.sendDriverServiceBrake.connect(self.signal_brake)
         trainControllerSWToTrainModel.sendAnnouncement.connect(self.signal_announcement)
         trainControllerSWToTrainModel.sendHeadlightState.connect(self.signal_headlights)
-        trainControllerSWToTrainModel.sendInteriorLightState.connect(self.signal_interrior_lights)
+        trainControllerSWToTrainModel.sendInteriorLightState.connect(
+            self.signal_interrior_lights
+        )
         trainControllerSWToTrainModel.sendLeftDoorState.connect(self.signal_left_door)
         trainControllerSWToTrainModel.sendRightDoorState.connect(self.signal_right_door)
-        trainControllerSWToTrainModel.sendSetpointTemperature.connect(self.signal_temperature)
-        trainControllerSWToTrainModel.sendAdvertisement.connect(self.signal_advertisements)
+        trainControllerSWToTrainModel.sendSetpointTemperature.connect(
+            self.signal_temperature
+        )
+        trainControllerSWToTrainModel.sendAdvertisement.connect(
+            self.signal_advertisements
+        )
 
-    # Functions to set 
+    # Functions to set
     def signal_power(self, train, power):
         self.trains.set_value("Train 1", "vehicle_status", 8, power)
-        
+
     def signal_emergency_brake(self, train, e_brake):
         self.trains.set_value("Train 1", "failure_status", 4, e_brake)
-    
+
     def signal_brake(self, train, brake):
         self.trains.set_value("Train 1", "vehicle_status", 7, brake)
-        
+
     def signal_announcement(self, train, announcement):
         self.trains.set_value("Train 1", "passenger_status", 6, announcement)
-        
+
     def signal_headlights(self, train, headlights):
         self.trains.set_value("Train 1", "navigation_status", 7, headlights)
-        
+
     def signal_interrior_lights(self, train, in_lights):
         self.trains.set_value("Train 1", "passenger_status", 5, in_lights)
-        
+
     def signal_left_door(self, train, left_door):
         self.trains.set_value("Train 1", "passenger_status", 3, left_door)
-    
+
     def signal_right_door(self, train, right_door):
         self.trains.set_value("Train 1", "passenger_status", 4, right_door)
-        
+
     def signal_temperature(self, train, temp):
         self.trains.set_value("Train 1", "passenger_status", 7, temp)
-        
+
     def signal_advertisements(self, train, advertisements):
         self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
- 
-        
-        
-    
 
 
 class SharedData:

@@ -61,7 +61,11 @@ class TCFunctions:
                 trainObject.set_speedLimit(15)
 
     def station_operations(self, trainObject):
-        if (trainObject.block["isStation"]) and (trainObject.get_currentSpeed() == 0) and (not trainObject.get_authority()):
+        if (
+            (trainObject.block["isStation"])
+            and (trainObject.get_currentSpeed() == 0)
+            and (not trainObject.get_authority())
+        ):
             trainObject.set_interiorLights(True)
             trainObject.set_leftDoor(trainObject.beacon["leftStation"])
             trainObject.set_rightDoor(trainObject.beacon["rightStation"])

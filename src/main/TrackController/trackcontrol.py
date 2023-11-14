@@ -57,7 +57,6 @@ class RunPLC:
         return data
 
 
-
 class Block:
     def __init__(
         self,
@@ -439,8 +438,7 @@ class Wayside:
             # Initialize a flag to track if any condition is satisfied
             any_condition_satisfied = False
 
-            for ifBlock in range (0,len(item)):
-
+            for ifBlock in range(0, len(item)):
                 switchString = item[ifBlock]["Section"].rstrip(":")
                 if switchString in self.switches:
                     # Determine what is the switch block
@@ -451,7 +449,6 @@ class Wayside:
                 # Parse the conditions
                 condition = item[ifBlock]["Condition"]
 
-                
                 entry, exitRange, notExist = self.parse_condition(condition)
                 condition1 = False
                 condition2 = False
@@ -460,7 +457,7 @@ class Wayside:
                 if isinstance(entry, int):
                     entry = [entry]  # Convert single integer to a list
 
-                print("Wayside Number: ",self.waysideNum)
+                print("Wayside Number: ", self.waysideNum)
 
                 if entry != 0:
                     # check for validity of conditon 1
@@ -662,12 +659,10 @@ class Wayside:
                     exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
                     notExist = True
                     break
-        
+
         print("Entry: ", entry)
         print("Exit: ", exit)
         return entry, exit, notExist
-
-
 
     # This is the method that parses the operation following a condition within a PLC file
     def parse_operation(self, operationLine):
@@ -685,7 +680,7 @@ class Wayside:
         for block in self.blocks:
             if int(block.get_number()) == int(blockNumber):
                 return block
-        #print(self.blocks[28].get_number())
+        # print(self.blocks[28].get_number())
         print("Did not find block " + str(blockNumber))
         return None  # Block not found
 

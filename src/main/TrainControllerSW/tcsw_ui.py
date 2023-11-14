@@ -958,9 +958,7 @@ class TrainControllerUI(QMainWindow):
                 self.tcFunctions.add_train(Train(name))
 
         # Update Train ID and attributes
-        self.trainIDLabel.setText(
-            "Train #: " + self.tcVariables["trainID"]
-        )
+        self.trainIDLabel.setText("Train #: " + self.tcVariables["trainID"])
 
         # SIGNAL INTEGRATION: TM -> TCSW
         trainModelToTrainController.sendSpeedLimit.connect(self.signal_speedLimit)
@@ -1403,7 +1401,11 @@ class TrainControllerUI(QMainWindow):
     def change_train(self):
         if self.trainNumberCombo.currentText() == "":
             return
-        self.tcVariables["trainID"] = self.trainLineCombo.currentText() + "_" + self.trainNumberCombo.currentText()
+        self.tcVariables["trainID"] = (
+            self.trainLineCombo.currentText()
+            + "_"
+            + self.trainNumberCombo.currentText()
+        )
 
     def send_announcement(self):
         self.tcVariables["customAnnouncement"] = self.announcementEdit.text()

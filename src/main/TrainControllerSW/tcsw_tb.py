@@ -33,7 +33,12 @@ class TestWindow(QMainWindow):
 
     # variables
     tcObject = TCFunctions()
-    testbenchVariables = {"trainID": "", "speedLimit": 0, "authority": 0, "trainList": []}
+    testbenchVariables = {
+        "trainID": "",
+        "speedLimit": 0,
+        "authority": 0,
+        "trainList": [],
+    }
 
     def __init__(self):
         super().__init__()
@@ -79,7 +84,9 @@ class TestWindow(QMainWindow):
         self.sendLabel = QPushButton(self)
         self.png_button(
             self.sendLabel,
-            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-red.svg").scaled(32, 32),
+            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-red.svg").scaled(
+                32, 32
+            ),
         )
         self.sendLabel.adjustSize()
         self.set_relative_below(self.sendLabel, self.addTrainLabel, 10)
@@ -94,7 +101,9 @@ class TestWindow(QMainWindow):
         self.sendLabel2 = QPushButton(self)
         self.png_button(
             self.sendLabel2,
-            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-green.svg").scaled(32, 32),
+            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-green.svg").scaled(
+                32, 32
+            ),
         )
         self.sendLabel2.adjustSize()
         self.set_relative_below(self.sendLabel2, self.addTrainEdit, 10)
@@ -104,7 +113,9 @@ class TestWindow(QMainWindow):
         self.text_label(self.addTrainEdit2)
         self.addTrainEdit2.setStyleSheet("color: green")
         self.set_relative_below(self.addTrainEdit2, self.addTrainEdit, 10)
-        self.addTrainEdit.setFixedWidth(self.sendLabel2.x() - self.addTrainEdit.x() - 10)
+        self.addTrainEdit.setFixedWidth(
+            self.sendLabel2.x() - self.addTrainEdit.x() - 10
+        )
 
         self.selectTrainLabel = QLabel("Select a Train", self)
         self.text_label(self.selectTrainLabel)
@@ -248,7 +259,9 @@ class TestWindow(QMainWindow):
 
         # signals
         self.sendLabel.clicked.connect(lambda: self.add_train("red", self.addTrainEdit))
-        self.sendLabel2.clicked.connect(lambda: self.add_train("green", self.addTrainEdit2))
+        self.sendLabel2.clicked.connect(
+            lambda: self.add_train("green", self.addTrainEdit2)
+        )
         self.speedLimitVal.valueChanged.connect(lambda: self.speed_limit())
         self.authorityButton.clicked.connect(lambda: self.authority_val())
         self.commandedSpeedVal.valueChanged.connect(lambda: self.commanded_speed())
