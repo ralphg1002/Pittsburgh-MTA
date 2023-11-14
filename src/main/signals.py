@@ -63,6 +63,7 @@ class Master(QObject):
     # Instantiate timing signals
     timingMultiplier = pyqtSignal(int)
     clockSignal = pyqtSignal(QTime)
+    addTrain = pyqtSignal(str, str) # (line, id)
 
 
 # Instantiation for signals sent from Track Controller

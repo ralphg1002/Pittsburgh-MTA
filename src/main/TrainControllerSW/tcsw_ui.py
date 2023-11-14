@@ -330,8 +330,10 @@ class TrainControllerUI(QMainWindow):
         )
         self.set_relative_right(self.trainLineCombo, self.trainLineLabel, 20)
         self.set_relative_before_right_end(self.trainLineCombo, self.trainChangeBox, 10)
+        self.trainLineCombo.addItem("red")
+        self.trainLineCombo.addItem("green")
 
-        self.trainNumberLabel = QLabel("Number", self)
+        self.trainNumberLabel = QLabel("Train Name", self)
         self.text_label(self.trainNumberLabel)
         self.set_relative_below(self.trainNumberLabel, self.trainLineLabel, 20)
 
@@ -909,7 +911,7 @@ class TrainControllerUI(QMainWindow):
             self.update
         )  # Connect the timer to the update_text function
         self.timer.start(
-            self.tcVariables["period"]
+            self.tcVariables["samplePeriod"]
         )  # Update the text every 1000 milliseconds (1 second)
 
         self.sysTime = QDateTime.currentDateTime()
@@ -917,15 +919,47 @@ class TrainControllerUI(QMainWindow):
 
     def update(self):
         # Update Train ID list
-        self.trainNumberCombo.clear()
-        for train in self.testWindow.tcObject.trainList:
-            self.trainNumberCombo.addItem(train.get_trainID())
+        for train in self.testWindow.testbenchVariables["trainList"]:
+            idCheck = False
+            for i in self.tcVariables["trainList"]:
+                if i == train:
+                    idCheck = True
+            if not idCheck:
+                self.tcVariables["trainList"].append(train)
 
-        self.tcVariables["trainList"] = self.testWindow.tcObject.trainList
+        if self.trainLineCombo.currentText() == "red":
+            self.trainNumberCombo.clear()
+
+            for train in self.tcVariables["trainList"]:
+                if isinstance(train, dict) and "red" in train:
+                    self.trainNumberCombo.addItem(train["red"])
+
+        if self.trainLineCombo.currentText() == "green":
+            self.trainNumberCombo.clear()
+
+            for train in self.tcVariables["trainList"]:
+                if isinstance(train, dict) and "green" in train:
+                    self.trainNumberCombo.addItem(train["green"])
+
+        updatedTrainList = []
+        for train in self.tcVariables["trainList"]:
+            if isinstance(train, dict):
+                for key, value in train.items():
+                    updatedTrainList.append(key + "_" + value)
+
+        self.testWindow.refresh_train_list(updatedTrainList, self.tcFunctions.trainList)
+
+        for name in updatedTrainList:
+            idCheck2 = False
+            for train in self.tcFunctions.trainList:
+                if train.get_trainID() == name:
+                    idCheck2 = True
+            if not idCheck2:
+                self.tcFunctions.add_train(Train(name))
 
         # Update Train ID and attributes
         self.trainIDLabel.setText(
-            "Train #: " + self.testWindow.testbenchVariables["trainID"]
+            "Train #: " + self.tcVariables["trainID"]
         )
 
         # SIGNAL INTEGRATION: TM -> TCSW
@@ -951,8 +985,8 @@ class TrainControllerUI(QMainWindow):
         trainModelToTrainController.sendBrakeFailure.connect(self.signal_brakeFail)
         trainModelToTrainController.sendPolarity.connect(self.signal_polarity)
 
-        for train in self.testWindow.tcObject.trainList:
-            if train.get_trainID() == self.testWindow.testbenchVariables["trainID"]:
+        for train in self.tcFunctions.trainList:
+            if train.get_trainID() == self.tcVariables["trainID"]:
                 # TRAIN MODEL INPUTS
                 # current temp
                 self.currentTempLabel.setText(str(train.get_currentTemp()) + " °F")
@@ -1241,22 +1275,23 @@ class TrainControllerUI(QMainWindow):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.timingMultiplier.connect(self.signal_period)
+        self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
+
         masterSignals.clockSignal.connect(self.sysTime.setTime)
-        self.timer.setInterval(self.tcVariables["period"])
 
         self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
         self.systemSpeedInput.setText(
-            "x" + format(1 / (self.tcVariables["period"] / 1000), ".3f")
+            "x" + format(1 / (self.tcVariables["samplePeriod"] / 1000), ".3f")
         )
+        self.timer.setInterval(self.tcVariables["samplePeriod"])
 
         hours, minutes, seconds = map(int, self.systemTimeInput.text().split(":"))
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
-        self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 
         print(self.sysTime.toString("HH:mm:ss"))
 
     def signal_period(self, period):
-        self.tcVariables["period"] = period
+        self.tcVariables["samplePeriod"] = period
         return
 
     def signal_speedLimit(self, id, speedLimit):
@@ -1354,19 +1389,21 @@ class TrainControllerUI(QMainWindow):
         return
 
     def speed_up(self):
-        self.tcVariables["period"] = int(self.tcVariables["period"] / 10)
-        if self.tcVariables["period"] == 0:
-            self.tcVariables["period"] = 1
+        self.tcVariables["samplePeriod"] = int(self.tcVariables["samplePeriod"] / 10)
+        if self.tcVariables["samplePeriod"] == 0:
+            self.tcVariables["samplePeriod"] = 1
         return
 
     def slow_down(self):
-        self.tcVariables["period"] = int(self.tcVariables["period"] * 10)
-        if self.tcVariables["period"] >= 10000:
-            self.tcVariables["period"] = 10000
+        self.tcVariables["samplePeriod"] = int(self.tcVariables["samplePeriod"] * 10)
+        if self.tcVariables["samplePeriod"] >= 10000:
+            self.tcVariables["samplePeriod"] = 10000
         return
 
     def change_train(self):
-        self.tcVariables["trainID"] = self.trainNumberCombo.currentText()
+        if self.trainNumberCombo.currentText() == "":
+            return
+        self.tcVariables["trainID"] = self.trainLineCombo.currentText() + "_" + self.trainNumberCombo.currentText()
 
     def send_announcement(self):
         self.tcVariables["customAnnouncement"] = self.announcementEdit.text()
