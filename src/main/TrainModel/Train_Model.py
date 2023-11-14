@@ -2,7 +2,7 @@ from re import T
 import sys
 from turtle import Turtle
 from PyQt5 import QtGui
-from PyQt5.QtCore import QCoreApplication, QRect, QSize, Qt, QTimer, QTime
+from PyQt5.QtCore import QCoreApplication, QRect, QSize, Qt, QTimer, QTime, QDateTime
 from PyQt5.QtGui import QCursor, QFont, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
@@ -19,9 +19,9 @@ from PyQt5.QtWidgets import (
 )
 
 from qtwidgets import AnimatedToggle
+from signals import masterSignals, trainControllerSWToTrainModel, trainModelToTrainController
 
 # from Signals import TrackModelSignals, TrainControllerSignals
-
 
 class TrainModel(QMainWindow):
     # Font variables
@@ -49,10 +49,17 @@ class TrainModel(QMainWindow):
         super().__init__()
         self.trains = SharedData()
 
-        # QTimer for system clock
+        self.time_interval = 1
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.setSystemTime)
-        self.timer.start(500)
+        self.timer.timeout.connect(
+            self.update
+        )  # Connect the timer to the update_text function
+        self.timer.start(
+            self.time_interval
+        )  # Update the text every 1000 milliseconds (1 second)
+
+        self.sysTime = QDateTime.currentDateTime()
+        self.sysTime.setTime(QTime(0, 0, 0))
 
         """ Header Template """
 
@@ -231,13 +238,23 @@ class TrainModel(QMainWindow):
         self.results_window = ResultsWindow(selected_item, self.trains)
         self.results_window.show()
 
-    def setSystemTime(self):
-        time = QTime.currentTime()
-        time_text = time.toString("hh:mm:ss")
-        self.systemTimeInput.setText(time_text)
-
     def show_gui(self):
         self.show()
+        
+    def signal_period(self, period):
+        self.time_interval = period
+    
+    def update(self):
+        # system time
+        # self.sysTime = self.sysTime.addSecs(1)
+        masterSignals.timingMultiplier.connect(self.signal_period)
+        masterSignals.clockSignal.connect(self.sysTime.setTime)
+        self.timer.setInterval(self.time_interval)
+
+        self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
+        self.systemSpeedInput.setText("x" + format(1 / (self.time_interval / 1000), ".3f"))
+        
+    
 
 
 class ResultsWindow(QMainWindow):
@@ -267,10 +284,17 @@ class ResultsWindow(QMainWindow):
         super().__init__()
         self.trains = trains
 
-        # QTimer for system clock
+        self.time_interval = 1
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.setSystemTime)
-        self.timer.start(1000)
+        self.timer.timeout.connect(
+            self.update
+        )  # Connect the timer to the update_text function
+        self.timer.start(
+            self.time_interval
+        )  # Update the text every 1000 milliseconds (1 second)
+
+        self.sysTime = QDateTime.currentDateTime()
+        self.sysTime.setTime(QTime(0, 0, 0))
 
         """ Header Template """
 
@@ -833,22 +857,11 @@ class ResultsWindow(QMainWindow):
             )
         )
 
-    def setSystemTime(self):
-        time = QTime.currentTime()
-        time_text = time.toString("hh:mm:ss")
-        self.systemTimeInput.setText(time_text)
-
     def update_failure_status(self, train_name, key, state):
         # Sets the value of the dictionary value for the failure variables
         self.trains.set_value(train_name, "failure_status", key, state)
 
     def update_ui(self):
-        if self.selected_train_name in self.trains.trains:
-            train_data = self.trains.trains[self.selected_train_name]
-            self.vehicle_status = train_data.get("vehicle_status", {})
-            self.passenger_status = train_data.get("passenger_status", {})
-            self.navigation_status = train_data.get("navigation_status", {})
-
             if self.vehicle_word_list:
                 # Update each UI element with the corresponding variable from the SharedData dictionary class
                 for i, word_placeholders in enumerate(self.vehicle_word_list):
@@ -873,6 +886,7 @@ class ResultsWindow(QMainWindow):
                         .lower()
                         .replace(" ", "_")
                     )
+                    print("SharedData.data:", SharedData.data)
                     word_value = SharedData.data.get(word_key, "N/A")
 
                     label_text = word_placeholders.format(word_value)
@@ -894,6 +908,66 @@ class ResultsWindow(QMainWindow):
 
                     # Update the text of the QLabel
                     self.navigation_labels[i].setText(label_text)
+    
+    def signal_period(self, period):
+        self.time_interval = period
+    
+    def update(self):
+        # system time
+        # self.sysTime = self.sysTime.addSecs(1)
+        masterSignals.timingMultiplier.connect(self.signal_period)
+        masterSignals.clockSignal.connect(self.sysTime.setTime)
+        self.timer.setInterval(self.time_interval)
+
+        self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
+        self.systemSpeedInput.setText("x" + format(1 / (self.time_interval / 1000), ".3f"))
+        
+        # Signals that connect from the train controller to the train model
+        trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
+        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(self.signal_emergency_brake)
+        trainControllerSWToTrainModel.sendDriverServiceBrake.connect(self.signal_brake)
+        trainControllerSWToTrainModel.sendAnnouncement.connect(self.signal_announcement)
+        trainControllerSWToTrainModel.sendHeadlightState.connect(self.signal_headlights)
+        trainControllerSWToTrainModel.sendInteriorLightState.connect(self.signal_interrior_lights)
+        trainControllerSWToTrainModel.sendLeftDoorState.connect(self.signal_left_door)
+        trainControllerSWToTrainModel.sendRightDoorState.connect(self.signal_right_door)
+        trainControllerSWToTrainModel.sendSetpointTemperature.connect(self.signal_temperature)
+        trainControllerSWToTrainModel.sendAdvertisement.connect(self.signal_advertisements)
+
+    # Functions to set 
+    def signal_power(self, train, power):
+        self.trains.set_value("Train 1", "vehicle_status", 8, power)
+        
+    def signal_emergency_brake(self, train, e_brake):
+        self.trains.set_value("Train 1", "failure_status", 4, e_brake)
+    
+    def signal_brake(self, train, brake):
+        self.trains.set_value("Train 1", "vehicle_status", 7, brake)
+        
+    def signal_announcement(self, train, announcement):
+        self.trains.set_value("Train 1", "passenger_status", 6, announcement)
+        
+    def signal_headlights(self, train, headlights):
+        self.trains.set_value("Train 1", "navigation_status", 7, headlights)
+        
+    def signal_interrior_lights(self, train, in_lights):
+        self.trains.set_value("Train 1", "passenger_status", 5, in_lights)
+        
+    def signal_left_door(self, train, left_door):
+        self.trains.set_value("Train 1", "passenger_status", 3, left_door)
+    
+    def signal_right_door(self, train, right_door):
+        self.trains.set_value("Train 1", "passenger_status", 4, right_door)
+        
+    def signal_temperature(self, train, temp):
+        self.trains.set_value("Train 1", "passenger_status", 7, temp)
+        
+    def signal_advertisements(self, train, advertisements):
+        self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
+ 
+        
+        
+    
 
 
 class SharedData:
@@ -901,15 +975,15 @@ class SharedData:
         self.trains = {
             "Train 1": {
                 "vehicle_status": {
-                    "speed_limit": 35,
-                    "current_speed": 45,
-                    "setpoint_speed": 55,
-                    "commanded_speed": 40,
-                    "acceleration": 3.5,
-                    "deceleration": 2.0,
-                    "brakes": True,
-                    "power": 75.0,
-                    "power_limit": 100.0,
+                    "speed_limit": 0,
+                    "current_speed": 0,
+                    "setpoint_speed": 0,
+                    "commanded_speed": 0,
+                    "acceleration": 0,
+                    "deceleration": 0,
+                    "brakes": False,
+                    "power": 0,
+                    "power_limit": 0,
                 },
                 "failure_status": {
                     "engine_failure": False,
@@ -918,24 +992,24 @@ class SharedData:
                     "emergency_brake": False,
                 },
                 "passenger_status": {
-                    "passengers": 42,
-                    "passenger_limit": 50,
+                    "passengers": 0,
+                    "passenger_limit": 0,
                     "left_door": False,
-                    "right_door": True,
-                    "lights_status": True,
-                    "announcements": True,
-                    "temperature": 72,
+                    "right_door": False,
+                    "lights_status": False,
+                    "announcements": False,
+                    "temperature": 0,
                     "air_conditioning": False,
-                    "advertisements": "Buy Drinks",
+                    "advertisements": 0,
                 },
                 "navigation_status": {
-                    "authority": 5,
-                    "beacon": 6,
-                    "block_length": 2,
-                    "block_grade": 15,
-                    "next_station": 9,
-                    "prev_station": 5,
-                    "headlights": True,
+                    "authority": 0,
+                    "beacon": 0,
+                    "block_length": 0,
+                    "block_grade": 0,
+                    "next_station": 0,
+                    "prev_station": 0,
+                    "headlights": False,
                     "passenger_emergency_brake": False,
                 },
             },
@@ -2781,7 +2855,6 @@ class Calculations:
         station_name = beacon_data["Station"]["Name"]
         station_distance = beacon_data["Station"]["Distance"]
         door = beacon_data["Station"]["Side"]
-        tunnel = train_inputs["Tunnel"]
         switch = beacon_data["Switch"]["Distance"]
 
         # Sets the door status and sends to train controller
@@ -2889,32 +2962,32 @@ class Calculations:
         return currentPassengers
 
     def occupancy(self):
-        total_distance = 0
-        occupancy = 0
+        self.total_distance = 0
+        self.occupancy = 0
         track_model_in = InputsTrackModel()
         track_model_in = track_model_in.get_Track_Model_Inputs()
         track_model_out = OutputTrackModel()
         block_length = track_model_in["Block Length"]
 
         current_speed = Calculations()
-        current_speed = current_speed.Current_speed_auto()
+        current_speed = current_speed.current_speed()
 
-        total_distance = current_speed * QTimer()
+        self.total_distance = current_speed * QTimer()
 
-        if total_distance == block_length:
+        if self.total_distance == block_length:
             total_distance = 0
             occupancy = 1
             track_model_out.occupancy = True
 
-        return occupancy
+        return self.occupancy
 
 
-def main():
-    app = QApplication(sys.argv)
-    ui = TrainModel()
-    ui.show_gui()
-    sys.exit(app.exec_())
+# def main():
+#     app = QApplication(sys.argv)
+#     ui = TrainModel()
+#     ui.show_gui()
+#     sys.exit(app.exec_())
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
