@@ -1,10 +1,11 @@
 import sys
 import re
-from TrackData import TrackData
-from Station import Station
+from .TrackData import TrackData
+from .Station import Station
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+
 # from signals import trackModeltoTrainModel, trackModelToCTC, trackModelToTrackController
 
 MTA_STYLING = {
@@ -29,6 +30,7 @@ MTA_STYLING = {
     "h": 960,
     # "moduleName": 'CTC'
 }
+
 
 class TrackView(QGraphicsView):
     def __init__(self, parent):
@@ -614,7 +616,7 @@ class TrackView(QGraphicsView):
         path_96.moveTo(-188, 473)
         path_96.quadTo(-182, 476, -179, 482)
         block_96 = self.createTrackBlock(path_96, "Block 96")
-        self.scene.addItem(block_96) 
+        self.scene.addItem(block_96)
 
         path_97 = QPainterPath()
         path_97.moveTo(-175, 491)
@@ -939,7 +941,7 @@ class TrackView(QGraphicsView):
         path_150.cubicTo(-207, 202, -179, 188, -177, 188)
         block_150 = self.createTrackBlock(path_150, "Block 150")
         self.scene.addItem(block_150)
-      
+
     def drawRedLine(self):
         path1 = QPainterPath()
         path1.moveTo(0, 0)
@@ -1117,7 +1119,7 @@ class TrackModel:
         self.setup_selection_window()
 
     def setup_selection_window(self):
-        app = QApplication(sys.argv) #Don't need for main.py
+        # app = QApplication(sys.argv) #Don't need for main.py
         self.mainWindow = QMainWindow()
         self.mainWindow.setGeometry(960, 35, 960, 1045)
         self.mainWindow.setWindowTitle(self.moduleName)
@@ -1160,8 +1162,8 @@ class TrackModel:
         self.map_toggle()
 
         # Hide by default
-        self.mainWindow.show()
-        sys.exit(app.exec_())
+        # self.mainWindow.show()
+        # sys.exit(app.exec_())
 
     def load_data(self):
         # Preload track data
@@ -1390,7 +1392,7 @@ class TrackModel:
 
         # Set Base Line to Red
         self.change_button_color(MTA_STYLING["green"])
-        self.toggle_green_data() ################
+        self.toggle_green_data()  ################
 
         # Connect button click events to change the background color when selected
         self.greenLineButton.clicked.connect(
@@ -1548,8 +1550,8 @@ class TrackModel:
     #     self.filePath.setStyleSheet("color: #008000; font-size: 9px;")
 
     # def update_file_path(self, filePath):
-        # When file is selected, its path is shown
-        # self.filePath.setText("Selected File:\n" + filePath)
+    # When file is selected, its path is shown
+    # self.filePath.setText("Selected File:\n" + filePath)
 
     def add_import_button(self):
         importButton = QPushButton("Import Track Data", self.mainWindow)
@@ -2195,6 +2197,7 @@ class TrackModel:
     #                 failuresStr = "None"
     #             block["Failures"] = failuresStr
     #     self.update_block_info_display
+
 
 #     def show_testbench(self):
 #         testbenchWindow = TestbenchWindow()

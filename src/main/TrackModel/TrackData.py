@@ -1,5 +1,7 @@
 import pandas as pd
-from Station import Station
+from .Station import Station
+
+
 class TrackData:
     redTrackData = {}
     greenTrackData = {}
@@ -31,131 +33,131 @@ class TrackData:
             block["Suggested Speed"] = 0
             block["Authority"] = 0
             if lineName == "Green Line":
-                if block["Block Number"] ==  2: #Section A, Pioneer
+                if block["Block Number"] == 2:  # Section A, Pioneer
                     block["Beacon"] = {
                         "Next Station1": "Station",
                         "Next Station2": "",
                         "Current Station": "Pioneer",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  9: #Section C, Edgebrook
+                if block["Block Number"] == 9:  # Section C, Edgebrook
                     block["Beacon"] = {
                         "Next Station1": "Pioneer",
                         "Next Station2": "",
                         "Current Station": "Edgebrook",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  16: #Section D, Station
+                if block["Block Number"] == 16:  # Section D, Station
                     block["Beacon"] = {
                         "Next Station1": "Edgebrook",
                         "Next Station2": "Whited",
                         "Current Station": "Station",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  22: #Section F, Whited
+                if block["Block Number"] == 22:  # Section F, Whited
                     block["Beacon"] = {
                         "Next Station1": "Station",
                         "Next Station2": "South Bank",
                         "Current Station": "Whited",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  31: #Section G, South Bank
+                if block["Block Number"] == 31:  # Section G, South Bank
                     block["Beacon"] = {
                         "Next Station1": "Central",
                         "Next Station2": "",
                         "Current Station": "South Bank",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  39: #Section I, Central
+                if block["Block Number"] == 39:  # Section I, Central
                     block["Beacon"] = {
                         "Next Station1": "Inglewood",
                         "Next Station2": "",
                         "Current Station": "Central",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  48: #Section I, Inglewood
+                if block["Block Number"] == 48:  # Section I, Inglewood
                     block["Beacon"] = {
                         "Next Station1": "Overbrook",
                         "Next Station2": "",
                         "Current Station": "Inglewood",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  57: #Section I, Overbrook
+                if block["Block Number"] == 57:  # Section I, Overbrook
                     block["Beacon"] = {
                         "Next Station1": "Glenbury",
                         "Next Station2": "",
                         "Current Station": "Overbrook",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  65: #Section K, Glenbury
+                if block["Block Number"] == 65:  # Section K, Glenbury
                     block["Beacon"] = {
                         "Next Station1": "Dormont",
                         "Next Station2": "",
                         "Current Station": "Glenbury",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  73: #Section L, Dormont
+                if block["Block Number"] == 73:  # Section L, Dormont
                     block["Beacon"] = {
                         "Next Station1": "Mt Lebanon",
                         "Next Station2": "",
                         "Current Station": "Dormont",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  77: #Section N, Mt Lebanon
+                if block["Block Number"] == 77:  # Section N, Mt Lebanon
                     block["Beacon"] = {
                         "Next Station1": "Poplar",
                         "Next Station2": "Dormont",
                         "Current Station": "Mt Lebanon",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  88: #Section O, Poplar
+                if block["Block Number"] == 88:  # Section O, Poplar
                     block["Beacon"] = {
                         "Next Station1": "Castle Shannon",
                         "Next Station2": "Mt Lebanon",
                         "Current Station": "Poplar",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  96: #Section P, Castle Shannon
+                if block["Block Number"] == 96:  # Section P, Castle Shannon
                     block["Beacon"] = {
                         "Next Station1": "Mt Lebanon",
                         "Next Station2": "",
                         "Current Station": "Castle Shannon",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  105: #Section T, Dormont
+                if block["Block Number"] == 105:  # Section T, Dormont
                     block["Beacon"] = {
                         "Next Station1": "Glenbury",
                         "Next Station2": "",
                         "Current Station": "Dormont",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  114: #Section U, Glenbury
+                if block["Block Number"] == 114:  # Section U, Glenbury
                     block["Beacon"] = {
                         "Next Station1": "Overbrook",
                         "Next Station2": "",
                         "Current Station": "Glenbury",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  123: #Section W, Overbrook
+                if block["Block Number"] == 123:  # Section W, Overbrook
                     block["Beacon"] = {
                         "Next Station1": "Inglewood",
                         "Next Station2": "",
                         "Current Station": "Overbrook",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  132: #Section W, Inglewood
+                if block["Block Number"] == 132:  # Section W, Inglewood
                     block["Beacon"] = {
                         "Next Station1": "Central",
                         "Next Station2": "",
                         "Current Station": "Inglewood",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
-                if block["Block Number"] ==  141: #Section W, Central
+                if block["Block Number"] == 141:  # Section W, Central
                     block["Beacon"] = {
                         "Next Station1": "Whited",
                         "Next Station2": "",
                         "Current Station": "Central",
-                        "Door Side": block["Station Side"]
+                        "Door Side": block["Station Side"],
                     }
 
     def set_data(self, line, data):
