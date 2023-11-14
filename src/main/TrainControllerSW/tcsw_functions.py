@@ -61,7 +61,11 @@ class TCFunctions:
                 trainObject.set_speedLimit(15)
 
     def station_operations(self, trainObject):
-        if (trainObject.block["isStation"]) and (trainObject.get_currentSpeed() == 0):
+        if (
+            (trainObject.block["isStation"])
+            and (trainObject.get_currentSpeed() == 0)
+            and (not trainObject.get_authority())
+        ):
             trainObject.set_interiorLights(True)
             trainObject.set_leftDoor(trainObject.beacon["leftStation"])
             trainObject.set_rightDoor(trainObject.beacon["rightStation"])
@@ -124,9 +128,11 @@ class TCFunctions:
 
     def update_block_info(self, blockDict, trainObject):
         if trainObject.prevPolarity != trainObject.polarity:
-            if self.find_block(self.blockDict, trainObject.prevStop) < self.find_block(
-                self.blockDict, trainObject.nextStop
-            ):
+            if trainObject.prevStop == trainObject.nextStop:
+                trainObject.block["blockNumber"] += 0
+            elif self.find_block(
+                self.blockDict, trainObject.prevStop
+            ) < self.find_block(self.blockDict, trainObject.nextStop):
                 trainObject.block["blockNumber"] += 1
             else:
                 trainObject.block["blockNumber"] -= 1

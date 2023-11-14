@@ -20,7 +20,7 @@ class Train:
 
         # train model inputs
         self.speedLimit = 0
-        self.authority = False
+        self.authority = True
         self.commandedSpeed = 0
         self.currentSpeed = 0
         self.engineFailure = False

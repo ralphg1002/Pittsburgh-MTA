@@ -33,7 +33,12 @@ class TestWindow(QMainWindow):
 
     # variables
     tcObject = TCFunctions()
-    testbenchVariables = {"trainID": "", "speedLimit": 0, "authority": 0}
+    testbenchVariables = {
+        "trainID": "",
+        "speedLimit": 0,
+        "authority": 0,
+        "trainList": [],
+    }
 
     def __init__(self):
         super().__init__()
@@ -72,23 +77,16 @@ class TestWindow(QMainWindow):
         self.box_label(self.buttonBox, 230, 492 - self.headerBlock.height() - 40)
         self.set_relative_right(self.buttonBox, self.editBox, 20)
 
-        self.selectTrainLabel = QLabel("Select a Train", self)
-        self.text_label(self.selectTrainLabel)
-        self.set_relative_below_right(self.selectTrainLabel, self.trainBox, 10)
-
-        self.trainCombo = QComboBox(self)
-        self.text_label(self.trainCombo)
-        self.set_relative_right(self.trainCombo, self.selectTrainLabel, 10)
-        self.set_relative_before_right_end(self.trainCombo, self.trainBox, 10)
-
         self.addTrainLabel = QLabel("Add Train", self)
         self.text_label(self.addTrainLabel)
-        self.set_relative_below(self.addTrainLabel, self.selectTrainLabel, 20)
+        self.set_relative_below_right(self.addTrainLabel, self.trainBox, 10)
 
         self.sendLabel = QPushButton(self)
         self.png_button(
             self.sendLabel,
-            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send.svg").scaled(32, 32),
+            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-red.svg").scaled(
+                32, 32
+            ),
         )
         self.sendLabel.adjustSize()
         self.set_relative_below(self.sendLabel, self.addTrainLabel, 10)
@@ -96,8 +94,38 @@ class TestWindow(QMainWindow):
 
         self.addTrainEdit = QLineEdit(self)
         self.text_label(self.addTrainEdit)
+        self.addTrainEdit.setStyleSheet("color: red")
         self.set_relative_below(self.addTrainEdit, self.addTrainLabel, 10)
         self.addTrainEdit.setFixedWidth(self.sendLabel.x() - self.addTrainEdit.x() - 10)
+
+        self.sendLabel2 = QPushButton(self)
+        self.png_button(
+            self.sendLabel2,
+            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-green.svg").scaled(
+                32, 32
+            ),
+        )
+        self.sendLabel2.adjustSize()
+        self.set_relative_below(self.sendLabel2, self.addTrainEdit, 10)
+        self.set_relative_before_right_end(self.sendLabel2, self.trainBox, 10)
+
+        self.addTrainEdit2 = QLineEdit(self)
+        self.text_label(self.addTrainEdit2)
+        self.addTrainEdit2.setStyleSheet("color: green")
+        self.set_relative_below(self.addTrainEdit2, self.addTrainEdit, 10)
+        self.addTrainEdit.setFixedWidth(
+            self.sendLabel2.x() - self.addTrainEdit.x() - 10
+        )
+
+        self.selectTrainLabel = QLabel("Select a Train", self)
+        self.text_label(self.selectTrainLabel)
+        self.set_relative_below(self.selectTrainLabel, self.addTrainEdit2, 10)
+
+        self.selectTrainCombo = QComboBox(self)
+        self.text_label(self.selectTrainCombo)
+        self.selectTrainCombo.addItem("Select")
+        self.set_relative_right(self.selectTrainCombo, self.selectTrainLabel, 20)
+        self.selectTrainCombo.currentTextChanged.connect(lambda: self.select_train())
 
         self.speedLimitLabel = QLabel("Speed Limit", self)
         self.text_label(self.speedLimitLabel)
@@ -224,15 +252,16 @@ class TestWindow(QMainWindow):
         self.rightSideButton.setCheckable(True)
         self.set_relative_right(self.rightSideButton, self.leftSideButton, 20)
 
-        self.beaconButton = QPushButton("Send Beacon Data", self)
+        self.beaconButton = QPushButton("Modify Static Data", self)
         self.text_label(self.beaconButton)
         self.beaconButton.setStyleSheet("color: " + self.colorDarkGreen)
         self.set_relative_below(self.beaconButton, self.leftSideButton, 20)
 
         # signals
-        self.testbenchVariables["trainID"] = self.trainCombo.currentText()
-        self.sendLabel.clicked.connect(lambda: self.add_train())
-        self.trainCombo.currentTextChanged.connect(lambda: self.select_train())
+        self.sendLabel.clicked.connect(lambda: self.add_train("red", self.addTrainEdit))
+        self.sendLabel2.clicked.connect(
+            lambda: self.add_train("green", self.addTrainEdit2)
+        )
         self.speedLimitVal.valueChanged.connect(lambda: self.speed_limit())
         self.authorityButton.clicked.connect(lambda: self.authority_val())
         self.commandedSpeedVal.valueChanged.connect(lambda: self.commanded_speed())
@@ -244,6 +273,22 @@ class TestWindow(QMainWindow):
         self.beaconButton.clicked.connect(lambda: self.send_beacon())
         self.polarityButton.clicked.connect(lambda: self.send_polarity())
         self.passengerBrakeButton.clicked.connect(lambda: self.set_paxEbrake())
+
+    def select_train(self):
+        self.testbenchVariables["trainID"] = self.selectTrainCombo.currentText()
+
+    def refresh_train_list(self, nameList, trainList):
+        for train in nameList:
+            trainCheck = False
+            for index in range(self.selectTrainCombo.count()):
+                if self.selectTrainCombo.itemText(index) == train:
+                    trainCheck = True
+            if not trainCheck:
+                self.selectTrainCombo.addItem(train)
+
+        self.tcObject.trainList.clear()
+        for train in trainList:
+            self.tcObject.add_train(train)
 
     def set_paxEbrake(self):
         for train in self.tcObject.trainList:
@@ -311,12 +356,9 @@ class TestWindow(QMainWindow):
             if train.get_trainID() == self.testbenchVariables["trainID"]:
                 train.set_speedLimit(self.speedLimitVal.value())
 
-    def add_train(self):
-        self.trainCombo.addItem(self.addTrainEdit.text())
-        self.tcObject.add_train(Train(self.addTrainEdit.text()))
-
-    def select_train(self):
-        self.testbenchVariables["trainID"] = self.trainCombo.currentText()
+    def add_train(self, line, edit):
+        train = {line: edit.text()}
+        self.testbenchVariables["trainList"].append(train)
 
     def text_label(self, label):
         label.setFont(QFont(self.fontStyle, self.textFontSize))

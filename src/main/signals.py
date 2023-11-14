@@ -24,6 +24,7 @@ class TrackControllerToTrackModel(QObject):
 class TrainModelToTrackModel(QObject):
     sendCurrentPassengers = pyqtSignal(int)
 
+
 class TrainModelToTrainController(QObject):
     sendSpeedLimit = pyqtSignal(str, int)
     sendAuthority = pyqtSignal(str, bool)
@@ -63,6 +64,7 @@ class Master(QObject):
     # Instantiate timing signals
     timingMultiplier = pyqtSignal(int)
     clockSignal = pyqtSignal(QTime)
+    addTrain = pyqtSignal(str, str)  # (line, id)
 
 
 # Instantiation for signals sent from Track Controller

@@ -306,6 +306,11 @@ class TrainControllerUI(QMainWindow):
         self.pixmapAd2 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad2.png")
         self.pixmapAd3 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad3.png")
 
+        self.pixmapAnnouncement = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/announcement.svg"
+        )
+        self.pixmapAnnouncement = self.pixmapAnnouncement.scaled(32, 32)
+
         # Train change section
         self.trainChangeBox = QLabel("", self)
         self.box_label(self.trainChangeBox, 245, 200)
@@ -330,8 +335,10 @@ class TrainControllerUI(QMainWindow):
         )
         self.set_relative_right(self.trainLineCombo, self.trainLineLabel, 20)
         self.set_relative_before_right_end(self.trainLineCombo, self.trainChangeBox, 10)
+        self.trainLineCombo.addItem("red")
+        self.trainLineCombo.addItem("green")
 
-        self.trainNumberLabel = QLabel("Number", self)
+        self.trainNumberLabel = QLabel("Train Name", self)
         self.text_label(self.trainNumberLabel)
         self.set_relative_below(self.trainNumberLabel, self.trainLineLabel, 20)
 
@@ -721,9 +728,19 @@ class TrainControllerUI(QMainWindow):
             self.trainLabel, self.travelledLine, -1 * math.floor(48 / 532 * 532)
         )
 
+        self.announceIcon = QLabel(self)
+        self.text_label(self.announceIcon)
+        self.png_label(self.announceIcon, self.pixmapAnnouncement)
+        self.announceIcon.adjustSize()
+        self.set_relative_below(self.announceIcon, self.originCircle, 10)
+
+        self.announceVal = QLabel(self)
+        self.text_label(self.announceVal)
+        self.set_relative_right(self.announceVal, self.announceIcon, 20)
+
         self.displayBox.setFixedHeight(
-            self.originCircle.y()
-            + self.originCircle.height()
+            self.announceIcon.y()
+            + self.announceIcon.height()
             + 10
             - self.displayBox.y()
         )
@@ -837,7 +854,7 @@ class TrainControllerUI(QMainWindow):
         # Failure block
         self.failLabel = QLabel("Status", self)
         self.header_label(self.failLabel)
-        self.set_relative_below(self.failLabel, self.displayBox, 55)
+        self.set_relative_below(self.failLabel, self.displayBox, 14)
 
         self.failBox = QLabel(self)
         self.box_label(self.failBox, self.displayBox.width(), 185)
@@ -909,7 +926,7 @@ class TrainControllerUI(QMainWindow):
             self.update
         )  # Connect the timer to the update_text function
         self.timer.start(
-            self.tcVariables["period"]
+            self.tcVariables["samplePeriod"]
         )  # Update the text every 1000 milliseconds (1 second)
 
         self.sysTime = QDateTime.currentDateTime()
@@ -917,16 +934,50 @@ class TrainControllerUI(QMainWindow):
 
     def update(self):
         # Update Train ID list
-        self.trainNumberCombo.clear()
-        for train in self.testWindow.tcObject.trainList:
-            self.trainNumberCombo.addItem(train.get_trainID())
+        # from test bench
+        for train in self.testWindow.testbenchVariables["trainList"]:
+            idCheck = False
+            for i in self.tcVariables["trainList"]:
+                if i == train:
+                    idCheck = True
+            if not idCheck:
+                self.tcVariables["trainList"].append(train)
 
-        self.tcVariables["trainList"] = self.testWindow.tcObject.trainList
+        # from CTC
+        masterSignals.addTrain.connect(lambda: self.signal_addTrain)
+
+        if self.trainLineCombo.currentText() == "red":
+            self.trainNumberCombo.clear()
+
+            for train in self.tcVariables["trainList"]:
+                if isinstance(train, dict) and "red" in train:
+                    self.trainNumberCombo.addItem(train["red"])
+
+        if self.trainLineCombo.currentText() == "green":
+            self.trainNumberCombo.clear()
+
+            for train in self.tcVariables["trainList"]:
+                if isinstance(train, dict) and "green" in train:
+                    self.trainNumberCombo.addItem(train["green"])
+
+        updatedTrainList = []
+        for train in self.tcVariables["trainList"]:
+            if isinstance(train, dict):
+                for key, value in train.items():
+                    updatedTrainList.append(key + "_" + value)
+
+        self.testWindow.refresh_train_list(updatedTrainList, self.tcFunctions.trainList)
+
+        for name in updatedTrainList:
+            idCheck2 = False
+            for train in self.tcFunctions.trainList:
+                if train.get_trainID() == name:
+                    idCheck2 = True
+            if not idCheck2:
+                self.tcFunctions.add_train(Train(name))
 
         # Update Train ID and attributes
-        self.trainIDLabel.setText(
-            "Train #: " + self.testWindow.testbenchVariables["trainID"]
-        )
+        self.trainIDLabel.setText("Train #: " + self.tcVariables["trainID"])
 
         # SIGNAL INTEGRATION: TM -> TCSW
         trainModelToTrainController.sendSpeedLimit.connect(self.signal_speedLimit)
@@ -951,8 +1002,8 @@ class TrainControllerUI(QMainWindow):
         trainModelToTrainController.sendBrakeFailure.connect(self.signal_brakeFail)
         trainModelToTrainController.sendPolarity.connect(self.signal_polarity)
 
-        for train in self.testWindow.tcObject.trainList:
-            if train.get_trainID() == self.testWindow.testbenchVariables["trainID"]:
+        for train in self.tcFunctions.trainList:
+            if train.get_trainID() == self.tcVariables["trainID"]:
                 # TRAIN MODEL INPUTS
                 # current temp
                 self.currentTempLabel.setText(str(train.get_currentTemp()) + " °F")
@@ -1102,9 +1153,24 @@ class TrainControllerUI(QMainWindow):
 
                     # an individual automatic
                     if self.announcementCombo.currentIndex() == 0:
+                        print(
+                            f'{not train.get_authority()}, {train.block["isStation"]}, {train.get_currentSpeed() == 0}'
+                        )
+                        if (
+                            (not train.get_authority())
+                            and (train.block["isStation"])
+                            and (train.get_currentSpeed() == 0)
+                        ):
+                            train.set_announcement(
+                                "This is " + train.beacon["currStop"] + "."
+                            )
+                        else:
+                            train.set_announcement("")
+
                         self.announcementEdit.setDisabled(True)
                         self.sendLabel.setDisabled(True)
                     else:
+                        train.set_announcement(self.tcVariables["customAnnouncement"])
                         self.announcementEdit.setDisabled(False)
                         self.sendLabel.setDisabled(False)
 
@@ -1133,16 +1199,6 @@ class TrainControllerUI(QMainWindow):
                     else:
                         train.set_rightDoor(False)
 
-                    if self.announcementCombo.currentIndex() == 0:
-                        if train.block["isStation"] and train.get_currentSpeed == 0:
-                            train.set_announcement(
-                                "This is " + train.beacon["currStop"] + "."
-                            )
-                        else:
-                            train.set_announcement("")
-                    else:
-                        train.set_announcement(self.tcVariables["customAnnouncement"])
-
                     train.set_setpointTemp(self.setpointTempVal.value())
 
                     if self.adCombo.currentIndex() == 0:
@@ -1162,6 +1218,10 @@ class TrainControllerUI(QMainWindow):
                 train.set_paxEbrake(False)
 
                 # updating display
+                self.announceVal.setText(train.get_announcement())
+                self.announceVal.adjustSize()
+                self.announceVal.setAlignment(Qt.AlignLeft)
+
                 self.nextStopLabel.setText("Next Stop:\n" + train.nextStop)
                 self.nextStopLabel.setAlignment(Qt.AlignRight)
                 self.nextStopLabel.adjustSize()
@@ -1241,22 +1301,32 @@ class TrainControllerUI(QMainWindow):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.timingMultiplier.connect(self.signal_period)
+        self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
+
         masterSignals.clockSignal.connect(self.sysTime.setTime)
-        self.timer.setInterval(self.tcVariables["period"])
 
         self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
         self.systemSpeedInput.setText(
-            "x" + format(1 / (self.tcVariables["period"] / 1000), ".3f")
+            "x" + format(1 / (self.tcVariables["samplePeriod"] / 1000), ".3f")
         )
+        self.timer.setInterval(self.tcVariables["samplePeriod"])
 
         hours, minutes, seconds = map(int, self.systemTimeInput.text().split(":"))
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
-        self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 
         print(self.sysTime.toString("HH:mm:ss"))
 
+    def signal_addTrain(self, line, id):
+        train = {line: id}
+        idCheck = False
+        for i in self.tcVariables["trainList"]:
+            if i == train:
+                idCheck = True
+        if not idCheck:
+            self.tcVariables["trainList"].append(train)
+
     def signal_period(self, period):
-        self.tcVariables["period"] = period
+        self.tcVariables["samplePeriod"] = period
         return
 
     def signal_speedLimit(self, id, speedLimit):
@@ -1354,19 +1424,25 @@ class TrainControllerUI(QMainWindow):
         return
 
     def speed_up(self):
-        self.tcVariables["period"] = int(self.tcVariables["period"] / 10)
-        if self.tcVariables["period"] == 0:
-            self.tcVariables["period"] = 1
+        self.tcVariables["samplePeriod"] = int(self.tcVariables["samplePeriod"] / 10)
+        if self.tcVariables["samplePeriod"] == 0:
+            self.tcVariables["samplePeriod"] = 1
         return
 
     def slow_down(self):
-        self.tcVariables["period"] = int(self.tcVariables["period"] * 10)
-        if self.tcVariables["period"] >= 10000:
-            self.tcVariables["period"] = 10000
+        self.tcVariables["samplePeriod"] = int(self.tcVariables["samplePeriod"] * 10)
+        if self.tcVariables["samplePeriod"] >= 10000:
+            self.tcVariables["samplePeriod"] = 10000
         return
 
     def change_train(self):
-        self.tcVariables["trainID"] = self.trainNumberCombo.currentText()
+        if self.trainNumberCombo.currentText() == "":
+            return
+        self.tcVariables["trainID"] = (
+            self.trainLineCombo.currentText()
+            + "_"
+            + self.trainNumberCombo.currentText()
+        )
 
     def send_announcement(self):
         self.tcVariables["customAnnouncement"] = self.announcementEdit.text()

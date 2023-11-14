@@ -4,7 +4,7 @@ import serial
 import time
 
 board = pyfirmata.Arduino
-arduino = serial.Serial(port='COM4', baudrate=11520, timeout=.1)
+arduino = serial.Serial(port="COM4", baudrate=11520, timeout=0.1)
 
 
 class HWTrainController:
@@ -21,8 +21,10 @@ class HWTrainController:
         # Location Variables
         self._currentBlock = 0
         self._currentPolarity = 0
-        self._stationList = np.zeros(20) # TODO: Once track model is finalized, hard code this
-                                         #       array with all stations' block numbers
+        self._stationList = np.zeros(
+            20
+        )  # TODO: Once track model is finalized, hard code this
+        #       array with all stations' block numbers
         # Train State Variables
         self._leftDoor = 0  # 0 for closed or Off
         self._rightDoor = 0
@@ -34,7 +36,7 @@ class HWTrainController:
         self._lastStation = "Yard"
         self._currentTemp = 70
         self._trainID = _id
-        self._nextDoors = '00'
+        self._nextDoors = "00"
         self._announcement = ""
 
         # Power Variables
@@ -77,10 +79,14 @@ class HWTrainController:
         return self._currentTemp
 
     # function to send beacon data
-    def SetBeaconData(self, neighbor1, thisSt, neighbor2, doors): # stations will be sent in order of increasing
-        self._thisStation = thisSt                                # distance from Yard, will be up to hwtc to
-        if self._lastStation == neighbor1:                        # determine which is next and last based on travel
-            self._nextStation = neighbor2                         # direction
+    def SetBeaconData(
+        self, neighbor1, thisSt, neighbor2, doors
+    ):  # stations will be sent in order of increasing
+        self._thisStation = thisSt  # distance from Yard, will be up to hwtc to
+        if (
+            self._lastStation == neighbor1
+        ):  # determine which is next and last based on travel
+            self._nextStation = neighbor2  # direction
         elif self._lastStation == neighbor2:
             self._nextStation = neighbor1
         self._nextDoors = doors
@@ -117,7 +123,9 @@ class HWTrainController:
         power1 = self._K_p * 2 + self._K_i * 2  # TODO: insert power calculation here
         power2 = self._K_p * 2 + self._K_i * 2
         power3 = self._K_p * 2 + self._K_i * 2
-        self._powerToSend = (power1 + power2 + power3)/3  # TODO: change this from an average to a voting algorithm
+        self._powerToSend = (
+            power1 + power2 + power3
+        ) / 3  # TODO: change this from an average to a voting algorithm
 
     def FailureHandler(self, failures=[0, 0, 0]):  # Power Failure at index 2
         for i in range(3):
@@ -128,7 +136,9 @@ class HWTrainController:
             self._inLights = 0
             self._headlights = 0
 
-    def UpdateUI(self):  # TODO: implement arduino communication for sending and receiving booleans from UI
+    def UpdateUI(
+        self,
+    ):  # TODO: implement arduino communication for sending and receiving booleans from UI
         return board
 
     def AutoUpdate(self):
