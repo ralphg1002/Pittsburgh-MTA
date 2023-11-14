@@ -1,7 +1,7 @@
 import sys
 import re
-from .TrackData import TrackData
-from .Station import Station
+from TrackData import TrackData
+from Station import Station
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -1117,7 +1117,7 @@ class TrackModel:
         self.setup_selection_window()
 
     def setup_selection_window(self):
-        # app = QApplication(sys.argv) #Don't need for main.py
+        app = QApplication(sys.argv) #Don't need for main.py
         self.mainWindow = QMainWindow()
         self.mainWindow.setGeometry(960, 35, 960, 1045)
         self.mainWindow.setWindowTitle(self.moduleName)
@@ -1160,8 +1160,8 @@ class TrackModel:
         self.map_toggle()
 
         # Hide by default
-        # self.mainWindow.show()
-        # sys.exit(app.exec_())
+        self.mainWindow.show()
+        sys.exit(app.exec_())
 
     def load_data(self):
         # Preload track data
@@ -1548,8 +1548,8 @@ class TrackModel:
     #     self.filePath.setStyleSheet("color: #008000; font-size: 9px;")
 
     # def update_file_path(self, filePath):
-    #     # When file is selected, its path is shown
-    #     self.filePath.setText("Selected File:\n" + filePath)
+        # When file is selected, its path is shown
+        # self.filePath.setText("Selected File:\n" + filePath)
 
     def add_import_button(self):
         importButton = QPushButton("Import Track Data", self.mainWindow)

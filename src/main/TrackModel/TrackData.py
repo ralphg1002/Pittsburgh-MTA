@@ -1,13 +1,8 @@
 import pandas as pd
-from .Station import Station
-
-
+from Station import Station
 class TrackData:
-    redTrackData = []
-    greenTrackData = []
-    redOccupancy = {}
-    greenOccupancy = {}
-    # trackController = TrackController()
+    redTrackData = {}
+    greenTrackData = {}
 
     def __init__(self):
         self.redTrackData = self.read_track_data(
@@ -28,7 +23,7 @@ class TrackData:
 
     def initialize_data(self, data, lineName):
         # Set default values for track
-        data.insert(0, {"Block Number": 0.0})
+        # data.insert(0, {"Block Number": 0.0}) #<-- not needed
         for block in data:
             block["Failures"] = ["None"]
             block["Occupancy"] = 0
@@ -120,27 +115,27 @@ class TrackData:
     def update_occupancy(self, trainID, line):
         return
 
-    def set_suggested_speed(self):
-        suggested_speed, blockNumber, line = trackController.get_suggested_speed()
-        if line == "Red":
-            for data in self.redTrackData:
-                if data["Block Number"] == blockNumber:
-                    data["Suggested Speed"] = suggested_speed
-        else:
-            for data in self.greenTrackData:
-                if data["Block Number"] == blockNumber:
-                    data["Suggested Speed"] = suggested_speed
+    # def set_suggested_speed(self):
+    #     suggested_speed, blockNumber, line = trackController.get_suggested_speed()
+    #     if line == "Red":
+    #         for data in self.redTrackData:
+    #             if data["Block Number"] == blockNumber:
+    #                 data["Suggested Speed"] = suggested_speed
+    #     else:
+    #         for data in self.greenTrackData:
+    #             if data["Block Number"] == blockNumber:
+    #                 data["Suggested Speed"] = suggested_speed
 
-    def set_authority(self):
-        authority, blockNumber, line = trackController.get_authority()
-        if line == "Red":
-            for data in self.redTrackData:
-                if data["Block Number"] == blockNumber:
-                    data["Authority"] = authority
-        else:
-            for data in self.greenTrackData:
-                if data["Block Number"] == blockNumber:
-                    data["Authority"] = authority
+    # def set_authority(self):
+    #     authority, blockNumber, line = trackController.get_authority()
+    #     if line == "Red":
+    #         for data in self.redTrackData:
+    #             if data["Block Number"] == blockNumber:
+    #                 data["Authority"] = authority
+    #     else:
+    #         for data in self.greenTrackData:
+    #             if data["Block Number"] == blockNumber:
+    #                 data["Authority"] = authority
 
     # Send occupancy to the Track Controller
     def get_occupancy(self, blockNumber):
