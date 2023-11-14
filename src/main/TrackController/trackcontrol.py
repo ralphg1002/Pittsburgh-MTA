@@ -20,29 +20,39 @@ class RunPLC:
         condition = None
         operations = []  # List to store multiple operations
 
-        with open(filename, "r") as file:
-            for line in file:
-                line = line.strip()
+        try:
+            with open(filename, "r") as file:
+                for line in file:
+                    line = line.strip()
 
-                if line.startswith("SW"):
-                    currentSection = line
-                elif line == "IF":
-                    insideIf = True
-                    operations = []  # Initialize operations list for this IF block
-                elif insideIf and line.startswith("Condition"):
-                    condition = line.split(":")[1].strip()
-                elif insideIf and line.startswith("Operation"):
-                    operation = line.split(":")[1].strip()
-                    operations.append(operation)
-                elif line == "END" and insideIf:
-                    data.append(
-                        {
-                            "Section": currentSection,
-                            "Condition": condition,
-                            "Operations": operations,
-                        }
-                    )
-                    insideIf = False
+                    if line.startswith("SW") or line.startswith("CRX"):
+                        currentSection = line
+                        sections = []
+                        ifBlock = 0
+                    elif line == "IF":
+                        insideIf = True
+                        operations = []  # Initialize operations list for this IF block
+                    elif insideIf and line.startswith("Condition"):
+                        condition = line.split(":")[1].strip()
+                    elif insideIf and line.startswith("Operation"):
+                        operation = line.split(":")[1].strip()
+                        operations.append(operation)
+                    elif insideIf and line == "end":
+                        sections.append(
+                            {
+                                "Section": currentSection,
+                                "IfBlock": ifBlock,
+                                "Condition": condition,
+                                "Operations": operations,
+                            }
+                        )
+                        ifBlock = ifBlock + 1
+                    elif line == "END" and insideIf:
+                        data.append(sections)
+                        insideIf = False
+        except Exception as e:
+            print(f"An error occurred while parsing the file: {e}")
+            # You can choose to continue or raise an exception here if needed
 
         return data
 
@@ -416,6 +426,7 @@ class Wayside:
     # This is the method that reads the PLC file and runs it accordingly
     def run_plc(self, plcFilepath):
         self.plcData = self.plc.parse_text_file(plcFilepath)
+        print(self.plcData)
         self.refresh_plc()
 
     def refresh_plc(self):
@@ -424,56 +435,62 @@ class Wayside:
             return
 
         for item in self.plcData:
-            print("Evaluating Section:", item["Section"])
-            print("Condition:", item["Condition"])
+            # Initialize a flag to track if any condition is satisfied
+            any_condition_satisfied = False
 
-            switchString = item["Section"].rstrip(":")
-            if switchString in self.switches:
-                # Determine what is the switch block
-                switchBlock = self.get_block(self.switches[switchString])
-            else:
-                continue
+            for ifBlock in range(0, len(item)):
+                switchString = item[ifBlock]["Section"].rstrip(":")
+                if switchString in self.switches:
+                    # Determine what is the switch block
+                    switchBlock = self.get_block(self.switches[switchString])
+                else:
+                    continue
 
-            # Parse the condition
-            entry, notExist, exitRange = self.parse_condition(item["Condition"])
-            condition1 = False
-            condition2 = False
+                # Parse the conditions
+                condition = item[ifBlock]["Condition"]
 
-            # check for validity of conditon 1
-            if isinstance(entry, int):
-                entry = [entry]  # Convert single integer to a list
-
-            print(entry)
-
-            if entry != 0:
-                # check for validity of conditon 1
-                for block in entry:
-                    if self.get_block(block).get_occupancystate() == True:
-                        condition1 = True
-                        break
-            else:
-                if self.get_block(0).get_occupancystate() == True:
-                    condition1 = True
-
-            # check for validity of condition 2
-            for block in exitRange:
-                if not exitRange:
-                    condition2 = True
-                    break
-
-                if self.get_block(block).get_occupancystate() == True:
-                    condition2 = True
-                    break
-
-            if condition2 == True and notExist:
+                entry, exitRange, notExist = self.parse_condition(condition)
+                condition1 = False
                 condition2 = False
-            elif condition2 == False and notExist:
-                condition2 = True
 
-            # if both condition 1 and 2 are valid continue to the operations
-            if condition1 and condition2:
-                # There are only two operations
-                # Set signal state and set switch state
+                # check for validity of conditon 1
+                if isinstance(entry, int):
+                    entry = [entry]  # Convert single integer to a list
+
+                print("Wayside Number: ", self.waysideNum)
+
+                if entry != 0:
+                    # check for validity of conditon 1
+                    for block in entry:
+                        if self.get_block(block).get_occupancystate() == True:
+                            condition1 = True
+                            break
+                else:
+                    if self.get_block(0).get_occupancystate() == True:
+                        condition1 = True
+
+                # check for validity of condition 2
+                for block in exitRange:
+                    if not exitRange:
+                        condition2 = True
+                        break
+
+                    if self.get_block(block).get_occupancystate() == True:
+                        condition2 = True
+                        break
+
+                if condition2 == True and notExist:
+                    condition2 = False
+                elif condition2 == False and notExist:
+                    condition2 = True
+
+                # If both condition 1 and 2 are valid, set the flag and break the loop
+                if condition1 and condition2:
+                    any_condition_satisfied = True
+                    break
+
+            # If any condition is satisfied, execute the operations
+            if any_condition_satisfied:
                 for operation in item["Operations"]:
                     parsedOperation = self.parse_operation(operation)
                     # set the switch value
@@ -533,48 +550,119 @@ class Wayside:
         This will be calculated using block occupancy, light states, and suggested authority from the CTC.
         """
 
+        # Loop through every block that the wayside controller has jurisdiction over
+        for block in self.blocks:
+            # check for occupancy of block
+            if block.get_occupancystate() == True:
+                pass
+
     # This is the method that parses the condition of a section within a PLC file
     def parse_condition(self, condition):
         entry = []
+        exit = []
         notExist = False
-        exitRange = []
 
-        # Regular expressions to match the various patterns
-        patternEntry = r"^(\d+)$"
-        patternEntryRange = r"^(\d+)->(\d+)$"
-        patternEntryReverseRange = r"^(\d+)<-(\d+)$"
-        patternExitRange = r"^\((\d+)->(\d+)\)$"
-        patternAndNotExitRange = r"^(\d+) AND NOT\((\d+)->(\d+)\)$"
-        patternAndExitRange = r"^\((\d+)->(\d+)\) AND \((\d+)->(\d+)\)$"
-        patternAndNotReverseExitRange = r"^\((\d+)->(\d+)\) AND NOT\((\d+)->(\d+)\)$"
+        patterns = {
+            "patternEntry": r"^(\d+)$",
+            "patternEntryRange": r"^\((\d+)->(\d+)\)$",
+            "patternEntryReverseRange": r"^\((\d+)<-(\d+)\)$",
+            "patternEntryAndExitRange": r"^(\d+) AND \((\d+)->(\d+)\)$",
+            "patternEntryAndExitReverseRange": r"^(\d+) AND \((\d+)<-(\d+)\)$",
+            "patternEntryRangeAndExit": r"^\((\d+)->(\d+)\) AND (\d+)$",
+            "patternEntryRangeAndExitRange": r"^\((\d+)->(\d+)\) AND \((\d+)->(\d+)\)$",
+            "patternEntryReverseRangeAndExitRange": r"^\((\d+)<-(\d+)\) AND \((\d+)->(\d+)\)$",
+            "patternEntryRangeAndExitReverseRange": r"^\((\d+)->(\d+)\) AND \((\d+)<-(\d+)\)$",
+            "patternEntryReverseRangeAndExitReverseRange": r"^\((\d+)<-(\d+)\) AND \((\d+)<-(\d+)\)$",
+            "patternEntryAndNotExitRange": r"^(\d+) AND NOT\((\d+)->(\d+)\)$",
+            "patternEntryAndNotExitReverseRange": r"^(\d+) AND NOT\((\d+)<-(\d+)\)$",
+            "patternEntryRangeAndNotExit": r"^\((\d+)->(\d+)\) AND NOT(\d+)$",
+            "patternEntryRangeAndNotExitRange": r"^\((\d+)->(\d+)\) AND NOT\((\d+)->(\d+)\)$",
+            "patternEntryReverseRangeAndNotExitRange": r"^\((\d+)<-(\d+)\) AND NOT\((\d+)->(\d+)\)$",
+            "patternEntryRangeAndNotExitReverseRange": r"^\((\d+)->(\d+)\) AND NOT\((\d+)<-(\d+)\)$",
+            "patternEntryReverseRangeAndNotExitReverseRange": r"^\((\d+)<-(\d+)\) AND NOT\((\d+)<-(\d+)\)$",
+        }
 
-        if re.match(patternEntry, condition):
-            entry = [int(condition)]
-        elif re.match(patternEntryRange, condition):
-            match = re.match(patternEntryRange, condition)
-            entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
-        elif re.match(patternEntryReverseRange, condition):
-            match = re.match(patternEntryReverseRange, condition)
-            entry = list(range(int(match.group(1)), int(match.group(2)) - 1, -1))
-        elif re.match(patternExitRange, condition):
-            match = re.match(patternExitRange, condition)
-            exitRange = list(range(int(match.group(1)), int(match.group(2)) + 1))
-        elif re.match(patternAndNotExitRange, condition):
-            match = re.match(patternAndNotExitRange, condition)
-            entry = [int(match.group(1))]
-            notExist = True
-            exitRange = list(range(int(match.group(2)), int(match.group(3)) + 1))
-        elif re.match(patternAndExitRange, condition):
-            match = re.match(patternAndExitRange, condition)
-            exitRange.extend(range(int(match.group(1)), int(match.group(2)) + 1))
-            exitRange.extend(range(int(match.group(3)), int(match.group(4)) + 1))
-        elif re.match(patternAndNotReverseExitRange, condition):
-            match = re.match(patternAndNotReverseExitRange, condition)
-            notExist = True
-            exitRange.extend(range(int(match.group(2)), int(match.group(1)) + 1))
-            exitRange.extend(range(int(match.group(3)), int(match.group(4)) + 1))
+        for pattern, regex in patterns.items():
+            match = re.match(regex, condition)
+            if match:
+                if pattern == "patternEntry":
+                    entry = [int(match.group(1))]
+                    break
+                elif pattern == "patternEntryRange":
+                    start, end = map(int, match.groups())
+                    entry = list(range(start, end + 1))
+                    break
+                elif pattern == "patternEntryReverseRange":
+                    end, start = map(int, match.groups())
+                    entry = list(range(start, end - 1, -1))
+                    break
+                elif pattern == "patternEntryAndExitRange":
+                    entry = [int(match.group(1))]
+                    exit = list(range(int(match.group(2)), int(match.group(3)) + 1))
+                    break
+                elif pattern == "patternEntryAndExitReverseRange":
+                    entry = [int(match.group(1))]
+                    exit = list(range(int(match.group(3)), int(match.group(2)) + 1))
+                    break
+                elif pattern == "patternEntryRangeAndExit":
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = [int(match.group(3))]
+                    break
+                elif pattern == "patternEntryRangeAndExitRange":
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    break
+                elif pattern == "patternEntryReverseRangeAndExitRange":
+                    entry = list(range(int(match.group(2)), int(match.group(1)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    break
+                elif pattern == "patternEntryRangeAndExitReverseRange":
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    break
+                elif pattern == "patternEntryReverseRangeAndExitReverseRange":
+                    entry = list(range(int(match.group(2)), int(match.group(1)) + 1))
+                    exit = list(range(int(match.group(4)), int(match.group(3)) + 1))
+                    break
+                elif pattern == "patternEntryAndNotExitRange":
+                    entry = [int(match.group(1))]
+                    exit = list(range(int(match.group(2)), int(match.group(3)) + 1))
+                    notExist = True
+                    break
+                elif pattern == "patternEntryAndNotExitReverseRange":
+                    entry = [int(match.group(1))]
+                    exit = list(range(int(match.group(3)), int(match.group(2)) + 1))
+                    notExist = True
+                    break
+                elif pattern == "patternEntryRangeAndNotExit":
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = [int(match.group(3))]
+                    notExist = True
+                    break
+                elif pattern == "patternEntryRangeAndNotExitRange":
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    notExist = True
+                    break
+                elif pattern == "patternEntryReverseRangeAndNotExitRange":
+                    entry = list(range(int(match.group(2)), int(match.group(1)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    notExist = True
+                    break
+                elif pattern == "patternEntryRangeAndNotExitReverseRange":
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    notExist = True
+                    break
+                elif pattern == "patternEntryReverseRangeAndNotExitReverseRange":
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    notExist = True
+                    break
 
-        return entry, notExist, exitRange
+        print("Entry: ", entry)
+        print("Exit: ", exit)
+        return entry, exit, notExist
 
     # This is the method that parses the operation following a condition within a PLC file
     def parse_operation(self, operationLine):
@@ -592,7 +680,7 @@ class Wayside:
         for block in self.blocks:
             if int(block.get_number()) == int(blockNumber):
                 return block
-        print(self.blocks[28].get_number())
+        # print(self.blocks[28].get_number())
         print("Did not find block " + str(blockNumber))
         return None  # Block not found
 
@@ -641,10 +729,10 @@ class TrackControl(QMainWindow):
         # Instantiate the track information for the Green Line
         self.greenLine = Line(1)
         self.wayside1G = Wayside(1, 1)
-        switchDict = {"SW1": 12, "SW2": 29, "SW3": 58}
+        switchDict = {"SW1": 12, "SW2": 29}
         self.wayside1G.switches_init(switchDict)
         self.wayside2G = Wayside(2, 1)
-        switchDict = {"SW4": 62, "SW5": 77, "SW6": 85}
+        switchDict = {"SW3": 58, "SW4": 62, "SW5": 77, "SW6": 85}
         self.wayside2G.switches_init(switchDict)
         self.greenLine.add_wayside(self.wayside1G)
         self.greenLine.add_wayside(self.wayside2G)
@@ -1373,10 +1461,10 @@ class TrackControl(QMainWindow):
         pass
 
 
-"""if __name__ == "__main__":
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     # window = MainUI()
     # window.setGeometry(0,0,960,970)
     # window.show()
     main_window = TrackControl()
-    sys.exit(app.exec_())  # Start the application event loop"""
+    sys.exit(app.exec_())  # Start the application event loop
