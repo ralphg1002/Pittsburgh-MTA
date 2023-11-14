@@ -23,8 +23,6 @@ class TrackControllerToTrackModel(QObject):
 ##########################################################################################
 class TrainModelToTrackModel(QObject):
     sendCurrentPassengers = pyqtSignal(int)
-    sendMaxPassengers = pyqtSignal(int)
-
 
 class TrainModelToTrainController(QObject):
     sendSpeedLimit = pyqtSignal(str, int)
