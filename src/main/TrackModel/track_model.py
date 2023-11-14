@@ -5,6 +5,8 @@ from .Station import Station
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+# sys.path.append("../../main")
+# from signals import trackModeltoTrainModel
 
 # Qgraphicsview, Qgraphicescene, Qpainterpath
 
@@ -31,115 +33,6 @@ MTA_STYLING = {
     # "moduleName": 'CTC'
 }
 
-# # DONE :)
-# class FailureWindow:
-#     selectedBlock = None
-#     selectedFailures = []
-
-#     def __init__(self):
-#         self.failureWindow = QDialog()
-#         self.setup_failure_popup()
-
-#     def setup_failure_popup(self):
-#         self.failureWindow.setWindowTitle("Change Failures")
-#         self.failureWindow.setGeometry(1550, 500, 250, 300)
-#         self.failureWindow.setStyleSheet("background-color: #ff4747;")
-
-#         self.failure_title()
-#         self.change_background()
-#         self.add_block_selection()
-#         self.add_failure_selection()
-#         self.add_set_button()
-
-#     def failure_title(self):
-#         title = QLabel("Failure Configuration:", self.failureWindow)
-#         title.setGeometry(10, 10, 230, 30)
-#         title.setStyleSheet("font-weight: bold; font-size: 18px")
-
-#         # Horizontal divider line
-#         thickness = 5
-#         hline = QFrame(self.failureWindow)
-#         hline.setFrameShape(QFrame.HLine)
-#         hline.setGeometry(0, 40, 250, thickness)
-#         hline.setLineWidth(thickness)
-
-#     def change_background(self):
-#         background = QWidget(self.failureWindow)
-#         background.setGeometry(0, 45, 250, 300)
-#         background.setStyleSheet("background-color: #ffd6d6;")
-
-#     def add_block_selection(self):
-#         selectBlock = QLabel("Select Block #:", self.failureWindow)
-#         selectBlock.setGeometry(10, 50, 230, 30)
-#         selectBlock.setStyleSheet(
-#             "font-weight: bold; font-size: 18px; background-color: #ffd6d6;"
-#         )
-
-#         # Add a dropdown selection
-#         self.blockDropdown = QComboBox(self.failureWindow)
-#         self.blockDropdown.setGeometry(10, 80, 115, 30)
-#         self.blockDropdown.setStyleSheet("background-color: white;")
-#         for i in range(1, 16):
-#             self.blockDropdown.addItem("Block " + str(i))
-
-#         self.blockDropdown.currentIndexChanged.connect(self.update_exit_button_state)
-
-#     def add_failure_selection(self):
-#         setFailure = QLabel("Set Failure Type:", self.failureWindow)
-#         setFailure.setGeometry(10, 120, 230, 30)
-#         setFailure.setStyleSheet(
-#             "font-weight: bold; font-size: 18px; background-color: #ffd6d6"
-#         )
-
-#         self.failureCheckboxes = []
-#         failures = ["Track Circuit Failure", "Power Failure", "Broken Rail"]
-#         yOffset = 150
-#         for failure in failures:
-#             option = QCheckBox(failure, self.failureWindow)
-#             option.setGeometry(10, yOffset, 230, 30)
-#             option.setStyleSheet("background-color: #ffd6d6")
-#             self.failureCheckboxes.append(option)
-#             yOffset += 30
-
-#     def update_exit_button_state(self):
-#         # Enable the button to "Set Failure Configuration" if a drop down item from the menu is selected
-#         isBlockSelected = self.blockDropdown.currentIndex() != -1
-#         self.button.setEnabled(isBlockSelected)
-
-#     def add_set_button(self):
-#         self.button = QPushButton("Set Failure Configuration", self.failureWindow)
-#         self.button.setGeometry(50, 250, 150, 30)
-#         self.button.setStyleSheet("background-color: #39E75F;")
-#         self.button.clicked.connect(self.update_failure)
-#         self.button.setEnabled(False)  # Button is set as disabled to begin with
-
-#     def update_failure(self):
-#         selectedBlockIndex = self.blockDropdown.currentIndex()
-#         selectedBlock = self.blockDropdown.itemText(selectedBlockIndex)
-
-#         self.selectedFailures.clear()
-#         for checkbox in self.failureCheckboxes:
-#             if checkbox.isChecked():
-#                 self.selectedFailures.append(checkbox.text())
-#         self.selectedBlock = selectedBlock
-
-#         self.failureWindow.close()
-
-#     def get_selected_block(self):
-#         if self.selectedBlock != None:
-#             # Pull block int from string
-#             pattern = r"\d+"
-#             searchInt = re.search(pattern, self.selectedBlock)
-#             if searchInt:
-#                 blockNum = int(searchInt.group())
-#                 return blockNum
-
-#     def get_selected_failures(self):
-#         if self.selectedFailures == []:
-#             return "None"
-#         return self.selectedFailures
-
-
 class TrackView(QGraphicsView):
     def __init__(self, parent):
         super().__init__(parent)
@@ -150,25 +43,906 @@ class TrackView(QGraphicsView):
 
     def drawGreenLine(self):
         # Create a horizontal dash track block
-        path1 = QPainterPath()
-        path1.moveTo(0, 0)
-        path1.lineTo(20, 0)
-        track_block1 = self.createTrackBlock(path1, "Horizontal Dash")
-        self.scene.addItem(track_block1)
+        path_1 = QPainterPath()
+        path_1.moveTo(0, 0)
+        path_1.cubicTo(0, 0, 5, 0, 10, 10)
+        block_1 = self.createTrackBlock(path_1, "Block 1")
+        self.scene.addItem(block_1)
 
-        # Create a vertical line track block
-        path2 = QPainterPath()
-        path2.moveTo(-20, 20)
-        path2.lineTo(-20, 40)
-        track_block2 = self.createTrackBlock(path2, "Vertical Line")
-        self.scene.addItem(track_block2)
+        path_2 = QPainterPath()
+        path_2.moveTo(14, 18)
+        path_2.lineTo(21, 30)
+        block_2 = self.createTrackBlock(path_2, "Block 2")
+        self.scene.addItem(block_2)
 
-        path3 = QPainterPath()
-        path3.moveTo(0, 0)
-        path3.cubicTo(-10, 0, -20, 0, -20, 20)
-        track_block3 = self.createTrackBlock(path3, "Curved Line")
-        self.scene.addItem(track_block3)
+        path_3 = QPainterPath()
+        path_3.moveTo(26, 38)
+        path_3.cubicTo(26, 38, 28, 41, 38, 47)
+        block_3 = self.createTrackBlock(path_3, "Block 3")
+        self.scene.addItem(block_3)
 
+        path_4 = QPainterPath()
+        path_4.moveTo(46, 52)
+        path_4.cubicTo(46, 52, 52, 55, 59, 57)
+        block_4 = self.createTrackBlock(path_4, "Block 4")
+        self.scene.addItem(block_4)
+
+        path_5 = QPainterPath()
+        path_5.moveTo(68, 60)
+        path_5.cubicTo(68, 60, 73, 61, 82, 61)
+        block_5 = self.createTrackBlock(path_5, "Block 5")
+        self.scene.addItem(block_5)
+
+        path_6 = QPainterPath()
+        path_6.moveTo(92, 61)
+        path_6.cubicTo(92, 61, 103, 60, 104, 58)
+        block_6 = self.createTrackBlock(path_6, "Block 6")
+        self.scene.addItem(block_6)
+
+        path_7 = QPainterPath()
+        path_7.moveTo(109, 50)
+        path_7.cubicTo(109, 50, 112, 45, 112, 39)
+        block_7 = self.createTrackBlock(path_7, "Block 7")
+        self.scene.addItem(block_7)
+
+        path_8 = QPainterPath()
+        path_8.moveTo(112, 29)
+        path_8.cubicTo(112, 29, 112, 25, 102, 18)
+        block_8 = self.createTrackBlock(path_8, "Block 8")
+        self.scene.addItem(block_8)
+
+        path_9 = QPainterPath()
+        path_9.moveTo(94, 14)
+        path_9.cubicTo(94, 14, 86, 11, 81, 10)
+        block_9 = self.createTrackBlock(path_9, "Block 9")
+        self.scene.addItem(block_9)
+
+        path_10 = QPainterPath()
+        path_10.moveTo(72, 8)
+        path_10.cubicTo(72, 8, 58, 5, 57, 5)
+        block_10 = self.createTrackBlock(path_10, "Block 10")
+        self.scene.addItem(block_10)
+
+        path_11 = QPainterPath()
+        path_11.moveTo(47, 4)
+        path_11.cubicTo(47, 4, 35, 3, 33, 3)
+        block_11 = self.createTrackBlock(path_11, "Block 11")
+        self.scene.addItem(block_11)
+
+        path_12 = QPainterPath()
+        path_12.moveTo(23, 2)
+        path_12.cubicTo(23, 2, 13, 1, 10, 1)
+        block_12 = self.createTrackBlock(path_12, "Block 12")
+        self.scene.addItem(block_12)
+
+        path_13 = QPainterPath()
+        path_13.moveTo(-10, 0)
+        path_13.lineTo(-25, 0)
+        block_13 = self.createTrackBlock(path_13, "Block 13")
+        self.scene.addItem(block_13)
+
+        path_14 = QPainterPath()
+        path_14.moveTo(-35, 0)
+        path_14.lineTo(-50, 0)
+        block_14 = self.createTrackBlock(path_14, "Block 14")
+        self.scene.addItem(block_14)
+
+        path_15 = QPainterPath()
+        path_15.moveTo(-60, 0)
+        path_15.lineTo(-75, 0)
+        block_15 = self.createTrackBlock(path_15, "Block 15")
+        self.scene.addItem(block_15)
+
+        path_16 = QPainterPath()
+        path_16.moveTo(-85, 0)
+        path_16.lineTo(-100, 0)
+        block_16 = self.createTrackBlock(path_16, "Block 16")
+        self.scene.addItem(block_16)
+
+        path_17 = QPainterPath()
+        path_17.moveTo(-110, 0)
+        path_17.quadTo(-115, 0, -125, 5)
+        block_17 = self.createTrackBlock(path_17, "Block 17")
+        self.scene.addItem(block_17)
+
+        path_18 = QPainterPath()
+        path_18.moveTo(-133, 9)
+        path_18.quadTo(-141, 14, -145, 19)
+        block_18 = self.createTrackBlock(path_18, "Block 18")
+        self.scene.addItem(block_18)
+
+        path_19 = QPainterPath()
+        path_19.moveTo(-151, 27)
+        path_19.quadTo(-156, 33, -159, 40)
+        block_19 = self.createTrackBlock(path_19, "Block 19")
+        self.scene.addItem(block_19)
+
+        path_20 = QPainterPath()
+        path_20.moveTo(-163, 49)
+        path_20.cubicTo(-166, 55, -167, 58, -167, 63)
+        block_20 = self.createTrackBlock(path_20, "Block 20")
+        self.scene.addItem(block_20)
+
+        path_21 = QPainterPath()
+        path_21.moveTo(-167, 73)
+        path_21.lineTo(-167, 78)
+        block_21 = self.createTrackBlock(path_21, "Block 21")
+        self.scene.addItem(block_21)
+
+        path_22 = QPainterPath()
+        path_22.moveTo(-167, 88)
+        path_22.lineTo(-167, 93)
+        block_22 = self.createTrackBlock(path_22, "Block 22")
+        self.scene.addItem(block_22)
+
+        path_23 = QPainterPath()
+        path_23.moveTo(-167, 103)
+        path_23.lineTo(-167, 108)
+        block_23 = self.createTrackBlock(path_23, "Block 23")
+        self.scene.addItem(block_23)
+
+        path_24 = QPainterPath()
+        path_24.moveTo(-167, 118)
+        path_24.lineTo(-167, 123)
+        block_24 = self.createTrackBlock(path_24, "Block 24")
+        self.scene.addItem(block_24)
+
+        path_25 = QPainterPath()
+        path_25.moveTo(-167, 133)
+        path_25.lineTo(-167, 138)
+        block_25 = self.createTrackBlock(path_25, "Block 25")
+        self.scene.addItem(block_25)
+
+        path_26 = QPainterPath()
+        path_26.moveTo(-167, 148)
+        path_26.lineTo(-167, 153)
+        block_26 = self.createTrackBlock(path_26, "Block 26")
+        self.scene.addItem(block_26)
+
+        path_27 = QPainterPath()
+        path_27.moveTo(-167, 163)
+        path_27.lineTo(-167, 168)
+        block_27 = self.createTrackBlock(path_27, "Block 27")
+        self.scene.addItem(block_27)
+
+        path_28 = QPainterPath()
+        path_28.moveTo(-167, 178)
+        path_28.lineTo(-167, 183)
+        block_28 = self.createTrackBlock(path_28, "Block 28")
+        self.scene.addItem(block_28)
+
+        path_29 = QPainterPath()
+        path_29.moveTo(-167, 193)
+        path_29.lineTo(-167, 198)
+        block_29 = self.createTrackBlock(path_29, "Block 29")
+        self.scene.addItem(block_29)
+
+        path_30 = QPainterPath()
+        path_30.moveTo(-167, 208)
+        path_30.lineTo(-167, 213)
+        block_30 = self.createTrackBlock(path_30, "Block 30")
+        self.scene.addItem(block_30)
+
+        path_31 = QPainterPath()
+        path_31.moveTo(-167, 223)
+        path_31.lineTo(-167, 228)
+        block_31 = self.createTrackBlock(path_31, "Block 31")
+        self.scene.addItem(block_31)
+
+        path_32 = QPainterPath()
+        path_32.moveTo(-167, 238)
+        path_32.lineTo(-167, 243)
+        block_32 = self.createTrackBlock(path_32, "Block 32")
+        self.scene.addItem(block_32)
+
+        path_33 = QPainterPath()
+        path_33.moveTo(-167, 253)
+        path_33.quadTo(-167, 255, -166, 258)
+        block_33 = self.createTrackBlock(path_33, "Block 33")
+        self.scene.addItem(block_33)
+
+        path_34 = QPainterPath()
+        path_34.moveTo(-162, 266)
+        path_34.quadTo(-161, 268, -159, 270)
+        block_34 = self.createTrackBlock(path_34, "Block 34")
+        self.scene.addItem(block_34)
+
+        path_35 = QPainterPath()
+        path_35.moveTo(-152, 277)
+        path_35.quadTo(-151, 278, -147, 278)
+        block_35 = self.createTrackBlock(path_35, "Block 35")
+        self.scene.addItem(block_35)
+
+        path_36 = QPainterPath()
+        path_36.moveTo(-137, 278)
+        path_36.lineTo(-135, 278)
+        block_36 = self.createTrackBlock(path_36, "Block 36")
+        self.scene.addItem(block_36)
+
+        path_37 = QPainterPath()
+        path_37.moveTo(-125, 278)
+        path_37.lineTo(-124, 278)
+        block_37 = self.createTrackBlock(path_37, "Block 37")
+        self.scene.addItem(block_37)
+
+        path_38 = QPainterPath()
+        path_38.moveTo(-114, 278)
+        path_38.lineTo(-113, 278)
+        block_38 = self.createTrackBlock(path_38, "Block 38")
+        self.scene.addItem(block_38)
+
+        path_39 = QPainterPath()
+        path_39.moveTo(-103, 278)
+        path_39.lineTo(-102, 278)
+        block_39 = self.createTrackBlock(path_39, "Block 39")
+        self.scene.addItem(block_39)
+
+        path_40 = QPainterPath()
+        path_40.moveTo(-92, 278)
+        path_40.lineTo(-91, 278)
+        block_40 = self.createTrackBlock(path_40, "Block 40")
+        self.scene.addItem(block_40)
+
+        path_41 = QPainterPath()
+        path_41.moveTo(-81, 278)
+        path_41.lineTo(-80, 278)
+        block_41 = self.createTrackBlock(path_41, "Block 41")
+        self.scene.addItem(block_41)
+
+        path_42 = QPainterPath()
+        path_42.moveTo(-70, 278)
+        path_42.lineTo(-69, 278)
+        block_42 = self.createTrackBlock(path_42, "Block 42")
+        self.scene.addItem(block_42)
+
+        path_43 = QPainterPath()
+        path_43.moveTo(-59, 278)
+        path_43.lineTo(-58, 278)
+        block_43 = self.createTrackBlock(path_43, "Block 43")
+        self.scene.addItem(block_43)
+
+        path_44 = QPainterPath()
+        path_44.moveTo(-48, 278)
+        path_44.lineTo(-47, 278)
+        block_44 = self.createTrackBlock(path_44, "Block 44")
+        self.scene.addItem(block_44)
+
+        path_45 = QPainterPath()
+        path_45.moveTo(-37, 278)
+        path_45.lineTo(-36, 278)
+        block_45 = self.createTrackBlock(path_45, "Block 45")
+        self.scene.addItem(block_45)
+
+        path_46 = QPainterPath()
+        path_46.moveTo(-26, 278)
+        path_46.lineTo(-25, 278)
+        block_46 = self.createTrackBlock(path_46, "Block 46")
+        self.scene.addItem(block_46)
+
+        path_47 = QPainterPath()
+        path_47.moveTo(-15, 278)
+        path_47.lineTo(-14, 278)
+        block_47 = self.createTrackBlock(path_47, "Block 47")
+        self.scene.addItem(block_47)
+
+        path_48 = QPainterPath()
+        path_48.moveTo(-4, 278)
+        path_48.lineTo(-3, 278)
+        block_48 = self.createTrackBlock(path_48, "Block 48")
+        self.scene.addItem(block_48)
+
+        path_49 = QPainterPath()
+        path_49.moveTo(7, 278)
+        path_49.lineTo(8, 278)
+        block_49 = self.createTrackBlock(path_49, "Block 49")
+        self.scene.addItem(block_49)
+
+        path_50 = QPainterPath()
+        path_50.moveTo(18, 278)
+        path_50.lineTo(19, 278)
+        block_50 = self.createTrackBlock(path_50, "Block 50")
+        self.scene.addItem(block_50)
+
+        path_51 = QPainterPath()
+        path_51.moveTo(29, 278)
+        path_51.lineTo(30, 278)
+        block_51 = self.createTrackBlock(path_51, "Block 51")
+        self.scene.addItem(block_51)
+
+        path_52 = QPainterPath()
+        path_52.moveTo(40, 278)
+        path_52.lineTo(41, 278)
+        block_52 = self.createTrackBlock(path_52, "Block 52")
+        self.scene.addItem(block_52)
+
+        path_53 = QPainterPath()
+        path_53.moveTo(51, 278)
+        path_53.lineTo(52, 278)
+        block_53 = self.createTrackBlock(path_53, "Block 53")
+        self.scene.addItem(block_53)
+
+        path_54 = QPainterPath()
+        path_54.moveTo(62, 278)
+        path_54.lineTo(63, 278)
+        block_54 = self.createTrackBlock(path_54, "Block 54")
+        self.scene.addItem(block_54)
+
+        path_55 = QPainterPath()
+        path_55.moveTo(73, 278)
+        path_55.lineTo(74, 278)
+        block_55 = self.createTrackBlock(path_55, "Block 55")
+        self.scene.addItem(block_55)
+
+        path_56 = QPainterPath()
+        path_56.moveTo(84, 278)
+        path_56.lineTo(85, 278)
+        block_56 = self.createTrackBlock(path_56, "Block 56")
+        self.scene.addItem(block_56)
+
+        path_57 = QPainterPath()
+        path_57.moveTo(95, 278)
+        path_57.lineTo(96, 278)
+        block_57 = self.createTrackBlock(path_57, "Block 57")
+        self.scene.addItem(block_57)
+
+        path_58 = QPainterPath()
+        path_58.moveTo(106, 278)
+        path_58.quadTo(107, 278, 111, 279)
+        block_58 = self.createTrackBlock(path_58, "Block 58")
+        self.scene.addItem(block_58)
+
+        path_59 = QPainterPath()
+        path_59.moveTo(120, 283)
+        path_59.quadTo(125, 285, 128, 287)
+        block_59 = self.createTrackBlock(path_59, "Block 59")
+        self.scene.addItem(block_59)
+
+        path_60 = QPainterPath()
+        path_60.moveTo(136, 293)
+        path_60.quadTo(142, 297, 143, 298)
+        block_60 = self.createTrackBlock(path_60, "Block 60")
+        self.scene.addItem(block_60)
+
+        path_61 = QPainterPath()
+        path_61.moveTo(150, 305)
+        path_61.quadTo(156, 312, 157, 314)
+        block_61 = self.createTrackBlock(path_61, "Block 61")
+        self.scene.addItem(block_61)
+
+        path_62 = QPainterPath()
+        path_62.moveTo(161, 322)
+        path_62.cubicTo(162, 324, 163, 328, 163, 330)
+        block_62 = self.createTrackBlock(path_62, "Block 62")
+        self.scene.addItem(block_62)
+
+        path_63 = QPainterPath()
+        path_63.moveTo(163, 340)
+        path_63.lineTo(163, 350)
+        block_63 = self.createTrackBlock(path_63, "Block 63")
+        self.scene.addItem(block_63)
+
+        path_64 = QPainterPath()
+        path_64.moveTo(163, 360)
+        path_64.lineTo(163, 370)
+        block_64 = self.createTrackBlock(path_64, "Block 64")
+        self.scene.addItem(block_64)
+
+        path_65 = QPainterPath()
+        path_65.moveTo(163, 380)
+        path_65.lineTo(163, 400)
+        block_65 = self.createTrackBlock(path_65, "Block 65")
+        self.scene.addItem(block_65)
+
+        path_66 = QPainterPath()
+        path_66.moveTo(163, 410)
+        path_66.lineTo(163, 430)
+        block_66 = self.createTrackBlock(path_66, "Block 66")
+        self.scene.addItem(block_66)
+
+        path_67 = QPainterPath()
+        path_67.moveTo(163, 440)
+        path_67.lineTo(163, 450)
+        block_67 = self.createTrackBlock(path_67, "Block 67")
+        self.scene.addItem(block_67)
+
+        path_68 = QPainterPath()
+        path_68.moveTo(163, 460)
+        path_68.lineTo(163, 470)
+        block_68 = self.createTrackBlock(path_68, "Block 68")
+        self.scene.addItem(block_68)
+
+        path_69 = QPainterPath()
+        path_69.moveTo(163, 480)
+        path_69.quadTo(163, 486, 162, 491)
+        block_69 = self.createTrackBlock(path_69, "Block 69")
+        self.scene.addItem(block_69)
+
+        path_70 = QPainterPath()
+        path_70.moveTo(160, 500)
+        path_70.quadTo(159, 505, 157, 510)
+        block_70 = self.createTrackBlock(path_70, "Block 70")
+        self.scene.addItem(block_70)
+
+        path_71 = QPainterPath()
+        path_71.moveTo(153, 519)
+        path_71.quadTo(151, 524, 148, 529)
+        block_71 = self.createTrackBlock(path_71, "Block 71")
+        self.scene.addItem(block_71)
+
+        path_72 = QPainterPath()
+        path_72.moveTo(143, 537)
+        path_72.quadTo(139, 543, 137, 545)
+        block_72 = self.createTrackBlock(path_72, "Block 72")
+        self.scene.addItem(block_72)
+
+        path_73 = QPainterPath()
+        path_73.moveTo(130, 551)
+        path_73.cubicTo(126, 554, 121, 556, 120, 556)
+        block_73 = self.createTrackBlock(path_73, "Block 73")
+        self.scene.addItem(block_73)
+
+        path_74 = QPainterPath()
+        path_74.moveTo(110, 556)
+        path_74.lineTo(90, 556)
+        block_74 = self.createTrackBlock(path_74, "Block 74")
+        self.scene.addItem(block_74)
+
+        path_75 = QPainterPath()
+        path_75.moveTo(80, 556)
+        path_75.lineTo(60, 556)
+        block_75 = self.createTrackBlock(path_75, "Block 75")
+        self.scene.addItem(block_75)
+
+        path_76 = QPainterPath()
+        path_76.moveTo(50, 556)
+        path_76.lineTo(30, 556)
+        block_76 = self.createTrackBlock(path_76, "Block 76")
+        self.scene.addItem(block_76)
+
+        path_77 = QPainterPath()
+        path_77.moveTo(20, 556)
+        path_77.lineTo(12, 556)
+        block_77 = self.createTrackBlock(path_77, "Block 77")
+        self.scene.addItem(block_77)
+
+        path_78 = QPainterPath()
+        path_78.moveTo(2, 556)
+        path_78.lineTo(-6, 556)
+        block_78 = self.createTrackBlock(path_78, "Block 78")
+        self.scene.addItem(block_78)
+
+        path_79 = QPainterPath()
+        path_79.moveTo(-16, 556)
+        path_79.lineTo(-24, 556)
+        block_79 = self.createTrackBlock(path_79, "Block 79")
+        self.scene.addItem(block_79)
+
+        path_80 = QPainterPath()
+        path_80.moveTo(-34, 556)
+        path_80.lineTo(-42, 556)
+        block_80 = self.createTrackBlock(path_80, "Block 80")
+        self.scene.addItem(block_80)
+
+        path_81 = QPainterPath()
+        path_81.moveTo(-52, 556)
+        path_81.lineTo(-60, 556)
+        block_81 = self.createTrackBlock(path_81, "Block 81")
+        self.scene.addItem(block_81)
+
+        path_82 = QPainterPath()
+        path_82.moveTo(-70, 556)
+        path_82.lineTo(-78, 556)
+        block_82 = self.createTrackBlock(path_82, "Block 82")
+        self.scene.addItem(block_82)
+
+        path_83 = QPainterPath()
+        path_83.moveTo(-88, 556)
+        path_83.lineTo(-96, 556)
+        block_83 = self.createTrackBlock(path_83, "Block 83")
+        self.scene.addItem(block_83)
+
+        path_84 = QPainterPath()
+        path_84.moveTo(-106, 556)
+        path_84.lineTo(-114, 556)
+        block_84 = self.createTrackBlock(path_84, "Block 84")
+        self.scene.addItem(block_84)
+
+        path_85 = QPainterPath()
+        path_85.moveTo(-124, 556)
+        path_85.lineTo(-132, 556)
+        block_85 = self.createTrackBlock(path_85, "Block 85")
+        self.scene.addItem(block_85)
+
+        path_86 = QPainterPath()
+        path_86.moveTo(-142, 556)
+        path_86.lineTo(-149, 556)
+        block_86 = self.createTrackBlock(path_86, "Block 86")
+        self.scene.addItem(block_86)
+
+        path_87 = QPainterPath()
+        path_87.moveTo(-159, 556)
+        path_87.lineTo(-163, 556)
+        block_87 = self.createTrackBlock(path_87, "Block 87")
+        self.scene.addItem(block_87)
+
+        path_88 = QPainterPath()
+        path_88.moveTo(-173, 556)
+        path_88.lineTo(-180, 556)
+        block_88 = self.createTrackBlock(path_88, "Block 88")
+        self.scene.addItem(block_88)
+
+        path_89 = QPainterPath()
+        path_89.moveTo(-190, 556)
+        path_89.quadTo(-196, 556, -198, 555)
+        block_89 = self.createTrackBlock(path_89, "Block 89")
+        self.scene.addItem(block_89)
+
+        path_90 = QPainterPath()
+        path_90.moveTo(-206, 551)
+        path_90.quadTo(-212, 547, -213, 546)
+        block_90 = self.createTrackBlock(path_90, "Block 90")
+        self.scene.addItem(block_90)
+
+        path_91 = QPainterPath()
+        path_91.moveTo(-220, 539)
+        path_91.quadTo(-225, 533, -226, 531)
+        block_91 = self.createTrackBlock(path_91, "Block 91")
+        self.scene.addItem(block_91)
+
+        path_92 = QPainterPath()
+        path_92.moveTo(-230, 523)
+        path_92.quadTo(-232, 519, -233, 512)
+        block_92 = self.createTrackBlock(path_92, "Block 92")
+        self.scene.addItem(block_92)
+
+        path_93 = QPainterPath()
+        path_93.moveTo(-234, 503)
+        path_93.quadTo(-234, 499, -231, 491)
+        block_93 = self.createTrackBlock(path_93, "Block 93")
+        self.scene.addItem(block_93)
+
+        path_94 = QPainterPath()
+        path_94.moveTo(-227, 482)
+        path_94.quadTo(-224, 476, -218, 473)
+        block_94 = self.createTrackBlock(path_94, "Block 94")
+        self.scene.addItem(block_94)
+
+        path_95 = QPainterPath()
+        path_95.moveTo(-210, 469)
+        path_95.quadTo(-203, 466, -196, 469)
+        block_95 = self.createTrackBlock(path_95, "Block 95")
+        self.scene.addItem(block_95)
+
+        path_96 = QPainterPath()
+        path_96.moveTo(-188, 473)
+        path_96.quadTo(-182, 476, -179, 482)
+        block_96 = self.createTrackBlock(path_96, "Block 96")
+        self.scene.addItem(block_96) 
+
+        path_97 = QPainterPath()
+        path_97.moveTo(-175, 491)
+        path_97.quadTo(-172, 499, -172, 503)
+        block_97 = self.createTrackBlock(path_97, "Block 97")
+        self.scene.addItem(block_97)
+
+        path_98 = QPainterPath()
+        path_98.moveTo(-172, 512)
+        path_98.quadTo(-171, 519, -168, 523)
+        block_98 = self.createTrackBlock(path_98, "Block 98")
+        self.scene.addItem(block_98)
+
+        path_99 = QPainterPath()
+        path_99.moveTo(-163, 530)
+        path_99.quadTo(-157, 537, -155, 539)
+        block_99 = self.createTrackBlock(path_99, "Block 99")
+        self.scene.addItem(block_99)
+
+        path_100 = QPainterPath()
+        path_100.moveTo(-148, 546)
+        path_100.quadTo(-147, 547, -142, 551)
+        block_100 = self.createTrackBlock(path_100, "Block 100")
+        self.scene.addItem(block_100)
+
+        path_101 = QPainterPath()
+        path_101.moveTo(24, 546)
+        path_101.cubicTo(24, 545, 34, 530, 35, 530)
+        block_101 = self.createTrackBlock(path_101, "Block 101")
+        self.scene.addItem(block_101)
+
+        path_102 = QPainterPath()
+        path_102.moveTo(45, 530)
+        path_102.lineTo(46, 530)
+        block_102 = self.createTrackBlock(path_102, "Block 102")
+        self.scene.addItem(block_102)
+
+        path_103 = QPainterPath()
+        path_103.moveTo(56, 530)
+        path_103.lineTo(57, 530)
+        block_103 = self.createTrackBlock(path_103, "Block 103")
+        self.scene.addItem(block_103)
+
+        path_104 = QPainterPath()
+        path_104.moveTo(67, 530)
+        path_104.lineTo(68, 530)
+        block_104 = self.createTrackBlock(path_104, "Block 104")
+        self.scene.addItem(block_104)
+
+        path_105 = QPainterPath()
+        path_105.moveTo(88, 525)
+        path_105.cubicTo(84, 528, 79, 530, 78, 530)
+        block_105 = self.createTrackBlock(path_105, "Block 105")
+        self.scene.addItem(block_105)
+
+        path_106 = QPainterPath()
+        path_106.moveTo(101, 511)
+        path_106.quadTo(97, 517, 95, 519)
+        block_106 = self.createTrackBlock(path_106, "Block 106")
+        self.scene.addItem(block_106)
+
+        path_107 = QPainterPath()
+        path_107.moveTo(111, 493)
+        path_107.quadTo(109, 498, 106, 503)
+        block_107 = self.createTrackBlock(path_107, "Block 107")
+        self.scene.addItem(block_107)
+
+        path_108 = QPainterPath()
+        path_108.moveTo(118, 474)
+        path_108.quadTo(117, 479, 115, 484)
+        block_108 = self.createTrackBlock(path_108, "Block 108")
+        self.scene.addItem(block_108)
+
+        path_109 = QPainterPath()
+        path_109.moveTo(121, 455)
+        path_109.quadTo(121, 460, 120, 464)
+        block_109 = self.createTrackBlock(path_109, "Block 109")
+        self.scene.addItem(block_109)
+
+        path_110 = QPainterPath()
+        path_110.moveTo(121, 445)
+        path_110.lineTo(121, 443)
+        block_110 = self.createTrackBlock(path_110, "Block 110")
+        self.scene.addItem(block_110)
+
+        path_111 = QPainterPath()
+        path_111.moveTo(121, 433)
+        path_111.lineTo(121, 431)
+        block_111 = self.createTrackBlock(path_111, "Block 111")
+        self.scene.addItem(block_111)
+
+        path_112 = QPainterPath()
+        path_112.moveTo(121, 421)
+        path_112.lineTo(121, 419)
+        block_112 = self.createTrackBlock(path_112, "Block 112")
+        self.scene.addItem(block_112)
+
+        path_113 = QPainterPath()
+        path_113.moveTo(121, 409)
+        path_113.lineTo(121, 407)
+        block_113 = self.createTrackBlock(path_113, "Block 113")
+        self.scene.addItem(block_113)
+
+        path_114 = QPainterPath()
+        path_114.moveTo(121, 397)
+        path_114.lineTo(121, 394)
+        block_114 = self.createTrackBlock(path_114, "Block 114")
+        self.scene.addItem(block_114)
+
+        path_115 = QPainterPath()
+        path_115.moveTo(121, 384)
+        path_115.lineTo(121, 382)
+        block_115 = self.createTrackBlock(path_115, "Block 115")
+        self.scene.addItem(block_115)
+
+        path_116 = QPainterPath()
+        path_116.moveTo(121, 372)
+        path_116.lineTo(121, 370)
+        block_116 = self.createTrackBlock(path_116, "Block 116")
+        self.scene.addItem(block_116)
+
+        path_117 = QPainterPath()
+        path_117.moveTo(119, 352)
+        path_117.cubicTo(120, 354, 121, 358, 121, 360)
+        block_117 = self.createTrackBlock(path_117, "Block 117")
+        self.scene.addItem(block_117)
+
+        path_118 = QPainterPath()
+        path_118.moveTo(108, 335)
+        path_118.quadTo(114, 342, 115, 344)
+        block_118 = self.createTrackBlock(path_118, "Block 118")
+        self.scene.addItem(block_118)
+
+        path_119 = QPainterPath()
+        path_119.moveTo(94, 323)
+        path_119.quadTo(100, 327, 101, 328)
+        block_119 = self.createTrackBlock(path_119, "Block 119")
+        self.scene.addItem(block_119)
+
+        path_120 = QPainterPath()
+        path_120.moveTo(78, 313)
+        path_120.quadTo(83, 315, 86, 317)
+        block_120 = self.createTrackBlock(path_120, "Block 120")
+        self.scene.addItem(block_120)
+
+        path_121 = QPainterPath()
+        path_121.moveTo(64, 308)
+        path_121.quadTo(65, 308, 69, 309)
+        block_121 = self.createTrackBlock(path_121, "Block 121")
+        self.scene.addItem(block_121)
+
+        path_122 = QPainterPath()
+        path_122.moveTo(54, 308)
+        path_122.lineTo(53, 308)
+        block_122 = self.createTrackBlock(path_122, "Block 122")
+        self.scene.addItem(block_122)
+
+        path_123 = QPainterPath()
+        path_123.moveTo(43, 308)
+        path_123.lineTo(42, 308)
+        block_123 = self.createTrackBlock(path_123, "Block 123")
+        self.scene.addItem(block_123)
+
+        path_124 = QPainterPath()
+        path_124.moveTo(32, 308)
+        path_124.lineTo(31, 308)
+        block_124 = self.createTrackBlock(path_124, "Block 124")
+        self.scene.addItem(block_124)
+
+        path_125 = QPainterPath()
+        path_125.moveTo(21, 308)
+        path_125.lineTo(20, 308)
+        block_125 = self.createTrackBlock(path_125, "Block 125")
+        self.scene.addItem(block_125)
+
+        path_126 = QPainterPath()
+        path_126.moveTo(10, 308)
+        path_126.lineTo(9, 308)
+        block_126 = self.createTrackBlock(path_126, "Block 126")
+        self.scene.addItem(block_126)
+
+        path_127 = QPainterPath()
+        path_127.moveTo(-1, 308)
+        path_127.lineTo(-2, 308)
+        block_127 = self.createTrackBlock(path_127, "Block 127")
+        self.scene.addItem(block_127)
+
+        path_128 = QPainterPath()
+        path_128.moveTo(-12, 308)
+        path_128.lineTo(-13, 308)
+        block_128 = self.createTrackBlock(path_128, "Block 128")
+        self.scene.addItem(block_128)
+
+        path_129 = QPainterPath()
+        path_129.moveTo(-23, 308)
+        path_129.lineTo(-24, 308)
+        block_129 = self.createTrackBlock(path_129, "Block 129")
+        self.scene.addItem(block_129)
+
+        path_130 = QPainterPath()
+        path_130.moveTo(-34, 308)
+        path_130.lineTo(-35, 308)
+        block_130 = self.createTrackBlock(path_130, "Block 130")
+        self.scene.addItem(block_130)
+
+        path_131 = QPainterPath()
+        path_131.moveTo(-45, 308)
+        path_131.lineTo(-46, 308)
+        block_131 = self.createTrackBlock(path_131, "Block 131")
+        self.scene.addItem(block_131)
+
+        path_132 = QPainterPath()
+        path_132.moveTo(-56, 308)
+        path_132.lineTo(-57, 308)
+        block_132 = self.createTrackBlock(path_132, "Block 132")
+        self.scene.addItem(block_132)
+
+        path_133 = QPainterPath()
+        path_133.moveTo(-66, 308)
+        path_133.lineTo(-67, 308)
+        block_133 = self.createTrackBlock(path_133, "Block 133")
+        self.scene.addItem(block_133)
+
+        path_134 = QPainterPath()
+        path_134.moveTo(-77, 308)
+        path_134.lineTo(-78, 308)
+        block_134 = self.createTrackBlock(path_134, "Block 134")
+        self.scene.addItem(block_134)
+
+        path_135 = QPainterPath()
+        path_135.moveTo(-88, 308)
+        path_135.lineTo(-89, 308)
+        block_135 = self.createTrackBlock(path_135, "Block 135")
+        self.scene.addItem(block_135)
+
+        path_136 = QPainterPath()
+        path_136.moveTo(-99, 308)
+        path_136.lineTo(-100, 308)
+        block_136 = self.createTrackBlock(path_136, "Block 136")
+        self.scene.addItem(block_136)
+
+        path_137 = QPainterPath()
+        path_137.moveTo(-110, 308)
+        path_137.lineTo(-111, 308)
+        block_137 = self.createTrackBlock(path_137, "Block 137")
+        self.scene.addItem(block_137)
+
+        path_138 = QPainterPath()
+        path_138.moveTo(-121, 308)
+        path_138.lineTo(-122, 308)
+        block_138 = self.createTrackBlock(path_138, "Block 138")
+        self.scene.addItem(block_138)
+
+        path_139 = QPainterPath()
+        path_139.moveTo(-132, 308)
+        path_139.lineTo(-133, 308)
+        block_139 = self.createTrackBlock(path_139, "Block 139")
+        self.scene.addItem(block_139)
+
+        path_140 = QPainterPath()
+        path_140.moveTo(-143, 308)
+        path_140.lineTo(-144, 308)
+        block_140 = self.createTrackBlock(path_140, "Block 140")
+        self.scene.addItem(block_140)
+
+        path_141 = QPainterPath()
+        path_141.moveTo(-154, 308)
+        path_141.lineTo(-155, 308)
+        block_141 = self.createTrackBlock(path_141, "Block 141")
+        self.scene.addItem(block_141)
+
+        path_142 = QPainterPath()
+        path_142.moveTo(-165, 308)
+        path_142.lineTo(-166, 308)
+        block_142 = self.createTrackBlock(path_142, "Block 142")
+        self.scene.addItem(block_142)
+
+        path_143 = QPainterPath()
+        path_143.moveTo(-176, 308)
+        path_143.lineTo(-177, 308)
+        block_143 = self.createTrackBlock(path_143, "Block 143")
+        self.scene.addItem(block_143)
+
+        path_144 = QPainterPath()
+        path_144.moveTo(-192, 307)
+        path_144.quadTo(-191, 308, -187, 308)
+        block_144 = self.createTrackBlock(path_144, "Block 144")
+        self.scene.addItem(block_144)
+
+        path_145 = QPainterPath()
+        path_145.moveTo(-202, 296)
+        path_145.quadTo(-201, 298, -199, 300)
+        block_145 = self.createTrackBlock(path_145, "Block 145")
+        self.scene.addItem(block_145)
+
+        path_146 = QPainterPath()
+        path_146.moveTo(-207, 283)
+        path_146.quadTo(-207, 285, -206, 288)
+        block_146 = self.createTrackBlock(path_146, "Block 146")
+        self.scene.addItem(block_146)
+
+        path_147 = QPainterPath()
+        path_147.moveTo(-207, 273)
+        path_147.lineTo(-207, 263)
+        block_147 = self.createTrackBlock(path_147, "Block 147")
+        self.scene.addItem(block_147)
+
+        path_148 = QPainterPath()
+        path_148.moveTo(-207, 253)
+        path_148.lineTo(-207, 233)
+        block_148 = self.createTrackBlock(path_148, "Block 148")
+        self.scene.addItem(block_148)
+
+        path_149 = QPainterPath()
+        path_149.moveTo(-207, 223)
+        path_149.lineTo(-207, 213)
+        block_149 = self.createTrackBlock(path_149, "Block 149")
+        self.scene.addItem(block_149)
+
+        path_150 = QPainterPath()
+        path_150.moveTo(-207, 203)
+        path_150.cubicTo(-207, 202, -179, 188, -177, 188)
+        block_150 = self.createTrackBlock(path_150, "Block 150")
+        self.scene.addItem(block_150)
+      
     def drawRedLine(self):
         path1 = QPainterPath()
         path1.moveTo(0, 0)
@@ -316,6 +1090,7 @@ class TrackBlock(QGraphicsPathItem):
 
     def mousePressEvent(self, event):
         print(f"Clicked on {self.number}")
+        # trackModeltoTrainModel.sendTest.emit(self.number)
 
     def hoverEnterEvent(self, event):
         self.setPen(self.hover_pen)
@@ -617,8 +1392,8 @@ class TrackModel:
         self.redLineButton.clicked.connect(self.toggle_red_data)
 
         # Set Base Line to Red
-        self.change_button_color(MTA_STYLING["red"])
-        self.toggle_red_data()
+        self.change_button_color(MTA_STYLING["green"])
+        self.toggle_green_data() ################
 
         # Connect button click events to change the background color when selected
         self.greenLineButton.clicked.connect(
