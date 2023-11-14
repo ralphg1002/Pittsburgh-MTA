@@ -128,9 +128,11 @@ class TCFunctions:
 
     def update_block_info(self, blockDict, trainObject):
         if trainObject.prevPolarity != trainObject.polarity:
-            if self.find_block(self.blockDict, trainObject.prevStop) < self.find_block(
-                self.blockDict, trainObject.nextStop
-            ):
+            if trainObject.prevStop == trainObject.nextStop:
+                trainObject.block["blockNumber"] += 0
+            elif self.find_block(
+                self.blockDict, trainObject.prevStop
+            ) < self.find_block(self.blockDict, trainObject.nextStop):
                 trainObject.block["blockNumber"] += 1
             else:
                 trainObject.block["blockNumber"] -= 1

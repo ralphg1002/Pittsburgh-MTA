@@ -306,6 +306,11 @@ class TrainControllerUI(QMainWindow):
         self.pixmapAd2 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad2.png")
         self.pixmapAd3 = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/ad3.png")
 
+        self.pixmapAnnouncement = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/announcement.svg"
+        )
+        self.pixmapAnnouncement = self.pixmapAnnouncement.scaled(32, 32)
+
         # Train change section
         self.trainChangeBox = QLabel("", self)
         self.box_label(self.trainChangeBox, 245, 200)
@@ -723,9 +728,19 @@ class TrainControllerUI(QMainWindow):
             self.trainLabel, self.travelledLine, -1 * math.floor(48 / 532 * 532)
         )
 
+        self.announceIcon = QLabel(self)
+        self.text_label(self.announceIcon)
+        self.png_label(self.announceIcon, self.pixmapAnnouncement)
+        self.announceIcon.adjustSize()
+        self.set_relative_below(self.announceIcon, self.originCircle, 10)
+
+        self.announceVal = QLabel(self)
+        self.text_label(self.announceVal)
+        self.set_relative_right(self.announceVal, self.announceIcon, 20)
+
         self.displayBox.setFixedHeight(
-            self.originCircle.y()
-            + self.originCircle.height()
+            self.announceIcon.y()
+            + self.announceIcon.height()
             + 10
             - self.displayBox.y()
         )
@@ -839,7 +854,7 @@ class TrainControllerUI(QMainWindow):
         # Failure block
         self.failLabel = QLabel("Status", self)
         self.header_label(self.failLabel)
-        self.set_relative_below(self.failLabel, self.displayBox, 55)
+        self.set_relative_below(self.failLabel, self.displayBox, 14)
 
         self.failBox = QLabel(self)
         self.box_label(self.failBox, self.displayBox.width(), 185)
@@ -1138,9 +1153,24 @@ class TrainControllerUI(QMainWindow):
 
                     # an individual automatic
                     if self.announcementCombo.currentIndex() == 0:
+                        print(
+                            f'{not train.get_authority()}, {train.block["isStation"]}, {train.get_currentSpeed() == 0}'
+                        )
+                        if (
+                            (not train.get_authority())
+                            and (train.block["isStation"])
+                            and (train.get_currentSpeed() == 0)
+                        ):
+                            train.set_announcement(
+                                "This is " + train.beacon["currStop"] + "."
+                            )
+                        else:
+                            train.set_announcement("")
+
                         self.announcementEdit.setDisabled(True)
                         self.sendLabel.setDisabled(True)
                     else:
+                        train.set_announcement(self.tcVariables["customAnnouncement"])
                         self.announcementEdit.setDisabled(False)
                         self.sendLabel.setDisabled(False)
 
@@ -1169,16 +1199,6 @@ class TrainControllerUI(QMainWindow):
                     else:
                         train.set_rightDoor(False)
 
-                    if self.announcementCombo.currentIndex() == 0:
-                        if train.block["isStation"] and train.get_currentSpeed == 0:
-                            train.set_announcement(
-                                "This is " + train.beacon["currStop"] + "."
-                            )
-                        else:
-                            train.set_announcement("")
-                    else:
-                        train.set_announcement(self.tcVariables["customAnnouncement"])
-
                     train.set_setpointTemp(self.setpointTempVal.value())
 
                     if self.adCombo.currentIndex() == 0:
@@ -1198,6 +1218,10 @@ class TrainControllerUI(QMainWindow):
                 train.set_paxEbrake(False)
 
                 # updating display
+                self.announceVal.setText(train.get_announcement())
+                self.announceVal.adjustSize()
+                self.announceVal.setAlignment(Qt.AlignLeft)
+
                 self.nextStopLabel.setText("Next Stop:\n" + train.nextStop)
                 self.nextStopLabel.setAlignment(Qt.AlignRight)
                 self.nextStopLabel.adjustSize()
