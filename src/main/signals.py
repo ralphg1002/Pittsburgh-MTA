@@ -59,6 +59,22 @@ class TrainControllerSWToTrainModel(QObject):
     sendAdvertisement = pyqtSignal(str, int)
 
 
+#########################################################################################
+class CTCTrackController(QObject):
+    sendAuthority = pyqtSignal(
+        int, int, int, int
+    )  # line (1 for green, 2 for red), wayside, block number, authority
+    sendSuggestedSpeed = pyqtSignal(
+        int, int, int, int
+    )  # line, wayside, block number, suggested speed
+    sendMaintenance = pyqtSignal(
+        int, int, int, bool
+    )  # line, wayside, block number, 1 if disabled, 0 if enabled
+    sendTrainDispatched = pyqtSignal(
+        int, int, str, bool
+    )  # line, wayside #, trainID, authority
+
+
 ##########################################################################################
 class Master(QObject):
     # Instantiate timing signals
@@ -78,6 +94,9 @@ trainModelToTrainController = TrainModelToTrainController()
 
 # Instantiation for signals sent from Train Controller (SW)
 trainControllerSWToTrainModel = TrainControllerSWToTrainModel()
+
+# Instantiation for signals sent from CTC
+ctcToTrackController = CTCTrackController()
 
 # Instantiation of signals shared by multiple classes
 masterSignals = Master()
