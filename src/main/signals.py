@@ -21,8 +21,25 @@ class TrackControllerToTrackModel(QObject):
 
 
 ##########################################################################################
+class TrackModelToTrackController(QObject):
+    occupancyState = pyqtSignal(
+        int, int, int
+    )  # line, block number occupied, block number unoccupied
+
+
+class TrackModelToCTC(QObject):
+    throughput = pyqtSignal(int, int)  # line, ticketsales/hr
+
+
+class TrackModelToTrainModel(QObject):
+    blockInfo = pyqtSignal(int, dict)  # next block, current block data
+    beacon = pyqtSignal(dict)  # beacon data
+    newCurrentPassengers = pyqtSignal(int)
+
+
+##########################################################################################
 class TrainModelToTrackModel(QObject):
-    sendCurrentPassengers = pyqtSignal(int)
+    sendCurrentPassengers = pyqtSignal(int)  # add station name to this :)
 
 
 class TrainModelToTrainController(QObject):
@@ -87,6 +104,9 @@ class Master(QObject):
 trackControllerToCTC = TrackControllerToCTC()
 trackControllerToTrackModel = TrackControllerToTrackModel()
 
+trackModelToTrackController = TrackModelToTrackController()
+trackModelToCTC = TrackModelToCTC()
+trackModelToTrainModel = TrackModelToTrainModel()
 
 # Instantiation for signals sent from Train Model
 trainModelToTrackModel = TrainModelToTrackModel()
