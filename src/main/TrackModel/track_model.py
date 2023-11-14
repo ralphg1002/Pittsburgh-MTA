@@ -5,10 +5,7 @@ from .Station import Station
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-# sys.path.append("../../main")
-# from signals import trackModeltoTrainModel
-
-# Qgraphicsview, Qgraphicescene, Qpainterpath
+# from signals import trackModeltoTrainModel, trackModelToCTC, trackModelToTrackController
 
 MTA_STYLING = {
     # font variables
@@ -38,7 +35,7 @@ class TrackView(QGraphicsView):
         super().__init__(parent)
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
-        self.layout_number = 1  # Initialize the layout to the first one
+        # self.layout_number = 1  # Initialize the layout to the first one
         # self.drawGreenLine()  # Call the initial layout function
 
     def drawGreenLine(self):
