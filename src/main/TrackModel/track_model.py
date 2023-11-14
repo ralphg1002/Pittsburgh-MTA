@@ -1590,7 +1590,7 @@ class TrackModel:
             # Update Gui
             # self.update_gui(filePath)
 
-            self.trackData = self.block.read_track_data(filePath, "Red Line")
+            self.trackData = self.block.read_track_data(filePath, "Green Line")
             print(self.trackData)
 
     def add_input_section(self):
