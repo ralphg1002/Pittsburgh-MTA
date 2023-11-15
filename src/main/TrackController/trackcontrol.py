@@ -547,18 +547,6 @@ class Wayside:
                         )
                         
 
-        # call the authority function to set authorities throughout the map
-        """
-        This section of code will deal with the authority of the system for each block that is occupied and send it to the track model
-        This will be calculated using block occupancy, light states, and suggested authority from the CTC.
-        """
-
-        # Loop through every block that the wayside controller has jurisdiction over
-        for block in self.blocks:
-            # check for occupancy of block
-            if block.get_occupancystate() == True:
-                pass
-
 
     # This is the method that parses the condition of a section within a PLC file
     def parse_condition(self, condition):
