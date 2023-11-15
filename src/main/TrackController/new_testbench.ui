@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>191</width>
-    <height>408</height>
+    <height>468</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>210</y>
+      <y>240</y>
       <width>91</width>
       <height>41</height>
      </rect>
@@ -158,7 +158,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>260</y>
+      <y>290</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -213,7 +213,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>320</y>
+      <y>350</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -226,7 +226,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>290</y>
+      <y>320</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -251,13 +251,39 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>350</y>
+      <y>380</y>
       <width>131</width>
       <height>22</height>
      </rect>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="inputApply">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>190</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="outputApply">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>410</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply</string>
     </property>
    </widget>
   </widget>
