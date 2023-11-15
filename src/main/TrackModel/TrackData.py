@@ -1,6 +1,6 @@
 import pandas as pd
 from .Station import Station
-
+from signals import trackControllerToTrackModel
 
 class TrackData:
     redTrackData = {}
@@ -13,6 +13,8 @@ class TrackData:
         self.greenTrackData = self.read_track_data(
             "src\main\TrackModel\Track Layout & Vehicle Data vF2.xlsx", "Green Line"
         )
+        trackControllerToTrackModel.suggestedSpeed.connect(self.set_suggested_speed)
+        trackControllerToTrackModel.authority.connect(self.set_authority)
 
     def read_track_data(self, filePath, lineName):
         excelData = pd.read_excel(filePath, sheet_name=lineName)
@@ -174,6 +176,26 @@ class TrackData:
         if line == "Red":
             return self.redTrackData
         return self.greenTrackData
+    
+    def set_suggested_speed(self, line, _, blockNum, suggestedSpeed):
+        if line == 1:
+            for block in self.greenTrackData:
+                if block["Block Number"] == blockNum:
+                    block["Suggested Speed"] == suggestedSpeed
+        if line == 2:
+            for block in self.redTrackData:
+                if block["Block Number"] == blockNum:
+                    block["Suggested Speed"] == suggestedSpeed
+    
+    def set_authority(self, line, _, blockNum, authority):
+        if line == 1:
+            for block in self.greenTrackData:
+                if block["Block Number"] == blockNum:
+                    block["Authority"] == authority
+        if line == 2:
+            for block in self.redTrackData:
+                if block["Block Number"] == blockNum:
+                    block["Authority"] == authority
 
     def update_station_data(self):
         station = Station()
