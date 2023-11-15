@@ -27,10 +27,11 @@ class TrackData:
         #From Wayside
         trackControllerToTrackModel.suggestedSpeed.connect(self.set_suggested_speed)
         trackControllerToTrackModel.authority.connect(self.set_authority)
+        trackControllerToTrackModel.maintenance.connect(self.set_maintenance)
         
         trackControllerToTrackModel.switchState.connect(self.set_switch_state)
-        trackControllerToTrackModel.lightState.connect
-        trackControllerToTrackModel.crossingState.connect
+        trackControllerToTrackModel.lightState.connect(self.set_light_state)
+        trackControllerToTrackModel.crossingState.connect(self.set_crossing_state)
         
         #From Train Model
         trainModelToTrackModel.sendCurrentPassengers.connect(self.update_station_data)
@@ -50,7 +51,7 @@ class TrackData:
         for block in data:
             block["Failures"] = ["None"]
             block["Occupancy"] = 0
-            block["Maintenance"] = 0
+            block["Maintenance"] = False
             block["Suggested Speed"] = 0
             block["Authority"] = 0
             #Initialize all infrastructure data
@@ -276,6 +277,16 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Authority"] == authority
+    
+    def set_maintenance(self, line, _, blockNum, maintenance):
+        if line == 1:
+            for block in self.greenTrackData:
+                if block["Block Number"] == blockNum:
+                    block["Maintenance"] == maintenance
+        elif line == 2:
+            for block in self.redTrackData:
+                if block["Block Number"] == blockNum:
+                    block["Maintenance"] == maintenance
     
     def set_switch_state(self, line, _, blockNum, state):
         # Initial Green Line Occupancy
