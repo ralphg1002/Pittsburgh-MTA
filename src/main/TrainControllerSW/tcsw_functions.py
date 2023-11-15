@@ -48,7 +48,9 @@ class TCFunctions:
                              "isStation": False,
                              "isTunnel": False,
                              "stationName": "",
-                             "firstStation": ""}
+                             "firstStation": "",
+                             "Infrastructure": "",
+                             "Limit": False}
             modifiedBlock["Line"] = block["Line"]
             modifiedBlock["Section"] = block["Section"]
             modifiedBlock["Number"] = block["Block Number"]
@@ -60,24 +62,24 @@ class TCFunctions:
                 modifiedStationName = modifiedStationName.replace("; UNDERGROUND", "")
                 modifiedStationName = modifiedStationName.replace(" (First)", "")
                 modifiedBlock["stationName"] = modifiedStationName
-                modifiedBlock["infrastructure"] = modifiedStationName
+                modifiedBlock["Infrastructure"] = modifiedStationName
             if "UNDERGROUND" in block["Infrastructure"]:
                 modifiedBlock["isTunnel"] = True
             if "SWITCH" in block["Infrastructure"]:
-                modifiedBlock["infrastructure"] = "SWITCH"
+                modifiedBlock["Infrastructure"] = "SWITCH"
                 affectedBlocks = re.findall(r'\d+', block["Infrastructure"])
                 affectedBlocks = [int(num) for num in affectedBlocks]
             if "RAILWAY CROSSING" in block["Infrastructure"]:
-                modifiedBlock["infrastructure"] = "RAILWAY CROSSING"
+                modifiedBlock["Infrastructure"] = "RAILWAY CROSSING"
             if "(First)" in block["Infrastructure"]:
                 firstStationName = modifiedBlock["stationName"]
-            if modifiedBlock["infrastructure"] != "":
+            if modifiedBlock["Infrastructure"] != "":
                 affectedBlocks.append(modifiedBlock["Number"] - 1)
                 affectedBlocks.append(modifiedBlock["Number"] + 1)
             affectedBlocks = list(set(affectedBlocks))
             for affected in affectedBlocks:
                 if affected == modifiedBlock["Number"]:
-                    modifiedBlock["limit"] = True
+                    modifiedBlock["Limit"] = True
 
             modifiedData.append(modifiedBlock)
 

@@ -946,6 +946,9 @@ class TrainControllerUI(QMainWindow):
 
     def update(self):
         # Update Train ID list
+        # from CTC
+        masterSignals.addTrain.connect(lambda: self.signal_addTrain)
+
         # from test bench
         for train in self.testWindow.testbenchVariables["trainList"]:
             idCheck = False
@@ -954,9 +957,6 @@ class TrainControllerUI(QMainWindow):
                     idCheck = True
             if not idCheck:
                 self.tcVariables["trainList"].append(train)
-
-        # from CTC
-        masterSignals.addTrain.connect(lambda: self.signal_addTrain)
 
         blockDict = []
         if self.trainLineCombo.currentText() == "red":
@@ -1337,8 +1337,9 @@ class TrainControllerUI(QMainWindow):
         hours, minutes, seconds = map(int, self.systemTimeInput.text().split(":"))
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
 
-    def signal_addTrain(self, line, id):
-        train = {line: id}
+    def signal_addTrain(self, line, name):
+        print("made it here")
+        train = {line: name}
         idCheck = False
         for i in self.tcVariables["trainList"]:
             if i == train:
@@ -1350,99 +1351,99 @@ class TrainControllerUI(QMainWindow):
         self.tcVariables["samplePeriod"] = period
         return
 
-    def signal_speedLimit(self, id, speedLimit):
+    def signal_speedLimit(self, name, speedLimit):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_speedLimit(int(speedLimit * 2.237))
         return
 
-    def signal_authority(self, id, authority):
+    def signal_authority(self, name, authority):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_authority(authority)
         return
 
-    def signal_leftDoor(self, id, leftStation):
+    def signal_leftDoor(self, name, leftStation):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.beacon["leftStation"] = leftStation
         return
 
-    def signal_rightDoor(self, id, rightStation):
+    def signal_rightDoor(self, name, rightStation):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.beacon["rightStation"] = rightStation
         return
 
-    def signal_nextStation1(self, id, nextStation):
+    def signal_nextStation1(self, name, nextStation):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.beacon["nextStop"][0] = nextStation
         return
 
-    def signal_nextStation2(self, id, nextStation):
+    def signal_nextStation2(self, name, nextStation):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.beacon["nextStop"][1] = nextStation
         return
 
-    def signal_currStation(self, id, currStation):
+    def signal_currStation(self, name, currStation):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.beacon["currStop"] = currStation
         return
 
-    def signal_commandedSpeed(self, id, commandedSpeed):
+    def signal_commandedSpeed(self, name, commandedSpeed):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_commandedSpeed(commandedSpeed)
         return
 
-    def signal_currSpeed(self, id, currSpeed):
+    def signal_currSpeed(self, name, currSpeed):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.prevSpeed = train.currentSpeed
                 train.set_currentSpeed(currSpeed)
         return
 
-    def signal_currTemp(self, id, currTemp):
+    def signal_currTemp(self, name, currTemp):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_currentTemp(currTemp)
         return
 
-    def signal_paxEbrake(self, id, status):
+    def signal_paxEbrake(self, name, status):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_paxEbrake(status)
         return
 
-    def signal_engineFail(self, id, status):
+    def signal_engineFail(self, name, status):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_engineFailure(status)
         return
 
-    def signal_signalFail(self, id, status):
+    def signal_signalFail(self, name, status):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_signalFailure(status)
         return
 
-    def signal_brakeFail(self, id, status):
+    def signal_brakeFail(self, name, status):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.set_brakeFailure(status)
         return
 
-    def signal_polarity(self, id, state):
+    def signal_polarity(self, name, state):
         for train in self.tcVariables["trainList"]:
-            if train.get_trainID() == id:
+            if train.get_trainID() == name:
                 train.polarity = state
         return
 
-    def test_display(self, id, power):
-        # print(f"ID: {id} Power: {power}")
+    def test_display(self, name, power):
+        # print(f"ID: {name} Power: {power}")
         return
 
     def speed_up(self):
