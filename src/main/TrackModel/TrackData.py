@@ -1,3 +1,5 @@
+from turtle import update
+from numpy import block
 import pandas as pd
 from .Station import Station
 from signals import (
@@ -8,11 +10,12 @@ from signals import (
     trackModelToTrainModel,
     trackModelToTrackController
 )
+from PyQt5.QtCore import pyqtSignal, QObject
 
 class TrackData:
     redTrackData = {}
     greenTrackData = {}
-
+    # updateOccupancyGUI = QObject.pyqtSignal(str, int)
 
     def __init__(self):
         self.redTrackData = self.read_track_data(
@@ -37,6 +40,8 @@ class TrackData:
         #From Train Model
         trainModelToTrackModel.sendCurrentPassengers.connect(self.update_station_data)
         trainModelToTrackModel.sendPolarity.connect(self.send_block_data)
+
+        #Test
 
     def read_track_data(self, filePath, lineName):
         excelData = pd.read_excel(filePath, sheet_name=lineName)
@@ -249,14 +254,16 @@ class TrackData:
         throughput = 0 #Reset
         if line == "Red":
             for block in self.redTrackData:
-                if "STATION" in block["Infrastructure"]:
-                    throughput += block["Ticket Sales"]
-                    block["Ticket Sales"] = 0 #Reset
+                if type(block["Infrastructure"]) == str:
+                    if "STATION" in block["Infrastructure"]:
+                        throughput += block["Ticket Sales"]
+                        block["Ticket Sales"] = 0 #Reset
         elif line == "Green":
             for block in self.greenTrackData:
-                if "STATION" in block["Infrastructure"]:
-                    throughput += block["Ticket Sales"]
-                    block["Ticket Sales"] = 0 #Reset
+                if type(block["Infrastructure"]) == str:
+                    if "STATION" in block["Infrastructure"]:
+                        throughput += block["Ticket Sales"]
+                        block["Ticket Sales"] = 0 #Reset
         trackModelToCTC.throughput.emit(throughput)
         
     def set_suggested_speed(self, line, _, blockNum, suggestedSpeed):
@@ -291,10 +298,10 @@ class TrackData:
     
     def set_switch_state(self, line, _, blockNum, state):
         # Initial Green Line Occupancy
-        if blockNum == 62 and state == 0 and line == 1:
+        if blockNum == 62 and state == 1 and line == 1:
             self.send_block_data("Green", 0, 0)
         # Initial Red Line Occupancy
-        elif blockNum == 9 and state == 0 and line == 2:
+        elif blockNum == 9 and state == 1 and line == 2:
             self.send_block_data("Red", 0, 0)
         if line == 1:
             for block in self.greenTrackData:
@@ -334,7 +341,8 @@ class TrackData:
                 for block in self.greenTrackData:
                     if block["Block Number"] == 62:
                         trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
             else:
                 #Clear occupancy of previous block
@@ -345,37 +353,43 @@ class TrackData:
                 for block in self.greenTrackData:
                     if block["Block Number"] == 13:
                         trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
             elif curBlock == 100:
                 for block in self.greenTrackData:
                     if block["Block Number"] == 85:
                         trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
             elif curBlock == 77 and prevBlock == 78:
                 for block in self.greenTrackData:
                     if block["Block Number"] == 101:
                         trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
             elif curBlock == 150:
                 for block in self.greenTrackData:
                     if block["Block Number"] == 28:
                         trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
             elif curBlock > prevBlock:
                 for block in self.greenTrackData:
                     if block["Block Number"] == curBlock + 1:
                         trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
             elif curBlock < prevBlock:
                 for block in self.greenTrackData:
                     if block["Block Number"] == curBlock - 1:
                         trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
             # Beacon data emission below
             if curBlock in greenBeforeStation:
@@ -400,5 +414,13 @@ class TrackData:
                 for block in self.redTrackData:
                     if block["Block Number"] == 9:
                         trackModelToTrainModel.blockInfo.emit(9, block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
-                        trackModelToTrackController.occupancyState.emit(1, block["Block Number"], curBlock)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(block["Block Number"]), block["Block Number"], True)
+                        trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(curBlock), curBlock, False)
                         block["Occupancy"] = 1
+                        # self.updateOccupancyGUI.emit("Green", 62)
+
+    def get_wasyside_num(self, blockNum):
+        if (blockNum >= 1 and blockNum <= 30) or (blockNum >= 102 and blockNum <= 150):
+            return 1
+        else:
+            return 2

@@ -23,8 +23,8 @@ class TrackControllerToTrackModel(QObject):
 ##########################################################################################
 class TrackModelToTrackController(QObject):
     occupancyState = pyqtSignal(
-        int, int, int
-    )  # line, block number occupied, block number unoccupied
+        int, int, int, bool
+    )  # line, wayside controller number, block number, occupancy state
 
 
 class TrackModelToCTC(QObject):
