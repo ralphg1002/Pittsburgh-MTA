@@ -1,6 +1,7 @@
 import sys, re, os
 import pandas as pd
-#from PyQt5.QtCore import pyqtSignal
+
+# from PyQt5.QtCore import pyqtSignal
 from signals import trackControllerToCTC, trackControllerToTrackModel
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from .trackcontrolui import MainUI
@@ -54,7 +55,6 @@ class RunPLC:
             # You can choose to continue or raise an exception here if needed
 
         return data
-
 
 
 class Block:
@@ -124,7 +124,7 @@ class Block:
 
     def get_suggestedspeed(self):
         return self.suggestedSpeed
-    
+
     def set_suggestedspeed(self, newSpeed):
         self.suggestedSpeed = newSpeed
 
@@ -438,8 +438,7 @@ class Wayside:
             # Initialize a flag to track if any condition is satisfied
             any_condition_satisfied = False
 
-            for ifBlock in range (0,len(item)):
-
+            for ifBlock in range(0, len(item)):
                 switchString = item[ifBlock]["Section"].rstrip(":")
                 if switchString in self.switches:
                     # Determine what is the switch block
@@ -450,7 +449,6 @@ class Wayside:
                 # Parse the conditions
                 condition = item[ifBlock]["Condition"]
 
-                
                 entry, exitRange, notExist = self.parse_condition(condition)
                 condition1 = False
                 condition2 = False
@@ -459,7 +457,7 @@ class Wayside:
                 if isinstance(entry, int):
                     entry = [entry]  # Convert single integer to a list
 
-                print("Wayside Number: ",self.waysideNum)
+                print("Wayside Number: ", self.waysideNum)
 
                 if entry != 0:
                     # check for validity of conditon 1
@@ -528,12 +526,12 @@ class Wayside:
                             self.line, self.waysideNum, signalNumber, signalState
                         )
 
-                    #Set the crossing value
+                    # Set the crossing value
                     elif parsedOperation["Type"] == "CROSS":
                         crossValue = int(parsedOperation["Value"])
                         crossNumber = parsedOperation["Number"]
 
-                        #2x redundancy
+                        # 2x redundancy
                         self.get_block(crossNumber).set_crosssingstate(crossValue)
                         self.get_block(crossNumber).set_crosssingstate(crossValue)
 
@@ -545,7 +543,6 @@ class Wayside:
                             crossNumber,
                             switchValue,
                         )
-                        
 
 
     # This is the method that parses the condition of a section within a PLC file
@@ -651,12 +648,10 @@ class Wayside:
                     exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
                     notExist = True
                     break
-        
+
         print("Entry: ", entry)
         print("Exit: ", exit)
         return entry, exit, notExist
-
-
 
     # This is the method that parses the operation following a condition within a PLC file
     def parse_operation(self, operationLine):
@@ -674,7 +669,7 @@ class Wayside:
         for block in self.blocks:
             if int(block.get_number()) == int(blockNumber):
                 return block
-        #print(self.blocks[28].get_number())
+        # print(self.blocks[28].get_number())
         print("Did not find block " + str(blockNumber))
         return None  # Block not found
 
@@ -685,7 +680,7 @@ class Wayside:
             if block.get_type() == blockType:
                 matchingBlocks.append(block)
         return matchingBlocks
-    
+
     def get_occupied_blocks(self):
         occupiedBlocks = []
         for block in self.blocks:
@@ -906,8 +901,9 @@ class TrackControl(QMainWindow):
         # Connect output signals to the track model to also call the switch state handler
         trackControllerToTrackModel.switchState.connect(self.set_switchstate_handler)
 
-        trackControllerToTrackModel.crossingState.connect(self.set_crossingstate_handler)
-
+        trackControllerToTrackModel.crossingState.connect(
+            self.set_crossingstate_handler
+        )
 
         # connect the input signals from the test bench to the main ui page handlers
         # self.ui.testBenchWindow.setSwitchState.connect(self.set_switchstate_handler)
@@ -1050,7 +1046,7 @@ class TrackControl(QMainWindow):
             # Clear the options for the next combo boxes
             self.ui.comboboxBlockType.clear()
             self.ui.comboboxBlockNum.clear()
-            
+
         else:
             self.ui.waysideSelect = self.ui.comboboxWayside.currentIndex()
             self.ui.comboboxBlockType.clear()
@@ -1065,14 +1061,21 @@ class TrackControl(QMainWindow):
             self.ui.comboboxBlockType.addItem("Junction w/o Switch")
             self.ui.comboboxBlockType.addItem("Plain")
 
-            
-        if(self.ui.waysideSelect != 0 and self.ui.waysideSelect != -1):
-            self.ui.buttonMode.set_button_style(self.lines[self.ui.lineSelect - 1].get_wayside(self.ui.waysideSelect).get_plc_state())
-            temporaryWayside = self.lines[self.ui.lineSelect - 1].get_wayside(self.ui.waysideSelect)
-            
+        if self.ui.waysideSelect != 0 and self.ui.waysideSelect != -1:
+            self.ui.buttonMode.set_button_style(
+                self.lines[self.ui.lineSelect - 1]
+                .get_wayside(self.ui.waysideSelect)
+                .get_plc_state()
+            )
+            temporaryWayside = self.lines[self.ui.lineSelect - 1].get_wayside(
+                self.ui.waysideSelect
+            )
+
             blockList = temporaryWayside.get_occupied_blocks()
             for block in blockList:
-                self.ui.occupancyBox.add_item(block.get_number(), block.get_type(), block.get_failurestate())
+                self.ui.occupancyBox.add_item(
+                    block.get_number(), block.get_type(), block.get_failurestate()
+                )
 
             self.ui.buttonMode.set_button_style(
                 self.lines[self.ui.lineSelect - 1]
@@ -1200,9 +1203,18 @@ class TrackControl(QMainWindow):
                 self.ui.lightState.lightChanged.connect(tempBlock.set_lightstate)
 
                 # Pass signals on to the track model
-                trackControllerToTrackModel.switchState.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_switchstate())
-                trackControllerToTrackModel.lightState.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_lightstate())
-
+                trackControllerToTrackModel.switchState.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_switchstate(),
+                )
+                trackControllerToTrackModel.lightState.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_lightstate(),
+                )
 
             elif blockType == "junctionNS":
                 self.ui.blockStatus.show()
@@ -1212,8 +1224,12 @@ class TrackControl(QMainWindow):
                 self.ui.lightState.show()
                 self.ui.lightState.lightChanged.connect(tempBlock.set_lightstate)
                 # Pass signal on to the track model
-                trackControllerToTrackModel.lightState.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_lightstate())
-
+                trackControllerToTrackModel.lightState.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_lightstate(),
+                )
 
             elif blockType == "station":
                 # blockStatus.shift_middle()
@@ -1242,34 +1258,45 @@ class TrackControl(QMainWindow):
                 self.ui.lightState.lightChanged.connect(tempBlock.set_lightstate)
 
                 # Pass signals on to the track model
-                trackControllerToTrackModel.crossingState.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_crossingstate())
-                trackControllerToTrackModel.lightState.emit(self.ui.lineSelect, self.ui.waysideSelect, tempBlock.get_number(), tempBlock.get_lightstate())
+                trackControllerToTrackModel.crossingState.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_crossingstate(),
+                )
+                trackControllerToTrackModel.lightState.emit(
+                    self.ui.lineSelect,
+                    self.ui.waysideSelect,
+                    tempBlock.get_number(),
+                    tempBlock.get_lightstate(),
+                )
 
     # These are the handle methods for the set states
     def set_switchstate_handler(self, line, wayside, num, state):
-            self.lines[line - 1].get_wayside(wayside).get_block(num).set_switchstate(state)
-            # check if the block is currently being displayed, if so, update the display accordingly
-            blockNum = 0
-            selectedItem = self.ui.comboboxBlockNum.currentText()
-            match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
-            if match:
-                blockNum = int(match.group(1))
-                if blockNum == num:
-                    self.ui.junctionSwitch.set_switch_state(state)
-            self.ui.testBenchWindow.refreshed.emit(True)
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_switchstate(state)
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = 0
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
+        if match:
+            blockNum = int(match.group(1))
+            if blockNum == num:
+                self.ui.junctionSwitch.set_switch_state(state)
+        self.ui.testBenchWindow.refreshed.emit(True)
 
     def set_crossingstate_handler(self, line, wayside, num, state):
-            self.lines[line - 1].get_wayside(wayside).get_block(num).set_crossingstate(state)
-            # check if the block is currently being displayed, if so, update the display accordingly
-            blockNum = 0
-            selectedItem = self.ui.comboboxBlockNum.currentText()
-            match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
-            if match:
-                blockNum = int(match.group(1))
-                if blockNum == num:
-                    self.ui.crossing.set_crossing_state(state)
-            self.ui.testBenchWindow.refreshed.emit(True)
-               
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_crossingstate(
+            state
+        )
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = 0
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
+        if match:
+            blockNum = int(match.group(1))
+            if blockNum == num:
+                self.ui.crossing.set_crossing_state(state)
+        self.ui.testBenchWindow.refreshed.emit(True)
 
     def set_occupancystate_handler(self, line, wayside, num, state):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
@@ -1321,7 +1348,6 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
         trackControllerToCTC.occupancyState.emit(line, num, state)
-            
 
     def set_lightstate_handler(self, line, wayside, num, color):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_lightstate(color)
@@ -1422,6 +1448,7 @@ class TrackControl(QMainWindow):
 
     def set_suggested_authority_handler(self, line, wayside, num, suggestedAuthority):
         pass
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

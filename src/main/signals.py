@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import *
 
 
 ##########################################################################################
@@ -21,35 +21,52 @@ class TrackControllerToTrackModel(QObject):
 
 
 ##########################################################################################
+class TrackModelToTrackController(QObject):
+    occupancyState = pyqtSignal(
+        int, int, int
+    )  # line, block number occupied, block number unoccupied
+
+
+class TrackModelToCTC(QObject):
+    throughput = pyqtSignal(int)  # line, ticketsales/hr
+
+
+class TrackModelToTrainModel(QObject):
+    blockInfo = pyqtSignal(float, float, float, float, int, int)  # next block, length, grade, speed limit, suggested speed, authority
+    beacon = pyqtSignal(dict)
+    newCurrentPassengers = pyqtSignal(int)
+
+   
+##########################################################################################
 class TrainModelToTrackModel(QObject):
-    sendCurrentPassengers = pyqtSignal(int)
-    sendMaxPassengers = pyqtSignal(int)
+    sendCurrentPassengers = pyqtSignal(int, str)
+    sendPolarity = pyqtSignal(str, int, int) # Line, current block, previous block
 
 
 class TrainModelToTrainController(QObject):
-    sendSpeedLimit = pyqtSignal(int)
-    sendAuthority = pyqtSignal(int)
-    sendLeftDoor = pyqtSignal(bool)
-    sendRightDoor = pyqtSignal(bool)
-    sendNextStation = pyqtSignal(str)
-    sendPrevStation = pyqtSignal(str)
-    sendEnterTunnel = pyqtSignal(bool)
-    sendCommandedSpeed = pyqtSignal(int)
-    sendBlockLength = pyqtSignal(int)
-    sendCurrentPassengers = pyqtSignal(int)
-    sendMaxPassengers = pyqtSignal(int)
-    sendCurrentSpeed = pyqtSignal(int)
-    sendTemperature = pyqtSignal(int)
-    sendPassengerEmergencyBrake = pyqtSignal(bool)
-    sendEngineFailure = pyqtSignal(bool)
-    sendSignalPickupFailure = pyqtSignal(bool)
-    sendBrakeFailure = pyqtSignal(bool)
+    sendSpeedLimit = pyqtSignal(str, int)
+    sendAuthority = pyqtSignal(str, bool)
+    sendLeftDoor = pyqtSignal(str, bool)
+    sendRightDoor = pyqtSignal(str, bool)
+    sendNextStation1 = pyqtSignal(str, str)
+    sendNextStation2 = pyqtSignal(str, str)
+    sendCurrStation = pyqtSignal(str, str)
+    sendEnterTunnel = pyqtSignal(bool)  # Check, can be in block dictionary
+    sendCommandedSpeed = pyqtSignal(str, int)
+    sendBlockLength = pyqtSignal(int)  # Check
+    sendCurrentSpeed = pyqtSignal(str, int)
+    sendTemperature = pyqtSignal(str, int)
+    sendPassengerEmergencyBrake = pyqtSignal(str, bool)
+    sendEngineFailure = pyqtSignal(str, bool)
+    sendSignalPickupFailure = pyqtSignal(str, bool)
+    sendBrakeFailure = pyqtSignal(str, bool)
+    sendPolarity = pyqtSignal(str, bool)
 
 
 ##########################################################################################
 class TrainControllerSWToTrainModel(QObject):
-    sendPower = pyqtSignal(str, int)
-    sendDriverEmergencyBrake = pyqtSignal(str, int)
+    sendPower = pyqtSignal(str, float)
+    sendDriverEmergencyBrake = pyqtSignal(str, bool)
     sendDriverServiceBrake = pyqtSignal(str, float)
     sendAnnouncement = pyqtSignal(str, str)
     sendHeadlightState = pyqtSignal(str, bool)
@@ -60,16 +77,39 @@ class TrainControllerSWToTrainModel(QObject):
     sendAdvertisement = pyqtSignal(str, int)
 
 
-##########################################################################################
+#########################################################################################
+class CTCTrackController(QObject):
+    sendAuthority = pyqtSignal(
+        int, int, int, int
+    )  # line (1 for green, 2 for red), wayside, block number, authority
+    sendSuggestedSpeed = pyqtSignal(
+        int, int, int, int
+    )  # line, wayside, block number, suggested speed
+    sendMaintenance = pyqtSignal(
+        int, int, int, bool
+    )  # line, wayside, block number, 1 if disabled, 0 if enabled
+    sendTrainDispatched = pyqtSignal(
+        int, int, str, bool
+    )  # line, wayside #, trainID, authority
 
-# Instantiate timing signals
-timingMultiplier = pyqtSignal(float)
-clockSignal = pyqtSignal(str)
+class CTCToTrackModel(QObject):
+    requestThroughput = pyqtSignal(str) #requests hourly
+
+##########################################################################################
+class Master(QObject):
+    # Instantiate timing signals
+    timingMultiplier = pyqtSignal(int)
+    clockSignal = pyqtSignal(QTime)
+    addTrain = pyqtSignal(str, str)  # (line, id)
+
 
 # Instantiation for signals sent from Track Controller
 trackControllerToCTC = TrackControllerToCTC()
 trackControllerToTrackModel = TrackControllerToTrackModel()
 
+trackModelToTrackController = TrackModelToTrackController()
+trackModelToCTC = TrackModelToCTC()
+trackModelToTrainModel = TrackModelToTrainModel()
 
 # Instantiation for signals sent from Train Model
 trainModelToTrackModel = TrainModelToTrackModel()
@@ -77,3 +117,10 @@ trainModelToTrainController = TrainModelToTrainController()
 
 # Instantiation for signals sent from Train Controller (SW)
 trainControllerSWToTrainModel = TrainControllerSWToTrainModel()
+
+# Instantiation for signals sent from CTC
+ctcToTrackController = CTCTrackController()
+ctcToTrackModel = CTCToTrackModel()
+
+# Instantiation of signals shared by multiple classes
+masterSignals = Master()

@@ -29,11 +29,16 @@ class TestWindow(QMainWindow):
 
     # dimensions
     w = 770
-    h = 420
+    h = 470
 
     # variables
     tcObject = TCFunctions()
-    testbenchVariables = {"trainID": "", "speedLimit": 0, "authority": 0}
+    testbenchVariables = {
+        "trainID": "",
+        "speedLimit": 0,
+        "authority": 0,
+        "trainList": [],
+    }
 
     def __init__(self):
         super().__init__()
@@ -57,38 +62,31 @@ class TestWindow(QMainWindow):
         self.set_relative_below_right(self.testBenchLabel, self.headerBlock, 20)
 
         self.trainBox = QLabel(self)
-        self.box_label(self.trainBox, 230, 432 - self.headerBlock.height() - 40)
+        self.box_label(self.trainBox, 230, 492 - self.headerBlock.height() - 40)
         self.set_relative_below_right(self.trainBox, self.headerBlock, 20)
         self.trainBox.move(
             self.trainBox.x(), self.headerBlock.y() + self.headerBlock.height() + 10
         )
 
         self.editBox = QLabel(self)
-        self.box_label(self.editBox, 230, 432 - self.headerBlock.height() - 40)
+        self.box_label(self.editBox, 230, 492 - self.headerBlock.height() - 40)
         self.set_relative_below_right(self.editBox, self.headerBlock, 20)
         self.set_relative_right(self.editBox, self.trainBox, 20)
 
         self.buttonBox = QLabel(self)
-        self.box_label(self.buttonBox, 230, 432 - self.headerBlock.height() - 40)
+        self.box_label(self.buttonBox, 230, 492 - self.headerBlock.height() - 40)
         self.set_relative_right(self.buttonBox, self.editBox, 20)
-
-        self.selectTrainLabel = QLabel("Select a Train", self)
-        self.text_label(self.selectTrainLabel)
-        self.set_relative_below_right(self.selectTrainLabel, self.trainBox, 10)
-
-        self.trainCombo = QComboBox(self)
-        self.text_label(self.trainCombo)
-        self.set_relative_right(self.trainCombo, self.selectTrainLabel, 10)
-        self.set_relative_before_right_end(self.trainCombo, self.trainBox, 10)
 
         self.addTrainLabel = QLabel("Add Train", self)
         self.text_label(self.addTrainLabel)
-        self.set_relative_below(self.addTrainLabel, self.selectTrainLabel, 20)
+        self.set_relative_below_right(self.addTrainLabel, self.trainBox, 10)
 
         self.sendLabel = QPushButton(self)
         self.png_button(
             self.sendLabel,
-            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send.svg").scaled(32, 32),
+            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-red.svg").scaled(
+                32, 32
+            ),
         )
         self.sendLabel.adjustSize()
         self.set_relative_below(self.sendLabel, self.addTrainLabel, 10)
@@ -96,8 +94,38 @@ class TestWindow(QMainWindow):
 
         self.addTrainEdit = QLineEdit(self)
         self.text_label(self.addTrainEdit)
+        self.addTrainEdit.setStyleSheet("color: red")
         self.set_relative_below(self.addTrainEdit, self.addTrainLabel, 10)
         self.addTrainEdit.setFixedWidth(self.sendLabel.x() - self.addTrainEdit.x() - 10)
+
+        self.sendLabel2 = QPushButton(self)
+        self.png_button(
+            self.sendLabel2,
+            QtGui.QPixmap("src/main/TrainControllerSW/PNGs/send-green.svg").scaled(
+                32, 32
+            ),
+        )
+        self.sendLabel2.adjustSize()
+        self.set_relative_below(self.sendLabel2, self.addTrainEdit, 10)
+        self.set_relative_before_right_end(self.sendLabel2, self.trainBox, 10)
+
+        self.addTrainEdit2 = QLineEdit(self)
+        self.text_label(self.addTrainEdit2)
+        self.addTrainEdit2.setStyleSheet("color: green")
+        self.set_relative_below(self.addTrainEdit2, self.addTrainEdit, 10)
+        self.addTrainEdit.setFixedWidth(
+            self.sendLabel2.x() - self.addTrainEdit.x() - 10
+        )
+
+        self.selectTrainLabel = QLabel("Select a Train", self)
+        self.text_label(self.selectTrainLabel)
+        self.set_relative_below(self.selectTrainLabel, self.addTrainEdit2, 10)
+
+        self.selectTrainCombo = QComboBox(self)
+        self.text_label(self.selectTrainCombo)
+        self.selectTrainCombo.addItem("Select")
+        self.set_relative_right(self.selectTrainCombo, self.selectTrainLabel, 20)
+        self.selectTrainCombo.currentTextChanged.connect(lambda: self.select_train())
 
         self.speedLimitLabel = QLabel("Speed Limit", self)
         self.text_label(self.speedLimitLabel)
@@ -109,19 +137,9 @@ class TestWindow(QMainWindow):
         self.speedLimitVal.setFixedWidth(60)
         self.set_relative_before_right_end(self.speedLimitVal, self.editBox, 10)
 
-        self.authorityLabel = QLabel("Authority", self)
-        self.text_label(self.authorityLabel)
-        self.set_relative_below(self.authorityLabel, self.speedLimitLabel, 10)
-
-        self.authorityVal = QSpinBox(self)
-        self.text_label(self.authorityVal)
-        self.set_relative_right(self.authorityVal, self.authorityLabel, 10)
-        self.authorityVal.setFixedWidth(60)
-        self.set_relative_before_right_end(self.authorityVal, self.editBox, 10)
-
         self.commandedSpeedLabel = QLabel("Commanded Speed", self)
         self.text_label(self.commandedSpeedLabel)
-        self.set_relative_below(self.commandedSpeedLabel, self.authorityLabel, 10)
+        self.set_relative_below(self.commandedSpeedLabel, self.speedLimitLabel, 10)
 
         self.commandedSpeedVal = QSpinBox(self)
         self.text_label(self.commandedSpeedVal)
@@ -184,10 +202,20 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.isStationButton, self.currStopLabel, 10)
         self.isStationButton.setCheckable(True)
 
+        self.authorityButton = QPushButton("Authority", self)
+        self.text_label(self.authorityButton)
+        self.authorityButton.setCheckable(True)
+        self.set_relative_below(self.authorityButton, self.currentTempLabel, 10)
+
+        self.polarityButton = QPushButton("Polarity", self)
+        self.text_label(self.polarityButton)
+        self.polarityButton.setCheckable(True)
+        self.set_relative_below(self.polarityButton, self.authorityButton, 10)
+
         self.engineFailButton = QPushButton("Engine Failure", self)
         self.text_label(self.engineFailButton)
         self.engineFailButton.setCheckable(True)
-        self.set_relative_below(self.engineFailButton, self.currentTempLabel, 10)
+        self.set_relative_below(self.engineFailButton, self.polarityButton, 10)
 
         self.brakeFailButton = QPushButton("Brake Failure", self)
         self.text_label(self.brakeFailButton)
@@ -224,17 +252,18 @@ class TestWindow(QMainWindow):
         self.rightSideButton.setCheckable(True)
         self.set_relative_right(self.rightSideButton, self.leftSideButton, 20)
 
-        self.beaconButton = QPushButton("Send Beacon Data", self)
+        self.beaconButton = QPushButton("Modify Static Data", self)
         self.text_label(self.beaconButton)
         self.beaconButton.setStyleSheet("color: " + self.colorDarkGreen)
         self.set_relative_below(self.beaconButton, self.leftSideButton, 20)
 
         # signals
-        self.testbenchVariables["trainID"] = self.trainCombo.currentText()
-        self.sendLabel.clicked.connect(lambda: self.add_train())
-        self.trainCombo.currentTextChanged.connect(lambda: self.select_train())
+        self.sendLabel.clicked.connect(lambda: self.add_train("red", self.addTrainEdit))
+        self.sendLabel2.clicked.connect(
+            lambda: self.add_train("green", self.addTrainEdit2)
+        )
         self.speedLimitVal.valueChanged.connect(lambda: self.speed_limit())
-        self.authorityVal.valueChanged.connect(lambda: self.authority_val())
+        self.authorityButton.clicked.connect(lambda: self.authority_val())
         self.commandedSpeedVal.valueChanged.connect(lambda: self.commanded_speed())
         self.currentSpeedVal.valueChanged.connect(lambda: self.current_speed())
         self.currentTempVal.valueChanged.connect(lambda: self.current_temp())
@@ -242,17 +271,46 @@ class TestWindow(QMainWindow):
         self.signalFailButton.clicked.connect(lambda: self.signal_failure())
         self.brakeFailButton.clicked.connect(lambda: self.brake_failure())
         self.beaconButton.clicked.connect(lambda: self.send_beacon())
+        self.polarityButton.clicked.connect(lambda: self.send_polarity())
+        self.passengerBrakeButton.clicked.connect(lambda: self.set_paxEbrake())
+
+    def select_train(self):
+        self.testbenchVariables["trainID"] = self.selectTrainCombo.currentText()
+
+    def refresh_train_list(self, nameList, trainList):
+        for train in nameList:
+            trainCheck = False
+            for index in range(self.selectTrainCombo.count()):
+                if self.selectTrainCombo.itemText(index) == train:
+                    trainCheck = True
+            if not trainCheck:
+                self.selectTrainCombo.addItem(train)
+
+        self.tcObject.trainList.clear()
+        for train in trainList:
+            self.tcObject.add_train(train)
+
+    def set_paxEbrake(self):
+        for train in self.tcObject.trainList:
+            if train.get_trainID() == self.testbenchVariables["trainID"]:
+                train.set_paxEbrake(self.passengerBrakeButton.isChecked())
+                self.passengerBrakeButton.setChecked(False)
+
+    def send_polarity(self):
+        for train in self.tcObject.trainList:
+            if train.get_trainID() == self.testbenchVariables["trainID"]:
+                train.polarity = self.polarityButton.isChecked()
 
     def send_beacon(self):
         for train in self.tcObject.trainList:
             if train.get_trainID() == self.testbenchVariables["trainID"]:
                 train.beacon["nextStop"][0] = self.prevStopVal.text()
                 train.beacon["nextStop"][1] = self.nextStopVal.text()
-                train.beacon["isStation"] = self.isStationButton.isChecked()
-                train.beacon["isTunnel"] = self.tunnelButton.isChecked()
                 train.beacon["leftStation"] = self.leftSideButton.isChecked()
                 train.beacon["rightStation"] = self.rightSideButton.isChecked()
                 train.beacon["currStop"] = self.currStopVal.text()
+                train.block["isStation"] = self.isStationButton.isChecked()
+                train.block["isTunnel"] = self.tunnelButton.isChecked()
 
     def brake_failure(self):
         for train in self.tcObject.trainList:
@@ -287,19 +345,20 @@ class TestWindow(QMainWindow):
     def authority_val(self):
         for train in self.tcObject.trainList:
             if train.get_trainID() == self.testbenchVariables["trainID"]:
-                train.set_authority(self.authorityVal.value())
+                train.set_authority(not self.authorityButton.isChecked())
+        if self.authorityButton.isChecked():
+            self.authorityButton.setStyleSheet("color: " + self.colorDarkRed)
+        else:
+            self.authorityButton.setStyleSheet("color: " + self.colorDarkBlue)
 
     def speed_limit(self):
         for train in self.tcObject.trainList:
             if train.get_trainID() == self.testbenchVariables["trainID"]:
                 train.set_speedLimit(self.speedLimitVal.value())
 
-    def add_train(self):
-        self.trainCombo.addItem(self.addTrainEdit.text())
-        self.tcObject.add_train(Train(self.addTrainEdit.text()))
-
-    def select_train(self):
-        self.testbenchVariables["trainID"] = self.trainCombo.currentText()
+    def add_train(self, line, edit):
+        train = {line: edit.text()}
+        self.testbenchVariables["trainList"].append(train)
 
     def text_label(self, label):
         label.setFont(QFont(self.fontStyle, self.textFontSize))
