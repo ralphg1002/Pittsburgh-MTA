@@ -38,8 +38,8 @@ class Train:
 
         # train controller inputs
         self.auto = True
-        self.kp = 0
-        self.ki = 0
+        self.kp = 1
+        self.ki = 1
         self.setpointSpeed = 0
         self.driverEbrake = False
         self.driverSbrake = 0
@@ -53,7 +53,7 @@ class Train:
 
         # train controller internal inputs
         self.powerCommand = 0
-        self.prevStop = ""
+        self.prevStop = "YARD"
         self.nextStop = ""
         self.prevPolarity = False
         self.stationDistance = 0

@@ -1,6 +1,7 @@
 # importing libraries
 import sys
 import math
+import pandas as pd
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
@@ -27,6 +28,51 @@ class TCFunctions:
             "block1": {"stationName": "station1", "blockNumber": 1, "blockLength": 50},
             "block2": {"stationName": "station2", "blockNumber": 1, "blockLength": 50},
         }
+        self.redBlockDict = self.parse_trackLayout(r"src\main\TrainControllerSW\track_layout.xlsx", "Red Line")
+        self.greenBlockDict = self.parse_trackLayout(r"src\main\TrainControllerSW\track_layout.xlsx", "Green Line")
+
+    def parse_trackLayout(self, file_path, sheet):
+        # Read the Excel file into a pandas DataFrame
+        df = pd.read_excel(file_path, sheet_name=sheet)
+
+        df = df.fillna('')
+
+        # Convert the DataFrame to a list of dictionaries (one dictionary per row)
+        data = df.to_dict(orient='records')
+
+        modifiedData = []
+        firstStationName = ""
+
+        for block in data:
+            modifiedBlock = {"Line": "line",
+                             "Section": "letter",
+                             "Number": 0,
+                             "Length": 0,
+                             "isStation": False,
+                             "isTunnel": False,
+                             "stationName": "",
+                             "firstStation": ""}
+            modifiedBlock["Line"] = block["Line"]
+            modifiedBlock["Section"] = block["Section"]
+            modifiedBlock["Number"] = block["Block Number"]
+            modifiedBlock["Length"] = block["Block Length (m)"]
+            if "STATION" in block["Infrastructure"]:
+                modifiedBlock["isStation"] = True
+                modifiedStationName = block["Infrastructure"]
+                modifiedStationName = modifiedStationName.replace("STATION; ", "")
+                modifiedStationName = modifiedStationName.replace("; UNDERGROUND", "")
+                modifiedStationName = modifiedStationName.replace(" (First)", "")
+                modifiedBlock["stationName"] = modifiedStationName
+            if "UNDERGROUND" in block["Infrastructure"]:
+                modifiedBlock["isTunnel"] = True
+            if "(First)" in block["Infrastructure"]:
+                firstStationName = modifiedBlock["stationName"]
+            modifiedData.append(modifiedBlock)
+
+        for block in modifiedData:
+            block["firstStation"] = firstStationName
+
+        return modifiedData
 
     def set_samplePeriod(self, samplePeriod):
         self.piVariables["samplePeriod"] = samplePeriod
@@ -43,7 +89,7 @@ class TCFunctions:
 
                 # assumed in m
                 trainLength = 32.2
-                distance = (trainObject.block["blockLength"] / 2) + trainLength
+                distance = (trainObject.block["blockLength"] + trainLength) / 2
 
                 deceleration = currentSpeed * currentSpeed / 2 / distance
 
@@ -57,8 +103,8 @@ class TCFunctions:
 
                 trainObject.set_driverSbrake(efficacy)
 
-            if trainObject.get_speedLimit() > 15:
-                trainObject.set_speedLimit(15)
+            if trainObject.get_speedLimit() > 20:
+                trainObject.set_speedLimit(20)
 
     def station_operations(self, trainObject):
         if (
@@ -79,24 +125,29 @@ class TCFunctions:
             trainObject.set_announcement("")
 
     def find_block(self, blockDict, stationName):
-        for i in blockDict:
-            if blockDict[i]["stationName"] == stationName:
-                return blockDict[i]["blockNumber"]
+        for block in blockDict:
+            if block["stationName"] == stationName:
+                return block["Number"]
+
+    def find_station(self, blockDict, section):
+        for block in blockDict:
+            if block["Section"] == section and block["isStation"] == True:
+                return block["stationName"]
 
     def distance_between(self, blockDict, start, end):
         distanceCounter = 0
         if start < end:
-            for i in blockDict:
-                if start <= blockDict[i]["blockNumber"] <= end:
-                    distanceCounter += blockDict[i]["blockLength"]
+            for block in blockDict:
+                if start <= block["Number"] <= end:
+                    distanceCounter += block["Length"]
         else:
-            for i in blockDict:
-                if end <= blockDict[i]["blockNumber"] <= start:
-                    distanceCounter += blockDict[i]["blockLength"]
+            for block in blockDict:
+                if end <= block["Number"] <= start:
+                    distanceCounter += block["Length"]
 
         return distanceCounter
 
-    def location_tracker(self, trainObject):
+    def location_tracker(self, blockDict, trainObject):
         if trainObject.prevStop != trainObject.beacon["currStop"]:
             if trainObject.prevStop != trainObject.beacon["nextStop"][0]:
                 trainObject.nextStop = trainObject.beacon["nextStop"][0]
@@ -113,13 +164,13 @@ class TCFunctions:
             return
 
         trainObject.stationDistance = self.distance_between(
-            self.blockDict,
-            self.find_block(self.blockDict, trainObject.prevStop),
-            self.find_block(self.blockDict, trainObject.nextStop),
+            blockDict,
+            self.find_block(blockDict, trainObject.prevStop),
+            self.find_block(blockDict, trainObject.nextStop),
         )
         trainObject.distanceTravelled = self.distance_between(
-            self.blockDict,
-            self.find_block(self.blockDict, trainObject.prevStop),
+            blockDict,
+            self.find_block(blockDict, trainObject.prevStop),
             trainObject.block["blockNumber"],
         )
         trainObject.distanceRatio = (
@@ -131,18 +182,18 @@ class TCFunctions:
             if trainObject.prevStop == trainObject.nextStop:
                 trainObject.block["blockNumber"] += 0
             elif self.find_block(
-                self.blockDict, trainObject.prevStop
-            ) < self.find_block(self.blockDict, trainObject.nextStop):
+                blockDict, trainObject.prevStop
+            ) < self.find_block(blockDict, trainObject.nextStop):
                 trainObject.block["blockNumber"] += 1
             else:
-                trainObject.block["blockNumber"] -= 1
+                trainObject.block["Number"] -= 1
             trainObject.prevPolarity = trainObject.polarity
 
-        for i in blockDict:
-            if blockDict[i]["blockNumber"] == trainObject.block["blockNumber"]:
-                trainObject.block["blockLength"] = blockDict[i]["blockLength"]
-                trainObject.block["isStation"] = blockDict[i]["isStation"]
-                trainObject.block["isTunnel"] = blockDict[i]["isTunnel"]
+        for block in blockDict:
+            if block["Number"] == trainObject.block["blockNumber"]:
+                trainObject.block["blockLength"] = block["Length"]
+                trainObject.block["isStation"] = block["isStation"]
+                trainObject.block["isTunnel"] = block["isTunnel"]
 
     def light_operations(self, trainObject):
         if trainObject.block["isTunnel"]:
@@ -252,7 +303,7 @@ class TCFunctions:
         trainObject.set_setpointTemp(70)
 
     def regular_operations(self, blockDict, trainObject):
-        self.location_tracker(trainObject)
+        self.location_tracker(blockDict, trainObject)
         self.update_block_info(blockDict, trainObject)
         self.failure_operations(trainObject)
         self.stopping_operations(trainObject)

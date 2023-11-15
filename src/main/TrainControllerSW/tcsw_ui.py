@@ -1,6 +1,7 @@
 # importing libraries
 import sys
 import math
+import pandas as pd
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtGui import *
@@ -946,7 +947,9 @@ class TrainControllerUI(QMainWindow):
         # from CTC
         masterSignals.addTrain.connect(lambda: self.signal_addTrain)
 
+        blockDict = []
         if self.trainLineCombo.currentText() == "red":
+            blockDict = self.tcFunctions.redBlockDict
             self.trainNumberCombo.clear()
 
             for train in self.tcVariables["trainList"]:
@@ -954,6 +957,7 @@ class TrainControllerUI(QMainWindow):
                     self.trainNumberCombo.addItem(train["red"])
 
         if self.trainLineCombo.currentText() == "green":
+            blockDict = self.tcFunctions.greenBlockDict
             self.trainNumberCombo.clear()
 
             for train in self.tcVariables["trainList"]:
@@ -1003,6 +1007,10 @@ class TrainControllerUI(QMainWindow):
         trainModelToTrainController.sendPolarity.connect(self.signal_polarity)
 
         for train in self.tcFunctions.trainList:
+            if train.get_auto():
+                self.tcFunctions.automatic_operations(train)
+            if train.block["blockNumber"] == 0:
+                train.nextStop = blockDict[0]["firstStation"]
             if train.get_trainID() == self.tcVariables["trainID"]:
                 # TRAIN MODEL INPUTS
                 # current temp
@@ -1018,10 +1026,10 @@ class TrainControllerUI(QMainWindow):
                         str(
                             math.floor(
                                 self.tcFunctions.distance_between(
-                                    self.tcFunctions.blockDict,
+                                    blockDict,
                                     train.block["blockNumber"],
                                     self.tcFunctions.find_block(
-                                        self.tcFunctions.blockDict, train.nextStop
+                                        blockDict, train.nextStop
                                     ),
                                 )
                                 / 1609
@@ -1153,9 +1161,6 @@ class TrainControllerUI(QMainWindow):
 
                     # an individual automatic
                     if self.announcementCombo.currentIndex() == 0:
-                        print(
-                            f'{not train.get_authority()}, {train.block["isStation"]}, {train.get_currentSpeed() == 0}'
-                        )
                         if (
                             (not train.get_authority())
                             and (train.block["isStation"])
@@ -1207,7 +1212,7 @@ class TrainControllerUI(QMainWindow):
                         train.set_advertisement(self.adCombo.currentIndex())
 
                 # regardless of automatic
-                self.tcFunctions.regular_operations(self.tcFunctions.blockDict, train)
+                self.tcFunctions.regular_operations(blockDict, train)
 
                 if self.emergencyBrakeButton.isChecked():
                     train.set_driverEbrake(True)
@@ -1225,6 +1230,7 @@ class TrainControllerUI(QMainWindow):
                 self.nextStopLabel.setText("Next Stop:\n" + train.nextStop)
                 self.nextStopLabel.setAlignment(Qt.AlignRight)
                 self.nextStopLabel.adjustSize()
+                self.set_relative_before_right_end(self.nextStopLabel, self.displayBox, 10)
 
                 self.prevStopLabel.setText("Prev Stop:\n" + train.prevStop)
                 self.prevStopLabel.setAlignment(Qt.AlignLeft)
@@ -1263,40 +1269,40 @@ class TrainControllerUI(QMainWindow):
                 elif train.get_advertisement() == 3:
                     self.png_label(self.adDisplay, self.pixmapAd3)
 
-                # SIGNAL INTEGRATION: TCSW -> TM
-                trainControllerSWToTrainModel.sendPower.emit(
-                    train.get_trainID(), train.get_powerCommand()
-                )
-                trainControllerSWToTrainModel.sendDriverEmergencyBrake.emit(
-                    train.get_trainID(), train.get_driverEbrake()
-                )
-                trainControllerSWToTrainModel.sendDriverServiceBrake.emit(
-                    train.get_trainID(), train.get_driverSbrake()
-                )
-                trainControllerSWToTrainModel.sendAnnouncement.emit(
-                    train.get_trainID(), train.get_announcement()
-                )
-                trainControllerSWToTrainModel.sendHeadlightState.emit(
-                    train.get_trainID(), train.get_headlights()
-                )
-                trainControllerSWToTrainModel.sendInteriorLightState.emit(
-                    train.get_trainID(), train.get_interiorLights()
-                )
-                trainControllerSWToTrainModel.sendLeftDoorState.emit(
-                    train.get_trainID(), train.get_leftDoor()
-                )
-                trainControllerSWToTrainModel.sendRightDoorState.emit(
-                    train.get_trainID(), train.get_rightDoor()
-                )
-                trainControllerSWToTrainModel.sendSetpointTemperature.emit(
-                    train.get_trainID(), train.get_setpointTemp()
-                )
-                trainControllerSWToTrainModel.sendAdvertisement.emit(
-                    train.get_trainID(), train.get_advertisement()
-                )
+            # SIGNAL INTEGRATION: TCSW -> TM
+            trainControllerSWToTrainModel.sendPower.emit(
+                train.get_trainID(), train.get_powerCommand()
+            )
+            trainControllerSWToTrainModel.sendDriverEmergencyBrake.emit(
+                train.get_trainID(), train.get_driverEbrake()
+            )
+            trainControllerSWToTrainModel.sendDriverServiceBrake.emit(
+                train.get_trainID(), train.get_driverSbrake()
+            )
+            trainControllerSWToTrainModel.sendAnnouncement.emit(
+                train.get_trainID(), train.get_announcement()
+            )
+            trainControllerSWToTrainModel.sendHeadlightState.emit(
+                train.get_trainID(), train.get_headlights()
+            )
+            trainControllerSWToTrainModel.sendInteriorLightState.emit(
+                train.get_trainID(), train.get_interiorLights()
+            )
+            trainControllerSWToTrainModel.sendLeftDoorState.emit(
+                train.get_trainID(), train.get_leftDoor()
+            )
+            trainControllerSWToTrainModel.sendRightDoorState.emit(
+                train.get_trainID(), train.get_rightDoor()
+            )
+            trainControllerSWToTrainModel.sendSetpointTemperature.emit(
+                train.get_trainID(), train.get_setpointTemp()
+            )
+            trainControllerSWToTrainModel.sendAdvertisement.emit(
+                train.get_trainID(), train.get_advertisement()
+            )
 
-                # test emit
-                trainControllerSWToTrainModel.sendPower.connect(self.test_display)
+            # test emit
+            trainControllerSWToTrainModel.sendPower.connect(self.test_display)
 
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
@@ -1314,8 +1320,6 @@ class TrainControllerUI(QMainWindow):
         hours, minutes, seconds = map(int, self.systemTimeInput.text().split(":"))
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
 
-        print(self.sysTime.toString("HH:mm:ss"))
-
     def signal_addTrain(self, line, id):
         train = {line: id}
         idCheck = False
@@ -1332,7 +1336,7 @@ class TrainControllerUI(QMainWindow):
     def signal_speedLimit(self, id, speedLimit):
         for train in self.tcVariables["trainList"]:
             if train.get_trainID() == id:
-                train.set_speedLimit(speedLimit)
+                train.set_speedLimit(int(speedLimit * 2.237))
         return
 
     def signal_authority(self, id, authority):
