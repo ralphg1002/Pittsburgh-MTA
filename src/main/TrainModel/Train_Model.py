@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (
 )
 from numpy import block
 from qtwidgets import AnimatedToggle
+
 sys.path.append("../../main")
 from signals import (
     trainControllerSWToTrainModel,
@@ -56,7 +57,7 @@ class TrainModel(QMainWindow):
     def __init__(self):
         super().__init__()
         self.trains = SharedData()
-        
+
         self.time_interval = 1
         self.timer = QTimer(self)
         self.timer.timeout.connect(
@@ -69,7 +70,9 @@ class TrainModel(QMainWindow):
         self.sysTime = QDateTime.currentDateTime()
         self.sysTime.setTime(QTime(0, 0, 0))
 
-        self.calculations = Calculations(time_interval=self.time_interval, sys_time=self.sysTime, trains=self.trains)
+        self.calculations = Calculations(
+            time_interval=self.time_interval, sys_time=self.sysTime, trains=self.trains
+        )
 
         """ Header Template """
 
@@ -202,9 +205,9 @@ class TrainModel(QMainWindow):
 
         # Populate the QComboBox with items
         trainID = self.trains.get_value("Train 1", "calculations", 17)
-        
+
         self.comboBox.addItem(str(trainID))
-        self.comboBox.addItem("Train 2")        
+        self.comboBox.addItem("Train 2")
 
         # Create a search icon for new window
         self.search_button = QtGui.QPixmap("src/main/TrainModel/search_icon.png")
@@ -244,7 +247,9 @@ class TrainModel(QMainWindow):
     def open_results_window(self, event):
         # This function is called when the search icon is clicked
         selected_item = self.comboBox.currentText()
-        self.results_window = ResultsWindow(selected_item, self.trains, self.calculations)
+        self.results_window = ResultsWindow(
+            selected_item, self.trains, self.calculations
+        )
         self.results_window.show()
 
     def show_gui(self):
@@ -875,7 +880,7 @@ class ResultsWindow(QMainWindow):
         if self.vehicle_word_list:
             # Update each UI element with the corresponding variable from the SharedData dictionary class
             for i, word_placeholders in enumerate(self.vehicle_word_list):
-                word_key = (                    
+                word_key = (
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
 
@@ -889,7 +894,6 @@ class ResultsWindow(QMainWindow):
                 word_key = (
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
-
 
                 label_text = word_placeholders.format(word_value)
 
@@ -906,10 +910,10 @@ class ResultsWindow(QMainWindow):
 
                 # Update the text of the QLabel
                 self.navigation_labels[i].setText(label_text)
-    
+
     def signal_period(self, period):
         self.time_interval = period
-    
+
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
@@ -924,15 +928,23 @@ class ResultsWindow(QMainWindow):
 
         # Signals that connect from the train controller to the train model
         trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
-        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(self.signal_emergency_brake)
+        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(
+            self.signal_emergency_brake
+        )
         trainControllerSWToTrainModel.sendDriverServiceBrake.connect(self.signal_brake)
         trainControllerSWToTrainModel.sendAnnouncement.connect(self.signal_announcement)
         trainControllerSWToTrainModel.sendHeadlightState.connect(self.signal_headlights)
-        trainControllerSWToTrainModel.sendInteriorLightState.connect(self.signal_interrior_lights)
+        trainControllerSWToTrainModel.sendInteriorLightState.connect(
+            self.signal_interrior_lights
+        )
         trainControllerSWToTrainModel.sendLeftDoorState.connect(self.signal_left_door)
         trainControllerSWToTrainModel.sendRightDoorState.connect(self.signal_right_door)
-        trainControllerSWToTrainModel.sendSetpointTemperature.connect(self.signal_temperature)
-        trainControllerSWToTrainModel.sendAdvertisement.connect(self.signal_advertisements)
+        trainControllerSWToTrainModel.sendSetpointTemperature.connect(
+            self.signal_temperature
+        )
+        trainControllerSWToTrainModel.sendAdvertisement.connect(
+            self.signal_advertisements
+        )
 
         # Signals that connect from the track model to the train model
         trackModelToTrainModel.blockInfo.connect(self.signal_blockInfo)
@@ -941,8 +953,6 @@ class ResultsWindow(QMainWindow):
 
         # Emit signals from the train model to the train controller
         # trainModelToTrainController.sendSpeedLimit.emit(speed_limit)
-
-
 
     # Functions to set
     def signal_power(self, train, power):
@@ -986,9 +996,13 @@ class ResultsWindow(QMainWindow):
         self.trains.set_value("Train 1", "calculations", 17, train)
         self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
 
-    def signal_blockInfo(self, next_block, length, grade, speed_limit, suggested_speed, authority):        
-        self.calculations.blockInfo(next_block, length, grade, speed_limit, suggested_speed, authority)
-    
+    def signal_blockInfo(
+        self, next_block, length, grade, speed_limit, suggested_speed, authority
+    ):
+        self.calculations.blockInfo(
+            next_block, length, grade, speed_limit, suggested_speed, authority
+        )
+
     def signal_beacon(self, beacon):
         self.calculations.beacon(beacon)
 
@@ -1001,61 +1015,61 @@ class SharedData:
         self.trains = {
             "Train 1": {
                 "vehicle_status": {
-                    "speed_limit": 0,      # 1
-                    "current_speed": 0,    # 2
-                    "setpoint_speed": 0,   # 3
+                    "speed_limit": 0,  # 1
+                    "current_speed": 0,  # 2
+                    "setpoint_speed": 0,  # 3
                     "commanded_speed": 0,  # 4
-                    "acceleration": 0,     # 5
-                    "deceleration": 0,     # 6
-                    "brakes": False,       # 7
-                    "power": 0,            # 8
-                    "power_limit": 0,      # 9
+                    "acceleration": 0,  # 5
+                    "deceleration": 0,  # 6
+                    "brakes": False,  # 7
+                    "power": 0,  # 8
+                    "power_limit": 0,  # 9
                 },
                 "failure_status": {
-                    "engine_failure": False,         # 1
+                    "engine_failure": False,  # 1
                     "signal_pickup_failure": False,  # 2
-                    "brake_failure": False,          # 3
-                    "emergency_brake": False,        # 4
+                    "brake_failure": False,  # 3
+                    "emergency_brake": False,  # 4
                 },
                 "passenger_status": {
-                    "passengers": 6,            # 1
-                    "passenger_limit": 74,      # 2
-                    "left_door": False,         # 3
-                    "right_door": False,        # 4
-                    "lights_status": False,     # 5
-                    "announcements": False,     # 6
-                    "temperature": 0,           # 7
+                    "passengers": 6,  # 1
+                    "passenger_limit": 74,  # 2
+                    "left_door": False,  # 3
+                    "right_door": False,  # 4
+                    "lights_status": False,  # 5
+                    "announcements": False,  # 6
+                    "temperature": 0,  # 7
                     "air_conditioning": False,  # 8
-                    "advertisements": 0,        # 9
+                    "advertisements": 0,  # 9
                 },
                 "navigation_status": {
-                    "authority": 0,                      # 1
-                    "beacon": 0,                         # 2
-                    "block_length": 0,                   # 3
-                    "block_grade": 0,                    # 4
-                    "next_station": "",                  # 5
-                    "prev_station": "",                  # 6
-                    "headlights": False,                 # 7
+                    "authority": 0,  # 1
+                    "beacon": 0,  # 2
+                    "block_length": 0,  # 3
+                    "block_grade": 0,  # 4
+                    "next_station": "",  # 5
+                    "prev_station": "",  # 6
+                    "headlights": False,  # 7
                     "passenger_emergency_brake": False,  # 8
                 },
                 "calculations": {
-                    "cars": 5,               # 1
-                    "mass": 5 * 56700,       # 2         
-                    "length": 5 * 105.6,     # 3
-                    "currVelocity": 0,       # 4
-                    "currForce":0,           # 5
-                    "currAcceleration": 0,   # 6
-                    "lastVelocity": 0,       # 7
-                    "lastAcceleration": 0,   # 8
-                    "lastPosition": 0,       # 9
-                    "nextBlock": 0,          # 10
-                    "currBlock": 0,          # 11
-                    "prevBlock": 0,          # 12
-                    "nextStation1": "",      # 13
-                    "nextStation2": "",      # 14
-                    "currStation": "",       # 15
-                    "line": "Green",         # 16
-                    "trainID": "",           # 17
+                    "cars": 5,  # 1
+                    "mass": 5 * 56700,  # 2
+                    "length": 5 * 105.6,  # 3
+                    "currVelocity": 0,  # 4
+                    "currForce": 0,  # 5
+                    "currAcceleration": 0,  # 6
+                    "lastVelocity": 0,  # 7
+                    "lastAcceleration": 0,  # 8
+                    "lastPosition": 0,  # 9
+                    "nextBlock": 0,  # 10
+                    "currBlock": 0,  # 11
+                    "prevBlock": 0,  # 12
+                    "nextStation1": "",  # 13
+                    "nextStation2": "",  # 14
+                    "currStation": "",  # 15
+                    "line": "Green",  # 16
+                    "trainID": "",  # 17
                 },
             },
         }
@@ -2634,12 +2648,12 @@ class InputsTrackModel:
     def get_Track_Model_Inputs():
         block = 9
         if block["Block Number"] == 9:  # Section C, Edgebrook
-                    block["Beacon"] = {
-                        "Next Station1": "Pioneer",
-                        "Next Station2": "",
-                        "Current Station": "Edgebrook",
-                        "Door Side": block["Station Side"],
-                    }
+            block["Beacon"] = {
+                "Next Station1": "Pioneer",
+                "Next Station2": "",
+                "Current Station": "Edgebrook",
+                "Door Side": block["Station Side"],
+            }
         return block
 
 
@@ -2664,20 +2678,19 @@ class InputsTrainController:
 class Calculations:
     def __init__(self, time_interval, sys_time, trains):
         self.time_interval = time_interval
-        self.sys_time = sys_time        
+        self.sys_time = sys_time
         self.trains = trains
-        
+
         self.train_control_in = InputsTrainController()
         self.train_control_out = OutputTrainController()
         self.track_model_in = InputsTrackModel()
         self.track_model_out = OutputTrackModel()
 
-
     # Sets the power of the train through the train controller
     def power(self, power):
         # Ensure that power does not exceed 120
         currPower = min(power, 120)
-        
+
         # Update the "vehicle_status" of "Train 1" in self.trains
         self.trains.set_value("Train 1", "vehicle_status", 8, currPower)
 
@@ -2739,7 +2752,7 @@ class Calculations:
         self.trains.set_value("Train 1", "calculations", 5, force)
 
         return force
-    
+
     def limit_acceleration(self):
         # Retrieve necessary values from self.trains
         failure_1 = self.trains.get_value("Train 1", "failure_status", 1)
@@ -2751,7 +2764,7 @@ class Calculations:
         mass = self.trains.get_value("Train 1", "calculations", 2)
         power = self.trains.get_value("Train 1", "vehicle_status", 8)
         currVelocity = self.trains.get_value("Train 1", "calculations", 4)
-        
+
         # Limit the acceleration of the train based on various conditions
         if (failure_1 or failure_2 or failure_3) and (brakes or emergency_brake):
             acceleration = (force - (0.01 * mass * 9.8)) / mass
@@ -2767,13 +2780,13 @@ class Calculations:
                 acceleration = force / mass
         else:
             acceleration = 0
-        
+
         # Set the limited acceleration value
         self.trains.set_value("Train 1", "calculations", 6, acceleration)
 
         return acceleration
-    
-    def velocity(self):    
+
+    def velocity(self):
         # Retrieve necessary values from self.trains
         brake = self.trains.get_value("Train 1", "vehicle_status", 7)
         emergency_brake = self.trains.get_value("Train 1", "failure_status", 4)
@@ -2797,7 +2810,7 @@ class Calculations:
         self.trains.set_value("Train 1", "calculations", 4, velocity)
 
         return velocity
-    
+
     def total_distance(self):
         # Retrieve necessary values from self.trains
         curr_velocity = self.trains.get_value("Train 1", "calculations", 4)
@@ -2811,7 +2824,9 @@ class Calculations:
 
         return distance
 
-    def blockID(self, next_block, length, grade, speed_limit, suggested_speed, authority):
+    def blockID(
+        self, next_block, length, grade, speed_limit, suggested_speed, authority
+    ):
         self.trains.set_value("Train 1", "calculations", 10, next_block)
         self.trains.set_value("Train 1", "navigation_status", 3, length)
         self.trains.set_value("Train 1", "navigation_status", 4, grade)
@@ -2906,7 +2921,7 @@ class Calculations:
         trainModelToTrainController.sendNextStation1.emit(next_station1)
         trainModelToTrainController.sendNextStation2.emit(next_station2)
         trainModelToTrainController.sendCurrStation.emit(current_station)
-        
+
         if door_side == "Left":
             trainModelToTrainController.sendLeftDoor.emit(door_side)
         elif door_side == "Right":
