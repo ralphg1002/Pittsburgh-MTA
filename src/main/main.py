@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
     w = 960
     h = 960
 
-    moduleName = "Train Controller Module (SW)"
+    moduleName = "Pittsburgh MTA"
 
     def __init__(self):
         super().__init__()

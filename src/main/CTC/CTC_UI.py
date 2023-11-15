@@ -14,6 +14,8 @@ sys.path.append("../../main")
 from signals import masterSignals
 from signals import ctcToTrackController
 from signals import trackControllerToCTC
+from signals import ctcToTrackModel
+from signals import trackModelToCTC
 
 # Global variables for the block numbers associated with each wayside
 WAYSIDE_1G_BLOCKS = [
@@ -417,7 +419,7 @@ class CTCWindow(QMainWindow):
         self.occupancy_table.setGeometry(360, 510, 252, 100)
 
         # Throughput per line
-        self.throughput_label = QLabel("Throughput: N/A", self)
+        self.throughput_label = QLabel("Throughput: ", self)
         self.throughput_label.setFont(QFont(self.fontStyle, self.textFontSize + 5))
         self.throughput_label.setGeometry(350, 170, 400, 50)
 
@@ -627,6 +629,10 @@ class CTCWindow(QMainWindow):
         self.dispatchTable.setStyleSheet("background-color: white;")
         self.dispatchTable.setGeometry(35, 280, 600, 200)
 
+        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
+
+        trackModelToCTC.throughput.connect(self.updateTickets)
+
         #self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
         #self.blockDropDown.currentIndexChanged.connect(
             #lambda: Block.updateStatusLabel(main_window, blocks)
@@ -636,6 +642,20 @@ class CTCWindow(QMainWindow):
 
     #def statusHandler(self):
         #Block.updateStatusLabel(self)
+
+    def ticketRequest(self):
+        beforeLine = self.selectLine.currentText()
+        if beforeLine == "Green Line":
+            requestLine = "Green"
+        else:
+            requestLine = "Red"
+            
+        ctcToTrackModel.requestThroughput.emit(requestLine)
+    
+    def updateTickets(self, throughput):
+        throughput_text = f"Throughput: {throughput}"
+        self.throughput_label.setText(throughput_text)
+
     def blockHandler(self):
         Block.setSelectedBlock(self)
     def updateInfoBlock(self):
@@ -1914,7 +1934,6 @@ class Block:
 
         status_text = f"Status: {block_status}" if block_status is not None else "Block not found"
         main_window.status_label.setText(status_text)
-
 
     @staticmethod
     def getBlockStatus(block):
