@@ -1052,6 +1052,7 @@ class TrackControl(QMainWindow):
 
     def handle_dispatch(self, line, wayside, trainID, authority):
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_authority(authority)
+        self.lines[line - 1].get_wayside(wayside).get_block(0).set_occupancy(True)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     # Method to disable or enable the PLC program for the wayside when the mode is switched to automatic or manual mode
