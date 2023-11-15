@@ -715,8 +715,8 @@ class TrackControl(QMainWindow):
 
         self.ui = MainUI()
         self.ui.setGeometry(0, 0, 960, 960)
-        self.ui.hide()
-
+        self.ui.show()
+        
         # Instantiate the track information for the Green Line
         self.greenLine = Line(1)
         self.wayside1G = Wayside(1, 1)
@@ -905,13 +905,11 @@ class TrackControl(QMainWindow):
 
 
         """ This section of code is for the connections from signals from the CTC to the handler"""
-        ctcToTrackController.sendAuthority.connect(self.handle_authority)
-        ctcToTrackController.sendSuggestedSpeed.connect(self.handle_suggested_speed)
-        ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
+        #ctcToTrackController.sendAuthority.connect(self.handle_authority)
+        #ctcToTrackController.sendSuggestedSpeed.connect(self.handle_suggested_speed)
+        #ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
 
-        trackControllerToTrackModel.crossingState.connect(
-            self.set_crossingstate_handler
-        )
+        trackControllerToTrackModel.crossingState.connect(self.set_crossingstate_handler)
 
 
         """ This section of code is for the connections from signals from the CTC to the handler"""
