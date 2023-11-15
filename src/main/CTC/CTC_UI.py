@@ -172,6 +172,8 @@ WAYSIDE_2G_BLOCKS = [
     101,
 ]  
 
+# Global variable declaration
+global_block_occupancy = {}
 
 class CTCWindow(QMainWindow):
     # font variables
@@ -569,7 +571,6 @@ class CTCWindow(QMainWindow):
         self.selectLine.currentIndexChanged.connect(
             self.updateInfoBlock
         )  
-        #self.blockDropDown.currentIndexChanged.connect(Block.showBlockStatus)  # Connect the signal to update the dropdown
 
         # repair block button
         self.repairBlockButton = QPushButton("Repair Block", self)
@@ -631,7 +632,10 @@ class CTCWindow(QMainWindow):
             #lambda: Block.updateStatusLabel(main_window, blocks)
         #)
         # self.show()
-    
+        #self.blockDropDown.currentIndexChanged.connect(self.statusHandler)  # Connect the signal to update the dropdown
+
+    #def statusHandler(self):
+        #Block.updateStatusLabel(self)
     def blockHandler(self):
         Block.setSelectedBlock(self)
     def updateInfoBlock(self):
@@ -1364,6 +1368,7 @@ class Routing:
                 seconds_to_traverse_block = float(row[10])
                 # Create a Block object for each block and append it to blockList
                 block = Block(
+                    self,
                     blockNumber,
                     trackSection,
                     blockLength,
@@ -1797,8 +1802,7 @@ class Train:
             if departureTime == current_time_str:
                 # Add the train to the dispatched_trains list
                 self.dispatchTrainsList.append(train)
-                print("HEELOOO")
-                print(self.trainStops)
+
                 next_stop = self.trainStops[0]
                 # Add the train's information to the dispatched trains table
                 row_position = self.main_window.dispatchTable.rowCount()
@@ -1819,7 +1823,7 @@ class Train:
                     row_position, 4, QTableWidgetItem(str(train.authority))
                 )
 
-                if train.trackLine == "Green":
+                if train.trackLine == "Green Line":
                     trainLine = 1
                 else:
                     trainLine = 2
@@ -1827,8 +1831,10 @@ class Train:
                 ctcToTrackController.sendTrainDispatched.emit(
                     trainLine, 2, train.train_id, train.authority
                 )
-                #masterSignals.addTrain.emit("Green", train.train_id)
-                masterSignals.addTrain.emit("Green", "hello")
+                print(f'{trainLine}')
+                #masterSignals.addTrain.emit(train.trackLine, train.train_id)
+                print("emmiting signal")
+                masterSignals.addTrain.emit("green", "hello")
 
                 self.scheduler.trainList.remove(train)
 
@@ -1854,6 +1860,7 @@ class Train:
 class Block:
     def __init__(
         self,
+        routing,
         blockNumber,
         trackSection,
         blockLength,
@@ -1861,6 +1868,7 @@ class Block:
         stationName,
         seconds_to_traverse_block,
     ):
+        self.routing = routing
         self.blockNumber = blockNumber
         self.section = trackSection
         self.length = blockLength
@@ -1870,7 +1878,9 @@ class Block:
         self.occupancy = 0
         self.enable = 1
 
-        # self.mode_handler = ModeHandler()
+    def update_block_occupancy(block_num, occupancy):
+        global global_block_occupancy
+        global_block_occupancy[block_num] = occupancy
 
     def setEnable(self, blockEnable):
         self.enable = blockEnable
@@ -1891,25 +1901,26 @@ class Block:
             main_window.blockDropDown.addItem(blockItem)
             main_window.blockDropDown.addItems(block_items)
 
-    """@staticmethod
+    @staticmethod
     def updateStatusLabel(self, main_window):
-        selected_block = main_window.blockDropDown.currentText()
-        block_status = self.getBlockStatus(selected_block)
-        main_window.status_label.setText(f"Status: {block_status}")"""
+
+        selected_block_num = int(main_window.blockDropDown.currentText())
+        block_status = None
+
+        for block in self.blockList:
+            if block.blockNumber == selected_block_num:
+                block_status = self.getBlockStatus(block)
+                break
+
+        status_text = f"Status: {block_status}" if block_status is not None else "Block not found"
+        main_window.status_label.setText(status_text)
+
 
     @staticmethod
-    def updateStatusLabel(main_window, blocks):
-        selected_block_num = int(main_window.blockDropDown.currentText())
-        selected_block = blocks.get(selected_block_num)
-
-        if selected_block:
-            occupancy_status = "Occupied" if selected_block.occupancy else "Unoccupied"
-            main_window.status_label.setText(f"Block {selected_block_num} Status: {occupancy_status}")
-        else:
-            main_window.status_label.setText("Block not found")
-
-    #def getBlockStatus(self, blockNum):
-
+    def getBlockStatus(block):
+        # Assuming occupancy is a boolean, you can adjust the return value based on your requirements
+        return "Occupied" if block.occupancy else "Unoccupied"
+    
     @staticmethod
     def setSelectedBlock(main_window):
         selected_block = main_window.blockDropDown.currentText()
