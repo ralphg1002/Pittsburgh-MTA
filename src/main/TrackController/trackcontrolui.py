@@ -5,7 +5,7 @@ import os
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # QPainter, QPen, QColor, QFont, QPixmap, QLine
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QDateTime
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.uic import loadUi
 from .testbench import UiMainWindow
 
@@ -209,6 +209,7 @@ class OccupancyBox(QWidget):
 
     def clear_table(self):
         self.tableWidget.clearContents()
+        self.tableWidget.setRowCount(0)
 
 
 class ModeButton(QPushButton):
@@ -319,19 +320,22 @@ class MapWindow(QMainWindow):
 
 class Clock(QWidget):
     def set_clock(self, parentWindow):
-        self.clock = QLabel("System Clock: 00:00:00", parentWindow)
-        self.clock.setGeometry(760, 920, 220, 30)
-        self.clock.setStyleSheet("font-weight: bold; font-size: 18px")
-        self.currentTime = "00:00:00"
-        self.update_clock()
+        pass
+        #self.clock = QLabel("System Clock: 00:00:00", parentWindow)
+        #self.clock.setGeometry(760, 920, 220, 30)
+        #self.clock.setStyleSheet("font-weight: bold; font-size: 18px")
+        #self.currentTime = "00:00:00"
+        #self.update_clock()
 
         # Update clock in real time while window is open
-        timer = QTimer(parentWindow)
-        timer.timeout.connect(self.update_clock)
+        #timer = QTimer(parentWindow)
+        #timer.timeout.connect(self.update_clock)
         # Update every 1 second
-        timer.start(1000)
+        #timer.start(1000)
 
     def update_clock(self):
+        pass
+        """
         # Increment the time by 1 second
         hours, minutes, seconds = map(int, self.currentTime.split(":"))
         seconds += 1
@@ -347,6 +351,7 @@ class Clock(QWidget):
         # Format the time as HH:mm:ss
         self.currentTime = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         self.clock.setText("System Clock: " + self.currentTime)
+        """
 
 
 class DeviceBox(QWidget):
@@ -1382,6 +1387,7 @@ class MainUI(QMainWindow):
         )
         self.testbenchButton.clicked.connect(lambda: self.testBenchWindow.show())
 
+        """
         # system time input
         self.systemTimeInput = QLabel("00:00:00", self)
         self.systemTimeInput.setFont(QFont(self.fontStyle, self.headerFontSize))
@@ -1439,7 +1445,7 @@ class MainUI(QMainWindow):
         self.slowDownButton.setStyleSheet(
             "color:" + self.colorDarkBlue + ";border: 1px solid black"
         )
-
+        """
         # This is the initialization for the main box rectangle
 
         self.mainBox = MainBox()

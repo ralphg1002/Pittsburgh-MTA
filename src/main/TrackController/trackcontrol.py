@@ -683,10 +683,12 @@ class Wayside:
 
     def get_occupied_blocks(self):
         occupiedBlocks = []
+        if(self.waysideNum == 2):
+            print("Block State: ", self.get_block(0).get_occupancystate())
         for block in self.blocks:
-            if block.get_occupancystate == True:
+            if block.get_occupancystate() == True:
                 occupiedBlocks.append(block)
-        print(occupiedBlocks)
+        print("Here are the occupied blocks: ", occupiedBlocks)
         return occupiedBlocks
 
 
