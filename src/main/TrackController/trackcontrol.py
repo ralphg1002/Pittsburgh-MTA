@@ -2,7 +2,7 @@ import sys, re, os
 import pandas as pd
 
 # from PyQt5.QtCore import pyqtSignal
-from signals import trackControllerToCTC, trackControllerToTrackModel
+from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from .trackcontrolui import MainUI
 
@@ -905,6 +905,12 @@ class TrackControl(QMainWindow):
             self.set_crossingstate_handler
         )
 
+
+        """ This section of code is for the connections from signals from the CTC to the handler"""
+        ctcToTrackController.sendAuthority.connect(self.handle_authority)
+        ctcToTrackController.sendSuggestedSpeed.connect(self.handle_suggested_speed)
+        ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
+
         # connect the input signals from the test bench to the main ui page handlers
         # self.ui.testBenchWindow.setSwitchState.connect(self.set_switchstate_handler)
         self.ui.testBenchWindow.setLightState.connect(self.set_lightstate_handler)
@@ -1022,6 +1028,19 @@ class TrackControl(QMainWindow):
             self.lines[self.ui.lineSelect - 1].get_wayside(
                 self.ui.waysideSelect
             ).run_plc(filePath)
+
+    """ Handler methods for the CTC input signals"""
+    def handle_authority(self, line, wayside, blockNum, authority):
+        self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_authority(authority)
+        self.ui.testBenchWindow.refreshed.emit(True)
+
+    def handle_suggested_speed(self, line, wayside, blockNum, suggestedSpeed):
+        self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_suggested_speed(suggestedSpeed)
+        self.ui.testBenchWindow.refreshed.emit(True)
+
+    def handle_dispatch(self, line, wayside, trainID, authority):
+        self.lines[line - 1].get_wayside(wayside).get_block(0).set_authority(authority)
+        self.ui.testBenchWindow.refreshed.emit(True)
 
     # Method to disable or enable the PLC program for the wayside when the mode is switched to automatic or manual mode
     def handle_mode(self, mode):
