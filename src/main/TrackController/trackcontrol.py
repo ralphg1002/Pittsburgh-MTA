@@ -911,6 +911,12 @@ class TrackControl(QMainWindow):
             self.set_crossingstate_handler
         )
 
+
+        """ This section of code is for the connections from signals from the CTC to the handler"""
+        ctcToTrackController.sendAuthority.connect(self.handle_authority)
+        ctcToTrackController.sendSuggestedSpeed.connect(self.handle_suggested_speed)
+        ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
+
         # connect the input signals from the test bench to the main ui page handlers
         # self.ui.testBenchWindow.setSwitchState.connect(self.set_switchstate_handler)
         self.ui.testBenchWindow.setLightState.connect(self.set_lightstate_handler)
@@ -1046,7 +1052,6 @@ class TrackControl(QMainWindow):
         print("authority: ", authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_authority(authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_occupancystate(True)
-        self.set_occupancystate_handler(line, wayside, 0, True)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     # Method to disable or enable the PLC program for the wayside when the mode is switched to automatic or manual mode
