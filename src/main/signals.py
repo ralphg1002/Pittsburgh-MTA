@@ -35,7 +35,7 @@ class TrackModelToTrainModel(QObject):
     blockInfo = pyqtSignal(int, dict)  # next block, current block data
     newCurrentPassengers = pyqtSignal(int)
 
-
+   
 ##########################################################################################
 class TrainModelToTrackModel(QObject):
     sendCurrentPassengers = pyqtSignal(int, str)
