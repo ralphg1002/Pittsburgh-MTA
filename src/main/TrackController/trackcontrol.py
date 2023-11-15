@@ -2,7 +2,7 @@ import sys, re, os
 import pandas as pd
 
 # from PyQt5.QtCore import pyqtSignal
-from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController   
+from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController, masterSignals 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from .trackcontrolui import MainUI
 
@@ -430,6 +430,7 @@ class Wayside:
         self.refresh_plc()
 
     def refresh_plc(self):
+        print("refreshing...")
         # check if it is in manual mode and exit the refresh if so
         if not self.plcState:
             return
@@ -716,7 +717,7 @@ class TrackControl(QMainWindow):
         self.ui = MainUI()
         self.ui.setGeometry(0, 0, 960, 960)
         self.ui.show()
-        
+
         # Instantiate the track information for the Green Line
         self.greenLine = Line(1)
         self.wayside1G = Wayside(1, 1)
@@ -871,6 +872,10 @@ class TrackControl(QMainWindow):
         # self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
         # self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
 
+
+        # REFRESH THE PLC ON THE TIME INTERVAL
+        masterSignals.clockSignal.connect(lambda: self.wayside1G.refresh_plc)
+        masterSignals.clockSignal.connect(lambda: self.wayside2G.refresh_plc)
         # Connect the plc load button to its handler
         self.ui.plcImportButton.clicked.connect(lambda: self.import_plc())
 
@@ -902,7 +907,6 @@ class TrackControl(QMainWindow):
 
         # Connect output signals to the track model to also call the switch state handler
         trackControllerToTrackModel.switchState.connect(self.set_switchstate_handler)
-
 
         """ This section of code is for the connections from signals from the CTC to the handler"""
         #ctcToTrackController.sendAuthority.connect(self.handle_authority)
@@ -1334,7 +1338,7 @@ class TrackControl(QMainWindow):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
             state
         )
-        self.lines[line - 1].get_wayside(wayside).refresh_plc()
+        #self.lines[line - 1].get_wayside(wayside).refresh_plc()
         # update the occupancy table
         if state == False:
             self.ui.occupancyBox.remove_item_by_blocknumber(num)
