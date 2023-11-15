@@ -1594,7 +1594,7 @@ class Routing:
             track = "Green"
         else:
             track = "Red"
-        trainLine = self.scheduler.getSelectedLine()
+        trainLine = self.main_window.selectLine.currentText()
         #for train_id, routeQ in self.train_routes.items():
         if occupancy == True and blockNum == self.routeQ[1] and trainLine == track:
             self.routeQ.pop(0)
@@ -1794,14 +1794,18 @@ class Train:
     def checkDepartureTime(self):
         current_time = self.main_window.systemTimeInput.text()
         current_time_str = current_time.replace(":", "")[:4]
-        # print(current_time_str)
+
         # Iterate through your list of trains and check their departure times
         for train in self.scheduler.trainList:
             departureTime = train.trainDeparture
-            # print(departureTime)
             if departureTime == current_time_str:
                 # Add the train to the dispatched_trains list
                 self.dispatchTrainsList.append(train)
+                if train.trackLine == "Green Line":
+                    lineTrack = "green"
+                else:
+                    lineTrack = "red"
+                masterSignals.addTrain.emit(lineTrack, train.train_id)
 
                 next_stop = self.trainStops[0]
                 # Add the train's information to the dispatched trains table
@@ -1831,10 +1835,6 @@ class Train:
                 ctcToTrackController.sendTrainDispatched.emit(
                     trainLine, 2, train.train_id, train.authority
                 )
-                print(f'{trainLine}')
-                #masterSignals.addTrain.emit(train.trackLine, train.train_id)
-                print("emmiting signal")
-                masterSignals.addTrain.emit("green", "hello")
 
                 self.scheduler.trainList.remove(train)
 
