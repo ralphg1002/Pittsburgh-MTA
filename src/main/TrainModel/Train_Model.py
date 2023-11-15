@@ -1,3 +1,4 @@
+from decimal import DivisionByZero
 from re import T
 import sys
 from turtle import Turtle
@@ -17,15 +18,16 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QCheckBox,
 )
-
+from numpy import block
 from qtwidgets import AnimatedToggle
+sys.path.append("../../main")
 from signals import (
-    masterSignals,
     trainControllerSWToTrainModel,
+    trackModelToTrainModel,
     trainModelToTrainController,
+    trainModelToTrackModel,
+    masterSignals,
 )
-
-# from Signals import TrackModelSignals, TrainControllerSignals
 
 
 class TrainModel(QMainWindow):
@@ -53,7 +55,7 @@ class TrainModel(QMainWindow):
     def __init__(self):
         super().__init__()
         self.trains = SharedData()
-
+        
         self.time_interval = 1
         self.timer = QTimer(self)
         self.timer.timeout.connect(
@@ -65,6 +67,8 @@ class TrainModel(QMainWindow):
 
         self.sysTime = QDateTime.currentDateTime()
         self.sysTime.setTime(QTime(0, 0, 0))
+
+        self.calculations = Calculations(time_interval=self.time_interval, sys_time=self.sys_time, trains=self.trains)
 
         """ Header Template """
 
@@ -240,7 +244,7 @@ class TrainModel(QMainWindow):
     def open_results_window(self, event):
         # This function is called when the search icon is clicked
         selected_item = self.comboBox.currentText()
-        self.results_window = ResultsWindow(selected_item, self.trains)
+        self.results_window = ResultsWindow(selected_item, self.trains, self.calculations)
         self.results_window.show()
 
     def show_gui(self):
@@ -285,9 +289,10 @@ class ResultsWindow(QMainWindow):
 
     moduleName = "Results Window"
 
-    def __init__(self, selected_text, trains):
+    def __init__(self, selected_text, trains, calculations):
         super().__init__()
         self.trains = trains
+        self.calculations = calculations
 
         self.time_interval = 1
         self.timer = QTimer(self)
@@ -870,7 +875,7 @@ class ResultsWindow(QMainWindow):
         if self.vehicle_word_list:
             # Update each UI element with the corresponding variable from the SharedData dictionary class
             for i, word_placeholders in enumerate(self.vehicle_word_list):
-                word_key = (
+                word_key = (                    
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
                 word_value = SharedData.data.get(word_key, "N/A")
@@ -885,7 +890,6 @@ class ResultsWindow(QMainWindow):
                 word_key = (
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
-                print("SharedData.data:", SharedData.data)
                 word_value = SharedData.data.get(word_key, "N/A")
 
                 label_text = word_placeholders.format(word_value)
@@ -904,11 +908,19 @@ class ResultsWindow(QMainWindow):
 
                 # Update the text of the QLabel
                 self.navigation_labels[i].setText(label_text)
-
+    
+    
+    
+    # ================================== [Fix some shit above] ====================================
+    
+    
+    
+    
     def signal_period(self, period):
         self.time_interval = period
-
+    
     def update(self):
+        
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.timingMultiplier.connect(self.signal_period)
@@ -922,27 +934,29 @@ class ResultsWindow(QMainWindow):
 
         # Signals that connect from the train controller to the train model
         trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
-        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(
-            self.signal_emergency_brake
-        )
+        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(self.signal_emergency_brake)
         trainControllerSWToTrainModel.sendDriverServiceBrake.connect(self.signal_brake)
         trainControllerSWToTrainModel.sendAnnouncement.connect(self.signal_announcement)
         trainControllerSWToTrainModel.sendHeadlightState.connect(self.signal_headlights)
-        trainControllerSWToTrainModel.sendInteriorLightState.connect(
-            self.signal_interrior_lights
-        )
+        trainControllerSWToTrainModel.sendInteriorLightState.connect(self.signal_interrior_lights)
         trainControllerSWToTrainModel.sendLeftDoorState.connect(self.signal_left_door)
         trainControllerSWToTrainModel.sendRightDoorState.connect(self.signal_right_door)
-        trainControllerSWToTrainModel.sendSetpointTemperature.connect(
-            self.signal_temperature
-        )
-        trainControllerSWToTrainModel.sendAdvertisement.connect(
-            self.signal_advertisements
-        )
+        trainControllerSWToTrainModel.sendSetpointTemperature.connect(self.signal_temperature)
+        trainControllerSWToTrainModel.sendAdvertisement.connect(self.signal_advertisements)
+
+        # Signals that connect from the track model to the train model
+        trackModelToTrainModel.blockInfo.connect(self.signal_block_info)
+        trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers)
+
 
     # Functions to set
     def signal_power(self, train, power):
-        self.trains.set_value("Train 1", "vehicle_status", 8, power)
+        new_power = self.calculations.power(power)
+        
+        current_speed = "temp"
+
+        self.trains.set_value("Train 1", "vehicle_status", 2, current_speed)
+        self.trains.set_value("Train 1", "vehicle_status", 8, new_power)
 
     def signal_emergency_brake(self, train, e_brake):
         self.trains.set_value("Train 1", "failure_status", 4, e_brake)
@@ -971,6 +985,16 @@ class ResultsWindow(QMainWindow):
     def signal_advertisements(self, train, advertisements):
         self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
 
+    def signal_block_info(self, next_block, current_block_data):
+        self.trains.set_value("Train 1", "calculations", 10, next_block)
+        nextstation1, nextstation2, currstation = self.calculations.beacon_info(current_block_data)
+    
+    def signal_new_passengers(self, new_pass):
+        self.trains.set_value("Train 1", "passenger_status", 1, new_pass)
+
+
+    
+
 
 class SharedData:
     def __init__(self):
@@ -994,8 +1018,8 @@ class SharedData:
                     "emergency_brake": False,
                 },
                 "passenger_status": {
-                    "passengers": 0,
-                    "passenger_limit": 0,
+                    "passengers": 6,
+                    "passenger_limit": 74,
                     "left_door": False,
                     "right_door": False,
                     "lights_status": False,
@@ -1009,10 +1033,25 @@ class SharedData:
                     "beacon": 0,
                     "block_length": 0,
                     "block_grade": 0,
-                    "next_station": 0,
-                    "prev_station": 0,
+                    "next_station": "",
+                    "prev_station": "",
                     "headlights": False,
                     "passenger_emergency_brake": False,
+                },
+                "calculations": {
+                    "cars": 5,
+                    "mass": 5 * 56700,                    
+                    "length": 5 * 105.6,
+                    "currVelocity": 0,
+                    "currForce":0,
+                    "currAcceleration": 0,
+                    "lastVelocity": 0,
+                    "lastAcceleration": 0,
+                    "lastPosition": 0,
+                    "block": 0,
+                    "nextStation1": "",
+                    "nextStation2": "",
+                    "currStation": "",
                 },
             },
         }
@@ -2588,29 +2627,16 @@ class OutputTrainController:
 
 
 class InputsTrackModel:
-    # TackModelSignals.sendSpeedLimit(speedLimit)
-    # TackModelSignals.sendAuthority(authority)
-    # TackModelSignals.sendBeacon(beacon)
-    # TackModelSignals.sendCommandedSpeed(commandedSpeed)
-    # TrackModelSignals.sendPassengersEntering(passengersEntering)
-
     def get_Track_Model_Inputs():
-        Track_Model_Inputs = {
-            "Speed Limit:": 35,
-            "Authority:": 6,
-            "Beacon": 5,
-            "Commanded Speed:": 30,
-            "Passengers Entering": 15,
-            "Block Length": 10,
-            "Block Grade": 5,
-            "Tunnel": True,
-            "Current Passengers": 15,
-        }
-        Beacon = {
-            "Station": {"Name": "Steel Plaza", "Distance": 5, "Side": "Left"},
-            "Switch": {"Distance": 20},
-        }
-        return Track_Model_Inputs, Beacon
+        block = 9
+        if block["Block Number"] == 9:  # Section C, Edgebrook
+                    block["Beacon"] = {
+                        "Next Station1": "Pioneer",
+                        "Next Station2": "",
+                        "Current Station": "Edgebrook",
+                        "Door Side": block["Station Side"],
+                    }
+        return block
 
 
 class InputsTrainController:
@@ -2632,162 +2658,101 @@ class InputsTrainController:
 
 
 class Calculations:
-    def __init__(self):
-        self.cars = 5
-        self.mass = 5 * 56700
-        self.length = 5 * 105.6
-        self.maxPassengers = 74
-        self.currVelocity = 0
-        self.currPower = 0
-        self.currForce = 0
-        self.currAcceleration = 0
-        self.lastVelocity = 0
-        self.lastAcceleration = 0
-        self.lastPosition = 0
-        self.time = 0
+    def __init__(self, time_interval, sys_time, trains):
+        self.time_interval = time_interval
+        self.sys_time = sys_time        
+        self.trains = trains
+        
+        self.train_control_in = InputsTrainController()
+        self.train_control_out = OutputTrainController()
+        self.track_model_in = InputsTrackModel()
+        self.track_model_out = OutputTrackModel()
+
 
     # Sets the power of the train through the train controller
-    def power(self):
-        train = SharedData()
-        train_control_in = InputsTrainController()
+    def power(self, power):
+        currPower = power
+        if currPower > 120:
+            currPower = 120
+        
+        power = self.trains.set_value("Train 1", "vehicle_status", 8, currPower)
 
-        self.currPower = train_control_in.get_Train_Controller_Inputs()["Power"]
-        train.set_value("Train 1", "vehicle_status", 8, self.currPower)
+        current_speed = self.current_speed(power)
 
-        return self.currPower
+        return power, current_speed
 
-    def current_speed(self):
+    def current_speed(self, power):
+        lastVelocity = self.trains.get_value("Train 1", "calculations", 7)
+        mass = self.trians.get_value("Train 1", "calculations", )
+        
         # Calculate force from power input
-        self.currForce = self.currPower / self.lastVelocity
-        self.limit_force()
+        try:
+            currForce = power / lastVelocity
+            currForce = self.limit_force(currForce)
+        except DivisionByZero:
+            currForce = self.currPower / 0.001
+            currForce = self.limit_force(currForce, power, lastVelocity)
 
         # Find acceleration from calculated force
-        self.currAcceleration = self.currForce / self.mass
-        self.limit_acceleration()
-
-        self.time = QTime()
-
-        # Find elasped time for train
-        self.changed_time = self.time - self.last_time
-        self.elapsed_time = self.changed_time / 1000
-        self.last_time = self.changed_time
+        currAcceleration = currForce / mass
+        currAcceleration = self.limit_acceleration(currAcceleration, currForce)
 
         # Find velocity from velocity function
-        self.currVelocity = self.velocity()
+        currVelocity = self.velocity()
 
         # Find the distance traveled
-        self.new_position = self.total_distance()
+        new_position = self.total_distance()
 
-    # # Calculates current speed of train in automatic mode
-    # def Current_speed_auto():
-    #     # Define variables for calculatons
-    #     train = SharedData()
-    #     acceleration = 5.0
-    #     deceleration = -5.0
-    #     current_speed = train.get_value("Train 1", "vehicle_status", 2)
-    #     speed_limit = train.get_value("Train 1", "vehicle_status", 1)
-    #     commanded_speed = train.get_value("Train 1", "vehicle_status", 4)
-    #     power = train.get_value("Train 1", "vehicle_status", 8)
-    #     passengers_entering = InputsTrackModel.get_Track_Model_Inputs[
-    #         "Passengers Entering"
-    #     ]
-    #     block_grade = train.get_value("Train 1", "navigation_status", 4)
-    #     average_passenger_weight = 150
-    #     total_train_weight = 40.9 * 2000
+        return currVelocity
 
-    #     signal_pickup_failure = Calculations.Failures()
-
-    #     # Calculate the effect of passengers entering on the speed
-    #     passenger_weight = passengers_entering * average_passenger_weight
-    #     speed_due_to_passengers = passenger_weight / total_train_weight
-
-    #     # Calculate the effect of block grade on the speed (you need to define grade_effect_on_speed)
-    #     grade_effect_on_speed = 0.1
-    #     speed_due_to_block = block_grade * grade_effect_on_speed
-
-    #     # Adjust current speed based on acceleration and deceleration
-    #     if commanded_speed > current_speed:
-    #         current_speed += acceleration
-    #         if current_speed > commanded_speed:
-    #             current_speed = commanded_speed
-    #     elif commanded_speed < current_speed:
-    #         current_speed += deceleration
-    #         if current_speed < commanded_speed:
-    #             current_speed = commanded_speed
-
-    #     # Ensure current speed is within the speed limit
-    #     if current_speed > speed_limit:
-    #         current_speed = speed_limit
-
-    #     if signal_pickup_failure == True:
-    #         # Set power to 0 and activate the emergency brake
-    #         train.set_value("Train 1", "vehicle_status", 8, 0)
-    #         train.set_value("Train 1", "failure_status", 4, True)
-
-    #     # Update speed in the train object
-    #     train.set_value("Train 1", "vehicle_status", 2, current_speed)
-
-    #     # Update the current speed in OuputTrainController
-    #     OutputTrainController.updateCurrentSpeed(current_speed)
-
-    #     return current_speed
-
-    def total_distance(self):
-        self.total_velocity = self.currVelocity
-        self.distance = (
-            self.lastPosition + (self.elapsed_time * 2) / self.total_velocity
-        )
-        return self.distance
-
-    def limit_force(self):
-        trains = SharedData()
-        emergency_brake = trains.get_value("Train 1", "failure_status", 4)
+    def limit_force(self, force, power, lastVelocity):
+        emergency_brake = self.trains.get_value("Train 1", "failure_status", 4)
+        mass = self.trains.get_value("Train 1", "calculations", )
 
         # Limit the force of the train
-        if self.currForce > (self.mass * 0.5):
-            self.currForce = self.mass * 0.5
-        elif (self.currPower == 0 and self.lastVelocity == 0) or emergency_brake:
-            self.currForce = 0
-        elif self.lastVelocity == 0:
-            self.currForce = self.mass * 0.5
+        if force > (mass * 0.5):
+            force = mass * 0.5
+        elif (power == 0 and lastVelocity == 0) or emergency_brake:
+            force = 0
+        elif lastVelocity == 0:
+            force = mass * 0.5
 
-        return self.currForce
-
-    def limit_acceleration(self):
-        trains = SharedData()
-        failure_1 = trains.get_value("Train 1", "failure_status", 1)
-        failure_2 = trains.get_value("Train 1", "failure_status", 2)
-        failure_3 = trains.get_value("Train 1", "failure_status", 3)
-        brakes = trains.get_value("Train 1", "vehicle_status", 7)
-        emergency_brake = trains.get_value("Train 1", "failure_status", 4)
-
-        if (failure_1 or failure_2 or failure_3) and (brakes or emergency_brake):
-            self.currAcceleration = (
-                self.currForce - (0.01 * self.mass * 9.8)
-            ) / self.mass
-            trains.set_value("Train 1", "vehicle_status", 7, False)
-            trains.set_value("Train 1", "failure_status", 4, False)
-        elif self.currPower == 0 and self.currVelocity > 0:
-            if emergency_brake:
-                self.currAcceleration = -2.73
+        return force
+    
+    def limit_acceleration(self, acceleration, force):
+            failure_1 = self.trains.get_value("Train 1", "failure_status", 1)
+            failure_2 = self.trains.get_value("Train 1", "failure_status", 2)
+            failure_3 = self.trains.get_value("Train 1", "failure_status", 3)
+            brakes = self.trains.get_value("Train 1", "vehicle_status", 7)
+            emergency_brake = self.trains.get_value("Train 1", "failure_status", 4)
+            
+            if (failure_1 or failure_2 or failure_3) and (brakes or emergency_brake):
+                acceleration = (
+                    force - (0.01 * mass * 9.8)
+                ) / mass
+                self.trains.set_value("Train 1", "vehicle_status", 7, False)
+                self.trains.set_value("Train 1", "failure_status", 4, False)
+            elif self.currPower == 0 and self.currVelocity > 0:
+                if emergency_brake:
+                    acceleration = -2.73
+                else:
+                    acceleration = -1.2
+            elif self.currPower != 0:
+                if self.currAcceleration > 0.5:
+                    self.currAcceleration = 0.5
             else:
-                self.currAcceleration = -1.2
-        elif self.currPower != 0:
-            if self.currAcceleration > 0.5:
-                self.currAcceleration = 0.5
-        else:
-            self.currAcceleration = 0
+                self.currAcceleration = 0
 
-        return self.currAcceleration
-
+            return self.currAcceleration
+    
     def velocity(self):
-        trains = SharedData()
-        brake = trains.get_value("Train 1", "vehicle_status", 7)
-        emergency_brake = trains.get_value("Train 1", "failure_status", 4)
+    
+        brake = self.trains.get_value("Train 1", "vehicle_status", 7)
+        emergency_brake = self.trains.get_value("Train 1", "failure_status", 4)
 
         self.total_acceleration = self.lastAcceleration + self.currAcceleration
         self.velocity = (
-            self.lastVelocity + (self.elapsed_time / 2) * self.total_acceleration
+            self.lastVelocity + (self.time_interval / 2) * self.total_acceleration
         )
 
         # Limit velocity so that it doesn't go below 0
@@ -2797,57 +2762,15 @@ class Calculations:
             self.velocity = 0
 
         return self.velocity
-
-    # # Calculates current speed of train in manual mode
-    # def current_speed_manual():
-    #     # Initialize train object and get current speed
-    #     train = SharedData()
-    #     curr_speed = train.get_value("Train 1", "vehicle_status", 1)
-    #     power = train.get_value("Train 1", "vehicle_status", 8)
-    #     emergencyBrake = train.get_value("Train 1", "failure_status", 4)
-    #     brakes = train.get_value("Train 1", "vehicle_status", 9)
-    #     speedLimit = train.get_value("Train 1", "vehicle_status", 1)
-
-    #     # Define limits for acceleration and deceleration
-    #     accel_limit = 1.2
-    #     decel_limit = 1.5
-    #     emg_brake_val = 2.7
-
-    #     # Limit power to 120
-    #     power = min(power, 120)
-
-    #     # Calculate speed difference using speedLimit
-    #     speed_diff = speedLimit - curr_speed
-
-    #     # Apply acceleration if speed difference is positive
-    #     if speed_diff > 0:
-    #         accel = min(accel_limit, speed_diff)
-    #         curr_speed += accel
-
-    #     # Apply deceleration if speed difference is negative
-    #     elif speed_diff < 0:
-    #         decel = min(decel_limit, -speed_diff)
-    #         curr_speed -= decel
-
-    #     # Apply brakes if brakes flag is True
-    #     if brakes:
-    #         decel = min(decel_limit, -speed_diff)
-    #         curr_speed -= decel
-
-    #     # Apply an emergency brake if the emergencyBrake flag is True
-    #     if emergencyBrake:
-    #         curr_speed -= emg_brake_val
-
-    #     # Update speed in the train object
-    #     train.set_value("Train 1", "vehicle_status", 2, curr_speed)
-
-    #     # Update the current speed in OuputTrainController
-    #     OutputTrainController.updateCurrentSpeed(curr_speed)
-
-    #     return curr_speed
+    
+    def total_distance(self):
+        self.total_velocity = self.currVelocity
+        self.distance = (
+            self.lastPosition + (self.time_interval * 2) / self.total_velocity
+        )
+        return self.distance
 
     def beacon_info(self):
-        train = SharedData()
         train_control = OutputTrainController()
 
         # Call the get_Track_Model_Inputs function
@@ -2861,18 +2784,18 @@ class Calculations:
 
         # Sets the door status and sends to train controller
         if door == "Left":
-            train.set_value("Train 1", "passenger_status", 3, door)
+            self.train.set_value("Train 1", "passenger_status", 3, door)
             train_control.left_door = True
             train_control.right_door = False
         else:
-            train.set_value("Train 1", "passenger_status", 4, door)
+            self.train.set_value("Train 1", "passenger_status", 4, door)
             train_control.right_door = True
             train_control.left_door = False
 
         # Sets the station name and sends to train controller
-        train.set_value("Train 1", "navigation_status", 5, station_name)
+        self.train.set_value("Train 1", "navigation_status", 5, station_name)
         prev_station = station_name
-        train.set_value("Train 1", "navigation_status", 6, prev_station)
+        self.train.set_value("Train 1", "navigation_status", 6, prev_station)
         train_control.next_station = station_name
         train_control.prev_station = prev_station
 
@@ -2984,12 +2907,12 @@ class Calculations:
         return self.occupancy
 
 
-# def main():
-#     app = QApplication(sys.argv)
-#     ui = TrainModel()
-#     ui.show_gui()
-#     sys.exit(app.exec_())
+def main():
+    app = QApplication(sys.argv)
+    ui = TrainModel()
+    ui.show_gui()
+    sys.exit(app.exec_())
 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
