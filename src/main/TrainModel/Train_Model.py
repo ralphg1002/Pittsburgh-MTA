@@ -204,9 +204,7 @@ class TrainModel(QMainWindow):
         self.comboBox.setFont(font1)
 
         # Populate the QComboBox with items
-        trainID = self.trains.get_value("Train 1", "calculations", 17)
-
-        self.comboBox.addItem(str(trainID))
+        self.comboBox.addItem("Train 1")
         self.comboBox.addItem("Train 2")
 
         # Create a search icon for new window
@@ -877,13 +875,14 @@ class ResultsWindow(QMainWindow):
         self.trains.set_value(train_name, "failure_status", key, state)
 
     def update_ui(self):
+        word_value = {}
         if self.vehicle_word_list:
             # Update each UI element with the corresponding variable from the SharedData dictionary class
             for i, word_placeholders in enumerate(self.vehicle_word_list):
                 word_key = (
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
-
+                
                 label_text = word_placeholders.format(word_value)
 
                 # Update the text of the QLabel
@@ -894,7 +893,7 @@ class ResultsWindow(QMainWindow):
                 word_key = (
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
-
+                
                 label_text = word_placeholders.format(word_value)
 
                 # Update the text of the QLabel
@@ -949,13 +948,11 @@ class ResultsWindow(QMainWindow):
         # Signals that connect from the track model to the train model
         trackModelToTrainModel.blockInfo.connect(self.signal_blockInfo)
         trackModelToTrainModel.beacon.connect(self.signal_beacon)
-        trackModelToTrainModel.newCurrentPassengers.connect(self.signal_newPassengers)
-
-        # Emit signals from the train model to the train controller
-        # trainModelToTrainController.sendSpeedLimit.emit(speed_limit)
+        trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers)
 
     # Functions to set
     def signal_power(self, train, power):
+        self.trains.set_value("Train 1", "calculations", 17, train)
         current_speed = self.calculations.power(power)
         self.trains.set_value("Train 1", "vehicle_status", 2, current_speed)
         trainModelToTrainController.sendCurrentSpeed.emit(current_speed)
@@ -996,12 +993,8 @@ class ResultsWindow(QMainWindow):
         self.trains.set_value("Train 1", "calculations", 17, train)
         self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
 
-    def signal_blockInfo(
-        self, next_block, length, grade, speed_limit, suggested_speed, authority
-    ):
-        self.calculations.blockInfo(
-            next_block, length, grade, speed_limit, suggested_speed, authority
-        )
+    def signal_blockInfo(self, next_block, length, grade, speed_limit, suggested_speed, authority):
+        self.calculations.blockInfo(next_block, length, grade, speed_limit, suggested_speed, authority)
 
     def signal_beacon(self, beacon):
         self.calculations.beacon(beacon)
@@ -2834,6 +2827,8 @@ class Calculations:
         self.trains.set_value("Train 1", "vehicle_status", 4, suggested_speed)
         self.trains.set_value("Train 1", "navigation_status", 0, authority)
 
+        self.occupancy(next_block)
+
         # Send train controller information
         trainModelToTrainController.sendBlockLength.emit(length)
         trainModelToTrainController.sendSpeedLimit.emit(speed_limit)
@@ -2843,23 +2838,24 @@ class Calculations:
         return next_block, length, grade, speed_limit, suggested_speed, authority
 
     def failures(self):
-        train = SharedData()
-        train_control = OutputTrainController()
-
-        engine_failure = train.get_value("Train 1", "failure_status", 1)
-        signal_pickup_failure = train.get_value("Train 1", "failure_status", 2)
-        brake_failure = train.get_value("Train 1", "failure_status", 3)
+        engine_failure = self.trains.get_value("Train 1", "failure_status", 1)
+        signal_pickup_failure = self.trains.get_value("Train 1", "failure_status", 2)
+        brake_failure = self.trains.get_value("Train 1", "failure_status", 3)
+        pass_emergency_brake = self.trians.get_value("Train 1", "failure_status", 4)
 
         if (
             engine_failure == True
             or signal_pickup_failure == True
             or brake_failure == True
         ):
-            train_control.engineFailure = True
-            train_control.signalPickupFailure = True
-            train_control.brakeFailure = True
+            trainModelToTrainController.sendEngineFailure.emit(engine_failure)
+            trainModelToTrainController.sendSignalPickupFailure.emit(signal_pickup_failure)
+            trainModelToTrainController.sendBrakeFailure.emit(brake_failure)
 
-        return engine_failure, signal_pickup_failure, brake_failure
+        if pass_emergency_brake == True:
+            trainModelToTrainController.sendPassengerEmergencyBrake.emit(pass_emergency_brake)
+
+        return engine_failure, signal_pickup_failure, brake_failure, pass_emergency_brake
 
     def temperature(self, temp):
         set_temp = temp
@@ -2892,25 +2888,33 @@ class Calculations:
 
         return passengers
 
-    def occupancy(self):
+    def occupancy(self, next_block):
         distance = 0
         polarity = 0
+        initialized = 0
         distance = self.calculations.distance()
         block_length = self.trains.get_value("Train 1", "navigation_stauts", 3)
-        next_block = self.trains.get_value("Train 1", "calculations", 10)
+        next_block = self.trains.set_value("Train 1", "calculations", 10, next_block)
         curr_block = self.trains.get_value("Train 1", "calculations", 11)
         prev_block = self.trains.get_value("Train 1", "calculations", 11)
         trainID = self.trains.get_value("Train 1", "calculations", 17)
         line = self.trains.get_value("Train 1", "calculations", 16)
+        
+        if initialized == 0:
+            trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
 
         if distance == block_length:
             distance = 0
             polarity = 1
-            trainModelToTrackModel.sendPolarity(line, curr_block, prev_block)
-            trainModelToTrainController.sendPolarity(trainID, polarity)
+            trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
+            trainModelToTrainController.sendPolarity.emit(trainID, polarity)
 
             curr_block = next_block
             prev_block = curr_block
+
+        initialized += 1
+        if initialized >= 999:
+            initialized = 1
 
     def beacon(self, beacon):
         next_station1 = beacon["Next Station1"]
