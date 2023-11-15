@@ -61,10 +61,18 @@ IF
     Operation: 0 R
     end
 IF
-    Condition: 0
+    Condition: 0 AND NOT(57->64)
     Operation: SWITCH(1)
     Operation: 62 R
     Operation: 63 R
+    Operation: 0 G
+    end
+IF
+    Condition: (57->64)
+    Operation: SWITCH(0)
+    Operation: 62 G
+    Operation: 63 R
+    Operation: 0 R
     end
 END
 

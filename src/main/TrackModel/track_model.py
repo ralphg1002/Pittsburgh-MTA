@@ -7,6 +7,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 # from signals import trackModeltoTrainModel, trackModelToCTC, trackModelToTrackController
+from signals import masterSignals
 
 MTA_STYLING = {
     # font variables
@@ -1128,7 +1129,7 @@ class TrackModel:
 
         # General layout
         self.set_clock()
-        self.set_simulation_speed_controls()
+        self.set_simulation_speed()
         # self.add_vline(mainWindow)
         # self.add_hline(mainWindow)
         self.add_header()
@@ -1183,12 +1184,12 @@ class TrackModel:
     #     line.setLineWidth(thickness)
 
     # def add_hline(self, parentWindow):
-    #     thickness = 5
+        # thickness = 5
 
-    #     line = QFrame(parentWindow)
-    #     line.setFrameShape(QFrame.HLine)
-    #     line.setGeometry(0, 100, 1200, thickness)
-    #     line.setLineWidth(thickness)
+        # line = QFrame(parentWindow)
+        # line.setFrameShape(QFrame.HLine)
+        # line.setGeometry(0, 100, 1200, thickness)
+        # line.setLineWidth(thickness)
 
     def add_header(self):
         headerBackground = QLabel(self.mainWindow)
@@ -1227,23 +1228,23 @@ class TrackModel:
         moduleLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
     # def add_testbench_button(self):
-    #     # icon
-    #     gearPng = QPixmap("src/main/TrackModel/pngs/MTA_logo.png")
-    #     gearPng = gearPng.scaledToWidth(25, 25)
-    #     testbenchIcon = QLabel(self.mainWindow)
-    #     testbenchIcon.setPixmap(gearPng)
-    #     testbenchIcon.setGeometry(30, 130, gearPng.width(), gearPng.height())
+        # # icon
+        # gearPng = QPixmap("src/main/TrackModel/pngs/MTA_logo.png")
+        # gearPng = gearPng.scaledToWidth(25, 25)
+        # testbenchIcon = QLabel(self.mainWindow)
+        # testbenchIcon.setPixmap(gearPng)
+        # testbenchIcon.setGeometry(30, 130, gearPng.width(), gearPng.height())
 
-    #     # button
-    #     testbenchButton = QPushButton("Test Bench", self.mainWindow)
-    #     testbenchFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
-    #     testbenchButton.setFont(testbenchFont)
-    #     testbenchButton.setGeometry(60, 130, 100, 30)
-    #     testbenchButton.setStyleSheet(
-    #         f'color: {MTA_STYLING["darkBlue"]}; border: 1px solid white'
-    #     )
+        # # button
+        # testbenchButton = QPushButton("Test Bench", self.mainWindow)
+        # testbenchFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
+        # testbenchButton.setFont(testbenchFont)
+        # testbenchButton.setGeometry(60, 130, 100, 30)
+        # testbenchButton.setStyleSheet(
+        #     f'color: {MTA_STYLING["darkBlue"]}; border: 1px solid white'
+        # )
 
-    #     testbenchButton.clicked.connect(self.show_testbench)
+        # testbenchButton.clicked.connect(self.show_testbench)
 
     def control_temperature(self):
         setTemperature = QLabel("Set Temperature:", self.mainWindow)
@@ -1309,20 +1310,27 @@ class TrackModel:
         self.clock.setFont(systemTimeFont)
         self.clock.setGeometry(830, 80, 150, 60)
         self.clock.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
-        self.update_clock()
+        
+        #Timer from CTC
+        self.timer = QTimer(self.mainWindow)
+        self.timer.start(1000)
+        self.timer.timeout.connect(self.get_CTC_timing)
 
-        # Update clock in real time while window is open
-        timer = QTimer(self.mainWindow)
-        timer.timeout.connect(self.update_clock)
-        # Update every 1 second
-        timer.start(1000)
+        self.sysTime = QDateTime.currentDateTime()
+        self.sysTime.setTime(QTime(0, 0, 0))
 
-    def update_clock(self):
-        currentDatetime = QDateTime.currentDateTime()
-        formattedTime = currentDatetime.toString("HH:mm:ss")
-        self.clock.setText(formattedTime)
+    def get_CTC_timing(self):      
+        masterSignals.timingMultiplier.connect(self.update_clock)
+        
+    def update_clock(self, period):
+        time_interval = period
+        masterSignals.clockSignal.connect(self.sysTime.setTime)
+        self.timer.setInterval(time_interval)
 
-    def set_simulation_speed_controls(self):
+        self.clock.setText(self.sysTime.toString("HH:mm:ss"))
+        self.speedText.setText("x" + format(1 / (time_interval / 1000), ".3f"))
+
+    def set_simulation_speed(self):
         systemSpeedFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
 
         systemSpeedLabel = QLabel("System Speed:", self.mainWindow)
@@ -1333,30 +1341,6 @@ class TrackModel:
         self.speedText.setFont(systemSpeedFont)
         self.speedText.setGeometry(850, 130, 50, 30)
         self.speedText.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
-
-        decreaseSpeed = QPushButton("<<", self.mainWindow)
-        decreaseSpeed.setGeometry(820, 130, 20, 30)
-        decreaseSpeed.setStyleSheet(
-            f'color: {MTA_STYLING["darkBlue"]}; border: 1px solid white; font-weight: bold'
-        )
-        decreaseSpeed.clicked.connect(self.decrease_simulation_speed)
-        increaseSpeed = QPushButton(">>", self.mainWindow)
-        increaseSpeed.setGeometry(890, 130, 20, 30)
-        increaseSpeed.setStyleSheet(
-            f'color: {MTA_STYLING["darkBlue"]}; border: 1px solid white; font-weight: bold'
-        )
-        increaseSpeed.clicked.connect(self.increase_simulation_speed)
-
-    def decrease_simulation_speed(self):
-        # Speed cannot go below 0.5
-        if self.simulationSpeed > 0.5:
-            self.simulationSpeed -= 0.5
-            self.speedText.setText(f"{self.simulationSpeed}x")
-
-    def increase_simulation_speed(self):
-        if self.simulationSpeed < 5.0:
-            self.simulationSpeed += 0.5
-            self.speedText.setText(f"{self.simulationSpeed}x")
 
     def setup_content_widget(self):
         mapWidget = QWidget(self.mainWindow)
@@ -1550,8 +1534,8 @@ class TrackModel:
     #     self.filePath.setStyleSheet("color: #008000; font-size: 9px;")
 
     # def update_file_path(self, filePath):
-    # When file is selected, its path is shown
-    # self.filePath.setText("Selected File:\n" + filePath)
+        # When file is selected, its path is shown
+        # self.filePath.setText("Selected File:\n" + filePath)
 
     def add_import_button(self):
         importButton = QPushButton("Import Track Data", self.mainWindow)
@@ -1565,17 +1549,17 @@ class TrackModel:
         importButton.clicked.connect(lambda: self.import_track_data())
 
     # def update_gui(self, filePath):
-    #     self.update_file_path(filePath)
-    #     self.select_line("Blue Line")  # Sets label to blue as that is the only line
-    #     self.trackMap.show()
-    #     self.zoomInButton.show()
-    #     self.zoomOutButton.show()
-    #     self.zoomInButton.setDisabled(True)
-    #     self.zoomOutButton.setDisabled(True)
-    #     self.changeFailuresButton.setEnabled(True)
-    #     self.goButton.setEnabled(True)
-    #     for checkbox in self.trackInfoCheckboxes.values():
-    #         checkbox.setDisabled(False)
+        # self.update_file_path(filePath)
+        # self.select_line("Blue Line")  # Sets label to blue as that is the only line
+        # self.trackMap.show()
+        # self.zoomInButton.show()
+        # self.zoomOutButton.show()
+        # self.zoomInButton.setDisabled(True)
+        # self.zoomOutButton.setDisabled(True)
+        # self.changeFailuresButton.setEnabled(True)
+        # self.goButton.setEnabled(True)
+        # for checkbox in self.trackInfoCheckboxes.values():
+        #     checkbox.setDisabled(False)
 
     def import_track_data(self):
         options = QFileDialog.Options() | QFileDialog.ReadOnly
@@ -2198,10 +2182,9 @@ class TrackModel:
     #             block["Failures"] = failuresStr
     #     self.update_block_info_display
 
-
-#     def show_testbench(self):
-#         testbenchWindow = TestbenchWindow()
-#         testbenchWindow.testbench.exec()
+    # def show_testbench(self):
+        # testbenchWindow = TestbenchWindow()
+        # testbenchWindow.testbench.exec()
 
 
 # class TestbenchWindow:
