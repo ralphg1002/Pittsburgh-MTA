@@ -491,7 +491,7 @@ class Wayside:
 
             # If any condition is satisfied, execute the operations
             if any_condition_satisfied:
-                for operation in item["Operations"]:
+                for operation in item[ifBlock]["Operations"]:
                     parsedOperation = self.parse_operation(operation)
                     # set the switch value
                     if parsedOperation["Type"] == "SWITCH":
@@ -1046,6 +1046,7 @@ class TrackControl(QMainWindow):
         print("authority: ", authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_authority(authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_occupancystate(True)
+        self.set_occupancystate_handler(line, wayside, 0, True)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     # Method to disable or enable the PLC program for the wayside when the mode is switched to automatic or manual mode
