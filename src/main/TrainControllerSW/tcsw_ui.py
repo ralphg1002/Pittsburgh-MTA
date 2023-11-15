@@ -312,6 +312,9 @@ class TrainControllerUI(QMainWindow):
         )
         self.pixmapAnnouncement = self.pixmapAnnouncement.scaled(32, 32)
 
+        self.pixmapStopSign = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/stop_sign.svg").scaled(64, 64)
+        self.pixmapGoSign = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/go_sign.png").scaled(64, 64)
+
         # Train change section
         self.trainChangeBox = QLabel("", self)
         self.box_label(self.trainChangeBox, 245, 200)
@@ -398,7 +401,7 @@ class TrainControllerUI(QMainWindow):
         self.kpLabel.move(self.kpLabel.x(), self.kpLabel.y() + 10)
 
         self.kpEdit = QSpinBox(self)
-        self.kpEdit.setValue(0)
+        self.kpEdit.setValue(1)
         self.kpEdit.setFont(QFont(self.fontStyle, self.textFontSize))
         self.set_relative_right(self.kpEdit, self.kpLabel, 20)
         self.set_relative_before_right_end(self.kpEdit, self.engineerBox, 10)
@@ -408,7 +411,7 @@ class TrainControllerUI(QMainWindow):
         self.set_relative_below(self.kiLabel, self.kpLabel, 20)
 
         self.kiEdit = QSpinBox(self)
-        self.kiEdit.setValue(0)
+        self.kiEdit.setValue(1)
         self.kiEdit.setFont(QFont(self.fontStyle, self.textFontSize))
         self.set_relative_right(self.kiEdit, self.kiLabel, 20)
         self.set_relative_before_right_end(self.kiEdit, self.engineerBox, 10)
@@ -830,21 +833,29 @@ class TrainControllerUI(QMainWindow):
         self.box_label(self.authorityBox, self.commandedPowerBox.width(), 100)
         self.set_relative_below(self.authorityBox, self.currentSpeedBox, 20)
 
-        self.authorityVal = QLabel(self)
-        self.authorityVal.setText("888888888")
-        self.regular_label(self.authorityVal)
-        self.authorityVal.setText("0")
-        self.authorityVal.setAlignment(Qt.AlignCenter)
-        self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
-        self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 10)
+        # self.authorityVal = QLabel(self)
+        # self.authorityVal.setText("888888888")
+        # self.regular_label(self.authorityVal)
+        # self.authorityVal.setText("0")
+        # self.authorityVal.setAlignment(Qt.AlignCenter)
+        # self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
+        # self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 10)
 
-        self.miLabel = QLabel("mi", self)
-        self.text_label(self.miLabel)
-        self.set_relative_below_center(self.miLabel, self.authorityVal, 10)
+        # self.miLabel = QLabel("Status", self)
+        # self.text_label(self.miLabel)
+        # self.set_relative_below_center(self.miLabel, self.authorityBox, 10)
+        # self.miLabel.move(self.miLabel.x(), self.authorityBox.y() + 10)
+
+
+        self.authorityVal = QLabel(self)
+        self.png_label(self.authorityVal, self.pixmapGoSign)
+        self.authorityVal.adjustSize()
+        self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
+        self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 5)
 
         self.authorityLabel = QLabel("Authority", self)
         self.regular_label(self.authorityLabel)
-        self.set_relative_below_center(self.authorityLabel, self.miLabel, 10)
+        self.set_relative_below_center(self.authorityLabel, self.authorityVal, 5)
 
         self.authorityBox.setFixedHeight(
             self.authorityLabel.y()
@@ -983,6 +994,8 @@ class TrainControllerUI(QMainWindow):
         # Update Train ID and attributes
         self.trainIDLabel.setText("Train #: " + self.tcVariables["trainID"])
 
+        masterSignals.timingMultiplier.connect(self.signal_period)
+
         # SIGNAL INTEGRATION: TM -> TCSW
         trainModelToTrainController.sendSpeedLimit.connect(self.signal_speedLimit)
         trainModelToTrainController.sendAuthority.connect(self.signal_authority)
@@ -1007,6 +1020,8 @@ class TrainControllerUI(QMainWindow):
         trainModelToTrainController.sendPolarity.connect(self.signal_polarity)
 
         for train in self.tcFunctions.trainList:
+            self.tcFunctions.set_samplePeriod(train, self.tcVariables["samplePeriod"])
+
             if train.get_auto():
                 self.tcFunctions.automatic_operations(train)
             if train.block["blockNumber"] == 0:
@@ -1021,25 +1036,29 @@ class TrainControllerUI(QMainWindow):
                 self.speedLimitLabel.adjustSize()
 
                 # authority
-                if not train.get_authority:
-                    self.authorityVal.setText(
-                        str(
-                            math.floor(
-                                self.tcFunctions.distance_between(
-                                    blockDict,
-                                    train.block["blockNumber"],
-                                    self.tcFunctions.find_block(
-                                        blockDict, train.nextStop
-                                    ),
-                                )
-                                / 1609
-                            )
-                        )
-                    )
+                if not train.get_authority():
+                    self.png_label(self.authorityVal, self.pixmapStopSign)
+                    self.authorityVal.adjustSize()
+                    # self.authorityVal.setText(
+                    #     str(
+                    #         math.floor(
+                    #             self.tcFunctions.distance_between(
+                    #                 blockDict,
+                    #                 train.block["blockNumber"],
+                    #                 self.tcFunctions.find_block(
+                    #                     blockDict, train.nextStop
+                    #                 ),
+                    #             )
+                    #             / 1609
+                    #         )
+                    #     )
+                    # )
                 else:
-                    self.authorityVal.setText(
-                        str(math.floor(train.block["blockLength"] / 1609))
-                    )
+                    self.png_label(self.authorityVal, self.pixmapGoSign)
+                    self.authorityVal.adjustSize()
+                    # self.authorityVal.setText(
+                    #     str(math.floor(train.block["blockLength"] / 1609))
+                    # )
                 self.authorityVal.setAlignment(Qt.AlignCenter)
 
                 # commanded speed
@@ -1306,8 +1325,6 @@ class TrainControllerUI(QMainWindow):
 
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
-        masterSignals.timingMultiplier.connect(self.signal_period)
-        self.tcFunctions.set_samplePeriod(self.tcVariables["samplePeriod"])
 
         masterSignals.clockSignal.connect(self.sysTime.setTime)
 
@@ -1384,6 +1401,7 @@ class TrainControllerUI(QMainWindow):
     def signal_currSpeed(self, id, currSpeed):
         for train in self.tcVariables["trainList"]:
             if train.get_trainID() == id:
+                train.prevSpeed = train.currentSpeed
                 train.set_currentSpeed(currSpeed)
         return
 

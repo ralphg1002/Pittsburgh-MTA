@@ -1,6 +1,7 @@
 # importing libraries
 import sys
 import math
+import re
 import pandas as pd
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui
@@ -13,13 +14,7 @@ class TCFunctions:
     def __init__(self):
         self.trainList = []
         self.time = 0
-        self.piVariables = {
-            "powerLimit": 120000,
-            "uk": 0,
-            "prevError": 0,
-            "ek": 0,
-            "samplePeriod": 1,
-        }
+
         self.power1 = {"powerValue": 0, "uk": 0, "prevError": 0}
         self.power2 = {"powerValue": 0, "uk": 0, "prevError": 0}
         self.power3 = {"powerValue": 0, "uk": 0, "prevError": 0}
@@ -41,9 +36,11 @@ class TCFunctions:
         data = df.to_dict(orient='records')
 
         modifiedData = []
+        affectedBlocks = []
         firstStationName = ""
 
         for block in data:
+            switchBlocks = []
             modifiedBlock = {"Line": "line",
                              "Section": "letter",
                              "Number": 0,
@@ -63,10 +60,25 @@ class TCFunctions:
                 modifiedStationName = modifiedStationName.replace("; UNDERGROUND", "")
                 modifiedStationName = modifiedStationName.replace(" (First)", "")
                 modifiedBlock["stationName"] = modifiedStationName
+                modifiedBlock["infrastructure"] = modifiedStationName
             if "UNDERGROUND" in block["Infrastructure"]:
                 modifiedBlock["isTunnel"] = True
+            if "SWITCH" in block["Infrastructure"]:
+                modifiedBlock["infrastructure"] = "SWITCH"
+                affectedBlocks = re.findall(r'\d+', block["Infrastructure"])
+                affectedBlocks = [int(num) for num in affectedBlocks]
+            if "RAILWAY CROSSING" in block["Infrastructure"]:
+                modifiedBlock["infrastructure"] = "RAILWAY CROSSING"
             if "(First)" in block["Infrastructure"]:
                 firstStationName = modifiedBlock["stationName"]
+            if modifiedBlock["infrastructure"] != "":
+                affectedBlocks.append(modifiedBlock["Number"] - 1)
+                affectedBlocks.append(modifiedBlock["Number"] + 1)
+            affectedBlocks = list(set(affectedBlocks))
+            for affected in affectedBlocks:
+                if affected == modifiedBlock["Number"]:
+                    modifiedBlock["limit"] = True
+
             modifiedData.append(modifiedBlock)
 
         for block in modifiedData:
@@ -74,8 +86,8 @@ class TCFunctions:
 
         return modifiedData
 
-    def set_samplePeriod(self, samplePeriod):
-        self.piVariables["samplePeriod"] = samplePeriod
+    def set_samplePeriod(self, trainObject, samplePeriod):
+        trainObject.piVariables["samplePeriod"] = samplePeriod
 
     def add_train(self, trainObject):
         self.trainList.append(trainObject)
@@ -124,12 +136,12 @@ class TCFunctions:
             trainObject.set_rightDoor(False)
             trainObject.set_announcement("")
 
-    def find_block(self, blockDict, stationName):
+    def find_block_by_stationName(self, blockDict, stationName):
         for block in blockDict:
             if block["stationName"] == stationName:
                 return block["Number"]
 
-    def find_station(self, blockDict, section):
+    def find_station_by_section(self, blockDict, section):
         for block in blockDict:
             if block["Section"] == section and block["isStation"] == True:
                 return block["stationName"]
@@ -148,6 +160,18 @@ class TCFunctions:
         return distanceCounter
 
     def location_tracker(self, blockDict, trainObject):
+        self.timeTravelled = 0
+        self.nextInfrastructure = ""
+        self.distanceToNextStation = 0
+        self.distanceToInfrastructure = 0
+        self.distanceTravelled = 0
+        self.distanceRatio = 0
+        if trainObject.block["isStation"]:
+            trainObject.distanceTravelled = 0
+            trainObject.distanceRatio = 0
+        #if trainObject.block["infrastructure"] == trainObject.nextInfrastructure:
+
+
         if trainObject.prevStop != trainObject.beacon["currStop"]:
             if trainObject.prevStop != trainObject.beacon["nextStop"][0]:
                 trainObject.nextStop = trainObject.beacon["nextStop"][0]
@@ -165,12 +189,12 @@ class TCFunctions:
 
         trainObject.stationDistance = self.distance_between(
             blockDict,
-            self.find_block(blockDict, trainObject.prevStop),
-            self.find_block(blockDict, trainObject.nextStop),
+            self.find_block_by_stationName(blockDict, trainObject.prevStop),
+            self.find_block_by_stationName(blockDict, trainObject.nextStop),
         )
         trainObject.distanceTravelled = self.distance_between(
             blockDict,
-            self.find_block(blockDict, trainObject.prevStop),
+            self.find_block_by_stationName(blockDict, trainObject.prevStop),
             trainObject.block["blockNumber"],
         )
         trainObject.distanceRatio = (
@@ -181,9 +205,8 @@ class TCFunctions:
         if trainObject.prevPolarity != trainObject.polarity:
             if trainObject.prevStop == trainObject.nextStop:
                 trainObject.block["blockNumber"] += 0
-            elif self.find_block(
-                blockDict, trainObject.prevStop
-            ) < self.find_block(blockDict, trainObject.nextStop):
+            elif self.find_block_by_stationName(blockDict, trainObject.prevStop) < self.find_block_by_stationName(
+                    blockDict, trainObject.nextStop):
                 trainObject.block["blockNumber"] += 1
             else:
                 trainObject.block["Number"] -= 1
@@ -225,16 +248,16 @@ class TCFunctions:
         newError = trainObject.get_setpointSpeed() - trainObject.get_currentSpeed()
 
         # calculate new uk
-        if newError == 0 and self.piVariables["prevError"] == 0:
+        if newError == 0 and trainObject.piVariables["prevError"] == 0:
             # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
             return
-        elif trainObject.get_powerCommand() < self.piVariables["powerLimit"]:
-            newUk = self.piVariables["uk"] + self.piVariables["samplePeriod"] / 2 * (
-                newError + self.piVariables["prevError"]
+        elif trainObject.get_powerCommand() < trainObject.piVariables["powerLimit"]:
+            newUk = trainObject.piVariables["uk"] + trainObject.piVariables["samplePeriod"] / 2 * (
+                newError + trainObject.piVariables["prevError"]
             )
         else:
-            newUk = self.piVariables["uk"]
+            newUk = trainObject.piVariables["uk"]
 
         # power equation
         newPowerCommand = trainObject.get_kp() * newError + trainObject.get_ki() * newUk
@@ -243,16 +266,16 @@ class TCFunctions:
         if newPowerCommand < 0:
             # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
-        elif newPowerCommand > self.piVariables["powerLimit"]:
-            # trainObject.set_powerCommand(self.piVariables["powerLimit"])
-            powerDict["powerValue"] = self.piVariables["powerLimit"]
+        elif newPowerCommand > trainObject.piVariables["powerLimit"]:
+            # trainObject.set_powerCommand(trainObject.piVariables["powerLimit"])
+            powerDict["powerValue"] = trainObject.piVariables["powerLimit"]
         else:
             # trainObject.set_powerCommand(newPowerCommand)
             powerDict["powerValue"] = newPowerCommand
 
         # update uk and velocity error variables
-        # self.piVariables["uk"] = newUk
-        # self.piVariables["prevError"] = newError
+        # trainObject.piVariables["uk"] = newUk
+        # trainObject.piVariables["prevError"] = newError
         powerDict["uk"] = newUk
         powerDict["prevError"] = newError
 
@@ -263,20 +286,20 @@ class TCFunctions:
         if self.power1["powerValue"] <= self.power2["powerValue"]:
             if self.power1["powerValue"] <= self.power3["powerValue"]:
                 trainObject.set_powerCommand(self.power1["powerValue"])
-                self.piVariables["uk"] = self.power1["uk"]
-                self.piVariables["prevError"] = self.power1["prevError"]
+                trainObject.piVariables["uk"] = self.power1["uk"]
+                trainObject.piVariables["prevError"] = self.power1["prevError"]
             else:
                 trainObject.set_powerCommand(self.power3["powerValue"])
-                self.piVariables["uk"] = self.power3["uk"]
-                self.piVariables["prevError"] = self.power3["prevError"]
+                trainObject.piVariables["uk"] = self.power3["uk"]
+                trainObject.piVariables["prevError"] = self.power3["prevError"]
         elif self.power2["powerValue"] <= self.power3["powerValue"]:
             trainObject.set_powerCommand(self.power2["powerValue"])
-            self.piVariables["uk"] = self.power2["uk"]
-            self.piVariables["prevError"] = self.power2["prevError"]
+            trainObject.piVariables["uk"] = self.power2["uk"]
+            trainObject.piVariables["prevError"] = self.power2["prevError"]
         else:
             trainObject.set_powerCommand(self.power3["powerValue"])
-            self.piVariables["uk"] = self.power3["uk"]
-            self.piVariables["prevError"] = self.power3["prevError"]
+            trainObject.piVariables["uk"] = self.power3["uk"]
+            trainObject.piVariables["prevError"] = self.power3["prevError"]
 
     def failure_operations(self, trainObject):
         if trainObject.get_engineFailure():

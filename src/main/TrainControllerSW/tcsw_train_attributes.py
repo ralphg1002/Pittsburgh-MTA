@@ -16,6 +16,8 @@ class Train:
             "blockLength": 0,
             "isStation": False,
             "isTunnel": False,
+            "infrastructure": "",
+            "limit": False
         }
 
         # train model inputs
@@ -56,9 +58,20 @@ class Train:
         self.prevStop = "YARD"
         self.nextStop = ""
         self.prevPolarity = False
-        self.stationDistance = 0
+        self.prevSpeed = 0
+        self.timeTravelled = 0
+        self.nextInfrastructure = ""
+        self.distanceToNextStation = 0
+        self.distanceToInfrastructure = 0
         self.distanceTravelled = 0
         self.distanceRatio = 0
+        self.piVariables = {
+            "powerLimit": 120000,
+            "uk": 0,
+            "prevError": 0,
+            "ek": 0,
+            "samplePeriod": 1,
+        }
 
     # setters and getters
     def get_trainID(self):
