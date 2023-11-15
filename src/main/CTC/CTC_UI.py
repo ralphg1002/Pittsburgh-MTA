@@ -8,9 +8,168 @@ from PyQt5.QtCore import *
 import csv
 from datetime import datetime, timedelta
 
-# from .signals import CTCtoTrackController, TrackControllerToCTC
+from numpy import block
+
 sys.path.append("../../main")
 from signals import masterSignals
+from signals import ctcToTrackController
+
+# Global variables for the block numbers associated with each wayside
+WAYSIDE_1G_BLOCKS = [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+]  # Fill in the actual numbers
+WAYSIDE_2G_BLOCKS = [
+    0,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+]  # Fill in the actual numbers
 
 
 class CTCWindow(QMainWindow):
@@ -460,8 +619,8 @@ class CTCWindow(QMainWindow):
         self.dispatchTable.setStyleSheet("background-color: white;")
         self.dispatchTable.setGeometry(35, 280, 600, 200)
 
-        self.selectLine.currentIndexChanged.connect(self.some_method)
-        self.blockDropDown.currentIndexChanged.connect(Block.updateStatusLabel)
+        # self.selectLine.currentIndexChanged.connect(self.some_method)
+        # self.blockDropDown.currentIndexChanged.connect(Block.updateStatusLabel)
 
         # self.show()
 
@@ -1538,42 +1697,50 @@ class Routing:
             + " with destination at "
             + str(self.routeQ[1])
         )
-        line = self.scheduler.getSelectedLine
-        if occupancy == True and blockNum == self.routeQ[1] and line == line:
-            self.routeQ.pop(0)
+        trainLine = self.scheduler.getSelectedLine
 
-            if self.stations_to_stop[0] == self.routeQ[3]:
+        if occupancy == True and blockNum == self.routeQ[1] and trainLine == line:
+            self.routeQ.pop(0)
+            nextBlock = self.routeQ[1]
+            wayside = self.find_wayside(nextBlock)
+
+            if self.stations_to_stop[0] == self.routeQ[4]:
                 suggestedSpeed = (
-                    int(0.75 * self.block_info_list[self.routeQ[0] - 1].speedLimit)
-                    * 3.60
+                    int(0.75 * self.block_info_list[self.routeQ[1]].speedLimit) * 3.60
                 )
                 print(suggestedSpeed)
-                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
+                ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, nextBlock, suggestedSpeed
+                )
+            elif self.stations_to_stop[0] == self.routeQ[3]:
+                suggestedSpeed = (
+                    int(0.50 * self.block_info_list[self.routeQ[1]].speedLimit) * 3.60
+                )
+                print(suggestedSpeed)
+                ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, nextBlock, suggestedSpeed
+                )
             elif self.stations_to_stop[0] == self.routeQ[2]:
                 suggestedSpeed = (
-                    int(0.50 * self.block_info_list[self.routeQ[0] - 1].speedLimit)
-                    * 3.60
+                    int(0.25 * self.block_info_list[self.routeQ[1]].speedLimit) * 3.60
                 )
                 print(suggestedSpeed)
-                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
+                ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, nextBlock, suggestedSpeed
+                )
             elif self.stations_to_stop[0] == self.routeQ[1]:
-                suggestedSpeed = (
-                    int(0.25 * self.block_info_list[self.routeQ[0] - 1].speedLimit)
-                    * 3.60
-                )
-                print(suggestedSpeed)
-                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
-            elif self.stations_to_stop[0] == self.routeQ[0]:
                 suggestedSpeed = 0
                 print(suggestedSpeed)
-                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ(0), suggestedSpeed)
-                # signals.sendAuthority.emit(WaysideNum, line, self.stations_to_stop[0], 0)
+                ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, nextBlock, suggestedSpeed
+                )
+                ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 0)
+            elif self.stations_to_stop[0] == self.routeQ[0]:
                 QTimer.singleShot(60, self.leaveStop)
             else:
                 suggestedSpeed = (
-                    self.block_info_list[self.routeQ[0] - 1].speedLimit
+                    self.block_info_list[self.routeQ[1]].speedLimit
                 ) * 3.60
-                # signals.sendSuggestedSpeed.emit(WaysideNum, line, self.routeQ[0], suggestedSpeed)
 
     def leaveStop(self):
         if self.stations_to_stop:
@@ -1608,6 +1775,16 @@ class Routing:
     def calculateArrivalTime(self, travelTime, current_time):
         arrival_time = current_time.addSecs(int(travelTime))
         return arrival_time
+
+    def find_wayside(self, block_number):
+        if block_number in WAYSIDE_1G_BLOCKS:
+            wayside = 1
+            return wayside
+        elif block_number in WAYSIDE_2G_BLOCKS:
+            wayside = 2
+            return wayside
+        else:
+            return "Block number not found"
 
 
 class Train:
@@ -1689,11 +1866,11 @@ class Train:
     def checkDepartureTime(self):
         current_time = self.main_window.systemTimeInput.text()
         current_time_str = current_time.replace(":", "")[:4]
-        print(current_time_str)
+        # print(current_time_str)
         # Iterate through your list of trains and check their departure times
         for train in self.scheduler.trainList:
             departureTime = train.trainDeparture
-            print(departureTime)
+            # print(departureTime)
             if departureTime == current_time_str:
                 # Add the train to the dispatched_trains list
                 self.dispatchTrainsList.append(train)
@@ -1718,10 +1895,25 @@ class Train:
                     departure_time_item = self.main_window.schedule_table.item(
                         row_index, 3
                     )
+
                     if departure_time_item.text() == departureTime:
+                        if train.train_id == "Green":
+                            trainLine = 1
+                        else:
+                            trainLine = 2
                         # Remove the row with the matching departure time
-                        self.main_window.schedule_table.removeRow(row_index)
-                        break  # Stop searching once the row is removed
+                        if trainLine == 1:
+                            ctcToTrackController.sendTrainDispatched.emit(
+                                trainLine, 2, train.train_id, train.authority
+                            )
+                            self.main_window.schedule_table.removeRow(row_index)
+                            break  # Stop searching once the row is removed
+                        else:
+                            ctcToTrackController.sendTrainDispatched.emit(
+                                trainLine, 1, train.train_id, train.authority
+                            )
+                            self.main_window.schedule_table.removeRow(row_index)
+                            break  # Stop searching once the row is removed
 
     # def leaveStation()
 

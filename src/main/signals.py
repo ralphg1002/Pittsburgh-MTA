@@ -21,8 +21,25 @@ class TrackControllerToTrackModel(QObject):
 
 
 ##########################################################################################
+class TrackModelToTrackController(QObject):
+    occupancyState = pyqtSignal(
+        int, int, int
+    )  # line, block number occupied, block number unoccupied
+
+
+class TrackModelToCTC(QObject):
+    throughput = pyqtSignal(int, int)  # line, ticketsales/hr
+
+
+class TrackModelToTrainModel(QObject):
+    blockInfo = pyqtSignal(int, dict)  # next block, current block data
+    beacon = pyqtSignal(dict)  # beacon data
+    newCurrentPassengers = pyqtSignal(int)
+
+
+##########################################################################################
 class TrainModelToTrackModel(QObject):
-    sendCurrentPassengers = pyqtSignal(int)
+    sendCurrentPassengers = pyqtSignal(int)  # add station name to this :)
 
 
 class TrainModelToTrainController(QObject):
@@ -59,6 +76,22 @@ class TrainControllerSWToTrainModel(QObject):
     sendAdvertisement = pyqtSignal(str, int)
 
 
+#########################################################################################
+class CTCTrackController(QObject):
+    sendAuthority = pyqtSignal(
+        int, int, int, int
+    )  # line (1 for green, 2 for red), wayside, block number, authority
+    sendSuggestedSpeed = pyqtSignal(
+        int, int, int, int
+    )  # line, wayside, block number, suggested speed
+    sendMaintenance = pyqtSignal(
+        int, int, int, bool
+    )  # line, wayside, block number, 1 if disabled, 0 if enabled
+    sendTrainDispatched = pyqtSignal(
+        int, int, str, bool
+    )  # line, wayside #, trainID, authority
+
+
 ##########################################################################################
 class Master(QObject):
     # Instantiate timing signals
@@ -71,6 +104,9 @@ class Master(QObject):
 trackControllerToCTC = TrackControllerToCTC()
 trackControllerToTrackModel = TrackControllerToTrackModel()
 
+trackModelToTrackController = TrackModelToTrackController()
+trackModelToCTC = TrackModelToCTC()
+trackModelToTrainModel = TrackModelToTrainModel()
 
 # Instantiation for signals sent from Train Model
 trainModelToTrackModel = TrainModelToTrackModel()
@@ -78,6 +114,9 @@ trainModelToTrainController = TrainModelToTrainController()
 
 # Instantiation for signals sent from Train Controller (SW)
 trainControllerSWToTrainModel = TrainControllerSWToTrainModel()
+
+# Instantiation for signals sent from CTC
+ctcToTrackController = CTCTrackController()
 
 # Instantiation of signals shared by multiple classes
 masterSignals = Master()
