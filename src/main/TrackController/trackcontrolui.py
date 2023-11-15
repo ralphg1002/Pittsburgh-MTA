@@ -927,10 +927,10 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.inputBlockNum = "Input Block #"
         self.inputStateText = "Input State"
         
-        self.inputActionSelect.currentIndexChanged.connect(self.handle_input_action_select)
-        self.inputLineSelect.currentIndexChanged.connect(self.handle_input_line_select)
-        self.inputBlockNumber.textChanged.connect(self.handle_input_block_select)
-        self.inputState.textChanged.connect(self.handle_input_state_select)
+        self.inputSelectAction.currentIndexChanged.connect(self.handle_input_action_select)
+        self.inputSelectLine.currentIndexChanged.connect(self.handle_input_line_select)
+        self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
+        self.inputSelectState.textChanged.connect(self.handle_input_state_select)
         self.inputApply.clicked.connect(self.handle_input_apply)
         
         
