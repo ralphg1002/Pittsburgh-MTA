@@ -430,7 +430,7 @@ class Wayside:
         self.refresh_plc()
 
     def refresh_plc(self):
-        print("refreshing...")
+        #print("refreshing...")
         # check if it is in manual mode and exit the refresh if so
         if not self.plcState:
             return
@@ -458,7 +458,7 @@ class Wayside:
                 if isinstance(entry, int):
                     entry = [entry]  # Convert single integer to a list
 
-                print("Wayside Number: ", self.waysideNum)
+                #print("Wayside Number: ", self.waysideNum)
 
                 if entry != 0:
                     # check for validity of conditon 1
@@ -471,14 +471,18 @@ class Wayside:
                         condition1 = True
 
                 # check for validity of condition 2
-                for block in exitRange:
-                    if not exitRange:
-                        condition2 = True
-                        break
+                if exitRange != None:
+                    for block in exitRange:
+                        if exitRange == None:
+                            condition2 = True
+                            break
 
-                    if self.get_block(block).get_occupancystate() == True:
-                        condition2 = True
-                        break
+                        elif self.get_block(block).get_occupancystate() == True:
+                            condition2 = True
+                            break
+                else:
+                    condition2 = True
+                    print("Here I set the condition2 to true")
 
                 if condition2 == True and notExist:
                     condition2 = False
@@ -489,6 +493,7 @@ class Wayside:
                 if condition1 and condition2:
                     any_condition_satisfied = True
                     break
+                
 
             # If any condition is satisfied, execute the operations
             if any_condition_satisfied:
@@ -498,7 +503,6 @@ class Wayside:
                     if parsedOperation["Type"] == "SWITCH":
                         switchValue = int(parsedOperation["Value"])
 
-                        switchBlock.set_switchstate(switchValue)
                         switchBlock.set_switchstate(switchValue)
 
                         # emit that a switch value has been changed
@@ -512,8 +516,8 @@ class Wayside:
                     # set the light value
                     elif parsedOperation["Type"] == "SIGNAL":
                         signalNumber = parsedOperation["Number"]
-                        print("The number is: " + str(signalNumber))
-                        print("The wayside is: " + str(self.waysideNum))
+                        #print("The number is: " + str(signalNumber))
+                        #print("The wayside is: " + str(self.waysideNum))
                         signalState = parsedOperation["State"]
                         if signalState == "G":
                             signalState = "green"
@@ -521,7 +525,7 @@ class Wayside:
                             signalState = "red"
 
                         self.get_block(signalNumber).set_lightstate(signalState)
-                        self.get_block(signalNumber).set_lightstate(signalState)
+                        #print(self.line, self.waysideNum, signalNumber, signalState)
                         # emit that a light value has been changed
                         trackControllerToTrackModel.lightState.emit(
                             self.line, self.waysideNum, int(signalNumber), signalState
@@ -575,42 +579,55 @@ class Wayside:
             if match:
                 if pattern == "patternEntry":
                     entry = [int(match.group(1))]
+                    exit = None
+                    notExist = False
                     break
                 elif pattern == "patternEntryRange":
                     start, end = map(int, match.groups())
                     entry = list(range(start, end + 1))
+                    exit = None
+                    notExist = False
                     break
                 elif pattern == "patternEntryReverseRange":
                     end, start = map(int, match.groups())
                     entry = list(range(start, end - 1, -1))
+                    exit = None
+                    notExist = False
                     break
                 elif pattern == "patternEntryAndExitRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(2)), int(match.group(3)) + 1))
+                    notExist = False
                     break
                 elif pattern == "patternEntryAndExitReverseRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(3)), int(match.group(2)) + 1))
+                    notExist = False
                     break
                 elif pattern == "patternEntryRangeAndExit":
                     entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     exit = [int(match.group(3))]
+                    notExist = False
                     break
                 elif pattern == "patternEntryRangeAndExitRange":
                     entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    notExist = False
                     break
                 elif pattern == "patternEntryReverseRangeAndExitRange":
                     entry = list(range(int(match.group(2)), int(match.group(1)) + 1))
                     exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    notExist = False
                     break
                 elif pattern == "patternEntryRangeAndExitReverseRange":
                     entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
+                    notExist = False
                     break
                 elif pattern == "patternEntryReverseRangeAndExitReverseRange":
                     entry = list(range(int(match.group(2)), int(match.group(1)) + 1))
                     exit = list(range(int(match.group(4)), int(match.group(3)) + 1))
+                    notExist = False
                     break
                 elif pattern == "patternEntryAndNotExitRange":
                     entry = [int(match.group(1))]
@@ -648,8 +665,8 @@ class Wayside:
                     notExist = True
                     break
 
-        print("Entry: ", entry)
-        print("Exit: ", exit)
+        #print("Entry: ", entry)
+        #print("Exit: ", exit)
         return entry, exit, notExist
 
     # This is the method that parses the operation following a condition within a PLC file
@@ -669,7 +686,7 @@ class Wayside:
             if int(block.get_number()) == int(blockNumber):
                 return block
         # print(self.blocks[28].get_number())
-        print("Did not find block " + str(blockNumber))
+        #print("Did not find block " + str(blockNumber))
         return None  # Block not found
 
     # Function to get blocks of a specific type
@@ -687,7 +704,7 @@ class Wayside:
         for block in self.blocks:
             if block.get_occupancystate() == True:
                 occupiedBlocks.append(block)
-        print("Here are the occupied blocks: ", occupiedBlocks)
+        #print("Here are the occupied blocks: ", occupiedBlocks)
         return occupiedBlocks
 
 
@@ -722,7 +739,7 @@ class TrackControl(QMainWindow):
         switchDict = {"SW1": 12, "SW2": 29}
         self.wayside1G.switches_init(switchDict)
         self.wayside2G = Wayside(2, 1)
-        switchDict = {"SW3": 58, "SW4": 62, "SW5": 77, "SW6": 85}
+        switchDict = {"SW3": 57, "SW4": 62, "SW5": 77, "SW6": 85}
         self.wayside2G.switches_init(switchDict)
         self.greenLine.add_wayside(self.wayside1G)
         self.greenLine.add_wayside(self.wayside2G)
@@ -919,6 +936,7 @@ class TrackControl(QMainWindow):
         """ Connect the input signals from the test bench to the main ui page handlers """
         self.ui.testBenchWindow.requestInput.connect(self.handle_input_apply)
 
+        """
         # self.ui.testBenchWindow.setSwitchState.connect(self.set_switchstate_handler)
         self.ui.testBenchWindow.setLightState.connect(self.set_lightstate_handler)
         self.ui.testBenchWindow.setFailureState.connect(self.set_failurestate_handler)
@@ -1013,6 +1031,7 @@ class TrackControl(QMainWindow):
                 )
             )
         )
+    """
 
     def show_gui(self):
         self.ui.show()
@@ -1049,10 +1068,10 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_dispatch(self, line, wayside, trainID, authority):
-        print("line #: ", line)
-        print("wayside #:, ", wayside)
-        print("trainID: ", trainID)
-        print("authority: ", authority)
+        #print("line #: ", line)
+        #print("wayside #:, ", wayside)
+        #print("trainID: ", trainID)
+        #print("authority: ", authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_authority(authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_occupancystate(True)
         self.set_occupancystate_handler(line,wayside,0,True)
@@ -1201,7 +1220,8 @@ class TrackControl(QMainWindow):
                 blockNum = int(match.group(1))
                 print(f"Block number: {blockNum}")
             else:
-                print("Pattern not matched")
+                #print("Pattern not matched")
+                pass
 
             tempBlock = tempWayside.get_block(blockNum)
             blockType = self.ui.blockTypeSelect
@@ -1246,6 +1266,7 @@ class TrackControl(QMainWindow):
                     tempBlock.get_number(),
                     tempBlock.get_switchstate(),
                 )
+            
                 trackControllerToTrackModel.lightState.emit(
                     self.ui.lineSelect,
                     self.ui.waysideSelect,
@@ -1339,15 +1360,19 @@ class TrackControl(QMainWindow):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
             state
         )
-        #self.lines[line - 1].get_wayside(wayside).refresh_plc()
+
         # update the occupancy table
         if state == False:
-            self.ui.occupancyBox.remove_item_by_blocknumber(num)
-        elif self.ui.occupancyBox.does_block_exist(
-            num,
-            self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate(),
-        ):
-            pass
+            self.ui.occupancyBox.clear_table()
+            blockList = self.lines[line - 1].get_wayside(wayside).get_occupied_blocks()
+            for block in blockList:
+                self.ui.occupancyBox.add_item(
+                    block.get_number(), block.get_type(), block.get_failurestate()
+                )
+
+        #elif self.ui.occupancyBox.does_block_exist(num,self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate()):
+            
+        
         elif state:
             blockStr = "Block {}".format(num)
             self.ui.occupancyBox.add_item(
@@ -1380,23 +1405,31 @@ class TrackControl(QMainWindow):
                 else:
                     self.ui.blockStatus.set_status("Unoccupied")
         else:
-            print("Pattern not matched")
+            #print("Pattern not matched")
+            pass
 
         self.ui.testBenchWindow.refreshed.emit(True)
-
-        trackControllerToCTC.occupancyState.emit(line, num, state)
+        """print("sending signal to CTC...")
+        print("line: ", line)
+        print("blocknumber: ", num)
+        print("state: ", state)"""
+        trackControllerToCTC.occupancyState.emit(line, int(num), state)
 
     def set_lightstate_handler(self, line, wayside, num, color):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_lightstate(color)
-        # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = 0
-        selectedItem = self.ui.comboboxBlockNum.currentText()
-        if selectedItem != "Select State" and selectedItem != "":
-            blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
-        if blockNum == (num - 1):
-            self.ui.lightState.set_state(color)
         self.ui.testBenchWindow.refreshed.emit(True)
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = -1
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        if selectedItem != "Select State" and selectedItem != "" and self.ui.lineSelect !=0:
+            try:
+                blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
+            except Exception as e:
+                return
 
+        if blockNum == (num):
+            self.ui.lightState.set_state(color)
+        
     def set_failurestate_handler(self, line, wayside, num, state):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_failurestate(state)
 
@@ -1500,8 +1533,10 @@ class TrackControl(QMainWindow):
         
         # green line selected
         elif line == 1:
-            if not(blockNum >= 0 and blockNum <= 150):
+            print(int(blockNum))
+            if not(int(blockNum) >= 0 and int(blockNum) <= 150):
                 print("Enter a valid block number for the green line (0-150)")
+                print("You entered: ", blockNum)
                 return
 
             # call the block

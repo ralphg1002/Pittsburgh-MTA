@@ -108,6 +108,13 @@ IF
     Operation: 86 R
     Operation: 100 G
     end
+IF
+    Condition: (95->100) AND (77->85)
+    Operation: SWITCH(0)
+    Operation: 85 G
+    Operation: 86 R
+    Operation: 100 R
+    end
 END
 
 
