@@ -952,10 +952,10 @@ class ResultsWindow(QMainWindow):
 
     # Functions to set
     def signal_power(self, train, power):
-        self.trains.set_value("Train 1", "calculations", 17, train)
+        train = self.trains.set_value("Train 1", "calculations", 17, train)
         current_speed = self.calculations.power(power)
         self.trains.set_value("Train 1", "vehicle_status", 2, current_speed)
-        trainModelToTrainController.sendCurrentSpeed.emit(current_speed)
+        trainModelToTrainController.sendCurrentSpeed.emit(train, current_speed)
 
     def signal_emergency_brake(self, train, e_brake):
         self.trains.set_value("Train 1", "calculations", 17, train)
@@ -993,12 +993,8 @@ class ResultsWindow(QMainWindow):
         self.trains.set_value("Train 1", "calculations", 17, train)
         self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
 
-    def signal_blockInfo(
-        self, next_block, length, grade, speed_limit, suggested_speed, authority
-    ):
-        self.calculations.blockInfo(
-            next_block, length, grade, speed_limit, suggested_speed, authority
-        )
+    def signal_blockInfo(self, next_block, length, grade, speed_limit, suggested_speed, authority):
+        self.calculations.blockID(next_block, length, grade, speed_limit, suggested_speed, authority)
 
     def signal_beacon(self, beacon):
         self.calculations.beacon(beacon)
@@ -2610,18 +2606,17 @@ class Calculations:
         # Return a tuple containing the updated power and current_speed
         return currPower, current_speed
 
-    def current_speed(self):
+    def current_speed(self, currPower):
         # Retrieve necessary values from self.trains
         lastVelocity = self.trains.get_value("Train 1", "calculations", 7)
         mass = self.trains.get_value("Train 1", "calculations", 2)
-        power = self.trains.get_value("Train 1", "vehicle_status", 8)
 
         # Calculate force from power input
         try:
-            currForce = power / lastVelocity
+            currForce = currPower / lastVelocity
         except ZeroDivisionError:
             # Handle division by zero appropriately (you might want to choose a default value or raise an exception)
-            currForce = power / 0.001
+            currForce = currPower / 0.001
 
         # Set calculated force and apply force limit
         self.trains.set_value("Train 1", "calculations", 5, currForce)
@@ -2717,7 +2712,7 @@ class Calculations:
             velocity = 0
 
         # Set the calculated velocity value
-        self.trains.set_value("Train 1", "calculations", 4, velocity)
+        velocity = self.trains.set_value("Train 1", "calculations", 4, velocity)
 
         return velocity
 
@@ -2728,7 +2723,7 @@ class Calculations:
 
         # Update total_velocity using the current velocity (consider whether this is necessary)
         total_velocity = curr_velocity
-
+        
         # Correct the distance calculation (multiply, not divide)
         distance = last_position + (self.time_interval * 2) * total_velocity
 
@@ -2743,14 +2738,16 @@ class Calculations:
         self.trains.set_value("Train 1", "vehicle_status", 0, speed_limit)
         self.trains.set_value("Train 1", "vehicle_status", 4, suggested_speed)
         self.trains.set_value("Train 1", "navigation_status", 0, authority)
+        
+        train = self.trains.get_value("Train 1", "calculations", 17)
 
         self.occupancy(next_block)
 
         # Send train controller information
         trainModelToTrainController.sendBlockLength.emit(length)
-        trainModelToTrainController.sendSpeedLimit.emit(speed_limit)
-        trainModelToTrainController.sendCommandedSpeed.emit(suggested_speed)
-        trainModelToTrainController.sendAuthority.emit(authority)
+        trainModelToTrainController.sendSpeedLimit.emit(train, speed_limit)
+        trainModelToTrainController.sendCommandedSpeed.emit(train, suggested_speed)
+        trainModelToTrainController.sendAuthority.emit(train, authority)
 
         return next_block, length, grade, speed_limit, suggested_speed, authority
 
@@ -2759,21 +2756,22 @@ class Calculations:
         signal_pickup_failure = self.trains.get_value("Train 1", "failure_status", 2)
         brake_failure = self.trains.get_value("Train 1", "failure_status", 3)
         pass_emergency_brake = self.trians.get_value("Train 1", "failure_status", 4)
+        train = self.trains.get_value("Train 1", "calculations", 17)
 
         if (
             engine_failure == True
             or signal_pickup_failure == True
             or brake_failure == True
         ):
-            trainModelToTrainController.sendEngineFailure.emit(engine_failure)
+            trainModelToTrainController.sendEngineFailure.emit(train, engine_failure)
             trainModelToTrainController.sendSignalPickupFailure.emit(
-                signal_pickup_failure
+                train, signal_pickup_failure
             )
-            trainModelToTrainController.sendBrakeFailure.emit(brake_failure)
+            trainModelToTrainController.sendBrakeFailure.emit(train, brake_failure)
 
         if pass_emergency_brake == True:
             trainModelToTrainController.sendPassengerEmergencyBrake.emit(
-                pass_emergency_brake
+                train, pass_emergency_brake
             )
 
         return (
@@ -2786,22 +2784,23 @@ class Calculations:
     def temperature(self, temp):
         set_temp = temp
         curr_temp = self.trains.get_value("Train 1", "vehicle_status", 7)
+        train = self.trains.get_value("Train 1", "calculations", 17)
 
         if curr_temp < set_temp:
             while curr_temp < set_temp:
                 curr_temp += 1
                 self.trains.set_value("Train 1", "vehicle_status", 7, curr_temp)
-                trainModelToTrainController.sendTemperature.emit(curr_temp)
+                trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp > curr_temp:
             while curr_temp > set_temp:
                 curr_temp -= 1
                 self.trains.set_value("Train 1", "vehicle_status", 7, curr_temp)
-                trainModelToTrainController.sendTemperature.emit(curr_temp)
+                trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp == curr_temp:
             self.trains.set_value("Train 1", "vehicle_status", 7, curr_temp)
-            trainModelToTrainController.sendTemperature.emit(curr_temp)
+            trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         return curr_temp
 
@@ -2818,7 +2817,7 @@ class Calculations:
         distance = 0
         polarity = 0
         initialized = 0
-        distance = self.calculations.distance()
+        # distance = self.total_distance()
         block_length = self.trains.get_value("Train 1", "navigation_stauts", 3)
         next_block = self.trains.set_value("Train 1", "calculations", 10, next_block)
         curr_block = self.trains.get_value("Train 1", "calculations", 11)
@@ -2847,18 +2846,19 @@ class Calculations:
         next_station2 = beacon["Next Station2"]
         current_station = beacon["Current Station"]
         door_side = beacon["Door Side"]
+        train = self.trains.get_value("Train 1", "calculations", 17)
 
-        trainModelToTrainController.sendNextStation1.emit(next_station1)
-        trainModelToTrainController.sendNextStation2.emit(next_station2)
-        trainModelToTrainController.sendCurrStation.emit(current_station)
+        trainModelToTrainController.sendNextStation1.emit(train, next_station1)
+        trainModelToTrainController.sendNextStation2.emit(train, next_station2)
+        trainModelToTrainController.sendCurrStation.emit(train, current_station)
 
         if door_side == "Left":
-            trainModelToTrainController.sendLeftDoor.emit(door_side)
+            trainModelToTrainController.sendLeftDoor.emit(train, door_side)
         elif door_side == "Right":
-            trainModelToTrainController.sendRightDoor.emit(door_side)
+            trainModelToTrainController.sendRightDoor.emit(train, door_side)
         else:
-            trainModelToTrainController.sendLeftDoor.emit(door_side)
-            trainModelToTrainController.sendRightDoor.emit(door_side)
+            trainModelToTrainController.sendLeftDoor.emit(train, door_side)
+            trainModelToTrainController.sendRightDoor.emit(train, door_side)
 
         return next_station1, next_station2, current_station, door_side
 
