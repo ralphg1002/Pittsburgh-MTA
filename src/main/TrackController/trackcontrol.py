@@ -544,7 +544,6 @@ class Wayside:
                             switchValue,
                         )
 
-
     # This is the method that parses the condition of a section within a PLC file
     def parse_condition(self, condition):
         entry = []
@@ -1037,10 +1036,12 @@ class TrackControl(QMainWindow):
                 self.ui.waysideSelect
             ).run_plc(filePath)
 
-
     """ Handler methods for the CTC input signals"""
+
     def handle_authority(self, line, wayside, blockNum, authority):
-        self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_authority(authority)
+        self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_authority(
+            authority
+        )
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_suggested_speed(self, line, wayside, blockNum, suggestedSpeed):
