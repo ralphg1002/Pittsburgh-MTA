@@ -4,16 +4,14 @@ import math
 import re
 
 class Calculations:
-    def __init__(self, time_interval, sys_time, trains):
-        self.time_interval = time_interval
-        self.sys_time = sys_time
-        self.trains = trains
+    def __init__(self):
+        placeholder = True
 
     # Sets the power of the train through the train controller
-    def power(self, trainObject, power):
+    def power(self, trainObject):
         # Ensure that power does not exceed 120
-        power /= 1000
-        currPower = min(power, 120)
+        trainObject.vehicle_status["power"] /= 1000
+        currPower = min(trainObject.vehicle_status["power"], 120)
 
         # Update the "vehicle_status" of "Train 1" in self.trains
         trainObject.vehicle_status["power"] = currPower
@@ -202,12 +200,12 @@ class Calculations:
 
     def beacon(self, trainObject):
         if trainObject.calculations["doorSide"] == "Left":
-            trainObject.passenger_status["left_door"] = True
-            trainObject.passenger_status["right_door"] = False
+            trainObject.calculations["leftDoor"] = True
+            trainObject.calculations["rightDoor"] = False
         elif trainObject.calculations["doorSide"] == "Right":
-            trainObject.passenger_status["left_door"] = False
-            trainObject.passenger_status["right_door"] = True
+            trainObject.calculations["leftDoor"] = False
+            trainObject.calculations["rightDoor"] = True
         else:
-            trainObject.passenger_status["left_door"] = True
-            trainObject.passenger_status["right_door"] = True
+            trainObject.calculations["leftDoor"] = True
+            trainObject.calculations["rightDoor"] = True
 
