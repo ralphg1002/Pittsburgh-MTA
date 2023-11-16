@@ -1611,7 +1611,7 @@ class Routing:
     def checkPosition(self, line, blockNum, occupancy):
         print(
             "comparing current block of "
-            + int(blockNum)
+            + str(blockNum)
             + " with destination at "
             + str(self.routeQ[1])
         )
@@ -1621,7 +1621,13 @@ class Routing:
             track = "Red"
         trainLine = self.main_window.selectLine.currentText()
         #for train_id, routeQ in self.train_routes.items():
-        if occupancy == True and blockNum == self.routeQ[1] and trainLine == track:
+        print(f'{trainLine}, {track}')
+        if trainLine == "Green Line":
+            trainTrack = "Green"
+        else:
+            trainTrack = "Red"
+        if occupancy == True and blockNum == self.routeQ[1] and trainTrack == track:
+            print("inside check position")
             self.routeQ.pop(0)
             nextBlock = self.routeQ[1]
             wayside = self.find_wayside(nextBlock)
@@ -1630,6 +1636,7 @@ class Routing:
                 suggestedSpeed = (
                     int(0.75 * self.block_info_list[self.routeQ[1]].speedLimit) * 3.60
                 )
+                
                 self.main_window.dispatchTable.setItem(
                     0, 3, QTableWidgetItem(str(suggestedSpeed))
                 )
@@ -1674,10 +1681,13 @@ class Routing:
                 QTimer.singleShot(60, self.leaveStop)
             else:
                 suggestedSpeed = (
-                    self.block_info_list[self.routeQ[1]].speedLimit
+                    self.block_info_list[int(self.routeQ[1])].speedLimit
                 ) * 3.60
                 self.main_window.dispatchTable.setItem(
                     0, 2, QTableWidgetItem(str(suggestedSpeed))
+                )
+                self.main_window.dispatchTable.setItem(
+                    0, 1, QTableWidgetItem(str(blockNum))
                 )
 
     def leaveStop(self):

@@ -899,7 +899,7 @@ class TestWindow(QMainWindow, UiMainWindow):
     def handle_input_block_select(self, blockNum):
         print("THIS IS THE BLOCK NUMBER: ", blockNum)
         self.inputBlockNum = blockNum
-        print("Here is it converted to an int: ", int(self.inputBlockNum))
+        #print("Here is it converted to an int: ", int(self.inputBlockNum))
 
     def handle_input_state_select(self, state):
         print("THIS IS THE STATE: ", state)

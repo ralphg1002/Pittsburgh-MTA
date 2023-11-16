@@ -1390,16 +1390,20 @@ class TrackControl(QMainWindow):
         print("line: ", line)
         print("blocknumber: ", num)
         print("state: ", state)
-        trackControllerToCTC.occupancyState.emit(line, num, state)
+        trackControllerToCTC.occupancyState.emit(line, int(num), state)
 
     def set_lightstate_handler(self, line, wayside, num, color):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_lightstate(color)
         # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = 0
+        blockNum = -1
         selectedItem = self.ui.comboboxBlockNum.currentText()
         if selectedItem != "Select State" and selectedItem != "" and self.ui.lineSelect !=0:
-            blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
-        if blockNum == (num - 1):
+            try:
+                blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
+            except Exception as e:
+                pass
+
+        if blockNum == (num):
             self.ui.lightState.set_state(color)
         self.ui.testBenchWindow.refreshed.emit(True)
 
