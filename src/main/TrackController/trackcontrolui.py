@@ -866,7 +866,7 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.inputSelectLine.currentIndexChanged.connect(self.handle_input_line_select)
         self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
         self.inputSelectState.textChanged.connect(self.handle_input_state_select)
-        self.inputApply.clicked.connect(self.requestInput.emit(self.inputAction, self.inputLine, self.inputBlockNum, self.inputStateText))
+        self.inputApply.clicked.connect(lambda: self.requestInput.emit(self.inputAction, self.inputLine, self.inputBlockNum, self.inputStateText))
         
         
     def handle_input_action_select(self, index):
