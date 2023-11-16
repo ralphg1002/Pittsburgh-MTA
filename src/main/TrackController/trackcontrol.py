@@ -430,7 +430,7 @@ class Wayside:
         self.refresh_plc()
 
     def refresh_plc(self):
-        print("refreshing...")
+        #print("refreshing...")
         # check if it is in manual mode and exit the refresh if so
         if not self.plcState:
             return
@@ -458,7 +458,7 @@ class Wayside:
                 if isinstance(entry, int):
                     entry = [entry]  # Convert single integer to a list
 
-                print("Wayside Number: ", self.waysideNum)
+                #print("Wayside Number: ", self.waysideNum)
 
                 if entry != 0:
                     # check for validity of conditon 1
@@ -512,8 +512,8 @@ class Wayside:
                     # set the light value
                     elif parsedOperation["Type"] == "SIGNAL":
                         signalNumber = parsedOperation["Number"]
-                        print("The number is: " + str(signalNumber))
-                        print("The wayside is: " + str(self.waysideNum))
+                        #print("The number is: " + str(signalNumber))
+                        #print("The wayside is: " + str(self.waysideNum))
                         signalState = parsedOperation["State"]
                         if signalState == "G":
                             signalState = "green"
@@ -521,10 +521,10 @@ class Wayside:
                             signalState = "red"
 
                         self.get_block(signalNumber).set_lightstate(signalState)
-                        self.get_block(signalNumber).set_lightstate(signalState)
+                        print(self.line, self.waysideNum, signalNumber, signalState)
                         # emit that a light value has been changed
                         trackControllerToTrackModel.lightState.emit(
-                            self.line, self.waysideNum, signalNumber, signalState
+                            self.line, self.waysideNum, int(signalNumber), signalState
                         )
 
                     # Set the crossing value
@@ -648,8 +648,8 @@ class Wayside:
                     notExist = True
                     break
 
-        print("Entry: ", entry)
-        print("Exit: ", exit)
+        #print("Entry: ", entry)
+        #print("Exit: ", exit)
         return entry, exit, notExist
 
     # This is the method that parses the operation following a condition within a PLC file
@@ -687,7 +687,7 @@ class Wayside:
         for block in self.blocks:
             if block.get_occupancystate() == True:
                 occupiedBlocks.append(block)
-        print("Here are the occupied blocks: ", occupiedBlocks)
+        #print("Here are the occupied blocks: ", occupiedBlocks)
         return occupiedBlocks
 
 
@@ -1201,7 +1201,8 @@ class TrackControl(QMainWindow):
                 blockNum = int(match.group(1))
                 print(f"Block number: {blockNum}")
             else:
-                print("Pattern not matched")
+                #print("Pattern not matched")
+                pass
 
             tempBlock = tempWayside.get_block(blockNum)
             blockType = self.ui.blockTypeSelect
@@ -1246,6 +1247,7 @@ class TrackControl(QMainWindow):
                     tempBlock.get_number(),
                     tempBlock.get_switchstate(),
                 )
+            
                 trackControllerToTrackModel.lightState.emit(
                     self.ui.lineSelect,
                     self.ui.waysideSelect,
@@ -1343,6 +1345,8 @@ class TrackControl(QMainWindow):
         # update the occupancy table
         if state == False:
             self.ui.occupancyBox.remove_item_by_blocknumber(num)
+            print("trying to remove block ", num)
+            
         elif self.ui.occupancyBox.does_block_exist(
             num,
             self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate(),
@@ -1500,8 +1504,10 @@ class TrackControl(QMainWindow):
         
         # green line selected
         elif line == 1:
-            if not(blockNum >= 0 and blockNum <= 150):
+            print(int(blockNum))
+            if not(int(blockNum) >= 0 and int(blockNum) <= 150):
                 print("Enter a valid block number for the green line (0-150)")
+                print("You entered: ", blockNum)
                 return
 
             # call the block

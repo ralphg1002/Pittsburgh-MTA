@@ -2,10 +2,12 @@
 import sys
 import ast
 import os
+#from xxlimited import Str
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # QPainter, QPen, QColor, QFont, QPixmap, QLine
 from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QDateTime, QTime
+from numpy import str_
 from .testbench import UiMainWindow
 from signals import masterSignals
 
@@ -130,10 +132,15 @@ class OccupancyBox(QWidget):
             item = self.tableWidget.item(
                 rowIndex, 0
             )  # Assuming block number is in the first column
-            rowBlockNumber = item.text()[6:]
-            if int(rowBlockNumber) == blockNumber:
-                self.tableWidget.removeRow(rowIndex)
-                return
+
+            # Check if the item is not None and if the substring is non-empty
+            if item and item.text()[6:]:
+                rowBlockNumber = item.text()[6:]
+
+                # Check if the substring is non-empty before converting to int
+                if rowBlockNumber and int(rowBlockNumber) == blockNumber:
+                    self.tableWidget.removeRow(rowIndex)
+                    return
 
     def does_block_and_state_exist(self, blockNumber, blockState):
         for rowIndex in range(self.tableWidget.rowCount()):
@@ -163,12 +170,15 @@ class OccupancyBox(QWidget):
                 rowIndex, 2
             )  # Assuming block failure state is in the second column
 
-            blockNumberString = blockNumberItem.text()[6:]
             if blockNumberItem and blockStateItem:
-                if int(blockNumberString) == blockNumber:
+                blockNumberString = blockNumberItem.text()[6:]
+
+                # Check if the substring is non-empty before converting to int
+                if blockNumberString and int(blockNumberString) == blockNumber:
                     return True
 
         return False
+
 
     def clear_table(self):
         self.tableWidget.clearContents()
@@ -844,7 +854,7 @@ class TestWindow(QMainWindow, UiMainWindow):
     # This is the refresh signal which checks to update states if they are changed
     refreshed = pyqtSignal(bool)
 
-    requestInput = pyqtSignal(int, int, int, str) # action, line, blocknum, state
+    requestInput = pyqtSignal(int, int, str, str) # action, line, blocknum, state
 
      
 
@@ -866,7 +876,7 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.inputSelectLine.currentIndexChanged.connect(self.handle_input_line_select)
         self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
         self.inputSelectState.textChanged.connect(self.handle_input_state_select)
-        self.inputApply.clicked.connect(self.requestInput.emit(self.inputAction, self.inputLine, self.inputBlockNum, self.inputStateText))
+        self.inputApply.clicked.connect(lambda: self.requestInput.emit(self.inputAction, self.inputLine, self.inputBlockNum, self.inputStateText))
         
         
     def handle_input_action_select(self, index):
@@ -875,7 +885,7 @@ class TestWindow(QMainWindow, UiMainWindow):
 
     def handle_input_line_select(self, index):
         self.inputLine = index
-        print("THIS IS THE ACTION SELECT INDEX: ", index)
+        print("THIS IS THE LINE: ", index)
         if index == 0:
             # reset the next selections
             pass
@@ -889,10 +899,11 @@ class TestWindow(QMainWindow, UiMainWindow):
     def handle_input_block_select(self, blockNum):
         print("THIS IS THE BLOCK NUMBER: ", blockNum)
         self.inputBlockNum = blockNum
+        print("Here is it converted to an int: ", int(self.inputBlockNum))
 
     def handle_input_state_select(self, state):
         print("THIS IS THE STATE: ", state)
-        inputStateText = state
+        self.inputStateText = state
     
         
     
