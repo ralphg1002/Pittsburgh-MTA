@@ -332,7 +332,7 @@ class TrainModel(QMainWindow):
             trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
             trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
             trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
-            trainObject.navigation_status["prevBlock"] = trainObject.navigation_status["currBlock"]
+            trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
             trainObject.calculations["initialized"] = False
 
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
