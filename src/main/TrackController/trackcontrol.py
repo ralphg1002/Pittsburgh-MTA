@@ -3,6 +3,7 @@ import pandas as pd
 
 # from PyQt5.QtCore import pyqtSignal
 from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController, masterSignals 
+from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController, masterSignals 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from .trackcontrolui import MainUI
 
