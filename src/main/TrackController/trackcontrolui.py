@@ -866,7 +866,7 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.inputSelectLine.currentIndexChanged.connect(self.handle_input_line_select)
         self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
         self.inputSelectState.textChanged.connect(self.handle_input_state_select)
-        self.inputApply.clicked.connect(self.handle_input_apply)
+        self.inputApply.clicked.connect(self.requestInput.emit(self.inputAction, self.inputLine, self.inputBlockNum, self.inputStateText))
         
         
     def handle_input_action_select(self, index):
@@ -898,50 +898,7 @@ class TestWindow(QMainWindow, UiMainWindow):
         inputStateText = state
     
         
-    def handle_input_apply(self):
-
-        if self.inputAction == 0:
-            print("You must select an input action.")
-            return
-        
-        if self.inputLine == 0:
-            print("You must select a line.")
-            return
-        
-        # green line selected
-        elif self.inputLine == 1:
-            if not(self.inputBlockNum >= 0 and self.inputBlockNum <= 150):
-                print("Enter a valid block number for the green line (0-150)")
-
-        elif self.inputLine == 2:
-            if not(self.inputBlockNum >= 0 and self.inputBlockNum <= 75):
-                print("Enter a valid block number for the red line (0-75)")
-                return
-            
-            # set switch state
-            if self.inputAction == 1:
-                pass
-            # Set Crossing State
-            elif self.inputAction == 2:
-                pass
-            # Set Light State
-            elif self.inputAction == 3:
-                pass
-            # Set Maintenance State
-            elif self.inputAction == 4:
-                pass
-            # Set Occupancy State
-            elif self.inputAction == 5:
-                pass
-            # Set Authority 
-            elif self.inputAction == 6:
-                pass
-            # Set Suggested Speed 
-            elif self.inputAction == 7:
-                pass
-            # Set Direction
-            elif self.inputAction == 8:
-                pass
+    
         
         """
         self.testBenchTitle.setStyleSheet(

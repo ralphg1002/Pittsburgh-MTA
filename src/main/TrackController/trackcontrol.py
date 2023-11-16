@@ -532,9 +532,8 @@ class Wayside:
                         crossValue = int(parsedOperation["Value"])
                         crossNumber = parsedOperation["Number"]
 
-                        # 2x redundancy
                         self.get_block(crossNumber).set_crosssingstate(crossValue)
-                        self.get_block(crossNumber).set_crosssingstate(crossValue)
+                        
 
                         # called again after the handler
                         # emit that a switch value has been changed
@@ -742,6 +741,8 @@ class TrackControl(QMainWindow):
 
         self.lines = [self.greenLine, self.redLine]
 
+        self.godWaysideGreen = Wayside(0, 1)
+
         # Create a dictionary to map infrastructure types to block classes
         blockMapping = {
             "junctionNS": JunctionNSBlock,
@@ -861,6 +862,7 @@ class TrackControl(QMainWindow):
                 # Append the block to the specified wayside controller
                 if i == 0:
                     wayside = self.greenLine.get_wayside(int(waysideController[-2]))
+                    self.godWaysideGreen.add_block(block)
                 if i == 1:
                     wayside = self.redLine.get_wayside(int(waysideController[-2]))
 
@@ -874,8 +876,8 @@ class TrackControl(QMainWindow):
 
 
         # REFRESH THE PLC ON THE TIME INTERVAL
-        masterSignals.clockSignal.connect(lambda: self.wayside1G.refresh_plc)
-        masterSignals.clockSignal.connect(lambda: self.wayside2G.refresh_plc)
+        self.ui.timer.timeout.connect(lambda: self.wayside1G.refresh_plc())
+        self.ui.timer.timeout.connect(lambda: self.wayside2G.refresh_plc())
         # Connect the plc load button to its handler
         self.ui.plcImportButton.clicked.connect(lambda: self.import_plc())
 
@@ -891,11 +893,11 @@ class TrackControl(QMainWindow):
             )
         )
 
+        """ Indexes for the GUI select """
         # Connect the signal (currentIndexChanged) to display the proper mode in the GUI
         self.ui.comboboxWayside.currentIndexChanged.connect(
             self.handle_selection_wayside
         )
-
         # Connect the signal (currentIndexChanged) to the slot (handle_selection)
         self.ui.comboboxBlockType.currentIndexChanged.connect(
             lambda: self.handle_selection_block_type()
@@ -905,23 +907,19 @@ class TrackControl(QMainWindow):
             lambda: self.handle_selection_blocknum()
         )
 
-        # Connect output signals to the track model to also call the switch state handler
+        """ This section of code is for the connections from signals from the Track Controller to the handler"""
         trackControllerToTrackModel.switchState.connect(self.set_switchstate_handler)
-
-        """ This section of code is for the connections from signals from the CTC to the handler"""
-        #ctcToTrackController.sendAuthority.connect(self.handle_authority)
-        #ctcToTrackController.sendSuggestedSpeed.connect(self.handle_suggested_speed)
-        #ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
-
         trackControllerToTrackModel.crossingState.connect(self.set_crossingstate_handler)
-
+        trackControllerToTrackModel.lightState.connect(self.set_lightstate_handler)
 
         """ This section of code is for the connections from signals from the CTC to the handler"""
         ctcToTrackController.sendAuthority.connect(self.handle_authority)
         ctcToTrackController.sendSuggestedSpeed.connect(self.handle_suggested_speed)
         ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
 
-        # connect the input signals from the test bench to the main ui page handlers
+        """ Connect the input signals from the test bench to the main ui page handlers """
+        self.ui.testBenchWindow.requestInput.connect(self.handle_input_apply)
+
         # self.ui.testBenchWindow.setSwitchState.connect(self.set_switchstate_handler)
         self.ui.testBenchWindow.setLightState.connect(self.set_lightstate_handler)
         self.ui.testBenchWindow.setFailureState.connect(self.set_failurestate_handler)
@@ -1046,7 +1044,7 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_suggested_speed(self, line, wayside, blockNum, suggestedSpeed):
-        self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_suggested_speed(suggestedSpeed)
+        self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_suggestedspeed(suggestedSpeed)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_dispatch(self, line, wayside, trainID, authority):
@@ -1058,6 +1056,8 @@ class TrackControl(QMainWindow):
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_occupancystate(True)
         self.set_occupancystate_handler(line,wayside,0,True)
         self.ui.testBenchWindow.refreshed.emit(True)
+
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""
 
     # Method to disable or enable the PLC program for the wayside when the mode is switched to automatic or manual mode
     def handle_mode(self, mode):
@@ -1473,7 +1473,7 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def set_speed_handler(self, line, wayside, num, speed):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_speed(speed)
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_suggestedspeed(speed)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def set_direction_handler(self, line, wayside, num, direction):
@@ -1485,6 +1485,116 @@ class TrackControl(QMainWindow):
     def set_suggested_authority_handler(self, line, wayside, num, suggestedAuthority):
         pass
 
+
+    """ Main Testbench Input Handler """
+    def handle_input_apply(self, action, line, blockNum, state):
+        
+        if action == 0:
+            print("You must select an input action.")
+            return
+        
+        if line == 0:
+            print("You must select a line.")
+            return
+        
+        # green line selected
+        elif line == 1:
+            if not(blockNum >= 0 and blockNum <= 150):
+                print("Enter a valid block number for the green line (0-150)")
+                return
+
+            # call the block
+            block = self.wayside1G.get_block(blockNum)
+            waysideNum = 1
+            if(block == None):
+                block = self.wayside2G.get_block(blockNum)
+                waysideNum = 2
+
+            # set switch state
+            if action == 1:
+                if (state == "true" or state == "True" or state == "1"):
+                    finalState = True
+                elif(state == "false" or state == "False" or state == "0"):
+                    finalState = False
+                else:
+                    print("This is not a valid input for the state. (True/False)")
+                    return
+                    
+                try:
+                    block.set_switchstate(finalState)
+                except Exception as e:
+                    print("This action cannot be performed on a block of type: ", block.get_type())
+                else:
+                    self.set_switchstate_handler(line, waysideNum, blockNum, finalState)
+
+                    
+            # Set Crossing State
+            elif action == 2:
+                pass
+            # Set Light State
+            elif action == 3:
+                pass
+            # Set Maintenance State
+            elif action == 4:
+                pass
+            # Set Occupancy State
+            elif action == 5:
+                if (state == "true" or state == "True" or state == "1"):
+                    finalState = True
+                elif(state == "false" or state == "False" or state == "0"):
+                    finalState = False
+                else:
+                    print("This is not a valid input for the state. (True/False)")
+                    return
+                    
+                try:
+                    block.set_occupancystate(finalState)
+                except Exception as e:
+                    print("This action cannot be performed on a block of type: ", None)
+                else:
+                    self.set_occupancystate_handler(line, waysideNum, blockNum, finalState)
+            
+            # Set Authority 
+            elif action == 6:
+                if (state == "true" or state == "True" or state == "1"):
+                    finalState = 1
+                elif(state == "false" or state == "False" or state == "0"):
+                    finalState = 0
+                else:
+                    print("This is not a valid input for the state. (True/False or 1/0)")
+                    return
+                    
+                try:
+                    block.set_authority(finalState)
+                except Exception as e:
+                    print("This action cannot be performed on a block of type: ", None)
+                else:
+                    self.set_authoritystate_handler(line, waysideNum, blockNum, finalState)
+
+            # Set Suggested Speed 
+            elif action == 7:
+                finalState = float(state)
+                if (finalState < 0 or finalState > block.get_speed()):
+                    print("This is not a valid input for the state. (Must range from 0 to block.get_speed)")
+                    return
+                    
+                try:
+                    block.set_suggestedspeed(finalState)
+                except Exception as e:
+                    print("This action cannot be performed on a block of type: ", None)
+                else:
+                    self.set_speed_handler(line, waysideNum, blockNum, finalState)
+
+            # Set Direction
+            elif action == 8:
+                pass
+
+        elif line == 2:
+            if not(blockNum >= 0 and blockNum <= 75):
+                print("Enter a valid block number for the red line (0-75)")
+                return
+            
+            
 """
 if __name__ == "__main__":
     app = QApplication(sys.argv)
