@@ -845,7 +845,7 @@ class TrainControllerUI(QMainWindow):
         self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
         self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 10)
 
-        self.miLabel = QLabel("mi", self)
+        self.miLabel = QLabel("ft", self)
         self.text_label(self.miLabel)
         self.set_relative_below_center(self.miLabel, self.authorityVal, 10)
 
@@ -1239,7 +1239,7 @@ class TrainControllerUI(QMainWindow):
                 self.prevStopLabel.adjustSize()
 
                 # authority
-                self.authorityVal.setText(str(math.floor(train.authorityVal / 1609)))
+                self.authorityVal.setText(str(math.floor(train.authorityVal * 3.281)))
                 self.authorityVal.setAlignment(Qt.AlignCenter)
 
                 # setpoint speed range
@@ -1257,7 +1257,7 @@ class TrainControllerUI(QMainWindow):
                 else:
                     self.png_label(self.trainLabel, self.pixmapTrain)
 
-                self.commandedPowerVal.setText(str(train.get_powerCommand()))
+                self.commandedPowerVal.setText(str(math.ceil(train.get_powerCommand())))
                 self.commandedPowerVal.setAlignment(Qt.AlignCenter)
 
                 self.travelledLine.setFixedWidth(
