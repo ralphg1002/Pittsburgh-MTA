@@ -10,8 +10,7 @@ class TrainModelAttributes:
                                "setpoint_speed": 0,
                                "commanded_speed": 0,
                                "acceleration": 0,
-                               "deceleration": 0,
-                               "brakes": False,
+                               "brakes": 0,
                                "power": 0,
                                "power_limit": 0}
 
@@ -19,15 +18,17 @@ class TrainModelAttributes:
                                "signal_pickup_failure": False,
                                "brake_failure": False,
                                "emergency_brake": False}
+        
         self.passenger_status = {"passengers": 6,
                                 "passenger_limit": 74,
                                 "left_door": False,
                                 "right_door": False,
                                 "lights_status": False,
-                                "announcements": False,
+                                "announcements": "",
                                 "temperature": 0,
                                 "air_conditioning": False,
                                 "advertisements": 0}
+        
         self.navigation_status = {"authority": 0,
                                  "beacon": 0,
                                  "block_length": 0,
@@ -36,6 +37,7 @@ class TrainModelAttributes:
                                  "prev_station": "",
                                  "headlights": False,
                                  "passenger_emergency_brake": False}
+        
         self.calculations = {"cars": 5,
                             "mass": 5 * 56700,
                             "length": 5 * 105.6,
