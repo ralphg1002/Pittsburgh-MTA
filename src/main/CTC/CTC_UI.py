@@ -1623,6 +1623,10 @@ class Routing:
         return lastStopTime
 
     def checkPosition(self, line, blockNum, occupancy):
+        try:
+            self.routeQ[0]
+        except Exception as e:
+            return
         print(
             "comparing current block of "
             + str(blockNum)

@@ -962,6 +962,7 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_suggested_speed(self, line, wayside, blockNum, suggestedSpeed):
+        print("Blocknum in handle suggested speed: ", blockNum)
         self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_suggestedspeed(suggestedSpeed)
         # send signal to the track model
         trackControllerToTrackModel.suggestedSpeed.emit(line, wayside, blockNum, suggestedSpeed)
@@ -1151,10 +1152,14 @@ class TrackControl(QMainWindow):
         selectedItem = self.ui.comboboxBlockNum.currentText()
         match = re.search(r"Block \d{1,3}", selectedItem)
         if match:
-            blockNum = int(match.group(1))
-            if blockNum == num:
-                self.ui.lightState.set_state(color)
-        self.ui.testBenchWindow.refreshed.emit(True)
+            try:
+                blockNum = int(match.group(1))
+            except Exception as e:
+                pass
+            else:
+                if blockNum == num:
+                    self.ui.lightState.set_state(color)
+            self.ui.testBenchWindow.refreshed.emit(True)
         
     def set_direction_handler(self, line, wayside, num, direction):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_direction(
