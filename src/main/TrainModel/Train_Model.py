@@ -276,6 +276,7 @@ class TrainModel(QMainWindow):
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
+        masterSignals.addTrain.emit("green", "train1")
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
         masterSignals.addTrain.connect(self.signal_addTrain)
