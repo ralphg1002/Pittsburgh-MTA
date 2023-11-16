@@ -23,8 +23,8 @@ class TrackControllerToTrackModel(QObject):
 ##########################################################################################
 class TrackModelToTrackController(QObject):
     occupancyState = pyqtSignal(
-        int, int, int
-    )  # line, block number occupied, block number unoccupied
+        int, int, int, bool
+    )  # line, wayside controller number, block number, occupancy state
 
 
 class TrackModelToCTC(QObject):
@@ -36,10 +36,10 @@ class TrackModelToTrainModel(QObject):
     beacon = pyqtSignal(dict)
     newCurrentPassengers = pyqtSignal(int)
 
-   
+
 ##########################################################################################
 class TrainModelToTrackModel(QObject):
-    sendCurrentPassengers = pyqtSignal(int, str)
+    sendCurrentPassengers = pyqtSignal(str, str, int)
     sendPolarity = pyqtSignal(str, int, int)  # Line, current block, previous block
 
 
@@ -61,6 +61,7 @@ class TrainModelToTrainController(QObject):
     sendSignalPickupFailure = pyqtSignal(str, bool)
     sendBrakeFailure = pyqtSignal(str, bool)
     sendPolarity = pyqtSignal(str, bool)
+    sendBlockNumber = pyqtSignal(str, int)
 
 
 ##########################################################################################
@@ -92,8 +93,10 @@ class CTCTrackController(QObject):
         int, int, str, bool
     )  # line, wayside #, trainID, authority
 
+
 class CTCToTrackModel(QObject):
-    requestThroughput = pyqtSignal(str) #requests hourly
+    requestThroughput = pyqtSignal(str)  # requests hourly
+
 
 ##########################################################################################
 class Master(QObject):
