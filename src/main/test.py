@@ -9,9 +9,6 @@ from PyQt5 import QtGui
 from TrackController.trackcontrol import TrackControl
 
 
-
-
-
 # create app
 app = QApplication(sys.argv)
 

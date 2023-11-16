@@ -844,9 +844,7 @@ class TestWindow(QMainWindow, UiMainWindow):
     # This is the refresh signal which checks to update states if they are changed
     refreshed = pyqtSignal(bool)
 
-    requestInput = pyqtSignal(int, int, int, str) # action, line, blocknum, state
-
-     
+    requestInput = pyqtSignal(int, int, int, str)  # action, line, blocknum, state
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -860,15 +858,22 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.inputLine = 0
         self.inputBlockNum = "Input Block #"
         self.inputStateText = "Input State"
-        
 
-        self.inputSelectAction.currentIndexChanged.connect(self.handle_input_action_select)
+        self.inputSelectAction.currentIndexChanged.connect(
+            self.handle_input_action_select
+        )
         self.inputSelectLine.currentIndexChanged.connect(self.handle_input_line_select)
         self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
         self.inputSelectState.textChanged.connect(self.handle_input_state_select)
-        self.inputApply.clicked.connect(self.requestInput.emit(self.inputAction, self.inputLine, self.inputBlockNum, self.inputStateText))
-        
-        
+        self.inputApply.clicked.connect(
+            self.requestInput.emit(
+                self.inputAction,
+                self.inputLine,
+                self.inputBlockNum,
+                self.inputStateText,
+            )
+        )
+
     def handle_input_action_select(self, index):
         print("THIS IS THE ACTION SELECT INDEX: ", index)
         self.inputAction = index
@@ -893,10 +898,7 @@ class TestWindow(QMainWindow, UiMainWindow):
     def handle_input_state_select(self, state):
         print("THIS IS THE STATE: ", state)
         inputStateText = state
-    
-        
-    
-        
+
         """
         self.testBenchTitle.setStyleSheet(
             "QTextEdit { background-color: rgba(0, 0, 0, 0); }"
@@ -1286,10 +1288,9 @@ class MainUI(QMainWindow):
         )
         self.testbenchButton.clicked.connect(lambda: self.testBenchWindow.show())
 
-
         """TIMING INFORMATION"""
         self.time_interval = 1.0
-        
+
         # system time input
         self.systemTimeInput = QLabel("00:00:00", self)
         self.systemTimeInput.setFont(QFont(self.fontStyle, self.headerFontSize))
@@ -1310,7 +1311,7 @@ class MainUI(QMainWindow):
 
         # system time period
         self.sysTime = QDateTime.currentDateTime()
-        self.sysTime.setTime(QTime(0,0,0))
+        self.sysTime.setTime(QTime(0, 0, 0))
 
         # system speed label
         self.systemSpeedLabel = QLabel("System Speed:", self)
@@ -1324,7 +1325,7 @@ class MainUI(QMainWindow):
         self.systemSpeedInput.setFont(QFont(self.fontStyle, self.textFontSize))
         self.systemSpeedInput.setGeometry(850, 127, 50, 50)
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
-        """"""""""""""""""""""""""""""""""""""""""""""""
+        """""" """""" """""" """""" """""" """""" """""" """"""
 
         # This is the initialization for the main box rectangle
         self.mainBox = MainBox()
@@ -1452,8 +1453,8 @@ class MainUI(QMainWindow):
         self.lineSelect = 0
         self.blockTypeSelect = " "
 
-
     """ Methods for updating time """
+
     def get_ctc_timing(self):
         masterSignals.timingMultiplier.connect(self.update_clock)
 
@@ -1463,7 +1464,9 @@ class MainUI(QMainWindow):
         self.timer.setInterval(self.time_interval)
 
         self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
-        self.systemSpeedInput.setText("x" + format(1 / (self.time_interval / 1000), ".3f"))
+        self.systemSpeedInput.setText(
+            "x" + format(1 / (self.time_interval / 1000), ".3f")
+        )
 
     # This is a method to make all of the device widgets hidden
     def hide_devices(self):

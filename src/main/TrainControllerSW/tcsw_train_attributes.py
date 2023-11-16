@@ -17,7 +17,7 @@ class Train:
             "isStation": False,
             "isTunnel": False,
             "infrastructure": "",
-            "limit": False
+            "limit": False,
         }
 
         # train model inputs

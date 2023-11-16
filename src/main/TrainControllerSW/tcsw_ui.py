@@ -312,8 +312,12 @@ class TrainControllerUI(QMainWindow):
         )
         self.pixmapAnnouncement = self.pixmapAnnouncement.scaled(32, 32)
 
-        self.pixmapStopSign = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/stop_sign.svg").scaled(64, 64)
-        self.pixmapGoSign = QtGui.QPixmap("src/main/TrainControllerSW/PNGs/go_sign.png").scaled(64, 64)
+        self.pixmapStopSign = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/stop_sign.svg"
+        ).scaled(64, 64)
+        self.pixmapGoSign = QtGui.QPixmap(
+            "src/main/TrainControllerSW/PNGs/go_sign.png"
+        ).scaled(64, 64)
 
         # Train change section
         self.trainChangeBox = QLabel("", self)
@@ -1226,7 +1230,9 @@ class TrainControllerUI(QMainWindow):
                 self.nextStopLabel.setText("Next Stop:\n" + train.nextStop)
                 self.nextStopLabel.setAlignment(Qt.AlignRight)
                 self.nextStopLabel.adjustSize()
-                self.set_relative_before_right_end(self.nextStopLabel, self.displayBox, 10)
+                self.set_relative_before_right_end(
+                    self.nextStopLabel, self.displayBox, 10
+                )
 
                 self.prevStopLabel.setText("Prev Stop:\n" + train.prevStop)
                 self.prevStopLabel.setAlignment(Qt.AlignLeft)
@@ -1326,7 +1332,7 @@ class TrainControllerUI(QMainWindow):
 
     def signal_addTrain(self, line, name):
         train = {line: name}
-        #print(self.sysTime.toString("HH:mm:ss"))
+        # print(self.sysTime.toString("HH:mm:ss"))
 
     def signal_addTrain(self, line, id):
         train = {line: id}

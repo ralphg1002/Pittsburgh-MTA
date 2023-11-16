@@ -23,33 +23,39 @@ class TCFunctions:
             "block1": {"stationName": "station1", "blockNumber": 1, "blockLength": 50},
             "block2": {"stationName": "station2", "blockNumber": 1, "blockLength": 50},
         }
-        self.redBlockDict = self.parse_trackLayout(r"src\main\TrainControllerSW\track_layout.xlsx", "Red Line")
-        self.greenBlockDict = self.parse_trackLayout(r"src\main\TrainControllerSW\track_layout.xlsx", "Green Line")
+        self.redBlockDict = self.parse_trackLayout(
+            r"src\main\TrainControllerSW\track_layout.xlsx", "Red Line"
+        )
+        self.greenBlockDict = self.parse_trackLayout(
+            r"src\main\TrainControllerSW\track_layout.xlsx", "Green Line"
+        )
 
     def parse_trackLayout(self, file_path, sheet):
         # Read the Excel file into a pandas DataFrame
         df = pd.read_excel(file_path, sheet_name=sheet)
 
-        df = df.fillna('')
+        df = df.fillna("")
 
         # Convert the DataFrame to a list of dictionaries (one dictionary per row)
-        data = df.to_dict(orient='records')
+        data = df.to_dict(orient="records")
 
         modifiedData = []
         affectedBlocks = []
         firstStationName = ""
 
         for block in data:
-            modifiedBlock = {"Line": "line",
-                             "Section": "letter",
-                             "Number": 0,
-                             "Length": 0,
-                             "isStation": False,
-                             "isTunnel": False,
-                             "stationName": "",
-                             "firstStation": "",
-                             "Infrastructure": "",
-                             "Limit": False}
+            modifiedBlock = {
+                "Line": "line",
+                "Section": "letter",
+                "Number": 0,
+                "Length": 0,
+                "isStation": False,
+                "isTunnel": False,
+                "stationName": "",
+                "firstStation": "",
+                "Infrastructure": "",
+                "Limit": False,
+            }
             modifiedBlock["Line"] = block["Line"]
             modifiedBlock["Section"] = block["Section"]
             modifiedBlock["Number"] = block["Block Number"]
@@ -66,7 +72,7 @@ class TCFunctions:
                 modifiedBlock["isTunnel"] = True
             if "SWITCH" in block["Infrastructure"]:
                 modifiedBlock["Infrastructure"] = "SWITCH"
-                switchBlocks = re.findall(r'\d+', block["Infrastructure"])
+                switchBlocks = re.findall(r"\d+", block["Infrastructure"])
                 switchBlocks = [int(num) for num in switchBlocks]
                 for aBlock in switchBlocks:
                     affectedBlocks.append(aBlock)
@@ -97,7 +103,6 @@ class TCFunctions:
         self.trainList.append(trainObject)
 
     def stopping_operations(self, trainObject):
-
         if not trainObject.get_authority():
             # assumed in m
             trainLength = 32.2
@@ -134,7 +139,9 @@ class TCFunctions:
                 currentSpeed = trainObject.get_currentSpeed() / 2.237
 
                 # m/s^2
-                deceleration = (speedLim * speedLim - currentSpeed * currentSpeed) / 2 / distance
+                deceleration = (
+                    (speedLim * speedLim - currentSpeed * currentSpeed) / 2 / distance
+                )
 
                 if deceleration < 0:
                     efficacy = 0
@@ -165,11 +172,15 @@ class TCFunctions:
             trainObject.set_announcement("")
 
     def update_block_info(self, blockDict, trainObject):
-        trainObject.authorityVal = trainObject.block["blockLength"] - trainObject.blockTravelled
+        trainObject.authorityVal = (
+            trainObject.block["blockLength"] - trainObject.blockTravelled
+        )
         if trainObject.block["blockLength"] == 0:
             trainObject.distanceRatio = 0
         else:
-            trainObject.distanceRatio = trainObject.blockTravelled / trainObject.block["blockLength"]
+            trainObject.distanceRatio = (
+                trainObject.blockTravelled / trainObject.block["blockLength"]
+            )
 
         for block in blockDict:
             if block["Number"] == trainObject.block["blockNumber"]:
@@ -209,7 +220,9 @@ class TCFunctions:
 
     def pi_calculation(self, trainObject, powerDict):
         # calculate new velocity error mph -> m/s
-        newError = (trainObject.get_setpointSpeed() - trainObject.get_currentSpeed()) / 2.237
+        newError = (
+            trainObject.get_setpointSpeed() - trainObject.get_currentSpeed()
+        ) / 2.237
 
         # calculate new uk
         if newError == 0 and trainObject.piVariables["prevError"] == 0:
@@ -217,9 +230,9 @@ class TCFunctions:
             powerDict["powerValue"] = 0
             return
         elif trainObject.get_powerCommand() < trainObject.piVariables["powerLimit"]:
-            newUk = trainObject.piVariables["uk"] + trainObject.piVariables["samplePeriod"] / 2 * (
-                newError + trainObject.piVariables["prevError"]
-            )
+            newUk = trainObject.piVariables["uk"] + trainObject.piVariables[
+                "samplePeriod"
+            ] / 2 * (newError + trainObject.piVariables["prevError"])
         else:
             newUk = trainObject.piVariables["uk"]
 
