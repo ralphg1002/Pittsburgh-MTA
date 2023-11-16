@@ -287,6 +287,7 @@ class TrainModel(QMainWindow):
         )
 
         self.update_drop_down()
+        
         # Signals that connect from the train controller to the train model
         trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
         trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(self.signal_emergency_brake)
@@ -303,7 +304,7 @@ class TrainModel(QMainWindow):
         trackModelToTrainModel.blockInfo.connect(self.signal_blockInfo)
         trackModelToTrainModel.beacon.connect(self.signal_beacon)
         trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers)
-
+        
         # Send train controller information
         for trainObject in self.trainsList:
             trainObject.calculations["timeInterval"] = self.time_interval
@@ -319,23 +320,23 @@ class TrainModel(QMainWindow):
             trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
             trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"], trainObject.navigation_status["passenger_emergency_brake"])
             trainModelToTrainController.sendTemperature.emit(trainObject.calculations["trainID"], trainObject.passenger_status["temperature"])
-            trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.calculations["currStation"], trainObject.passenger_status["passengers"])
+            # trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.calculations["currStation"], trainObject.passenger_status["passengers"])
             trainModelToTrainController.sendNextStation1.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation1"])
             trainModelToTrainController.sendNextStation2.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation2"])
             trainModelToTrainController.sendCurrStation.emit(trainObject.calculations["trainID"], trainObject.calculations["currStation"])
             trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
             trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
-            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])            
             if trainObject.calculations["initialized"]:
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+                trainObject.calculations["initialized"] = False
             if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"]:
                 trainObject.calculations["distance"] = 0
                 trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
-            trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
             trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
-            trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
+            # trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
             trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
-            trainObject.calculations["initialized"] = False
 
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
@@ -349,10 +350,20 @@ class TrainModel(QMainWindow):
 
     def signal_beacon(self, beaconDict):
         for trainObject in self.trainsList:
+            if trainObject.calulations["currStation"] == trainObject.navigation_status["next_station"]:
+                trainObject.navigation_status["prev_station"] = trainObject.calulations["currStation"]
+                trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.calculations["currStation"], trainObject.passenger_status["passengers"])
+            
             trainObject.calculations["nextStation1"] = beaconDict["Next Station1"]
             trainObject.calculations["nextStation2"] = beaconDict["Next Station2"]
             trainObject.calculations["currStation"] = beaconDict["Current Station"]
             trainObject.calculations["doorSide"] = beaconDict["Door Side"]
+
+            if trainObject.calculations["nextStation1"] == trainObject.navigation_status["prev_station"]:
+                trainObject.navigation_status["next_station"] = trainObject.calculations["nextStation2"]
+            else: 
+                trainObject.navigation_status["next_station"] = trainObject.calculations["nextStation1"]
+            
         return
 
     def signal_new_passengers(self, passengers):
