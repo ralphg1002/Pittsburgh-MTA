@@ -262,7 +262,9 @@ class TrainModel(QMainWindow):
     def update_drop_down(self):
         existing_items = [self.comboBox.itemText(i) for i in range(self.comboBox.count())]
 
-        all_trainIDs = [str(self.trainsList.calculations["trainID"])]
+        all_trainIDs = []
+        for trains in self.trainsList:
+            all_trainIDs.append(trains.calculations["trainID"])
 
         missing_trainIDs = set(all_trainIDs) - set(existing_items)
         for trainID in missing_trainIDs:
@@ -1477,7 +1479,6 @@ class ResultsWindow(QMainWindow):
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
-        masterSignals.addTrain.connect(self.signal_addTrain)
 
         self.timer.setInterval(self.time_interval)
 
@@ -1486,25 +1487,107 @@ class ResultsWindow(QMainWindow):
             "x" + format(1 / (self.time_interval / 1000), ".3f")
         )
 
-        # Update QLabel widgets with new information
-        self.word_label_speed_limit.setText(
-            "Speed Limit: {} mph".format(self.trainsList.vehicle_status["speed_limit"])
-        )
+        for trainObject in self.trainsList:
+            # Update QLabel widgets with new information
+            self.word_label_speed_limit.setText(
+                "Speed Limit: {} mph".format(trainObject.vehicle_status["speed_limit"])
+            )
 
-        self.word_label_current_speed.setText(
-            "Current Speed {} mph".format(self.trainsList.vehicle_status["current_speed"])
-        )
+            self.word_label_current_speed.setText(
+                "Current Speed {} mph".format(trainObject.vehicle_status["current_speed"])
+            )
 
-        
-        
-        
-        ###### FINISH #######
+            self.word_label_setpoint_speed.setText(
+                "Setpoint Speed {} mph".format(trainObject.vehicle_status["setpoint_speed"])
+            )
 
+            self.word_label_commanded_speed.setText(
+                "Commanded Speed {} mph".format(trainObject.vehicle_status["commanded_speed"])
+            )
+            
+            self.word_label_acceleration.setText(
+                "Acceleration {} ft/s".format(trainObject.vehicle_status["acceleration"])
+            )
 
-        
-        
-        
-        
+            self.word_label_brakes.setText(
+                "Brakes {}".format(trainObject.vehicle_status["brakes"])
+            )
+            
+            self.word_label_power.setText(
+                "Power {} kW".format(trainObject.vehicle_status["power"])
+            )
+
+            self.word_label_power_limit.setText(
+                "Power Limit {} kW".format(trainObject.vehicle_status["power_limit"])
+            )
+
+            self.word_label_passengers.setText(
+                "Power Limit {} kW".format(trainObject.vehicle_status["power_limit"])
+            )
+
+            self.word_label_power_limit.setText(
+                "Passenger Limit {}".format(trainObject.passenger_status["passenger_limit"])
+            )
+
+            self.word_label_left_door.setText(
+                "Left Door {}".format(trainObject.passenger_status["left_door"])
+            )
+
+            self.word_label_right_door.setText(
+                "Right Door {}".format(trainObject.passenger_status["right_door"])
+            )
+
+            self.word_label_lights_status.setText(
+                "Lights Status {}".format(trainObject.passenger_status["lights_status"])
+            )
+
+            self.word_label_announcements.setText(
+                "Announcements {}".format(trainObject.passenger_status["announcements"])
+            )
+
+            self.word_label_temperature.setText(
+                "Temperature {}".format(trainObject.passenger_status["temperature"])
+            )
+
+            self.word_label_air_conditioning.setText(
+                "Air Conditioning {}".format(trainObject.passenger_status["air_conditioning"])
+            )
+
+            self.word_label_advertisements.setText(
+                "Advertisements {}".format(trainObject.passenger_status["advertisements"])
+            )
+
+            self.word_label_authority.setText(
+                "Authority {}".format(trainObject.navigation_status["authority"])
+            )
+
+            self.word_label_beacon.setText(
+                "Beacon {}".format(trainObject.navigation_status["beacon"])
+            )
+
+            self.word_label_block_length.setText(
+                "Block Length {}".format(trainObject.navigation_status["block_length"])
+            )
+
+            self.word_label_block_grade.setText(
+                "Block Grade {}".format(trainObject.navigation_status["block_grade"])
+            )
+
+            self.word_label_next_station.setText(
+                "Next Station {}".format(trainObject.navigation_status["next_station"])
+            )
+
+            self.word_label_prev_station.setText(
+                "Previous Station {}".format(trainObject.navigation_status["prev_station"])
+            )
+
+            self.word_label_headlights.setText(
+                "Headlights {}".format(trainObject.navigation_status["headlights"])
+            )
+
+            self.word_label_pass_emergency_brake.setText(
+                "Passenger Emergency Brake {}".format(trainObject.navigation_status["passenger_emergency_brake"])
+            )
         
         # Signals that connect from the train controller to the train model
         trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
