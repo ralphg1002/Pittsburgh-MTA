@@ -11,17 +11,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+class UiMainWindow(object):
+    def setup_ui(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(191, 408)
+        MainWindow.resize(191, 468)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.inputTitle = QtWidgets.QTextEdit(self.centralwidget)
         self.inputTitle.setGeometry(QtCore.QRect(50, 20, 91, 41))
         self.inputTitle.setObjectName("inputTitle")
         self.outputTitle = QtWidgets.QTextEdit(self.centralwidget)
-        self.outputTitle.setGeometry(QtCore.QRect(50, 210, 91, 41))
+        self.outputTitle.setGeometry(QtCore.QRect(50, 240, 91, 41))
         self.outputTitle.setObjectName("outputTitle")
         self.inputSelectLine = QtWidgets.QComboBox(self.centralwidget)
         self.inputSelectLine.setGeometry(QtCore.QRect(30, 100, 131, 22))
@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.inputSelectState.setGeometry(QtCore.QRect(30, 160, 131, 22))
         self.inputSelectState.setObjectName("inputSelectState")
         self.outputSelectAction = QtWidgets.QComboBox(self.centralwidget)
-        self.outputSelectAction.setGeometry(QtCore.QRect(30, 260, 131, 22))
+        self.outputSelectAction.setGeometry(QtCore.QRect(30, 290, 131, 22))
         self.outputSelectAction.setObjectName("outputSelectAction")
         self.outputSelectAction.addItem("")
         self.outputSelectAction.addItem("")
@@ -60,18 +60,24 @@ class Ui_MainWindow(object):
         self.outputSelectAction.addItem("")
         self.outputSelectAction.addItem("")
         self.outputSelectBlock = QtWidgets.QLineEdit(self.centralwidget)
-        self.outputSelectBlock.setGeometry(QtCore.QRect(30, 320, 131, 22))
+        self.outputSelectBlock.setGeometry(QtCore.QRect(30, 350, 131, 22))
         self.outputSelectBlock.setObjectName("outputSelectBlock")
         self.outputSelectLine = QtWidgets.QComboBox(self.centralwidget)
-        self.outputSelectLine.setGeometry(QtCore.QRect(30, 290, 131, 22))
+        self.outputSelectLine.setGeometry(QtCore.QRect(30, 320, 131, 22))
         self.outputSelectLine.setObjectName("outputSelectLine")
         self.outputSelectLine.addItem("")
         self.outputSelectLine.addItem("")
         self.outputSelectLine.addItem("")
         self.outputState = QtWidgets.QLineEdit(self.centralwidget)
-        self.outputState.setGeometry(QtCore.QRect(30, 350, 131, 22))
+        self.outputState.setGeometry(QtCore.QRect(30, 380, 131, 22))
         self.outputState.setText("")
         self.outputState.setObjectName("outputState")
+        self.inputApply = QtWidgets.QPushButton(self.centralwidget)
+        self.inputApply.setGeometry(QtCore.QRect(50, 190, 93, 28))
+        self.inputApply.setObjectName("inputApply")
+        self.outputApply = QtWidgets.QPushButton(self.centralwidget)
+        self.outputApply.setGeometry(QtCore.QRect(50, 410, 93, 28))
+        self.outputApply.setObjectName("outputApply")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -80,40 +86,91 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.inputTitle.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600;\">Inputs</span></p></body></html>"))
-        self.outputTitle.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600;\">Outputs</span></p></body></html>"))
+        self.inputTitle.setHtml(
+            _translate(
+                "MainWindow",
+                '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+                '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+                '<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:12pt; font-weight:600;">Inputs</span></p></body></html>',
+            )
+        )
+        self.outputTitle.setHtml(
+            _translate(
+                "MainWindow",
+                '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\n'
+                '<html><head><meta name="qrichtext" content="1" /><style type="text/css">\n'
+                "p, li { white-space: pre-wrap; }\n"
+                "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+                '<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:12pt; font-weight:600;">Outputs</span></p></body></html>',
+            )
+        )
         self.inputSelectLine.setItemText(0, _translate("MainWindow", "Select Line"))
         self.inputSelectLine.setItemText(1, _translate("MainWindow", "Green Line"))
         self.inputSelectLine.setItemText(2, _translate("MainWindow", "Red Line"))
         self.inputSelectAction.setItemText(0, _translate("MainWindow", "Select Action"))
-        self.inputSelectAction.setItemText(1, _translate("MainWindow", "Set Switch State"))
-        self.inputSelectAction.setItemText(2, _translate("MainWindow", "Set Crossing State"))
-        self.inputSelectAction.setItemText(3, _translate("MainWindow", "Set Light State"))
-        self.inputSelectAction.setItemText(4, _translate("MainWindow", "Set Maintenance"))
+        self.inputSelectAction.setItemText(
+            1, _translate("MainWindow", "Set Switch State")
+        )
+        self.inputSelectAction.setItemText(
+            2, _translate("MainWindow", "Set Crossing State")
+        )
+        self.inputSelectAction.setItemText(
+            3, _translate("MainWindow", "Set Light State")
+        )
+        self.inputSelectAction.setItemText(
+            4, _translate("MainWindow", "Set Maintenance")
+        )
         self.inputSelectAction.setItemText(5, _translate("MainWindow", "Set Occupancy"))
         self.inputSelectAction.setItemText(6, _translate("MainWindow", "Set Authority"))
-        self.inputSelectAction.setItemText(7, _translate("MainWindow", "Set Suggested Speed"))
+        self.inputSelectAction.setItemText(
+            7, _translate("MainWindow", "Set Suggested Speed")
+        )
         self.inputSelectAction.setItemText(8, _translate("MainWindow", "Set Direction"))
         self.inputSelectBlock.setText(_translate("MainWindow", "Input Block #"))
         self.inputSelectState.setText(_translate("MainWindow", "Input State"))
-        self.outputSelectAction.setItemText(0, _translate("MainWindow", "Select Action"))
-        self.outputSelectAction.setItemText(1, _translate("MainWindow", "Set Switch State"))
-        self.outputSelectAction.setItemText(2, _translate("MainWindow", "Set Crossing State"))
-        self.outputSelectAction.setItemText(3, _translate("MainWindow", "Set Light State"))
-        self.outputSelectAction.setItemText(4, _translate("MainWindow", "Set Maintenance"))
-        self.outputSelectAction.setItemText(5, _translate("MainWindow", "Set Occupancy"))
-        self.outputSelectAction.setItemText(6, _translate("MainWindow", "Set Authority"))
-        self.outputSelectAction.setItemText(7, _translate("MainWindow", "Set Suggested Speed"))
-        self.outputSelectAction.setItemText(8, _translate("MainWindow", "Set Direction"))
+        self.outputSelectAction.setItemText(
+            0, _translate("MainWindow", "Select Action")
+        )
+        self.outputSelectAction.setItemText(
+            1, _translate("MainWindow", "Set Switch State")
+        )
+        self.outputSelectAction.setItemText(
+            2, _translate("MainWindow", "Set Crossing State")
+        )
+        self.outputSelectAction.setItemText(
+            3, _translate("MainWindow", "Set Light State")
+        )
+        self.outputSelectAction.setItemText(
+            4, _translate("MainWindow", "Set Maintenance")
+        )
+        self.outputSelectAction.setItemText(
+            5, _translate("MainWindow", "Set Occupancy")
+        )
+        self.outputSelectAction.setItemText(
+            6, _translate("MainWindow", "Set Authority")
+        )
+        self.outputSelectAction.setItemText(
+            7, _translate("MainWindow", "Set Suggested Speed")
+        )
+        self.outputSelectAction.setItemText(
+            8, _translate("MainWindow", "Set Direction")
+        )
         self.outputSelectBlock.setText(_translate("MainWindow", "Input Block #"))
         self.outputSelectLine.setItemText(0, _translate("MainWindow", "Select Line"))
         self.outputSelectLine.setItemText(1, _translate("MainWindow", "Green Line"))
         self.outputSelectLine.setItemText(2, _translate("MainWindow", "Red Line"))
+        self.inputApply.setText(_translate("MainWindow", "Apply"))
+        self.outputApply.setText(_translate("MainWindow", "Apply"))
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = UiMainWindow()
+    ui.setup_ui(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())

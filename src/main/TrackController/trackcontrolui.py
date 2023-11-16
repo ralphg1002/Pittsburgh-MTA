@@ -5,11 +5,9 @@ import os
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *  # QPainter, QPen, QColor, QFont, QPixmap, QLine
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QDateTime
-from PyQt5.uic import loadUi
+from PyQt5.QtCore import Qt, pyqtSignal, QTimer, QDateTime, QTime
 from .testbench import UiMainWindow
-
-app = QApplication(sys.argv)
+from signals import masterSignals
 
 modeChanged = pyqtSignal(bool)  # Custom signal to indicate mode change
 switchCrossChanged = pyqtSignal(
@@ -33,41 +31,6 @@ def create_text_label(text, x, y, fontSize):
 
 ########################################### UI Classes  ############################################
 ####################################################################################################
-
-
-class SimulationSpeed(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.simulationSpeed = 1.0
-
-    def set_simulationspeed_controls(self, parentWindow):
-        simulationspeedText = QLabel("Simulation Speed:", parentWindow)
-        simulationspeedText.setGeometry(900 - 160, 890, 170, 30)
-        simulationspeedText.setStyleSheet("font-weight: bold; font-size: 18px")
-
-        self.speedText = QLabel("1.0x", parentWindow)
-        self.speedText.setGeometry(1110 - 160, 890, 40, 30)
-        self.speedText.setAlignment(Qt.AlignCenter)
-        self.speedText.setStyleSheet("font-weight: bold; font-size: 18px")
-
-        decreaseSpeed = QPushButton("<<", parentWindow)
-        decreaseSpeed.setGeometry(1070 - 160, 895, 30, 20)
-        decreaseSpeed.clicked.connect(self.decrease_simulationspeed)
-
-        increaseSpeed = QPushButton(">>", parentWindow)
-        increaseSpeed.setGeometry(1160 - 160, 895, 30, 20)
-        increaseSpeed.clicked.connect(self.increase_simulationspeed)
-
-    def decrease_simulationspeed(self):
-        # Speed cannot go below 0.5
-        if self.simulationSpeed > 0.5:
-            self.simulationSpeed -= 0.5
-            self.speedText.setText(f"{self.simulationSpeed}x")
-
-    def increase_simulationspeed(self):
-        if self.simulationSpeed < 5.0:
-            self.simulationSpeed += 0.5
-            self.speedText.setText(f"{self.simulationSpeed}x")
 
 
 class MainBox(QWidget):
@@ -209,6 +172,7 @@ class OccupancyBox(QWidget):
 
     def clear_table(self):
         self.tableWidget.clearContents()
+        self.tableWidget.setRowCount(0)
 
 
 class ModeButton(QPushButton):
@@ -315,38 +279,6 @@ class MapWindow(QMainWindow):
             self.mapLabel.setPixmap(self.scaledPixmapGreenLine)
         else:
             self.mapLabel.setPixmap(self.scaledPixmapRedLine)
-
-
-class Clock(QWidget):
-    def set_clock(self, parentWindow):
-        self.clock = QLabel("System Clock: 00:00:00", parentWindow)
-        self.clock.setGeometry(760, 920, 220, 30)
-        self.clock.setStyleSheet("font-weight: bold; font-size: 18px")
-        self.currentTime = "00:00:00"
-        self.update_clock()
-
-        # Update clock in real time while window is open
-        timer = QTimer(parentWindow)
-        timer.timeout.connect(self.update_clock)
-        # Update every 1 second
-        timer.start(1000)
-
-    def update_clock(self):
-        # Increment the time by 1 second
-        hours, minutes, seconds = map(int, self.currentTime.split(":"))
-        seconds += 1
-        if seconds == 60:
-            seconds = 0
-            minutes += 1
-            if minutes == 60:
-                minutes = 0
-                hours += 1
-                if hours == 24:
-                    hours = 0
-
-        # Format the time as HH:mm:ss
-        self.currentTime = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-        self.clock.setText("System Clock: " + self.currentTime)
 
 
 class DeviceBox(QWidget):
@@ -912,13 +844,60 @@ class TestWindow(QMainWindow, UiMainWindow):
     # This is the refresh signal which checks to update states if they are changed
     refreshed = pyqtSignal(bool)
 
+    requestInput = pyqtSignal(int, int, int, str) # action, line, blocknum, state
+
+     
+
     def __init__(self, parent=None):
         super().__init__(parent)
         # call the set up ui function from the UiMainWindow
         self.setup_ui(self)
-        self.setGeometry(0, 0, 1100, 960)
         self.setWindowTitle("Track Controller Test Bench")
         # set the background colors of the following texts to transparent
+
+        """ Initialization of the input variables """
+        self.inputAction = 0
+        self.inputLine = 0
+        self.inputBlockNum = "Input Block #"
+        self.inputStateText = "Input State"
+        
+
+        self.inputSelectAction.currentIndexChanged.connect(self.handle_input_action_select)
+        self.inputSelectLine.currentIndexChanged.connect(self.handle_input_line_select)
+        self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
+        self.inputSelectState.textChanged.connect(self.handle_input_state_select)
+        self.inputApply.clicked.connect(self.requestInput.emit(self.inputAction, self.inputLine, self.inputBlockNum, self.inputStateText))
+        
+        
+    def handle_input_action_select(self, index):
+        print("THIS IS THE ACTION SELECT INDEX: ", index)
+        self.inputAction = index
+
+    def handle_input_line_select(self, index):
+        self.inputLine = index
+        print("THIS IS THE ACTION SELECT INDEX: ", index)
+        if index == 0:
+            # reset the next selections
+            pass
+        # set green line
+        elif index == 1:
+            pass
+        # set red line
+        elif index == 2:
+            pass
+
+    def handle_input_block_select(self, blockNum):
+        print("THIS IS THE BLOCK NUMBER: ", blockNum)
+        self.inputBlockNum = blockNum
+
+    def handle_input_state_select(self, state):
+        print("THIS IS THE STATE: ", state)
+        inputStateText = state
+    
+        
+    
+        
+        """
         self.testBenchTitle.setStyleSheet(
             "QTextEdit { background-color: rgba(0, 0, 0, 0); }"
         )
@@ -928,6 +907,9 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.outputHeader.setStyleSheet(
             "QTextEdit { background-color: rgba(0, 0, 0, 0); }"
         )
+        
+    
+        
 
         # Create links between input combo box actions for when the state value is changed
         self.setSwitchSelectState.currentIndexChanged.connect(
@@ -1210,6 +1192,7 @@ class TestWindow(QMainWindow, UiMainWindow):
             self.requestViewDirection.emit(
                 int(self.viewDirectionSelectBlock.currentText())
             )
+    """
 
 
 class MainUI(QMainWindow):
@@ -1236,6 +1219,7 @@ class MainUI(QMainWindow):
         super().__init__(None)
 
         self.testBenchWindow = TestWindow()
+        self.testBenchWindow.setGeometry(0, 0, 191, 408)
 
         # setting title
         self.setWindowTitle(self.moduleName)
@@ -1302,6 +1286,10 @@ class MainUI(QMainWindow):
         )
         self.testbenchButton.clicked.connect(lambda: self.testBenchWindow.show())
 
+
+        """TIMING INFORMATION"""
+        self.time_interval = 1.0
+        
         # system time input
         self.systemTimeInput = QLabel("00:00:00", self)
         self.systemTimeInput.setFont(QFont(self.fontStyle, self.headerFontSize))
@@ -1315,6 +1303,15 @@ class MainUI(QMainWindow):
         self.systemTimeLabel.setGeometry(650, 65, 200, 100)
         self.systemTimeLabel.setStyleSheet("color:" + self.colorDarkBlue)
 
+        # system time variable
+        self.timer = QTimer(self)
+        self.timer.start(1000)
+        self.timer.timeout.connect(self.get_ctc_timing)
+
+        # system time period
+        self.sysTime = QDateTime.currentDateTime()
+        self.sysTime.setTime(QTime(0,0,0))
+
         # system speed label
         self.systemSpeedLabel = QLabel("System Speed:", self)
         self.systemSpeedLabel.setFont(QFont(self.fontStyle, self.textFontSize))
@@ -1327,41 +1324,9 @@ class MainUI(QMainWindow):
         self.systemSpeedInput.setFont(QFont(self.fontStyle, self.textFontSize))
         self.systemSpeedInput.setGeometry(850, 127, 50, 50)
         self.systemSpeedInput.setStyleSheet("color:" + self.colorDarkBlue)
-
-        # decrease system speed button
-        self.pixmapRewind = QtGui.QPixmap("src/main/TrackController/images/rewind.svg")
-        self.pixmapRewind = self.pixmapRewind.scaled(20, 20)
-        self.slowDownButton = QPushButton(self)
-        self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
-        self.slowDownButton.setGeometry(819, 143, 20, 20)
-        self.slowDownButton.setStyleSheet(
-            "color:" + self.colorDarkBlue + ";border: 1px solid white"
-        )
-
-        # increase system speed button
-        self.pixmapFastForward = QtGui.QPixmap(
-            "src/main/TrackController/images/fast-forward.svg"
-        )
-        self.pixmapFastForward = self.pixmapFastForward.scaled(20, 20)
-        self.speedUpButton = QPushButton(self)
-        self.speedUpButton.setIcon(QtGui.QIcon(self.pixmapFastForward))
-        self.speedUpButton.setGeometry(890, 143, 20, 20)
-        self.speedUpButton.setStyleSheet(
-            "color:" + self.colorDarkBlue + ";border: 1px solid white"
-        )
-
-        # decrease system speed button
-        self.pixmapRewind = QtGui.QPixmap("src/main/TrackController/images/rewind.svg")
-        self.pixmapRewind = self.pixmapRewind.scaled(20, 20)
-        self.slowDownButton = QPushButton(self)
-        self.slowDownButton.setIcon(QtGui.QIcon(self.pixmapRewind))
-        self.slowDownButton.setGeometry(1874, 304, 20, 20)
-        self.slowDownButton.setStyleSheet(
-            "color:" + self.colorDarkBlue + ";border: 1px solid black"
-        )
+        """"""""""""""""""""""""""""""""""""""""""""""""
 
         # This is the initialization for the main box rectangle
-
         self.mainBox = MainBox()
         self.mainBox.setGeometry(50, 200, 600, 675)
         self.mainBox.setParent(self)
@@ -1486,6 +1451,19 @@ class MainUI(QMainWindow):
         self.waysideSelect = 0
         self.lineSelect = 0
         self.blockTypeSelect = " "
+
+
+    """ Methods for updating time """
+    def get_ctc_timing(self):
+        masterSignals.timingMultiplier.connect(self.update_clock)
+
+    def update_clock(self, period):
+        self.time_interval = period
+        masterSignals.clockSignal.connect(self.sysTime.setTime)
+        self.timer.setInterval(self.time_interval)
+
+        self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
+        self.systemSpeedInput.setText("x" + format(1 / (self.time_interval / 1000), ".3f"))
 
     # This is a method to make all of the device widgets hidden
     def hide_devices(self):

@@ -1326,6 +1326,10 @@ class TrainControllerUI(QMainWindow):
 
     def signal_addTrain(self, line, name):
         train = {line: name}
+        #print(self.sysTime.toString("HH:mm:ss"))
+
+    def signal_addTrain(self, line, id):
+        train = {line: id}
         idCheck = False
         for i in self.tcVariables["trainList"]:
             if i == train:

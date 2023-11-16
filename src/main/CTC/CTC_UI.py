@@ -14,6 +14,8 @@ sys.path.append("../../main")
 from signals import masterSignals
 from signals import ctcToTrackController
 from signals import trackControllerToCTC
+from signals import ctcToTrackModel
+from signals import trackModelToCTC
 
 # Global variables for the block numbers associated with each wayside
 WAYSIDE_1G_BLOCKS = [
@@ -124,7 +126,7 @@ WAYSIDE_1G_BLOCKS = [
     148,
     149,
     150,
-] 
+]
 WAYSIDE_2G_BLOCKS = [
     0,
     59,
@@ -170,7 +172,10 @@ WAYSIDE_2G_BLOCKS = [
     99,
     100,
     101,
-]  
+]
+
+# Global variable declaration
+global_block_occupancy = {}
 
 
 class CTCWindow(QMainWindow):
@@ -415,7 +420,7 @@ class CTCWindow(QMainWindow):
         self.occupancy_table.setGeometry(360, 510, 252, 100)
 
         # Throughput per line
-        self.throughput_label = QLabel("Throughput: N/A", self)
+        self.throughput_label = QLabel("Throughput: ", self)
         self.throughput_label.setFont(QFont(self.fontStyle, self.textFontSize + 5))
         self.throughput_label.setGeometry(350, 170, 400, 50)
 
@@ -566,10 +571,7 @@ class CTCWindow(QMainWindow):
         # select block numbers
         self.blockDropDown = QComboBox(self)
         self.blockDropDown.setGeometry(35, 500, 100, 50)
-        self.selectLine.currentIndexChanged.connect(
-            self.updateInfoBlock
-        )  
-        #self.blockDropDown.currentIndexChanged.connect(Block.showBlockStatus)  # Connect the signal to update the dropdown
+        self.selectLine.currentIndexChanged.connect(self.updateInfoBlock)
 
         # repair block button
         self.repairBlockButton = QPushButton("Repair Block", self)
@@ -593,7 +595,7 @@ class CTCWindow(QMainWindow):
             + self.colorDarkBlue
             + "; border: 1px solid black"
         )
-        #self.closeBlockButton.clicked.connect(Block.closeBlockButton)
+        # self.closeBlockButton.clicked.connect(Block.closeBlockButton)
 
         # Displaying the occupancy status
         self.status_label = QLabel("Status: ", self)
@@ -621,19 +623,45 @@ class CTCWindow(QMainWindow):
         self.dispatchTable.setColumnWidth(1, 100)  # Width for "Location"
         self.dispatchTable.setColumnWidth(2, 150)  # Width for "Next Stop"
         self.dispatchTable.setColumnWidth(3, 180)  # Width for "Suggested Speed (mph)"
-        self.dispatchTable.setColumnWidth(4, 100) 
+        self.dispatchTable.setColumnWidth(4, 100)
 
         self.dispatchTable.setStyleSheet("background-color: white;")
         self.dispatchTable.setGeometry(35, 280, 600, 200)
 
-        #self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
-        #self.blockDropDown.currentIndexChanged.connect(
-            #lambda: Block.updateStatusLabel(main_window, blocks)
-        #)
+        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
+
+        trackModelToCTC.throughput.connect(self.updateTickets)
+
+        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
+
+        trackModelToCTC.throughput.connect(self.updateTickets)
+
+        # self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
+        # self.blockDropDown.currentIndexChanged.connect(
+        # lambda: Block.updateStatusLabel(main_window, blocks)
+        # )
         # self.show()
+        # self.blockDropDown.currentIndexChanged.connect(self.statusHandler)  # Connect the signal to update the dropdown
+
+    #def statusHandler(self):
+        #Block.updateStatusLabel(self)
+
+    def ticketRequest(self):
+        beforeLine = self.selectLine.currentText()
+        if beforeLine == "Green Line":
+            requestLine = "Green"
+        else:
+            requestLine = "Red"
+            
+        ctcToTrackModel.requestThroughput.emit(requestLine)
     
+    def updateTickets(self, throughput):
+        throughput_text = f"Throughput: {throughput}"
+        self.throughput_label.setText(throughput_text)
+
     def blockHandler(self):
         Block.setSelectedBlock(self)
+
     def updateInfoBlock(self):
         Block.updateBlockDropDown(self)
 
@@ -1333,11 +1361,12 @@ class Routing:
         self.filename = filename
         self.data = self.load_data()
         self.main_window = main_window
-        #self.scheduler_class = Scheduler(main_window)
+        # self.scheduler_class = Scheduler(main_window)
         self.train_routes = {}  # Dictionary to map train IDs to their routes
-        self.temp_routes = []   # temp dict
+        self.temp_routes = []  # temp dict
 
         trackControllerToCTC.occupancyState.connect(self.checkPosition)
+
     def load_data(self):
         data = []
         with open(self.filename, "r") as file:
@@ -1364,6 +1393,7 @@ class Routing:
                 seconds_to_traverse_block = float(row[10])
                 # Create a Block object for each block and append it to blockList
                 block = Block(
+                    self,
                     blockNumber,
                     trackSection,
                     blockLength,
@@ -1589,7 +1619,7 @@ class Routing:
             track = "Green"
         else:
             track = "Red"
-        trainLine = self.scheduler.getSelectedLine()
+        trainLine = self.main_window.selectLine.currentText()
         #for train_id, routeQ in self.train_routes.items():
         if occupancy == True and blockNum == self.routeQ[1] and trainLine == track:
             self.routeQ.pop(0)
@@ -1632,9 +1662,7 @@ class Routing:
                 self.main_window.dispatchTable.setItem(
                     0, 3, QTableWidgetItem(str(suggestedSpeed))
                 )
-                self.main_window.dispatchTable.setItem(
-                    0, 4, QTableWidgetItem("0")
-                )
+                self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("0"))
                 ctcToTrackController.sendSuggestedSpeed.emit(
                     line, wayside, nextBlock, suggestedSpeed
                 )
@@ -1656,28 +1684,22 @@ class Routing:
         if self.stations_to_stop:
             self.stations_to_stop.pop()
             nextStop = self.stations_to_stop[0]
-            suggestedSpeed = (
-                self.block_info_list[self.routeQ[0]].speedLimit
-            ) * 3.60
-            
+            suggestedSpeed = (self.block_info_list[self.routeQ[0]].speedLimit) * 3.60
+
             wayside = self.find_wayside(self.routeQ[0])
             print("fix")
 
-            ctcToTrackController.sendSuggestedSpeed.emit(self.routeQ[0].trackLine, wayside, self.routeQ[0], suggestedSpeed)
+            ctcToTrackController.sendSuggestedSpeed.emit(
+                self.routeQ[0].trackLine, wayside, self.routeQ[0], suggestedSpeed
+            )
             self.main_window.dispatchTable.setItem(
                 0, 3, QTableWidgetItem(str(suggestedSpeed))
             )
-            self.main_window.dispatchTable.setItem(
-                0, 2, QTableWidgetItem(nextStop)
-            )
-            self.main_window.dispatchTable.setItem(
-                    0, 4, QTableWidgetItem("1")
-            )
+            self.main_window.dispatchTable.setItem(0, 2, QTableWidgetItem(nextStop))
+            self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("1"))
 
         else:
-            self.main_window.dispatchTable.setItem(
-                    0, 4, QTableWidgetItem("1")
-            )
+            self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("1"))
             self.main_window.dispatchTable.setItem(
                 0, 2, QTableWidgetItem("Returning to Yard")
             )
@@ -1789,16 +1811,19 @@ class Train:
     def checkDepartureTime(self):
         current_time = self.main_window.systemTimeInput.text()
         current_time_str = current_time.replace(":", "")[:4]
-        # print(current_time_str)
+
         # Iterate through your list of trains and check their departure times
         for train in self.scheduler.trainList:
             departureTime = train.trainDeparture
-            # print(departureTime)
             if departureTime == current_time_str:
                 # Add the train to the dispatched_trains list
                 self.dispatchTrainsList.append(train)
-                print("HEELOOO")
-                print(self.trainStops)
+                if train.trackLine == "Green Line":
+                    lineTrack = "green"
+                else:
+                    lineTrack = "red"
+                masterSignals.addTrain.emit(lineTrack, train.train_id)
+
                 next_stop = self.trainStops[0]
                 # Add the train's information to the dispatched trains table
                 row_position = self.main_window.dispatchTable.rowCount()
@@ -1819,7 +1844,7 @@ class Train:
                     row_position, 4, QTableWidgetItem(str(train.authority))
                 )
 
-                if train.trackLine == "Green":
+                if train.trackLine == "Green Line":
                     trainLine = 1
                 else:
                     trainLine = 2
@@ -1827,8 +1852,6 @@ class Train:
                 ctcToTrackController.sendTrainDispatched.emit(
                     trainLine, 2, train.train_id, train.authority
                 )
-                #masterSignals.addTrain.emit("Green", train.train_id)
-                masterSignals.addTrain.emit("Green", "hello")
 
                 self.scheduler.trainList.remove(train)
 
@@ -1854,6 +1877,7 @@ class Train:
 class Block:
     def __init__(
         self,
+        routing,
         blockNumber,
         trackSection,
         blockLength,
@@ -1861,6 +1885,7 @@ class Block:
         stationName,
         seconds_to_traverse_block,
     ):
+        self.routing = routing
         self.blockNumber = blockNumber
         self.section = trackSection
         self.length = blockLength
@@ -1870,7 +1895,9 @@ class Block:
         self.occupancy = 0
         self.enable = 1
 
-        # self.mode_handler = ModeHandler()
+    def update_block_occupancy(block_num, occupancy):
+        global global_block_occupancy
+        global_block_occupancy[block_num] = occupancy
 
     def setEnable(self, blockEnable):
         self.enable = blockEnable
@@ -1891,27 +1918,27 @@ class Block:
             main_window.blockDropDown.addItem(blockItem)
             main_window.blockDropDown.addItems(block_items)
 
-    """@staticmethod
+    @staticmethod
     def updateStatusLabel(self, main_window):
-        selected_block = main_window.blockDropDown.currentText()
-        block_status = self.getBlockStatus(selected_block)
-        main_window.status_label.setText(f"Status: {block_status}")"""
+        selected_block_num = int(main_window.blockDropDown.currentText())
+        block_status = None
+
+        for block in self.blockList:
+            if block.blockNumber == selected_block_num:
+                block_status = self.getBlockStatus(block)
+                break
+
+        status_text = (
+            f"Status: {block_status}" if block_status is not None else "Block not found"
+        )
+        main_window.status_label.setText(status_text)
 
     @staticmethod
-    def updateStatusLabel(main_window, blocks):
-        selected_block_num = int(main_window.blockDropDown.currentText())
-        selected_block = blocks.get(selected_block_num)
-
-        if selected_block:
-            occupancy_status = "Occupied" if selected_block.occupancy else "Unoccupied"
-            main_window.status_label.setText(f"Block {selected_block_num} Status: {occupancy_status}")
-        else:
-            main_window.status_label.setText("Block not found")
-
-    #def getBlockStatus(self, blockNum):
+    def getBlockStatus(block):
+        # Assuming occupancy is a boolean, you can adjust the return value based on your requirements
+        return "Occupied" if block.occupancy else "Unoccupied"
 
     @staticmethod
     def setSelectedBlock(main_window):
         selected_block = main_window.blockDropDown.currentText()
         return selected_block
-
