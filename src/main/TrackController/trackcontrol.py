@@ -506,13 +506,15 @@ class Wayside:
 
                         switchBlock.set_switchstate(switchValue)
 
-                        # emit that a switch value has been changed
+                        # emit that a switch value has been changed to the Track Model
                         trackControllerToTrackModel.switchState.emit(
                             self.line,
                             self.waysideNum,
                             self.switches[switchString],
                             switchValue,
                         )
+                        # emit that the switch value has bene changed to the CTC
+                        trackControllerToCTC.switchState.emit(self.line, self.switches[switchString], switchValue)
 
                     # set the light value
                     elif parsedOperation["Type"] == "SIGNAL":
@@ -892,25 +894,12 @@ class TrackControl(QMainWindow):
         # self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
 
 
-        # REFRESH THE PLC ON THE TIME INTERVAL
+        """ REFRESH THE PLCS FOR EACH WAYSIDE ON THE TIME INTERVAL """
         self.ui.timer.timeout.connect(lambda: self.wayside1G.refresh_plc())
         self.ui.timer.timeout.connect(lambda: self.wayside2G.refresh_plc())
-        # Connect the plc load button to its handler
-        self.ui.plcImportButton.clicked.connect(lambda: self.import_plc())
-
-        # Connect the open map button to its handler
-        self.ui.buttonMap.clicked.connect(lambda: self.handle_map())
-
-        # Connect the automatic/manual mode button click to the wayside controller
-        self.ui.buttonMode.clicked.connect(
-            lambda: self.handle_mode(
-                self.lines[self.ui.lineSelect - 1]
-                .get_wayside(self.ui.waysideSelect)
-                .get_plc_state()
-            )
-        )
-
-        """ Indexes for the GUI select """
+        
+       
+        """ Connect handlers for GUI actions """
         # Connect the signal (currentIndexChanged) to display the proper mode in the GUI
         self.ui.comboboxWayside.currentIndexChanged.connect(
             self.handle_selection_wayside
@@ -922,6 +911,18 @@ class TrackControl(QMainWindow):
         # Connect the signal (currentIndexChanged) to the slot (handle_selection)
         self.ui.comboboxBlockNum.currentIndexChanged.connect(
             lambda: self.handle_selection_blocknum()
+        )
+         # Connect the plc load button to its handler
+        self.ui.plcImportButton.clicked.connect(lambda: self.import_plc())
+        # Connect the open map button to its handler
+        self.ui.buttonMap.clicked.connect(lambda: self.ui.buttonMap.on_button_click(self.ui.lineSelect))
+        # Connect the automatic/manual mode button click to the wayside controller
+        self.ui.buttonMode.clicked.connect(
+            lambda: self.handle_mode(
+                self.lines[self.ui.lineSelect - 1]
+                .get_wayside(self.ui.waysideSelect)
+                .get_plc_state()
+            )
         )
 
         """ This section of code is for the connections from signals from the Track Controller to the handler"""
@@ -937,135 +938,24 @@ class TrackControl(QMainWindow):
         """ Connect the input signals from the test bench to the main ui page handlers """
         self.ui.testBenchWindow.requestInput.connect(self.handle_input_apply)
 
-        """
-        # self.ui.testBenchWindow.setSwitchState.connect(self.set_switchstate_handler)
-        self.ui.testBenchWindow.setLightState.connect(self.set_lightstate_handler)
-        self.ui.testBenchWindow.setFailureState.connect(self.set_failurestate_handler)
-        self.ui.testBenchWindow.setMaintenanceState.connect(
-            self.set_maintenancestate_handler
-        )
-        # self.ui.testBenchWindow.setOccupancyState.connect(self.set_occupancystate_handler)
-        self.ui.testBenchWindow.setOccupancyState.connect(
-            lambda line, wayside, num, state: self.set_occupancystate_handler(
-                line, wayside, num, state
-            )
-        )
-        self.ui.testBenchWindow.setAuthority.connect(self.set_authoritystate_handler)
-        self.ui.testBenchWindow.setSpeed.connect(self.set_speed_handler)
-        self.ui.testBenchWindow.setDirection.connect(self.set_direction_handler)
-
-        # connect the output signal requests from the test bench and send the values back
-        self.ui.testBenchWindow.requestViewSwitchState.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewSwitchState.emit(
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_switchstate()
-                )
-            )
-        )
-        self.ui.testBenchWindow.requestViewLightState.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewLightState.emit(
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_lightstate()
-                )
-            )
-        )
-        self.ui.testBenchWindow.requestViewFailureState.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewFailureState.emit(
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_failurestate()
-                )
-            )
-        )
-        self.ui.testBenchWindow.requestViewMaintenanceState.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewMaintenanceState.emit(
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_maintenancestate()
-                )
-            )
-        )
-        self.ui.testBenchWindow.requestViewOccupancyState.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewOccupancyState.emit(
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_occupancystate()
-                )
-            )
-        )
-        self.ui.testBenchWindow.requestViewAuthority.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewAuthority.emit(
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_authority()
-                )
-            )
-        )
-        self.ui.testBenchWindow.requestViewSpeed.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewSpeed.emit(
-                str(
-                    self.lines[line - 1].get_wayside(wayside).get_block(num).get_speed()
-                )
-            )
-        )
-        self.ui.testBenchWindow.requestViewDirection.connect(
-            lambda line, wayside, num: self.ui.testBenchWindow.returnViewDirection.emit(
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_direction()
-                )
-            )
-        )
-    """
 
     def show_gui(self):
         self.ui.show()
 
-    # This method is called whenever the import plc button is clicked
-    def import_plc(self):
-        if self.ui.waysideSelect == 0 or self.ui.lineSelect == 0:
-            print("You must select a track and wayside controller first!")
-            return
-
-        options = QFileDialog.Options()
-        filePath, _ = QFileDialog.getOpenFileName(
-            self, "Open File", "", "All Files (*);;Text Files (*.txt)", options=options
-        )
-
-        if filePath:
-            self.filePath = filePath
-            fileName = os.path.basename(filePath)  # Extract just the filename
-            print(f"Selected file: {fileName}")
-            self.lines[self.ui.lineSelect - 1].get_wayside(
-                self.ui.waysideSelect
-            ).run_plc(filePath)
-
-    """ Handler methods for the CTC input signals"""
-
+    """ Handler methods for the CTC input signals (and internally change gui)"""
     def handle_authority(self, line, wayside, blockNum, authority):
+        # set the authority value
         self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_authority(
             authority
         )
+        # send signal to the track model
+        trackControllerToTrackModel.authority.emit(line, wayside, blockNum, authority)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_suggested_speed(self, line, wayside, blockNum, suggestedSpeed):
         self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_suggestedspeed(suggestedSpeed)
+        # send signal to the track model
+        trackControllerToTrackModel.suggestedSpeed.emit(line, wayside, blockNum, suggestedSpeed)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_dispatch(self, line, wayside, trainID, authority):
@@ -1078,7 +968,193 @@ class TrackControl(QMainWindow):
         self.set_occupancystate_handler(line,wayside,0,True)
         self.ui.testBenchWindow.refreshed.emit(True)
 
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""
+    def handle_maintenance(self, line, wayside, num, state):
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_maintenancestate(
+            state
+        )
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = 0
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        if selectedItem != "Select State" and selectedItem != "":
+            try:
+                blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
+            except Exception as e:
+                blockNum = -1
+            
+        if blockNum == (num):
+            if state:
+                self.ui.blockStatus.set_status("Maintenance")
+            elif (
+                self.lines[line - 1]
+                .get_wayside(wayside)
+                .get_block(num)
+                .get_occupancystate()
+            ):
+                self.ui.blockStatus.set_status("Occupied")
+            else:
+                self.ui.blockStatus.set_status("Unoccupied")
+
+        # send maintenance state signal to the track model
+        trackControllerToTrackModel.maintenance.emit(line, wayside, num, state)
+        self.ui.testBenchWindow.refreshed.emit(True)
+
+    def handle_failure(self, line, wayside, num, state):
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_failurestate(state)
+
+        # update the occupancy table
+        if self.ui.occupancyBox.does_block_and_state_exist(num, state):
+            pass
+        elif (
+            state
+            or self.lines[line - 1]
+            .get_wayside(wayside)
+            .get_block(num)
+            .get_occupancystate()
+        ):
+            self.ui.occupancyBox.remove_item_by_blockNumber(num)
+            blockStr = "Block {}".format(num)
+            self.ui.occupancyBox.add_item(
+                blockStr,
+                self.lines[line - 1].get_wayside(wayside).get_block(num).get_type(),
+                str(
+                    self.lines[line - 1]
+                    .get_wayside(wayside)
+                    .get_block(num)
+                    .get_failurestate()
+                ),
+            )
+        else:
+            self.ui.occupancyBox.remove_item_by_blockNumber(num)
+
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = 0
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        if selectedItem != "Select State" and selectedItem != "":
+            blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
+        if blockNum == (num - 1):
+            if (
+                self.lines[line - 1]
+                .get_wayside(wayside)
+                .get_block(num)
+                .get_maintenancestate()
+                == False
+                and state
+            ):
+                self.ui.blockStatus.set_status("Occupied")
+            elif not state:
+                self.ui.blockStatus.set_status("Unoccupied")
+        self.ui.testBenchWindow.refreshed.emit(True)
+    
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    """ Handler methods for the  Track Model input signals (and internally change gui) """
+    def set_occupancystate_handler(self, line, wayside, num, state):
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
+            state
+        )
+
+        # update the occupancy table
+        if state == False:
+            self.ui.occupancyBox.clear_table()
+            blockList = self.lines[line - 1].get_wayside(wayside).get_occupied_blocks()
+            for block in blockList:
+                self.ui.occupancyBox.add_item(
+                    block.get_number(), block.get_type(), block.get_failurestate()
+                )
+
+        #elif self.ui.occupancyBox.does_block_exist(num,self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate()):
+            
+        
+        elif state:
+            blockStr = "Block {}".format(num)
+            self.ui.occupancyBox.add_item(
+                blockStr,
+                self.lines[line - 1].get_wayside(wayside).get_block(num).get_type(),
+                str(
+                    self.lines[line - 1]
+                    .get_wayside(wayside)
+                    .get_block(num)
+                    .get_failurestate()
+                ),
+            )
+
+        # check if the block is currently being displayed, if so, update the display accordingly
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
+        if match:
+            blockNum = int(match.group(1))
+            print(f"Block number: {blockNum}")
+            if blockNum == num:
+                if (
+                    self.lines[line - 1]
+                    .get_wayside(wayside)
+                    .get_block(num)
+                    .get_maintenancestate()
+                ):
+                    pass
+                elif state:
+                    self.ui.blockStatus.set_status("Occupied")
+                else:
+                    self.ui.blockStatus.set_status("Unoccupied")
+        else:
+            #print("Pattern not matched")
+            pass
+
+        self.ui.testBenchWindow.refreshed.emit(True)
+        """print("sending signal to CTC...")
+        print("line: ", line)
+        print("blocknumber: ", num)
+        print("state: ", state)"""
+        trackControllerToCTC.occupancyState.emit(line, int(num), state)
+    
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    """ Handler methods for internal GUI """
+        # Set state handlers
+    def set_crossingstate_handler(self, line, wayside, num, state):
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_crossingstate(
+            state
+        )
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = 0
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
+        if match:
+            blockNum = int(match.group(1))
+            if blockNum == num:
+                self.ui.crossing.set_crossing_state(state)
+        self.ui.testBenchWindow.refreshed.emit(True)
+
+    def set_switchstate_handler(self, line, wayside, num, state):
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_switchstate(state)
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = 0
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
+        if match:
+            blockNum = int(match.group(1))
+            if blockNum == num:
+                self.ui.junctionSwitch.set_switch_state(state)
+        self.ui.testBenchWindow.refreshed.emit(True)
+
+    def set_lightstate_handler(self, line, wayside, num, color):
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_lightstate(color)
+        self.ui.testBenchWindow.refreshed.emit(True)
+        # check if the block is currently being displayed, if so, update the display accordingly
+        blockNum = -1
+        selectedItem = self.ui.comboboxBlockNum.currentText()
+        if selectedItem != "Select State" and selectedItem != "" and self.ui.lineSelect !=0:
+            try:
+                blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
+            except Exception as e:
+                return
+
+        if blockNum == (num):
+            self.ui.lightState.set_state(color)
+        
+    def set_direction_handler(self, line, wayside, num, direction):
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_direction(
+            direction
+        )
+        self.ui.testBenchWindow.refreshed.emit(True)
 
     # Method to disable or enable the PLC program for the wayside when the mode is switched to automatic or manual mode
     def handle_mode(self, mode):
@@ -1330,197 +1406,27 @@ class TrackControl(QMainWindow):
                     tempBlock.get_lightstate(),
                 )
 
-    # These are the handle methods for the set states
-    def set_switchstate_handler(self, line, wayside, num, state):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_switchstate(state)
-        # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = 0
-        selectedItem = self.ui.comboboxBlockNum.currentText()
-        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
-        if match:
-            blockNum = int(match.group(1))
-            if blockNum == num:
-                self.ui.junctionSwitch.set_switch_state(state)
-        self.ui.testBenchWindow.refreshed.emit(True)
 
-    def set_crossingstate_handler(self, line, wayside, num, state):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_crossingstate(
-            state
-        )
-        # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = 0
-        selectedItem = self.ui.comboboxBlockNum.currentText()
-        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
-        if match:
-            blockNum = int(match.group(1))
-            if blockNum == num:
-                self.ui.crossing.set_crossing_state(state)
-        self.ui.testBenchWindow.refreshed.emit(True)
+    # This method is called whenever the import plc button is clicked
+    def import_plc(self):
+        if self.ui.waysideSelect == 0 or self.ui.lineSelect == 0:
+            print("You must select a track and wayside controller first!")
+            return
 
-    def set_occupancystate_handler(self, line, wayside, num, state):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
-            state
+        options = QFileDialog.Options()
+        filePath, _ = QFileDialog.getOpenFileName(
+            self, "Open File", "", "All Files (*);;Text Files (*.txt)", options=options
         )
 
-        # update the occupancy table
-        if state == False:
-            self.ui.occupancyBox.clear_table()
-            blockList = self.lines[line - 1].get_wayside(wayside).get_occupied_blocks()
-            for block in blockList:
-                self.ui.occupancyBox.add_item(
-                    block.get_number(), block.get_type(), block.get_failurestate()
-                )
+        if filePath:
+            self.filePath = filePath
+            fileName = os.path.basename(filePath)  # Extract just the filename
+            print(f"Selected file: {fileName}")
+            self.lines[self.ui.lineSelect - 1].get_wayside(
+                self.ui.waysideSelect
+            ).run_plc(filePath)
 
-        #elif self.ui.occupancyBox.does_block_exist(num,self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate()):
-            
-        
-        elif state:
-            blockStr = "Block {}".format(num)
-            self.ui.occupancyBox.add_item(
-                blockStr,
-                self.lines[line - 1].get_wayside(wayside).get_block(num).get_type(),
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_failurestate()
-                ),
-            )
-
-        # check if the block is currently being displayed, if so, update the display accordingly
-        selectedItem = self.ui.comboboxBlockNum.currentText()
-        match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
-        if match:
-            blockNum = int(match.group(1))
-            print(f"Block number: {blockNum}")
-            if blockNum == num:
-                if (
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_maintenancestate()
-                ):
-                    pass
-                elif state:
-                    self.ui.blockStatus.set_status("Occupied")
-                else:
-                    self.ui.blockStatus.set_status("Unoccupied")
-        else:
-            #print("Pattern not matched")
-            pass
-
-        self.ui.testBenchWindow.refreshed.emit(True)
-        """print("sending signal to CTC...")
-        print("line: ", line)
-        print("blocknumber: ", num)
-        print("state: ", state)"""
-        trackControllerToCTC.occupancyState.emit(line, int(num), state)
-
-    def set_lightstate_handler(self, line, wayside, num, color):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_lightstate(color)
-        self.ui.testBenchWindow.refreshed.emit(True)
-        # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = -1
-        selectedItem = self.ui.comboboxBlockNum.currentText()
-        if selectedItem != "Select State" and selectedItem != "" and self.ui.lineSelect !=0:
-            try:
-                blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
-            except Exception as e:
-                return
-
-        if blockNum == (num):
-            self.ui.lightState.set_state(color)
-        
-    def set_failurestate_handler(self, line, wayside, num, state):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_failurestate(state)
-
-        # update the occupancy table
-        if self.ui.occupancyBox.does_block_and_state_exist(num, state):
-            pass
-        elif (
-            state
-            or self.lines[line - 1]
-            .get_wayside(wayside)
-            .get_block(num)
-            .get_occupancystate()
-        ):
-            self.ui.occupancyBox.remove_item_by_blockNumber(num)
-            blockStr = "Block {}".format(num)
-            self.ui.occupancyBox.add_item(
-                blockStr,
-                self.lines[line - 1].get_wayside(wayside).get_block(num).get_type(),
-                str(
-                    self.lines[line - 1]
-                    .get_wayside(wayside)
-                    .get_block(num)
-                    .get_failurestate()
-                ),
-            )
-        else:
-            self.ui.occupancyBox.remove_item_by_blockNumber(num)
-
-        # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = 0
-        selectedItem = self.ui.comboboxBlockNum.currentText()
-        if selectedItem != "Select State" and selectedItem != "":
-            blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
-        if blockNum == (num - 1):
-            if (
-                self.lines[line - 1]
-                .get_wayside(wayside)
-                .get_block(num)
-                .get_maintenancestate()
-                == False
-                and state
-            ):
-                self.ui.blockStatus.set_status("Occupied")
-            elif not state:
-                self.ui.blockStatus.set_status("Unoccupied")
-        self.ui.testBenchWindow.refreshed.emit(True)
-
-    def set_maintenancestate_handler(self, line, wayside, num, state):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_maintenancestate(
-            state
-        )
-        # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = 0
-        selectedItem = self.ui.comboboxBlockNum.currentText()
-        if selectedItem != "Select State" and selectedItem != "":
-            blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
-        if blockNum == (num - 1):
-            if state:
-                self.ui.blockStatus.set_status("Maintenance")
-            elif (
-                self.lines[line - 1]
-                .get_wayside(wayside)
-                .get_block(num)
-                .get_occupancystate()
-            ):
-                self.ui.blockStatus.set_status("Occupied")
-            else:
-                self.ui.blockStatus.set_status("Unoccupied")
-        self.ui.testBenchWindow.refreshed.emit(True)
-
-    def set_authoritystate_handler(self, line, wayside, num, authority):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_authority(
-            authority
-        )
-        self.ui.testBenchWindow.refreshed.emit(True)
-
-    def set_speed_handler(self, line, wayside, num, speed):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_suggestedspeed(speed)
-        self.ui.testBenchWindow.refreshed.emit(True)
-
-    def set_direction_handler(self, line, wayside, num, direction):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_direction(
-            direction
-        )
-        self.ui.testBenchWindow.refreshed.emit(True)
-
-    def set_suggested_authority_handler(self, line, wayside, num, suggestedAuthority):
-        pass
-
-
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     """ Main Testbench Input Handler """
     def handle_input_apply(self, action, line, blockNum, state):
         
@@ -1606,7 +1512,7 @@ class TrackControl(QMainWindow):
                 except Exception as e:
                     print("This action cannot be performed on a block of type: ", None)
                 else:
-                    self.set_authoritystate_handler(line, waysideNum, blockNum, finalState)
+                    self.handle_authority(line, waysideNum, blockNum, finalState)
 
             # Set Suggested Speed 
             elif action == 7:
@@ -1620,7 +1526,7 @@ class TrackControl(QMainWindow):
                 except Exception as e:
                     print("This action cannot be performed on a block of type: ", None)
                 else:
-                    self.set_speed_handler(line, waysideNum, blockNum, finalState)
+                    self.handle_suggested_speed(line, waysideNum, blockNum, finalState)
 
             # Set Direction
             elif action == 8:
