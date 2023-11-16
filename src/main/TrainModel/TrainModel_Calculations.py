@@ -3,6 +3,7 @@ import sys
 import math
 import re
 
+
 class Calculations:
     def __init__(self):
         placeholder = True
@@ -35,7 +36,9 @@ class Calculations:
         self.limit_force(trainObject)
 
         # Calculate acceleration from force and set it, applying acceleration limit
-        trainObject.calculations["currAcceleration"] = trainObject.calculations["currForce"] / mass
+        trainObject.calculations["currAcceleration"] = (
+            trainObject.calculations["currForce"] / mass
+        )
         self.limit_acceleration(trainObject)
 
         # Calculate velocity using the velocity function and set it
@@ -104,7 +107,10 @@ class Calculations:
 
         # Calculate the total acceleration and update velocity
         total_acceleration = last_acceleration + curr_acceleration
-        velocity = last_velocity + (trainObject.calculations["timeInterval"] / 2) * total_acceleration
+        velocity = (
+            last_velocity
+            + (trainObject.calculations["timeInterval"] / 2) * total_acceleration
+        )
 
         # Limit velocity so that it doesn't go below 0
         if velocity < 0:
@@ -126,12 +132,22 @@ class Calculations:
         total_velocity = curr_velocity
 
         # Correct the distance calculation (multiply, not divide)
-        distance = last_position + (trainObject.calculations["timeInterval"] * 2) * total_velocity
+        distance = (
+            last_position
+            + (trainObject.calculations["timeInterval"] * 2) * total_velocity
+        )
 
         trainObject.calculations["distance"] = distance
 
     def blockID(
-            self, trainObject, next_block, length, grade, speed_limit, suggested_speed, authority
+        self,
+        trainObject,
+        next_block,
+        length,
+        grade,
+        speed_limit,
+        suggested_speed,
+        authority,
     ):
         trainObject.calculations["nextBlock"] = next_block
         trainObject.navigation_status["length"] = length
@@ -182,6 +198,7 @@ class Calculations:
     def passengers(self, trainObject):
         # trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.passenger_status["passengers"], trainObject.calculations["trainID"])
         return
+
     def occupancy(self, trainObject, next_block):
         # if trainObject.calculations["initialized"]:
         #     trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
@@ -195,7 +212,7 @@ class Calculations:
         #     trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
         #     trainObject.navigation_status["prevBlock"] = trainObject.navigation_status["currBlock"]
 
-        #trainObject.calculations["initialized"] = False
+        # trainObject.calculations["initialized"] = False
         return
 
     def beacon(self, trainObject):
@@ -208,4 +225,3 @@ class Calculations:
         else:
             trainObject.calculations["leftDoor"] = True
             trainObject.calculations["rightDoor"] = True
-
