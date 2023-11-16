@@ -912,8 +912,6 @@ class TestWindow(QMainWindow, UiMainWindow):
     # This is the refresh signal which checks to update states if they are changed
     refreshed = pyqtSignal(bool)
 
-     
-
     def __init__(self, parent=None):
         super().__init__(parent)
         # call the set up ui function from the UiMainWindow
@@ -926,24 +924,24 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.inputLine = 0
         self.inputBlockNum = "Input Block #"
         self.inputStateText = "Input State"
-        
-        self.inputSelectAction.currentIndexChanged.connect(self.handle_input_action_select)
+
+        self.inputSelectAction.currentIndexChanged.connect(
+            self.handle_input_action_select
+        )
         self.inputSelectLine.currentIndexChanged.connect(self.handle_input_line_select)
         self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
         self.inputSelectState.textChanged.connect(self.handle_input_state_select)
         self.inputApply.clicked.connect(self.handle_input_apply)
-        
-        
+
     def handle_input_action_select(self, index):
         print("THIS IS THE ACTION SELECT INDEX: ", index)
         self.inputAction = index
-        
 
     def handle_input_line_select(self, index):
         self.inputLine = index
         print("THIS IS THE ACTION SELECT INDEX: ", index)
         if index == 0:
-            #reset the next selections
+            # reset the next selections
             pass
         # set green line
         elif index == 1:
@@ -952,20 +950,17 @@ class TestWindow(QMainWindow, UiMainWindow):
         elif index == 2:
             pass
 
-        
     def handle_input_block_select(self, blockNum):
         print("THIS IS THE BLOCK NUMBER: ", blockNum)
         self.inputBlockNum = blockNum
-        
 
     def handle_input_state_select(self, state):
         print("THIS IS THE STATE: ", state)
         inputStateText = state
-    
-        
+
     def handle_input_apply(self):
         if self.inputAction == 0:
-            #reset the next selections
+            # reset the next selections
             pass
         # set switch state
         elif self.inputAction == 1:
@@ -982,16 +977,16 @@ class TestWindow(QMainWindow, UiMainWindow):
         # Set Occupancy State
         elif self.inputAction == 5:
             pass
-        # Set Authority 
+        # Set Authority
         elif self.inputAction == 6:
             pass
-        # Set Suggested Speed 
+        # Set Suggested Speed
         elif self.inputAction == 7:
             pass
         # Set Direction
         elif self.inputAction == 8:
             pass
-        
+
         """
         self.testBenchTitle.setStyleSheet(
             "QTextEdit { background-color: rgba(0, 0, 0, 0); }"
@@ -1289,7 +1284,6 @@ class TestWindow(QMainWindow, UiMainWindow):
             )
     """
 
-    
 
 class MainUI(QMainWindow):
     # font variables
@@ -1315,7 +1309,7 @@ class MainUI(QMainWindow):
         super().__init__(None)
 
         self.testBenchWindow = TestWindow()
-        self.testBenchWindow.setGeometry(0,0,191,408)
+        self.testBenchWindow.setGeometry(0, 0, 191, 408)
 
         # setting title
         self.setWindowTitle(self.moduleName)

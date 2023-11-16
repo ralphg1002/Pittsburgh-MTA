@@ -3,12 +3,12 @@ from numpy import block
 import pandas as pd
 from .Station import Station
 from signals import (
-    trackControllerToTrackModel, 
-    trainModelToTrackModel, 
+    trackControllerToTrackModel,
+    trainModelToTrackModel,
     ctcToTrackModel,
     trackModelToCTC,
     trackModelToTrainModel,
-    trackModelToTrackController
+    trackModelToTrackController,
 )
 from PyQt5.QtCore import pyqtSignal, QObject
 
@@ -24,20 +24,20 @@ class TrackData:
         self.greenTrackData = self.read_track_data(
             "src\main\TrackModel\Track Layout & Vehicle Data vF2.xlsx", "Green Line"
         )
-        
-        #From CTC
+
+        # From CTC
         ctcToTrackModel.requestThroughput.connect(self.get_ticket_sales)
-        
-        #From Wayside
+
+        # From Wayside
         trackControllerToTrackModel.suggestedSpeed.connect(self.set_suggested_speed)
         trackControllerToTrackModel.authority.connect(self.set_authority)
         trackControllerToTrackModel.maintenance.connect(self.set_maintenance)
-        
+
         trackControllerToTrackModel.switchState.connect(self.set_switch_state)
         trackControllerToTrackModel.lightState.connect(self.set_light_state)
         trackControllerToTrackModel.crossingState.connect(self.set_crossing_state)
-        
-        #From Train Model
+
+        # From Train Model
         trainModelToTrackModel.sendCurrentPassengers.connect(self.update_station_data)
         trainModelToTrackModel.sendPolarity.connect(self.send_block_data)
 
@@ -60,7 +60,7 @@ class TrackData:
             block["Maintenance"] = False
             block["Suggested Speed"] = 0
             block["Authority"] = 0
-            #Initialize all infrastructure data
+            # Initialize all infrastructure data
             if type(block["Infrastructure"]) == str:
                 if "STATION" in block["Infrastructure"]:
                     block["Ticket Sales"] = 0
@@ -70,7 +70,7 @@ class TrackData:
                 if "SWITCH" in block["Infrastructure"]:
                     block["Switch State"] = 0
                 if "RAILWAY CROSSING" in block["Infrastructure"]:
-                    block ["Crossing State"] = 0
+                    block["Crossing State"] = 0
             if lineName == "Green Line":
                 if block["Block Number"] == 2:  # Section A, Pioneer
                     block["Beacon"] = {
@@ -215,43 +215,55 @@ class TrackData:
         return self.greenTrackData
 
     def update_station_data(self, line, stationName, currentPassengers):
-        #stationName must be caps
+        # stationName must be caps
         station = Station()
-        
+
         if line == "Red":
             for block in self.redTrackData:
                 if type(block["Infrastructure"]) == str:
                     if stationName in block["Infrastructure"]:
-                        ticketSales = station.get_ticket_sales() #random number generated
+                        ticketSales = (
+                            station.get_ticket_sales()
+                        )  # random number generated
                         block["Ticket Sales"] += ticketSales
-                            
+
                         waiting = block["Passengers Waiting"] + ticketSales
-                        disembarkingPassengers, newPassengers, passengersWaiting = station.get_passenger_exchange(currentPassengers, waiting)
-                        
+                        (
+                            disembarkingPassengers,
+                            newPassengers,
+                            passengersWaiting,
+                        ) = station.get_passenger_exchange(currentPassengers, waiting)
+
                         block["Passengers Disembarking"] = disembarkingPassengers
                         block["Passengers Boarding"] = newPassengers
                         block["Passengers Waiting"] = passengersWaiting
-                        
+
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
         elif line == "Green":
             for block in self.greenTrackData:
                 if type(block["Infrastructure"]) == str:
                     if stationName in block["Infrastructure"]:
-                        ticketSales = station.get_ticket_sales() #random number generated
+                        ticketSales = (
+                            station.get_ticket_sales()
+                        )  # random number generated
                         block["Ticket Sales"] += ticketSales
-                        
-                        waiting = block["Passengers Waiting"] + ticketSales 
-                        disembarkingPassengers, newPassengers, passengersWaiting = station.get_passenger_exchange(currentPassengers, waiting)
-                        
+
+                        waiting = block["Passengers Waiting"] + ticketSales
+                        (
+                            disembarkingPassengers,
+                            newPassengers,
+                            passengersWaiting,
+                        ) = station.get_passenger_exchange(currentPassengers, waiting)
+
                         block["Passengers Disembarking"] = disembarkingPassengers
                         block["Passengers Boarding"] = newPassengers
                         block["Passengers Waiting"] = passengersWaiting
                         # print(ticketSales, passengersWaiting, disembarkingPassengers, newPassengers)
-                        
+
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
-                
+
     def get_ticket_sales(self, line):
-        throughput = 0 #Reset
+        throughput = 0  # Reset
         if line == "Red":
             for block in self.redTrackData:
                 if type(block["Infrastructure"]) == str:
@@ -265,7 +277,7 @@ class TrackData:
                         throughput += block["Ticket Sales"]
                         block["Ticket Sales"] = 0 #Reset
         trackModelToCTC.throughput.emit(throughput)
-        
+
     def set_suggested_speed(self, line, _, blockNum, suggestedSpeed):
         if line == 1:
             for block in self.greenTrackData:
@@ -275,7 +287,7 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Suggested Speed"] == suggestedSpeed
-    
+
     def set_authority(self, line, _, blockNum, authority):
         if line == 1:
             for block in self.greenTrackData:
@@ -285,7 +297,7 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Authority"] == authority
-    
+
     def set_maintenance(self, line, _, blockNum, maintenance):
         if line == 1:
             for block in self.greenTrackData:
@@ -295,7 +307,7 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Maintenance"] == maintenance
-    
+
     def set_switch_state(self, line, _, blockNum, state):
         # Initial Green Line Occupancy
         if blockNum == 62 and state == 1 and line == 1:
@@ -311,7 +323,7 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Switch State"] == state
-                    
+
     def set_light_state(self, line, _, blockNum, state):
         if line == 1:
             for block in self.greenTrackData:
@@ -321,7 +333,7 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Light State"] == state
-                    
+
     def set_crossing_state(self, line, _, blockNum, state):
         if line == 1:
             for block in self.greenTrackData:
@@ -331,7 +343,7 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Crossing State"] == state
-        
+
     def send_block_data(self, line, curBlock, prevBlock):
         greenBeforeStation = [3, 10, 30, 38, 47, 56, 64, 72, 87, 95, 113, 122, 131, 140]
         if line == "Green":
@@ -401,11 +413,19 @@ class TrackData:
                     for block in self.greenTrackData:
                         if block["Block Number"] == curBlock + 1:
                             trackModelToTrainModel.beacon.emit(block["Beacon"])
-                elif (curBlock == 15 and prevBlock == 14) or (curBlock == 21 and prevBlock == 20) or (curBlock == 76 and prevBlock == 75):
+                elif (
+                    (curBlock == 15 and prevBlock == 14)
+                    or (curBlock == 21 and prevBlock == 20)
+                    or (curBlock == 76 and prevBlock == 75)
+                ):
                     for block in self.greenTrackData:
                         if block["Block Number"] == curBlock + 1:
                             trackModelToTrainModel.beacon.emit(block["Beacon"])
-                elif (curBlock == 17 and prevBlock == 18) or (curBlock == 23 and prevBlock == 24) or (curBlock == 78 and prevBlock == 79):
+                elif (
+                    (curBlock == 17 and prevBlock == 18)
+                    or (curBlock == 23 and prevBlock == 24)
+                    or (curBlock == 78 and prevBlock == 79)
+                ):
                     for block in self.greenTrackData:
                         if block["Block Number"] == curBlock - 1:
                             trackModelToTrainModel.beacon.emit(block["Beacon"])
