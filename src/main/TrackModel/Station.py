@@ -16,8 +16,9 @@ class Station:
         CREW = 6
 
         # Determine passengers disembarking
-        self.disembarkingPassengers = random.randint(CREW + 1, currentPassengers)
-        currentPassengers -= self.disembarkingPassengers
+        if currentPassengers > CREW:
+            self.disembarkingPassengers = random.randint(CREW + 1, currentPassengers)
+            currentPassengers -= self.disembarkingPassengers
 
         # Find max passengers that can be send to board
         if waiting > TRAINMAX - currentPassengers:
