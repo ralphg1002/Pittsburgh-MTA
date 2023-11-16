@@ -867,18 +867,16 @@ class TestWindow(QMainWindow, UiMainWindow):
         self.inputSelectBlock.textChanged.connect(self.handle_input_block_select)
         self.inputSelectState.textChanged.connect(self.handle_input_state_select)
         self.inputApply.clicked.connect(self.handle_input_apply)
-        
-        
+
     def handle_input_action_select(self, index):
         print("THIS IS THE ACTION SELECT INDEX: ", index)
         self.inputAction = index
-        
 
     def handle_input_line_select(self, index):
         self.inputLine = index
         print("THIS IS THE ACTION SELECT INDEX: ", index)
         if index == 0:
-            #reset the next selections
+            # reset the next selections
             pass
         # set green line
         elif index == 1:
@@ -887,17 +885,14 @@ class TestWindow(QMainWindow, UiMainWindow):
         elif index == 2:
             pass
 
-        
     def handle_input_block_select(self, blockNum):
         print("THIS IS THE BLOCK NUMBER: ", blockNum)
         self.inputBlockNum = blockNum
-        
 
     def handle_input_state_select(self, state):
         print("THIS IS THE STATE: ", state)
         inputStateText = state
-    
-        
+
     def handle_input_apply(self):
 
         if self.inputAction == 0:
@@ -1240,7 +1235,6 @@ class TestWindow(QMainWindow, UiMainWindow):
             )
     """
 
-    
 
 class MainUI(QMainWindow):
     # font variables
@@ -1266,7 +1260,7 @@ class MainUI(QMainWindow):
         super().__init__(None)
 
         self.testBenchWindow = TestWindow()
-        self.testBenchWindow.setGeometry(0,0,191,408)
+        self.testBenchWindow.setGeometry(0, 0, 191, 408)
 
         # setting title
         self.setWindowTitle(self.moduleName)

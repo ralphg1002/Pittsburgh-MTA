@@ -126,7 +126,7 @@ WAYSIDE_1G_BLOCKS = [
     148,
     149,
     150,
-] 
+]
 WAYSIDE_2G_BLOCKS = [
     0,
     59,
@@ -172,10 +172,11 @@ WAYSIDE_2G_BLOCKS = [
     99,
     100,
     101,
-]  
+]
 
 # Global variable declaration
 global_block_occupancy = {}
+
 
 class CTCWindow(QMainWindow):
     # font variables
@@ -570,9 +571,7 @@ class CTCWindow(QMainWindow):
         # select block numbers
         self.blockDropDown = QComboBox(self)
         self.blockDropDown.setGeometry(35, 500, 100, 50)
-        self.selectLine.currentIndexChanged.connect(
-            self.updateInfoBlock
-        )  
+        self.selectLine.currentIndexChanged.connect(self.updateInfoBlock)
 
         # repair block button
         self.repairBlockButton = QPushButton("Repair Block", self)
@@ -596,7 +595,7 @@ class CTCWindow(QMainWindow):
             + self.colorDarkBlue
             + "; border: 1px solid black"
         )
-        #self.closeBlockButton.clicked.connect(Block.closeBlockButton)
+        # self.closeBlockButton.clicked.connect(Block.closeBlockButton)
 
         # Displaying the occupancy status
         self.status_label = QLabel("Status: ", self)
@@ -624,7 +623,7 @@ class CTCWindow(QMainWindow):
         self.dispatchTable.setColumnWidth(1, 100)  # Width for "Location"
         self.dispatchTable.setColumnWidth(2, 150)  # Width for "Next Stop"
         self.dispatchTable.setColumnWidth(3, 180)  # Width for "Suggested Speed (mph)"
-        self.dispatchTable.setColumnWidth(4, 100) 
+        self.dispatchTable.setColumnWidth(4, 100)
 
         self.dispatchTable.setStyleSheet("background-color: white;")
         self.dispatchTable.setGeometry(35, 280, 600, 200)
@@ -633,12 +632,16 @@ class CTCWindow(QMainWindow):
 
         trackModelToCTC.throughput.connect(self.updateTickets)
 
-        #self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
-        #self.blockDropDown.currentIndexChanged.connect(
-            #lambda: Block.updateStatusLabel(main_window, blocks)
-        #)
+        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
+
+        trackModelToCTC.throughput.connect(self.updateTickets)
+
+        # self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
+        # self.blockDropDown.currentIndexChanged.connect(
+        # lambda: Block.updateStatusLabel(main_window, blocks)
+        # )
         # self.show()
-        #self.blockDropDown.currentIndexChanged.connect(self.statusHandler)  # Connect the signal to update the dropdown
+        # self.blockDropDown.currentIndexChanged.connect(self.statusHandler)  # Connect the signal to update the dropdown
 
     #def statusHandler(self):
         #Block.updateStatusLabel(self)
@@ -658,6 +661,7 @@ class CTCWindow(QMainWindow):
 
     def blockHandler(self):
         Block.setSelectedBlock(self)
+
     def updateInfoBlock(self):
         Block.updateBlockDropDown(self)
 
@@ -1357,11 +1361,12 @@ class Routing:
         self.filename = filename
         self.data = self.load_data()
         self.main_window = main_window
-        #self.scheduler_class = Scheduler(main_window)
+        # self.scheduler_class = Scheduler(main_window)
         self.train_routes = {}  # Dictionary to map train IDs to their routes
-        self.temp_routes = []   # temp dict
+        self.temp_routes = []  # temp dict
 
         trackControllerToCTC.occupancyState.connect(self.checkPosition)
+
     def load_data(self):
         data = []
         with open(self.filename, "r") as file:
@@ -1657,9 +1662,7 @@ class Routing:
                 self.main_window.dispatchTable.setItem(
                     0, 3, QTableWidgetItem(str(suggestedSpeed))
                 )
-                self.main_window.dispatchTable.setItem(
-                    0, 4, QTableWidgetItem("0")
-                )
+                self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("0"))
                 ctcToTrackController.sendSuggestedSpeed.emit(
                     line, wayside, nextBlock, suggestedSpeed
                 )
@@ -1681,28 +1684,22 @@ class Routing:
         if self.stations_to_stop:
             self.stations_to_stop.pop()
             nextStop = self.stations_to_stop[0]
-            suggestedSpeed = (
-                self.block_info_list[self.routeQ[0]].speedLimit
-            ) * 3.60
-            
+            suggestedSpeed = (self.block_info_list[self.routeQ[0]].speedLimit) * 3.60
+
             wayside = self.find_wayside(self.routeQ[0])
             print("fix")
 
-            ctcToTrackController.sendSuggestedSpeed.emit(self.routeQ[0].trackLine, wayside, self.routeQ[0], suggestedSpeed)
+            ctcToTrackController.sendSuggestedSpeed.emit(
+                self.routeQ[0].trackLine, wayside, self.routeQ[0], suggestedSpeed
+            )
             self.main_window.dispatchTable.setItem(
                 0, 3, QTableWidgetItem(str(suggestedSpeed))
             )
-            self.main_window.dispatchTable.setItem(
-                0, 2, QTableWidgetItem(nextStop)
-            )
-            self.main_window.dispatchTable.setItem(
-                    0, 4, QTableWidgetItem("1")
-            )
+            self.main_window.dispatchTable.setItem(0, 2, QTableWidgetItem(nextStop))
+            self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("1"))
 
         else:
-            self.main_window.dispatchTable.setItem(
-                    0, 4, QTableWidgetItem("1")
-            )
+            self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("1"))
             self.main_window.dispatchTable.setItem(
                 0, 2, QTableWidgetItem("Returning to Yard")
             )
@@ -1923,7 +1920,6 @@ class Block:
 
     @staticmethod
     def updateStatusLabel(self, main_window):
-
         selected_block_num = int(main_window.blockDropDown.currentText())
         block_status = None
 
@@ -1932,16 +1928,17 @@ class Block:
                 block_status = self.getBlockStatus(block)
                 break
 
-        status_text = f"Status: {block_status}" if block_status is not None else "Block not found"
+        status_text = (
+            f"Status: {block_status}" if block_status is not None else "Block not found"
+        )
         main_window.status_label.setText(status_text)
 
     @staticmethod
     def getBlockStatus(block):
         # Assuming occupancy is a boolean, you can adjust the return value based on your requirements
         return "Occupied" if block.occupancy else "Unoccupied"
-    
+
     @staticmethod
     def setSelectedBlock(main_window):
         selected_block = main_window.blockDropDown.currentText()
         return selected_block
-
