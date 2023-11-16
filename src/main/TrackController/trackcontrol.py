@@ -3,6 +3,7 @@ import pandas as pd
 
 # from PyQt5.QtCore import pyqtSignal
 from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController, masterSignals 
+from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController, masterSignals 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from .trackcontrolui import MainUI
 
@@ -426,7 +427,7 @@ class Wayside:
     # This is the method that reads the PLC file and runs it accordingly
     def run_plc(self, plcFilepath):
         self.plcData = self.plc.parse_text_file(plcFilepath)
-        print(self.plcData)
+        #print(self.plcData)
         self.refresh_plc()
 
     def refresh_plc(self):
@@ -482,7 +483,7 @@ class Wayside:
                             break
                 else:
                     condition2 = True
-                    print("Here I set the condition2 to true")
+                    #print("Here I set the condition2 to true")
 
                 if condition2 == True and notExist:
                     condition2 = False
