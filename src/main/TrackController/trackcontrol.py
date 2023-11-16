@@ -1126,7 +1126,7 @@ class TrackControl(QMainWindow):
     def set_switchstate_handler(self, line, wayside, num, state):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_switchstate(state)
         # check if the block is currently being displayed, if so, update the display accordingly
-        blockNum = 0
+        blockNum = -1
         selectedItem = self.ui.comboboxBlockNum.currentText()
         match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
         if match:
@@ -1137,18 +1137,15 @@ class TrackControl(QMainWindow):
 
     def set_lightstate_handler(self, line, wayside, num, color):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_lightstate(color)
-        self.ui.testBenchWindow.refreshed.emit(True)
         # check if the block is currently being displayed, if so, update the display accordingly
         blockNum = -1
         selectedItem = self.ui.comboboxBlockNum.currentText()
-        if selectedItem != "Select State" and selectedItem != "" and self.ui.lineSelect !=0:
-            try:
-                blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
-            except Exception as e:
-                return
-
-        if blockNum == (num):
-            self.ui.lightState.set_state(color)
+        match = re.search(r"Block \d{1,3}", selectedItem)
+        if match:
+            blockNum = int(match.group(1))
+            if blockNum == num:
+                self.ui.lightState.set_state(color)
+        self.ui.testBenchWindow.refreshed.emit(True)
         
     def set_direction_handler(self, line, wayside, num, direction):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_direction(
@@ -1295,7 +1292,7 @@ class TrackControl(QMainWindow):
             match = re.search(r"Block (\d+)(?: - Station)?", selectedItem)
             if match:
                 blockNum = int(match.group(1))
-                print(f"Block number: {blockNum}")
+                #print(f"Block number: {blockNum}")
             else:
                 #print("Pattern not matched")
                 pass
