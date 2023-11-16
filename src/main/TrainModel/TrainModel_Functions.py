@@ -61,4 +61,5 @@ class TrainModelAttributes:
                             "setpoint_temp": 0,
                             "leftDoor": False,
                             "rightDoor": False,
+                            "timeInterval": 0,
                             "trainID": trainID}

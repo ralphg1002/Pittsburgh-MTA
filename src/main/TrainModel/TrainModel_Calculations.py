@@ -104,7 +104,7 @@ class Calculations:
 
         # Calculate the total acceleration and update velocity
         total_acceleration = last_acceleration + curr_acceleration
-        velocity = last_velocity + (self.time_interval / 2) * total_acceleration
+        velocity = last_velocity + (trainObject.calculations["timeInterval"] / 2) * total_acceleration
 
         # Limit velocity so that it doesn't go below 0
         if velocity < 0:
@@ -126,7 +126,7 @@ class Calculations:
         total_velocity = curr_velocity
 
         # Correct the distance calculation (multiply, not divide)
-        distance = last_position + (self.time_interval * 2) * total_velocity
+        distance = last_position + (trainObject.calculations["timeInterval"] * 2) * total_velocity
 
         trainObject.calculations["distance"] = distance
 
@@ -157,23 +157,23 @@ class Calculations:
 
     def temperature(self, trainObject):
         set_temp = trainObject.calculations["setpoint_temp"]
-        curr_temp = trainObject.vehicle_status["temperature"]
+        curr_temp = trainObject.passenger_status["temperature"]
         train = trainObject.calculations["trainID"]
 
         if curr_temp < set_temp:
             while curr_temp < set_temp:
                 curr_temp += 1
-                trainObject.vehicle_status["temperature"] = curr_temp
+                trainObject.passenger_status["temperature"] = curr_temp
                 # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp > curr_temp:
             while curr_temp > set_temp:
                 curr_temp -= 1
-                trainObject.vehicle_status["temperature"] = curr_temp
+                trainObject.passenger_status["temperature"] = curr_temp
                 # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp == curr_temp:
-            trainObject.vehicle_status["temperature"] = curr_temp
+            trainObject.passenger_status["temperature"] = curr_temp
             # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         return

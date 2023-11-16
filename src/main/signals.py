@@ -39,7 +39,7 @@ class TrackModelToTrainModel(QObject):
 
 ##########################################################################################
 class TrainModelToTrackModel(QObject):
-    sendCurrentPassengers = pyqtSignal(int, str)
+    sendCurrentPassengers = pyqtSignal(str, str, int)
     sendPolarity = pyqtSignal(str, int, int)  # Line, current block, previous block
 
 
