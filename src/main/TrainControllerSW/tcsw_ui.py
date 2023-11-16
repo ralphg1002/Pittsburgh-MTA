@@ -1018,6 +1018,7 @@ class TrainControllerUI(QMainWindow):
         )
         trainModelToTrainController.sendBrakeFailure.connect(self.signal_brakeFail)
         trainModelToTrainController.sendPolarity.connect(self.signal_polarity)
+        trainModelToTrainController.sendBlockNumber.connect(self.signal_blockNumber)
 
         for train in self.tcFunctions.trainList:
             self.tcFunctions.set_samplePeriod(train, self.tcVariables["samplePeriod"])
@@ -1425,6 +1426,12 @@ class TrainControllerUI(QMainWindow):
         for train in self.tcVariables["trainList"]:
             if train.get_trainID() == name:
                 train.polarity = state
+        return
+
+    def signal_blockNumber(self, name, number):
+        for train in self.tcVariables["trainList"]:
+            if train.get_trainID() == name:
+                train.block["blockNumber"] = number
         return
 
     def test_display(self, name, power):
