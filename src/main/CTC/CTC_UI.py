@@ -1520,11 +1520,13 @@ class Routing:
         print("BLOCKS TO STOP AT")
         print(self.stations_to_stop)
         self.routeQ = []
+        self.routeQ = [0, 53, 54, 55, 56, 57, 0]
         # if self.main_window.selectLine == "Green Line":
+        """
         self.routeQ = self.travelGreenBlocks()
 
         # Use stop_blocks to check if the train should stop at a block
-        """for i, block in enumerate(self.routeQ):
+        for i, block in enumerate(self.routeQ):
             if isinstance(block, int):
                 for station_info in self.stations_to_stop:
                     stop_block, station_name = station_info[0], station_info[1]
@@ -1627,12 +1629,15 @@ class Routing:
             self.routeQ[0]
         except Exception as e:
             return
-        print(
-            "comparing current block of "
-            + str(blockNum)
-            + " with destination at "
-            + str(self.routeQ[1])
-        )
+        try:
+            print(
+                "comparing current block of "
+                + str(blockNum)
+                + " with destination at "
+                + str(self.routeQ[1])
+            )
+        except Exception as e:
+            pass
         if line == 1:
             track = "Green"
         else:
@@ -1649,15 +1654,20 @@ class Routing:
             print("inside check position")
 
             self.routeQ.pop(0)
+
+            if(len(self.routeQ) == 1):
+                self.main_window.dispatchTable.removeRow(0)
+                print("removing row...")
+                return
             # nextBlock = self.routeQ[1]
             wayside = self.find_wayside(self.routeQ[0])
             print("STATIONS TO STOP:")
             print(self.stations_to_stop[0])
             print("ROUTE Q")
-            print(self.routeQ[1])
+            #print(self.routeQ[1])
             print(self.block_info_list[65].speedLimit)
             print(self.routeQ)
-            if self.stations_to_stop[0] == self.routeQ[3]:
+            if len(self.routeQ) >= 4 and self.stations_to_stop[0] == self.routeQ[3]:
                 suggestedSpeed = (
                     int(0.75 * self.block_info_list[self.routeQ[0]].speedLimit)
                     * 0.621371
@@ -1672,7 +1682,7 @@ class Routing:
                 ctcToTrackController.sendSuggestedSpeed.emit(
                     line, wayside, self.routeQ[0], suggestedSpeed
                 )
-            elif self.stations_to_stop[0] == self.routeQ[2]:
+            elif len(self.routeQ) >= 3 and self.stations_to_stop[0] == self.routeQ[2]:
                 suggestedSpeed = (
                     int(0.50 * self.block_info_list[self.routeQ[0]].speedLimit)
                     * 0.621371
@@ -1687,7 +1697,7 @@ class Routing:
                 ctcToTrackController.sendSuggestedSpeed.emit(
                     line, wayside, self.routeQ[0], suggestedSpeed
                 )
-            elif self.stations_to_stop[0] == self.routeQ[1]:
+            elif len(self.routeQ) >= 2 and self.stations_to_stop[0] == self.routeQ[1]:
                 suggestedSpeed = (
                     int(0.25 * self.block_info_list[self.routeQ[0]].speedLimit)
                     * 0.621371
@@ -1703,7 +1713,7 @@ class Routing:
                 ctcToTrackController.sendSuggestedSpeed.emit(
                     line, wayside, self.routeQ[0], suggestedSpeed
                 )
-            elif self.stations_to_stop[0] == self.routeQ[0]:
+            elif len(self.routeQ) >= 1 and self.stations_to_stop[0] == self.routeQ[0]:
                 suggestedSpeed = 0
                 station_name = self.find_station_name_by_block(self.stations_to_stop[0])
 
@@ -1722,6 +1732,8 @@ class Routing:
                     0, 2, QTableWidgetItem("Dwelling")
                 )
                 QTimer.singleShot(60000, self.leaveStop)
+            
+
             else:
                 print(
                     "Top of route queue: ",
