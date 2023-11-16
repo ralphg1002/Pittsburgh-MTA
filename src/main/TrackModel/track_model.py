@@ -1,13 +1,10 @@
-from email.charset import QP
-import sys
-import re
 from .TrackData import TrackData
 from .Station import Station
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from signals import masterSignals, trainModelToTrackModel
+from signals import masterSignals, trainModelToTrackModel, trackControllerToTrackModel
 
 MTA_STYLING = {
     # font variables
@@ -41,7 +38,25 @@ class TrackView(QGraphicsView):
         self.blocks = {}
 
     def drawGreenLine(self):
-        # Create a horizontal dash track block
+        yardImage = QPixmap("src/main/TrackModel/pngs/yard.jpg")
+        yardImage = yardImage.scaledToWidth(100)
+        yardScene = QGraphicsPixmapItem(yardImage)
+        yardScene.setPos(90, 180)
+        self.scene.addItem(yardScene)
+        
+        path_0 = QPainterPath()
+        path_0.moveTo(163, 250)
+        path_0.lineTo(163, 330)
+        block_0 = self.createTrackBlock(path_0, "Block 0")
+        self.scene.addItem(block_0)
+        self.blocks[0] = block_0
+        
+        path_151 = QPainterPath()
+        path_151.moveTo(106, 278)
+        path_151.cubicTo(107, 278, 130, 251, 130, 250)
+        block_151 = self.createTrackBlock(path_151, "Block 151")
+        self.scene.addItem(block_151)
+        
         path_1 = QPainterPath()
         path_1.moveTo(0, 0)
         path_1.cubicTo(0, 0, 5, 0, 10, 10)
@@ -1229,11 +1244,12 @@ class TrackView(QGraphicsView):
     def change_color(self, on, off):
         print("works")
         onBlock = self.blocks.get(on)
-        offBlock = self.blocks.get(off)
         if onBlock:
             onBlock.toggle_occupancy(True)
-        if offBlock:
-            offBlock.toggle_occupancy(False)
+        if off != '':
+            offBlock = self.blocks.get(off)
+            if offBlock:
+                offBlock.toggle_occupancy(False)
 
 
 class TrackBlock(QGraphicsPathItem):
@@ -1292,6 +1308,7 @@ class TrackModel:
         self.load_data()
         
         trainModelToTrackModel.sendPolarity.connect(self.update_occupancy)
+        trackControllerToTrackModel.switchState.connect(self.update_switch_state)
         
         self.setup_selection_window()
 
@@ -1564,7 +1581,6 @@ class TrackModel:
 
     def toggle_green_data(self):
         self.trackView.showGreenLineLayout()
-        self.update_occupancy("Green", 63 ,62)
         self.trackData = self.greenTrackData
         self.selectedLine = "Green"
         # self.update_blockinfo()
@@ -2072,295 +2088,14 @@ class TrackModel:
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
         self.block.set_data(self.selectedLine, self.trackData)
-
-    # Toggle occupancy
-    def toggle_occupied(self):
-        # Obtain block number provided
-        blockNumber = self.entryField.text()
-        # Update the block info based on the block selected
-        for data in self.trackData:
-            if data["Block Number"] == int(blockNumber):
-                if self.occupied == 0:
-                    self.occupied == 1
-                    data["Occupancy"] = self.occupied
-                else:
-                    self.occupied == 0
-                    data["Occupancy"] = self.occupied
-        self.block.set_data(self.selectedLine, self.trackData)
-
-    ############################################################################################
-    # Update signal state, includes turning off upon failure
-    def update_signal(self):
-        return
-
-    # Send failure alert to Track Controller
-    def send_failure_alert(self, blockNumber):
-        return 1, blockNumber
-
-    # Recieve maintenance from TrackData
-    def update_block_state(self):
-        blockNumber, self.maintenance = self.block.get_maintenance()
-        for data in self.trackData:
-            if data["Block Number"] == blockNumber:
-                data["Maintenance"] = self.maintenance
-
-    # Updates station information for specified block
-    def update_station_info(self):
-        self.trackData = self.block.get_data(self.selectedLine)
-
-    # Show station data when station is selected
-    def show_station(self):
-        self.update_station_info()
-        # update ui display for each station
-
-    def show_occupancy(self):
-        self.trackData = self.block.get_data(self.selectedLine)
-        # show on ui (update blocks as they become occupied)
-
-    # def add_block_info_display(self, parentWindow):
-    #     self.blockInfoDisplay = QTextEdit(parentWindow)
-    #     self.blockInfoDisplay.setGeometry(10, 550, 400, 160)
-    #     self.blockInfoDisplay.setStyleSheet("background-color: white; font-size: 14px")
-    #     self.blockInfoDisplay.setReadOnly(True)
-    #     self.blockInfoDisplay.hide()
-
-    # def add_selectable_block_info(self, parentWindow):
-    #     label = QLabel("Block Information:", parentWindow)
-    #     label.setGeometry(970, 210, 200, 30)
-    #     label.setStyleSheet("font-weight: bold; font-size: 18px")
-
-    #     self.blockInfoCheckboxes = {}
-    #     blockInfo = [
-    #         "Block Length",
-    #         "Speed Limit",
-    #         "Elevation",
-    #         "Cumulative Elevation",
-    #         "Block Grade",
-    #         "Allowed Directions of Travel",
-    #         "Track Heater",
-    #         "Failures",
-    #         "Beacon",
-    #     ]
-    #     yOffset = 240
-    #     for info in blockInfo:
-    #         checkbox = QCheckBox(info, parentWindow)
-    #         checkbox.setGeometry(980, yOffset, 200, 30)
-    #         self.blockInfoCheckboxes[info] = checkbox
-    #         yOffset += 30
-    #         checkbox.setDisabled(True)
-    #         checkbox.stateChanged.connect(self.update_block_info_display)
-
-    #     self.trackInfoCheckboxes = {}
-    #     trackInfo = [
-    #         "Show Occupied Blocks",
-    #         "Show Switches",
-    #         "Show Light Signals",
-    #         "Show Railway Crossings",
-    #     ]
-    #     yOffset += 20
-    #     for info in trackInfo:
-    #         checkbox = QCheckBox(info, parentWindow)
-    #         checkbox.setGeometry(970, yOffset, 160, 30)
-    #         self.trackInfoCheckboxes[info] = checkbox
-    #         checkbox.setDisabled(True)
-    #         if "Switch" in info:
-    #             switchPng = QLabel(parentWindow)
-    #             switchPng.setGeometry(1080, yOffset, 30, 30)
-    #             switchPng.setPixmap(
-    #                 QPixmap("src/main/TrackModel/pngs/train_track.png").scaled(25, 25)
-    #             )
-    #         if "Light Signal" in info:
-    #             lightSignalPng = QLabel(parentWindow)
-    #             lightSignalPng.setGeometry(1100, yOffset, 30, 30)
-    #             lightSignalPng.setPixmap(
-    #                 QPixmap("src/main/TrackModel/pngs/traffic_light.png").scaled(25, 25)
-    #             )
-    #         if "Railway Crossing" in info:
-    #             railwayCrossingPng = QLabel(parentWindow)
-    #             railwayCrossingPng.setGeometry(1130, yOffset, 30, 30)
-    #             railwayCrossingPng.setPixmap(
-    #                 QPixmap("src/main/TrackModel/pngs/railway_crossing.png").scaled(
-    #                     25, 25
-    #                 )
-    #             )
-
-    #         yOffset += 30
-
-    #     # Checkbox events
-    #     showSwitchesCheckbox = self.trackInfoCheckboxes["Show Switches"]
-    #     showSwitchesCheckbox.stateChanged.connect(self.change_switches_img)
-    #     showSwitchesCheckbox = self.trackInfoCheckboxes["Show Occupied Blocks"]
-    #     showSwitchesCheckbox.stateChanged.connect(self.change_occupied_img)
-
-    # def add_station_info(self, parentWindow):
-    #     self.stationInfo = QTextEdit("", parentWindow)
-    #     self.stationInfo.setGeometry(760, 300, 160, 70)
-    #     self.stationInfo.setAlignment(Qt.AlignCenter)
-    #     self.stationInfo.setStyleSheet(
-    #         "background-color: #d0efff; color: black; font-size: 14px"
-    #     )
-    #     self.stationInfo.hide()
-
-    # def update_station_display(self, event):
-    #     if self.stationInfo.isHidden():
-    #         self.stationInfo.setText(
-    #             f"<b>Blue Line</b>"
-    #             f"<br>Ticket Sales/Hr: {self.ticketSales}</br>"
-    #             f"<br>Waiting @ Station B: {self.waiting}</br>"
-    #         )
-    #         self.stationInfo.show()
-    #     else:
-    #         self.stationInfo.hide()
-
-    # def change_switches_img(self, state):
-    #     if state == Qt.Checked:
-    #         self.switchPng.show()
-    #     else:
-    #         self.switchPng.hide()
-
-    # def change_occupied_img(self, state):
-    #     if state == Qt.Checked:
-    #         self.occ1Png.show()
-    #         self.occ10Png.show()
-    #     else:
-    #         self.occ1Png.hide()
-    #         self.occ10Png.hide()
-
-    # def update_block_info_display(self):
-    #     # Always display the block number
-    #     blockNumber = self.entryField.text()
-    #     blockInfo = [f"Block Number: {blockNumber}"]
-
-    #     # Check possible errors in block entry value
-    #     if blockNumber.isdigit() and blockNumber:
-    #         if blockNumber:
-    #             blockCheck = self.check_block_exist(blockNumber)
-    #             if blockCheck:
-    #                 # Enable checkboxes if block # entry is valid
-    #                 for checkbox in self.blockInfoCheckboxes.values():
-    #                     checkbox.setDisabled(False)
-
-    #                 self.blockInfoDisplay.setPlainText("\n".join(blockInfo))
-    #                 self.blockInfoDisplay.show()
-    #                 self.errorLabel.clear()
-    #             else:
-    #                 # Disable checkboxes if block # entry is not valid
-    #                 for checkbox in self.blockInfoCheckboxes.values():
-    #                     checkbox.setDisabled(True)
-
-    #                 self.blockInfoDisplay.clear()
-    #                 self.blockInfoDisplay.hide()
-    #                 self.errorLabel.setText(f"Block {blockNumber} not found.")
-    #     else:
-    #         # Disable checkboxes if block # entry is not valid
-    #         for checkbox in self.blockInfoCheckboxes.values():
-    #             checkbox.setDisabled(True)
-
-    #         self.blockInfoDisplay.clear()
-    #         self.blockInfoDisplay.hide()
-    #         self.errorLabel.setText("Please enter a valid block number.")
-
-    #     # Check for checkbox selection
-    #     for info, checkbox in self.blockInfoCheckboxes.items():
-    #         if checkbox.isChecked():
-    #             if info == "Block Length":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(
-    #                             f"Block Length: {data['Block Length (m)']} m"
-    #                         )
-    #             if info == "Speed Limit":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(
-    #                             f"Speed Limit: {data['Speed Limit (Km/Hr)']} Km/Hr"
-    #                         )
-    #             if info == "Elevation":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(f"Elevation: {data['ELEVATION (M)']} m")
-    #             if info == "Cumulative Elevation":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(
-    #                             f"Cumulative Elevation: {data['CUMALTIVE ELEVATION (M)']} m"
-    #                         )
-    #             if info == "Block Grade":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(f"Block Grade: {data['Block Grade (%)']}%")
-    #             if info == "Allowed Directions of Travel":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(
-    #                             f"Allowed Directions of Travel: {self.allowableDirections}"
-    #                         )
-    #             if info == "Track Heater":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(f"Track Heater: {self.trackHeater}")
-    #             if info == "Failures":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(f"Failures: {data['Failures']}")
-    #             if info == "Beacon":
-    #                 for data in self.trackData:
-    #                     if data["Block Number"] == int(blockNumber):
-    #                         blockInfo.append(f"Beacon: {self.beacon}\n")
-    #     # Then append to display is info is selected
-    #     self.blockInfoDisplay.setPlainText("\n".join(blockInfo))
-
-    # def check_block_exist(self, blockNumber):
-    #     if self.trackData:
-    #         for data in self.trackData:
-    #             if data["Block Number"] == int(blockNumber):
-    #                 return True
-    #     return False
-
-    # def add_change_failures_button(self, parentWindow):
-    #     self.changeFailuresButton = QPushButton("Change Failures ->", parentWindow)
-    #     self.changeFailuresButton.setStyleSheet("background-color: red; color: white")
-    #     buttonWidth = 200
-    #     buttonHeight = 30
-    #     buttonX = int(950 + (parentWindow.width() - 950 - buttonWidth) / 2)
-    #     buttonY = parentWindow.height() - 50
-    #     self.changeFailuresButton.setGeometry(
-    #         buttonX, buttonY, buttonWidth, buttonHeight
-    #     )
-    #     self.changeFailuresButton.setEnabled(True)
-
-    #     self.changeFailuresButton.clicked.connect(self.show_failure_popup)
-
-    # def add_tabbar(self, parentWindow):
-    #     changeFailuresButton = QPushButton("Home", parentWindow)
-    #     changeFailuresButton.setStyleSheet(
-    #         "background-color: black; color: white; font-weight: bold; border: 2px solid white; border-bottom: none;"
-    #     )
-    #     changeFailuresButton.setGeometry(100, 70, 100, 30)
-
-    #     testbenchTab = QPushButton("TestBench", parentWindow)
-    #     testbenchTab.setStyleSheet(
-    #         "background-color: black; color: white; font-weight: bold; border: 2px solid white; border-bottom: none;"
-    #     )
-    #     testbenchTab.setGeometry(200, 70, 100, 30)
-
-    #     testbenchTab.clicked.connect(self.show_testbench)
-
-    # def show_failure_popup(self):
-    #     failurePopup = FailureWindow()
-    #     failurePopup.failureWindow.exec()
-    #     selectedBlock = failurePopup.get_selected_block()
-    #     self.failures = failurePopup.get_selected_failures()
-
-    #     # Update the track_data with failures
-    #     for block in self.trackData:
-    #         if block["Block Number"] == selectedBlock:
-    #             # Convert to a string for the use of the display, but kept a list privately
-    #             failuresStr = ", ".join(self.failures)
-    #             if self.failures == "None":
-    #                 failuresStr = "None"
-    #             block["Failures"] = failuresStr
-    #     self.update_block_info_display
+    
+    def update_switch_state(self, line, _, blockNum, state):
+        # Initial Green Line Occupancy
+        if blockNum == 62 and state == 1 and line == 1:
+            self.update_occupancy("Green", 0, '')
+        # # Initial Red Line Occupancy
+        # elif blockNum == 9 and state == 1 and line == 2:
+        #     self.update_occupancy("Red", 0, '')
 
     def show_testbench(self):
         testbenchWindow = TestbenchWindow()
@@ -2630,8 +2365,8 @@ class TestbenchWindow:
         # self.lineInput.addItem("Red")
         # self.lineInput.currentIndexChanged.connect(self.send_occupancy_signal)
         
-        signalTest = QPushButton("Signal Test", self.testbench)
-        signalTest.setGeometry(625, 550, 100, 30)
+        signalTest = QPushButton("Occupancy Test", self.testbench)
+        signalTest.setGeometry(625, 250, 100, 30)
         signalTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
@@ -2639,7 +2374,10 @@ class TestbenchWindow:
     
     def send_occupancy_signal(self):
         line = self.occupancyLineInput.text()
-        cur = int(self.occupancyCurrentBlock.text())
+        if self.occupancyCurrentBlock.text() != '':
+            cur = int(self.occupancyCurrentBlock.text())
+        else:
+            cur = ''
         next = int(self.occupancyNextBlock.text())
         trainModelToTrackModel.sendPolarity.emit(line, next, cur)
 
