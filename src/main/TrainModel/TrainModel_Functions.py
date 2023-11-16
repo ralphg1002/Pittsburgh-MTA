@@ -10,7 +10,6 @@ class TrainModelAttributes:
                                "setpoint_speed": 0,
                                "commanded_speed": 0,
                                "acceleration": 0,
-                               "deceleration": 0,
                                "brakes": False,
                                "power": 0,
                                "power_limit": 0}
@@ -24,7 +23,7 @@ class TrainModelAttributes:
                                 "left_door": False,
                                 "right_door": False,
                                 "lights_status": False,
-                                "announcements": False,
+                                "announcements": "",
                                 "temperature": 0,
                                 "air_conditioning": False,
                                 "advertisements": 0}

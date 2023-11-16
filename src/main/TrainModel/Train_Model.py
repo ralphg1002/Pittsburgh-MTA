@@ -204,10 +204,6 @@ class TrainModel(QMainWindow):
         font1.setKerning(True)
         self.comboBox.setFont(font1)
 
-        # Populate the QComboBox with items
-        self.comboBox.addItem("Train 1")
-        self.comboBox.addItem("Train 2")
-
         # Create a search icon for new window
         self.search_button = QtGui.QPixmap("src/main/TrainModel/search_icon.png")
         self.search_button = self.search_button.scaled(40, 40)
@@ -261,6 +257,20 @@ class TrainModel(QMainWindow):
         name = line + "_" + id
         self.trainsList.append(TrainModelAttributes(name))
 
+    def update_drop_down(self):
+        existing_items = [self.comboBox.itemText(i) for i in range(self.comboBox.count())]
+
+        all_trainIDs = [str(self.trainsList.calculations["trainID"])]
+
+        missing_trainIDs = set(all_trainIDs) - set(existing_items)
+        for trainID in missing_trainIDs:
+            self.comboBox.addItem(trainID)
+
+        for item in existing_items:
+            if item not in all_trainIDs:
+                index = self.comboBox.findText(item)
+                self.comboBox.removeItem(index)
+
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
@@ -273,6 +283,8 @@ class TrainModel(QMainWindow):
         self.systemSpeedInput.setText(
             "x" + format(1 / (self.time_interval / 1000), ".3f")
         )
+
+        self.update_drop_down()
 
 
 class ResultsWindow(QMainWindow):
@@ -475,57 +487,188 @@ class ResultsWindow(QMainWindow):
         self.vehicle_word_list = [
             "Speed Limit: {} mph",
             "Current Speed: {} mph",
-            "Setpoint Speed: {}",
-            "Commanded Speed: {}",
-            "Acceleration: {}",
-            "Deceleration: {}",
+            "Setpoint Speed: {} mph",
+            "Commanded Speed: {} mph",
+            "Acceleration: {} ft/s",
             "Brakes: {}",
-            "Power: {}",
-            "Power Limit: {}",
+            "Power: {} kW",
+            "Power Limit: {}kW",
         ]
 
-        self.vehicle_status = {}
-        self.vehicle_labels = []
+        # QLabel for speed limit
+        self.word_label_speed_limit = QLabel(
+            "Speed Limit {} mph".format(self.trainsList.vehicle_status["speed_limit"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_speed_limit.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_speed_limit.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_speed_limit.setContentsMargins(5, 5, 5, 5)
+        self.word_label_speed_limit.setFont(QFont("Arial", 9))
 
-        # Check if the selected train exists in the trains dictionary
-        if self.selected_train_name in self.trains.trains:
-            train_data = self.trains.trains[self.selected_train_name]
-            self.vehicle_status = train_data.get("vehicle_status", {})
+        # QLabel for current speed
+        self.word_label_current_speed = QLabel(
+            "Current Speed {} mph".format(self.trainsList.vehicle_status["current_speed"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_current_speed.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_current_speed.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_current_speed.setContentsMargins(5, 5, 5, 5)
+        self.word_label_current_speed.setFont(QFont("Arial", 9))
 
-            # Create and add QLabel widgets for each word the layout in vehicle status
-            for word_placeholders in self.vehicle_word_list:
-                word_key = (
-                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
-                )
-                word_value = self.vehicle_status.get(word_key, "N/A")
+        # QLabel for Setpoint Speed
+        self.word_label_setpoint_speed = QLabel(
+            "Setpoint Speed {} mph".format(self.trainsList.vehicle_status["setpoint_speed"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_setpoint_speed.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_setpoint_speed.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_setpoint_speed.setContentsMargins(5, 5, 5, 5)
+        self.word_label_setpoint_speed.setFont(QFont("Arial", 9))
 
-                # Create the QLabel widget
-                if (
-                    "{}" in word_placeholders
-                    and "{}" in word_placeholders[word_placeholders.find("{}") + 2 :]
-                ):  # Check if there are two placeholders in the string
-                    word = word_placeholders.format(
-                        self.selected_train_name, word_value
-                    )
-                else:
-                    word = word_placeholders.format(word_value)
+        # QLabel for commanded speed
+        self.word_label_commanded_speed = QLabel(
+            "Commanded Speed {} mph".format(self.trainsList.vehicle_status["commanded_speed"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_commanded_speed.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_commanded_speed.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_commanded_speed.setContentsMargins(5, 5, 5, 5)
+        self.word_label_commanded_speed.setFont(QFont("Arial", 9))
 
-                # Create the QLabel widget
-                self.word_label = QLabel(word, self.vehicle_white_background_label)
-                self.word_label.setStyleSheet(
-                    "color: #000000; background-color: transparent; border: none;"
-                )
-                self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                self.word_label.setContentsMargins(5, 5, 5, 5)
-                self.word_label.setFont(QFont("Arial", 9))
+        # QLabel for acceleration
+        self.word_label_acceleration = QLabel(
+            "Acceleration {} ft/s".format(self.trainsList.vehicle_status["acceleration"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_acceleration.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_acceleration.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_acceleration.setContentsMargins(5, 5, 5, 5)
+        self.word_label_acceleration.setFont(QFont("Arial", 9))
 
-                self.vehicle_labels.append(self.word_label)
+        # QLabel for brakes
+        self.word_label_brakes = QLabel(
+            "Brakes {}".format(self.trainsList.vehicle_status["brakes"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_brakes.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_brakes.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_brakes.setContentsMargins(5, 5, 5, 5)
+        self.word_label_brakes.setFont(QFont("Arial", 9))
 
-                self.vehicle_white_background_layout.addWidget(
-                    self.word_label, alignment=Qt.AlignTop
-                )
+        # QLabel for power
+        self.word_label_power = QLabel(
+            "Power {} kW".format(self.trainsList.vehicle_status["power"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_power.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_power.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_power.setContentsMargins(5, 5, 5, 5)
+        self.word_label_power.setFont(QFont("Arial", 9))
 
+        # QLabel for power limit
+        self.word_label_power_limit = QLabel(
+            "Power Limit {} kW".format(self.trainsList.vehicle_status["power_limit"]),
+            self.vehicle_white_background_label
+        )
+        self.word_label_power_limit.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_power_limit.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_power_limit.setContentsMargins(5, 5, 5, 5)
+        self.word_label_power_limit.setFont(QFont("Arial", 9))
+
+        # Add QLabel widgets to layout
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_speed_limit, alignment=Qt.AlignTop
+        )
+
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_current_speed, alignment=Qt.AlignTop
+        )
+
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_setpoint_speed, alignment=Qt.AlignTop
+        )
+
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_commanded_speed, alignment=Qt.AlignTop
+        )
+
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_acceleration, alignment=Qt.AlignTop
+        )
+
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_brakes, alignment=Qt.AlignTop
+        )
+
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_power, alignment=Qt.AlignTop
+        )
+
+        self.vehicle_white_background_layout.addWidget(
+            self.word_label_power_limit, alignment=Qt.AlignTop
+        )
+
+        # Add stretch
         self.vehicle_white_background_layout.addStretch(1)
+        
+        # self.vehicle_status = {}
+        # self.vehicle_labels = []
+
+        # # Check if the selected train exists in the trains dictionary
+        # if self.selected_train_name in self.trains.trains:
+        #     train_data = self.trains.trains[self.selected_train_name]
+        #     self.vehicle_status = train_data.get("vehicle_status", {})
+
+        #     # Create and add QLabel widgets for each word the layout in vehicle status
+        #     for word_placeholders in self.vehicle_word_list:
+        #         word_key = (
+        #             word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+        #         )
+        #         word_value = self.vehicle_status.get(word_key, "N/A")
+
+        #         # Create the QLabel widget
+        #         if (
+        #             "{}" in word_placeholders
+        #             and "{}" in word_placeholders[word_placeholders.find("{}") + 2 :]
+        #         ):  # Check if there are two placeholders in the string
+        #             word = word_placeholders.format(
+        #                 self.selected_train_name, word_value
+        #             )
+        #         else:
+        #             word = word_placeholders.format(word_value)
+
+        #         # Create the QLabel widget
+        #         self.word_label = QLabel(word, self.vehicle_white_background_label)
+        #         self.word_label.setStyleSheet(
+        #             "color: #000000; background-color: transparent; border: none;"
+        #         )
+        #         self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        #         self.word_label.setContentsMargins(5, 5, 5, 5)
+        #         self.word_label.setFont(QFont("Arial", 9))
+
+        #         self.vehicle_labels.append(self.word_label)
+
+        #         self.vehicle_white_background_layout.addWidget(
+        #             self.word_label, alignment=Qt.AlignTop
+        #         )
+
+        # self.vehicle_white_background_layout.addStretch(1)
 
         # Create the title label for vehicle status
         self.vehicle_title_label = QLabel("Vehicle Status:", self.vehicle_label)
@@ -708,47 +851,196 @@ class ResultsWindow(QMainWindow):
             "Advertisements: {}",
         ]
 
-        self.passenger_status = {}
-        self.passenger_labels = []
+        # QLabel for passengers
+        self.word_label_passengers = QLabel(
+            "Passengers {}".format(self.trainsList.passenger_status["passengers"]),
+            self.passenger_white_background_label
+            
+        )
+        self.word_label_passengers.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_passengers.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_passengers.setContentsMargins(5, 5, 5, 5)
+        self.word_label_passengers.setFont(QFont("Arial", 9))
 
-        # Check if the selected train exists in the trains dictionary
-        if self.selected_train_name in self.trains.trains:
-            train_data = self.trains.trains[self.selected_train_name]
-            self.passenger_status = train_data.get("passenger_status", {})
+        # QLabel for passenger limit
+        self.word_label_passenger_limit = QLabel(
+            "Passenger Limit {}".format(self.trainsList.passenger_status["passenger_limit"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_passenger_limit.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_passenger_limit.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_passenger_limit.setContentsMargins(5, 5, 5, 5)
+        self.word_label_passenger_limit.setFont(QFont("Arial", 9))
 
-            # Create and add QLabel widgets for each word in the layout in passenger status
-            for word_placeholders in self.passenger_word_list:
-                word_key = (
-                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
-                )
-                word_value = self.passenger_status.get(word_key, "N/A")
+        # QLabel for left door
+        self.word_label_left_door = QLabel(
+            "Left Door {}".format(self.trainsList.passenger_status["left_door"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_left_door.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_left_door.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_left_door.setContentsMargins(5, 5, 5, 5)
+        self.word_label_left_door.setFont(QFont("Arial", 9))
 
-                # Create the QLabel widget
-                if (
-                    "{}" in word_placeholders
-                    and "{}" in word_placeholders[word_placeholders.find("{}") + 2 :]
-                ):
-                    word = word_placeholders.format(
-                        self.selected_train_name, word_value
-                    )
-                else:
-                    word = word_placeholders.format(word_value)
+        # QLabel for right door
+        self.word_label_right_door = QLabel(
+            "Right Door {}".format(self.trainsList.passenger_status["right_door"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_right_door.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_right_door.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_right_door.setContentsMargins(5, 5, 5, 5)
+        self.word_label_right_door.setFont(QFont("Arial", 9))
 
-                self.word_label = QLabel(word, self.passenger_white_background_label)
-                self.word_label.setStyleSheet(
-                    "color: #000000; background-color: transparent; border: none;"
-                )
-                self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                self.word_label.setContentsMargins(5, 5, 5, 5)
-                self.word_label.setFont(QFont("Arial", 9))
+        # QLabel for lights status
+        self.word_label_lights_status = QLabel(
+            "Lights Status {}".format(self.trainsList.passenger_status["lights_status"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_lights_status.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_lights_status.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_lights_status.setContentsMargins(5, 5, 5, 5)
+        self.word_label_lights_status.setFont(QFont("Arial", 9))
 
-                self.passenger_labels.append(self.word_label)
+        # QLabel for announcements
+        self.word_label_announcements = QLabel(
+            "Announcements {}".format(self.trainsList.passenger_status["announcements"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_announcements.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_announcements.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_announcements.setContentsMargins(5, 5, 5, 5)
+        self.word_label_announcements.setFont(QFont("Arial", 9))
 
-                self.passenger_white_background_layout.addWidget(
-                    self.word_label, alignment=Qt.AlignTop
-                )
+        # QLabel for temperature
+        self.word_label_temperature = QLabel(
+            "Temperature {}".format(self.trainsList.passenger_status["temperature"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_temperature.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_temperature.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_temperature.setContentsMargins(5, 5, 5, 5)
+        self.word_label_temperature.setFont(QFont("Arial", 9))
 
+        # QLabel for air conditioning
+        self.word_label_air_conditioning = QLabel(
+            "Air Conditioning {}".format(self.trainsList.passenger_status["air_conditioning"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_air_conditioning.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_air_conditioning.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_air_conditioning.setContentsMargins(5, 5, 5, 5)
+        self.word_label_air_conditioning.setFont(QFont("Arial", 9))
+
+        # QLabel for advertisements
+        self.word_label_advertisements = QLabel(
+            "Advertisements {}".format(self.trainsList.passenger_status["advertisements"]),
+            self.passenger_white_background_label
+        )
+        self.word_label_advertisements.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_advertisements.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_advertisements.setContentsMargins(5, 5, 5, 5)
+        self.word_label_advertisements.setFont(QFont("Arial", 9))
+
+        # Add QLabel widgets to layout
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_passengers, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_passenger_limit, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_left_door, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_right_door, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_lights_status, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_announcements, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_temperature, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_air_conditioning, alignment=Qt.AlignTop
+        )
+
+        self.passenger_white_background_layout.addWidget(
+            self.word_label_advertisements, alignment=Qt.AlignTop
+        )
+
+        # Add stretch
         self.passenger_white_background_layout.addStretch(1)
+        
+        # self.passenger_status = {}
+        # self.passenger_labels = []
+
+        # # Check if the selected train exists in the trains dictionary
+        # if self.selected_train_name in self.trains.trains:
+        #     train_data = self.trains.trains[self.selected_train_name]
+        #     self.passenger_status = train_data.get("passenger_status", {})
+
+        #     # Create and add QLabel widgets for each word in the layout in passenger status
+        #     for word_placeholders in self.passenger_word_list:
+        #         word_key = (
+        #             word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+        #         )
+        #         word_value = self.passenger_status.get(word_key, "N/A")
+
+        #         # Create the QLabel widget
+        #         if (
+        #             "{}" in word_placeholders
+        #             and "{}" in word_placeholders[word_placeholders.find("{}") + 2 :]
+        #         ):
+        #             word = word_placeholders.format(
+        #                 self.selected_train_name, word_value
+        #             )
+        #         else:
+        #             word = word_placeholders.format(word_value)
+
+        #         self.word_label = QLabel(word, self.passenger_white_background_label)
+        #         self.word_label.setStyleSheet(
+        #             "color: #000000; background-color: transparent; border: none;"
+        #         )
+        #         self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        #         self.word_label.setContentsMargins(5, 5, 5, 5)
+        #         self.word_label.setFont(QFont("Arial", 9))
+
+        #         self.passenger_labels.append(self.word_label)
+
+        #         self.passenger_white_background_layout.addWidget(
+        #             self.word_label, alignment=Qt.AlignTop
+        #         )
+
+        # self.passenger_white_background_layout.addStretch(1)
 
         # Create the title label
         self.passenger_title_label = QLabel("Passenger Status:", self.passenger_label)
@@ -816,47 +1108,179 @@ class ResultsWindow(QMainWindow):
             "Passenger Emergency Brake: {}",
         ]
 
-        self.navigation_status = {}
-        self.navigation_labels = []
+        # QLabel for authority
+        self.word_label_authority = QLabel(
+            "Authority {}".format(self.trainsList.navigation_status["authority"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_authority.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_authority.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_authority.setContentsMargins(5, 5, 5, 5)
+        self.word_label_authority.setFont(QFont("Arial", 9))
 
-        # Check if the selected train exists in the trains dictionary
-        if self.selected_train_name in self.trains.trains:
-            train_data = self.trains.trains[self.selected_train_name]
-            navigation_status = train_data.get("navigation_status", {})
+        # QLabel for beacon
+        self.word_label_beacon = QLabel(
+            "Beacon {}".format(self.trainsList.navigation_status["beacon"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_beacon.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_beacon.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_beacon.setContentsMargins(5, 5, 5, 5)
+        self.word_label_beacon.setFont(QFont("Arial", 9))
 
-            # Create and add QLabel widgets for each word the layout in navigation status
-            for word_placeholders in self.navigation_word_list:
-                word_key = (
-                    word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
-                )
-                word_value = navigation_status.get(word_key, "N/A")
+        # QLabel for block length
+        self.word_label_block_length = QLabel(
+            "Block Length {}".format(self.trainsList.navigation_status["block_length"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_block_length.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_block_length.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_block_length.setContentsMargins(5, 5, 5, 5)
+        self.word_label_block_length.setFont(QFont("Arial", 9))
 
-                # Create the QLabel widget
-                if (
-                    "{}" in word_placeholders
-                    and "{}" in word_placeholders[word_placeholders.find("{}") + 2 :]
-                ):
-                    word = word_placeholders.format(
-                        self.selected_train_name, word_value
-                    )
-                else:
-                    word = word_placeholders.format(word_value)
+        # QLabel for block grade
+        self.word_label_block_grade = QLabel(
+            "Block Grade {}".format(self.trainsList.navigation_status["block_grade"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_block_grade.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_block_grade.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_block_grade.setContentsMargins(5, 5, 5, 5)
+        self.word_label_block_grade.setFont(QFont("Arial", 9))
 
-                self.word_label = QLabel(word, self.navigation_white_background_label)
-                self.word_label.setStyleSheet(
-                    "color: #000000; background-color: transparent; border: none;"
-                )
-                self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-                self.word_label.setContentsMargins(5, 5, 5, 5)
-                self.word_label.setFont(QFont("Arial", 9))
+        # QLabel for next station
+        self.word_label_next_station = QLabel(
+            "Next Station {}".format(self.trainsList.navigation_status["next_station"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_next_station.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_next_station.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_next_station.setContentsMargins(5, 5, 5, 5)
+        self.word_label_next_station.setFont(QFont("Arial", 9))
 
-                self.navigation_labels.append(self.word_label)
+        # QLabel for prev station
+        self.word_label_prev_station = QLabel(
+            "Previous Station {}".format(self.trainsList.navigation_status["prev_station"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_prev_station.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_prev_station.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_prev_station.setContentsMargins(5, 5, 5, 5)
+        self.word_label_prev_station.setFont(QFont("Arial", 9))
 
-                self.navigation_white_background_layout.addWidget(
-                    self.word_label, alignment=Qt.AlignTop
-                )
+        # QLabel for headlights
+        self.word_label_headlights = QLabel(
+            "Headlights {}".format(self.trainsList.navigation_status["headlights"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_headlights.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_headlights.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_headlights.setContentsMargins(5, 5, 5, 5)
+        self.word_label_headlights.setFont(QFont("Arial", 9))
 
+        # QLabel for passenger emergency brake
+        self.word_label_pass_emergency_brake = QLabel(
+            "Passenger Emergency Brake {}".format(self.trainsList.navigation_status["passenger_emergency_brake"]),
+            self.navigation_white_background_label
+        )
+        self.word_label_pass_emergency_brake.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_pass_emergency_brake.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_pass_emergency_brake.setContentsMargins(5, 5, 5, 5)
+        self.word_label_pass_emergency_brake.setFont(QFont("Arial", 9))
+
+        # Add QLabel widgets to layout
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_authority, alignment=Qt.AlignTop
+        )
+
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_beacon, alignment=Qt.AlignTop
+        )
+
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_block_length, alignment=Qt.AlignTop
+        )
+
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_block_grade, alignment=Qt.AlignTop
+        )
+
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_next_station, alignment=Qt.AlignTop
+        )
+
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_prev_station, alignment=Qt.AlignTop
+        )
+
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_headlights, alignment=Qt.AlignTop
+        )
+
+        self.navigation_white_background_layout.addWidget(
+            self.word_label_pass_emergency_brake, alignment=Qt.AlignTop
+        )
+
+        # Add stretch
         self.navigation_white_background_layout.addStretch(1)
+        
+        # self.navigation_status = {}
+        # self.navigation_labels = []
+
+        # # Check if the selected train exists in the trains dictionary
+        # if self.selected_train_name in self.trains.trains:
+        #     train_data = self.trains.trains[self.selected_train_name]
+        #     navigation_status = train_data.get("navigation_status", {})
+
+        #     # Create and add QLabel widgets for each word the layout in navigation status
+        #     for word_placeholders in self.navigation_word_list:
+        #         word_key = (
+        #             word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
+        #         )
+        #         word_value = navigation_status.get(word_key, "N/A")
+
+        #         # Create the QLabel widget
+        #         if (
+        #             "{}" in word_placeholders
+        #             and "{}" in word_placeholders[word_placeholders.find("{}") + 2 :]
+        #         ):
+        #             word = word_placeholders.format(
+        #                 self.selected_train_name, word_value
+        #             )
+        #         else:
+        #             word = word_placeholders.format(word_value)
+
+        #         self.word_label = QLabel(word, self.navigation_white_background_label)
+        #         self.word_label.setStyleSheet(
+        #             "color: #000000; background-color: transparent; border: none;"
+        #         )
+        #         self.word_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        #         self.word_label.setContentsMargins(5, 5, 5, 5)
+        #         self.word_label.setFont(QFont("Arial", 9))
+
+        #         self.navigation_labels.append(self.word_label)
+
+        #         self.navigation_white_background_layout.addWidget(
+        #             self.word_label, alignment=Qt.AlignTop
+        #         )
+
+        # self.navigation_white_background_layout.addStretch(1)
 
         # Create the title label
         self.navigation_title_label = QLabel(
@@ -941,6 +1365,26 @@ class ResultsWindow(QMainWindow):
             "x" + format(1 / (self.time_interval / 1000), ".3f")
         )
 
+        # Update QLabel widgets with new information
+        self.word_label_speed_limit.setText(
+            "Speed Limit: {} mph".format(self.trainsList.vehicle_status["speed_limit"])
+        )
+
+        self.word_label_current_speed.setText(
+            "Current Speed {} mph".format(self.trainsList.vehicle_status["current_speed"])
+        )
+
+        
+        
+        
+        ###### FINISH #######
+
+
+        
+        
+        
+        
+        
         # Signals that connect from the train controller to the train model
         trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
         trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(
