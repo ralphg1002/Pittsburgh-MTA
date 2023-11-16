@@ -175,12 +175,14 @@ class TCFunctions:
         trainObject.authorityVal = (
             trainObject.block["blockLength"] - trainObject.blockTravelled
         )
+        if trainObject.blockTravelled >= trainObject.block["blockLength"]:
+            trainObject.authorityVal = 0
         if trainObject.block["blockLength"] == 0:
             trainObject.distanceRatio = 0
             trainObject.blockTravelled = 0
-        elif trainObject.block["blockLength"] == trainObject.blockTravelled:
-            trainObject.distanceRatio = 0
-            trainObject.blockTravelled = 0
+        elif trainObject.blockTravelled >= trainObject.block["blockLength"]:
+            trainObject.distanceRatio = 1
+            trainObject.blockTravelled = trainObject.blockTravelled - trainObject.block["blockLength"]
         else:
             trainObject.distanceRatio = (
                 trainObject.blockTravelled / trainObject.block["blockLength"]
@@ -238,7 +240,7 @@ class TCFunctions:
             # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
             return
-        elif trainObject.get_powerCommand() < trainObject.piVariables["powerLimit"]:
+        elif trainObject.get_powerCommand() <= trainObject.piVariables["powerLimit"]:
             newUk = trainObject.piVariables["uk"] + trainObject.piVariables[
                 "samplePeriod"
             ] / 2 * (newError + trainObject.piVariables["prevError"])
