@@ -3,6 +3,7 @@ import pandas as pd
 
 # from PyQt5.QtCore import pyqtSignal
 from signals import (
+    trackModelToTrackController,
     trackControllerToCTC,
     trackControllerToTrackModel,
     ctcToTrackController,
@@ -536,7 +537,8 @@ class Wayside:
                         elif signalState == "R":
                             signalState = "red"
 
-                        self.get_block(signalNumber).set_lightstate(signalState)
+                    
+                        self.get_block(int(signalNumber)).set_lightstate(signalState)
                         # print(self.line, self.waysideNum, signalNumber, signalState)
                         # emit that a light value has been changed
                         trackControllerToTrackModel.lightState.emit(
@@ -747,7 +749,7 @@ class TrackControl(QMainWindow):
         # Instantiate the track information for the Green Line
         self.greenLine = Line(1)
         self.wayside1G = Wayside(1, 1)
-        switchDict = {"SW1": 12, "SW2": 29}
+        switchDict = {"SW1": 13, "SW2": 29}
         self.wayside1G.switches_init(switchDict)
         self.wayside2G = Wayside(2, 1)
         switchDict = {"SW3": 57, "SW4": 62, "SW5": 77, "SW6": 85}
@@ -932,7 +934,7 @@ class TrackControl(QMainWindow):
             )
         )
 
-        """ This section of code is for the connections from signals from the Track Controller to the handler"""
+        """ This section of code is for the connections from signals from the Track Controller to the handler GUI stuff"""
         trackControllerToTrackModel.switchState.connect(self.set_switchstate_handler)
         trackControllerToTrackModel.crossingState.connect(
             self.set_crossingstate_handler
@@ -943,6 +945,9 @@ class TrackControl(QMainWindow):
         ctcToTrackController.sendAuthority.connect(self.handle_authority)
         ctcToTrackController.sendSuggestedSpeed.connect(self.handle_suggested_speed)
         ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
+
+        """ This section of code is for the connections from track model to the track controller handler"""
+        trackModelToTrackController.occupancyState.connect(self.set_occupancystate_handler)
 
         """ Connect the input signals from the test bench to the main ui page handlers """
         self.ui.testBenchWindow.requestInput.connect(self.handle_input_apply)
@@ -1511,6 +1516,7 @@ class TrackControl(QMainWindow):
                     self.set_occupancystate_handler(
                         line, waysideNum, blockNum, finalState
                     )
+                    trackModelToTrackController.occupancyState.emit(line, waysideNum, blockNum, state)
 
             # Set Authority
             elif action == 6:
