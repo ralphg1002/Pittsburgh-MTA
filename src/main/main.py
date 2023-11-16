@@ -33,13 +33,14 @@ class MainWindow(QMainWindow):
     w = 960
     h = 960
 
-    moduleName = "Train Controller Module (SW)"
+    moduleName = "Pittsburgh MTA"
 
     def __init__(self):
         super().__init__()
 
         # Initialize all the different modules
         trackControl = TrackControl()
+        trackControl.ui.hide()
         self.trainControllerSW = TrainControllerUI()
         trackModel = TrackModel()
         ctc = CTCWindow()
@@ -107,7 +108,7 @@ class MainWindow(QMainWindow):
         self.box4 = QPushButton("Track Controller", self)
         self.box_button(self.box4, self.box1.width(), self.box1.height())
         self.set_relative_right(self.box4, self.box3, 20)
-        self.box4.clicked.connect(trackControl.show_gui)
+        self.box4.clicked.connect(lambda: trackControl.show_gui())
 
         self.box5 = QPushButton("Train Controller\nSW", self)
         self.box_button(self.box5, self.box1.width(), self.box1.height())

@@ -14,6 +14,8 @@ sys.path.append("../../main")
 from signals import masterSignals
 from signals import ctcToTrackController
 from signals import trackControllerToCTC
+from signals import ctcToTrackModel
+from signals import trackModelToCTC
 
 # Global variables for the block numbers associated with each wayside
 WAYSIDE_1G_BLOCKS = [
@@ -418,7 +420,7 @@ class CTCWindow(QMainWindow):
         self.occupancy_table.setGeometry(360, 510, 252, 100)
 
         # Throughput per line
-        self.throughput_label = QLabel("Throughput: N/A", self)
+        self.throughput_label = QLabel("Throughput: ", self)
         self.throughput_label.setFont(QFont(self.fontStyle, self.textFontSize + 5))
         self.throughput_label.setGeometry(350, 170, 400, 50)
 
@@ -626,6 +628,14 @@ class CTCWindow(QMainWindow):
         self.dispatchTable.setStyleSheet("background-color: white;")
         self.dispatchTable.setGeometry(35, 280, 600, 200)
 
+        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
+
+        trackModelToCTC.throughput.connect(self.updateTickets)
+
+        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
+
+        trackModelToCTC.throughput.connect(self.updateTickets)
+
         # self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
         # self.blockDropDown.currentIndexChanged.connect(
         # lambda: Block.updateStatusLabel(main_window, blocks)
@@ -633,8 +643,22 @@ class CTCWindow(QMainWindow):
         # self.show()
         # self.blockDropDown.currentIndexChanged.connect(self.statusHandler)  # Connect the signal to update the dropdown
 
-    # def statusHandler(self):
-    # Block.updateStatusLabel(self)
+    #def statusHandler(self):
+        #Block.updateStatusLabel(self)
+
+    def ticketRequest(self):
+        beforeLine = self.selectLine.currentText()
+        if beforeLine == "Green Line":
+            requestLine = "Green"
+        else:
+            requestLine = "Red"
+            
+        ctcToTrackModel.requestThroughput.emit(requestLine)
+    
+    def updateTickets(self, throughput):
+        throughput_text = f"Throughput: {throughput}"
+        self.throughput_label.setText(throughput_text)
+
     def blockHandler(self):
         Block.setSelectedBlock(self)
 
@@ -1595,8 +1619,8 @@ class Routing:
             track = "Green"
         else:
             track = "Red"
-        trainLine = self.scheduler.getSelectedLine()
-        # for train_id, routeQ in self.train_routes.items():
+        trainLine = self.main_window.selectLine.currentText()
+        #for train_id, routeQ in self.train_routes.items():
         if occupancy == True and blockNum == self.routeQ[1] and trainLine == track:
             self.routeQ.pop(0)
             nextBlock = self.routeQ[1]
@@ -1787,14 +1811,18 @@ class Train:
     def checkDepartureTime(self):
         current_time = self.main_window.systemTimeInput.text()
         current_time_str = current_time.replace(":", "")[:4]
-        # print(current_time_str)
+
         # Iterate through your list of trains and check their departure times
         for train in self.scheduler.trainList:
             departureTime = train.trainDeparture
-            # print(departureTime)
             if departureTime == current_time_str:
                 # Add the train to the dispatched_trains list
                 self.dispatchTrainsList.append(train)
+                if train.trackLine == "Green Line":
+                    lineTrack = "green"
+                else:
+                    lineTrack = "red"
+                masterSignals.addTrain.emit(lineTrack, train.train_id)
 
                 next_stop = self.trainStops[0]
                 # Add the train's information to the dispatched trains table
@@ -1824,10 +1852,6 @@ class Train:
                 ctcToTrackController.sendTrainDispatched.emit(
                     trainLine, 2, train.train_id, train.authority
                 )
-                print(f"{trainLine}")
-                # masterSignals.addTrain.emit(train.trackLine, train.train_id)
-                print("emmiting signal")
-                masterSignals.addTrain.emit("green", "hello")
 
                 self.scheduler.trainList.remove(train)
 
