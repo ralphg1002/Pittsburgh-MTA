@@ -43,20 +43,20 @@ class TrackView(QGraphicsView):
         yardScene = QGraphicsPixmapItem(yardImage)
         yardScene.setPos(90, 180)
         self.scene.addItem(yardScene)
-        
+
         path_0 = QPainterPath()
         path_0.moveTo(163, 250)
         path_0.lineTo(163, 330)
         block_0 = self.createTrackBlock(path_0, "Block 0")
         self.scene.addItem(block_0)
         self.blocks[0] = block_0
-        
+
         path_151 = QPainterPath()
         path_151.moveTo(106, 278)
         path_151.cubicTo(107, 278, 130, 251, 130, 250)
         block_151 = self.createTrackBlock(path_151, "Block 151")
         self.scene.addItem(block_151)
-        
+
         path_1 = QPainterPath()
         path_1.moveTo(0, 0)
         path_1.cubicTo(0, 0, 5, 0, 10, 10)
@@ -1239,14 +1239,14 @@ class TrackView(QGraphicsView):
     def showRedLineLayout(self):
         self.scene.clear()
         self.drawRedLine()
-    
-    #Change color of block based on occupancy toggle
+
+    # Change color of block based on occupancy toggle
     def change_color(self, on, off):
         print("works")
         onBlock = self.blocks.get(on)
         if onBlock:
             onBlock.toggle_occupancy(True)
-        if off != '':
+        if off != "":
             offBlock = self.blocks.get(off)
             if offBlock:
                 offBlock.toggle_occupancy(False)
@@ -1279,7 +1279,7 @@ class TrackBlock(QGraphicsPathItem):
             self.setPen(self.current_pen)
         else:
             self.setPen(self.original_pen)
-    
+
     def toggle_occupancy(self, occupied):
         if occupied:
             self.current_pen = self.occupied_pen
@@ -1287,6 +1287,7 @@ class TrackBlock(QGraphicsPathItem):
         else:
             self.current_pen = self.original_pen
             self.setPen(self.original_pen)
+
 
 class TrackModel:
     moduleName = "Track Model"
@@ -1306,10 +1307,10 @@ class TrackModel:
         self.block = TrackData()
         self.station = Station()
         self.load_data()
-        
+
         trainModelToTrackModel.sendPolarity.connect(self.update_occupancy)
         trackControllerToTrackModel.switchState.connect(self.update_switch_state)
-        
+
         self.setup_selection_window()
 
     def setup_selection_window(self):
@@ -1606,7 +1607,7 @@ class TrackModel:
 
     def toggle_content(self):
         self.trackView.toggleLayout()  # Call the toggleLayout method in TrackView
-    
+
     def update_occupancy(self, _, curBlock, prevBlock):
         self.trackView.change_color(curBlock, prevBlock)
 
@@ -1886,56 +1887,56 @@ class TrackModel:
         self.trackHeaterLabel.setFont(font)
         self.trackHeaterLabel.setStyleSheet(style)
         self.trackHeaterLabel.setGeometry(750, 575, 110, 25)
-        
-        #Station Labels:
+
+        # Station Labels:
         self.stationNameLabel = QLabel(self.mainWindow)
         self.stationNameLabel.setFont(font)
         self.stationNameLabel.setStyleSheet(style)
         self.stationNameLabel.setGeometry(650, 800, 200, 25)
-        
+
         self.ticketSalesLabel = QLabel(self.mainWindow)
         self.ticketSalesLabel.setFont(font)
         self.ticketSalesLabel.setStyleSheet(style)
         self.ticketSalesLabel.setText("Ticket Sales:")
         self.ticketSalesLabel.setGeometry(600, 830, 200, 25)
         self.ticketSalesLabel.hide()
-        
+
         self.ticketSalesOutput = QLabel(self.mainWindow)
         self.ticketSalesOutput.setFont(font)
         self.ticketSalesOutput.setStyleSheet(style)
         self.ticketSalesOutput.setGeometry(800, 830, 200, 25)
-        
+
         self.waitingLabel = QLabel(self.mainWindow)
         self.waitingLabel.setFont(font)
         self.waitingLabel.setStyleSheet(style)
         self.waitingLabel.setText("Passengers Waiting:")
         self.waitingLabel.setGeometry(600, 860, 200, 25)
         self.waitingLabel.hide()
-        
+
         self.waitingOutput = QLabel(self.mainWindow)
         self.waitingOutput.setFont(font)
         self.waitingOutput.setStyleSheet(style)
         self.waitingOutput.setGeometry(800, 860, 200, 25)
-        
+
         self.boardingLabel = QLabel(self.mainWindow)
-        self.boardingLabel.setFont(font)  
+        self.boardingLabel.setFont(font)
         self.boardingLabel.setStyleSheet(style)
         self.boardingLabel.setText("Passengers Boarding:")
         self.boardingLabel.setGeometry(600, 890, 200, 25)
         self.boardingLabel.hide()
-        
+
         self.boardingOutput = QLabel(self.mainWindow)
         self.boardingOutput.setFont(font)
         self.boardingOutput.setStyleSheet(style)
         self.boardingOutput.setGeometry(800, 890, 200, 25)
-        
+
         self.leavingLabel = QLabel(self.mainWindow)
         self.leavingLabel.setFont(font)
         self.leavingLabel.setStyleSheet(style)
         self.leavingLabel.setText("Passengers Disembarking:")
         self.leavingLabel.setGeometry(600, 920, 200, 25)
         self.leavingLabel.hide()
-        
+
         self.leavingOutput = QLabel(self.mainWindow)
         self.leavingOutput.setFont(font)
         self.leavingOutput.setStyleSheet(style)
@@ -1991,16 +1992,16 @@ class TrackModel:
                 ]  # Store new blocks data in self.failures
                 print(self.failures)
                 self.check_failures()
-    
+
     def show_station_data(self):
         blockNumber = self.entryField.text()
-        
+
         if self.selectedLine == "Green":
             for data in self.trackData:
                 if data["Block Number"] == int(blockNumber):
                     if type(data["Infrastructure"]) == str:
                         stationName = str(data["Infrastructure"])
-                        stationName = stationName.split(';')[0]
+                        stationName = stationName.split(";")[0]
                         print(stationName)
                         # if stationName in data["Infrastructure"]:
                         #     print(data["Infrasctructure"])#Left off here
@@ -2179,11 +2180,11 @@ class TrackModel:
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
         self.block.set_data(self.selectedLine, self.trackData)
-    
+
     def update_switch_state(self, line, _, blockNum, state):
         # Initial Green Line Occupancy
         if blockNum == 62 and state == 1 and line == 1:
-            self.update_occupancy("Green", 0, '')
+            self.update_occupancy("Green", 0, "")
         # # Initial Red Line Occupancy
         # elif blockNum == 9 and state == 1 and line == 2:
         #     self.update_occupancy("Red", 0, '')
@@ -2221,8 +2222,8 @@ class TestbenchWindow:
         # Inputs
         self.setup_inputs()
         self.setup_failure_inputs()
-        
-        #New
+
+        # New
         self.add_occupancy_test()
         self.add_passenger_test()
 
@@ -2430,7 +2431,7 @@ class TestbenchWindow:
         self.greenRadio.setEnabled(True)
         self.yellowRadio.setEnabled(True)
         self.redRadio.setEnabled(True)
-    
+
     def add_occupancy_test(self):
         selectLineLabel = QLabel("Select Line:", self.testbench)
         selectLineLabel.setGeometry(500, 210, 75, 30)
@@ -2438,41 +2439,41 @@ class TestbenchWindow:
         self.occupancyLineInput = QLineEdit(self.testbench)
         self.occupancyLineInput.setGeometry(570, 210, 50, 30)
         self.occupancyLineInput.setStyleSheet("background-color: white")
-        
+
         currentBlockLabel = QLabel("Current Block:", self.testbench)
         currentBlockLabel.setGeometry(625, 210, 100, 30)
         currentBlockLabel.setStyleSheet("font-weight: bold")
         self.occupancyCurrentBlock = QLineEdit(self.testbench)
         self.occupancyCurrentBlock.setGeometry(710, 210, 50, 30)
         self.occupancyCurrentBlock.setStyleSheet("background-color: white")
-        
+
         nextBlockLabel = QLabel("Next Block:", self.testbench)
         nextBlockLabel.setGeometry(770, 210, 100, 30)
         nextBlockLabel.setStyleSheet("font-weight: bold")
         self.occupancyNextBlock = QLineEdit(self.testbench)
         self.occupancyNextBlock.setGeometry(840, 210, 50, 30)
         self.occupancyNextBlock.setStyleSheet("background-color: white")
-        
+
         # self.lineInput.addItem("Green")
         # self.lineInput.addItem("Red")
         # self.lineInput.currentIndexChanged.connect(self.send_occupancy_signal)
-        
+
         signalTest = QPushButton("Occupancy Test", self.testbench)
         signalTest.setGeometry(625, 250, 100, 30)
         signalTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
         signalTest.clicked.connect(self.send_occupancy_signal)
-    
+
     def send_occupancy_signal(self):
         line = self.occupancyLineInput.text()
-        if self.occupancyCurrentBlock.text() != '':
+        if self.occupancyCurrentBlock.text() != "":
             cur = int(self.occupancyCurrentBlock.text())
         else:
-            cur = ''
+            cur = ""
         next = int(self.occupancyNextBlock.text())
         trainModelToTrackModel.sendPolarity.emit(line, next, cur)
-        
+
     def add_passenger_test(self):
         selectLineLabel = QLabel("Select Line:", self.testbench)
         selectLineLabel.setGeometry(500, 300, 75, 30)
@@ -2480,33 +2481,35 @@ class TestbenchWindow:
         self.passengerLineInput = QLineEdit(self.testbench)
         self.passengerLineInput.setGeometry(570, 300, 50, 30)
         self.passengerLineInput.setStyleSheet("background-color: white")
-        
+
         stationNameLabel = QLabel("Station Name:", self.testbench)
         stationNameLabel.setGeometry(625, 300, 100, 30)
         stationNameLabel.setStyleSheet("font-weight: bold")
         self.passengerStationName = QLineEdit(self.testbench)
         self.passengerStationName.setGeometry(710, 300, 50, 30)
         self.passengerStationName.setStyleSheet("background-color: white")
-        
+
         passengers = QLabel("Passengers:", self.testbench)
         passengers.setGeometry(770, 300, 100, 30)
         passengers.setStyleSheet("font-weight: bold")
         self.trainPassengers = QLineEdit(self.testbench)
         self.trainPassengers.setGeometry(840, 300, 50, 30)
         self.trainPassengers.setStyleSheet("background-color: white")
-        
+
         signalTest = QPushButton("Passenger Test", self.testbench)
         signalTest.setGeometry(625, 340, 100, 30)
         signalTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
         signalTest.clicked.connect(self.send_passenger_signal)
-        
-    def send_passenger_signal(self): 
+
+    def send_passenger_signal(self):
         line = self.passengerLineInput.text()
         station = self.passengerStationName.text()
         passengersOnBoard = int(self.trainPassengers.text())
-        trainModelToTrackModel.sendCurrentPassengers.emit(line, station, passengersOnBoard)
+        trainModelToTrackModel.sendCurrentPassengers.emit(
+            line, station, passengersOnBoard
+        )
 
 
 if __name__ == "__main__":
