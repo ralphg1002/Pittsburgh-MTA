@@ -281,7 +281,8 @@ class TrackData:
                 if type(block["Infrastructure"]) == str:
                     if "STATION" in block["Infrastructure"]:
                         throughput += block["Ticket Sales"]
-                        block["Ticket Sales"] = 0  # Reset
+                        #block["Ticket Sales"] = 0  # Reset Temporarily commented for Iteration 3
+        print("SENDING THROUGHPUT", throughput)
         trackModelToCTC.throughput.emit(throughput)
 
     def set_suggested_speed(self, line, _, blockNum, suggestedSpeed):
