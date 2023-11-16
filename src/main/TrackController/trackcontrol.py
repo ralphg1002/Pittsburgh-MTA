@@ -2,8 +2,18 @@ import sys, re, os
 import pandas as pd
 
 # from PyQt5.QtCore import pyqtSignal
-from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController, masterSignals 
-from signals import trackControllerToCTC, trackControllerToTrackModel, ctcToTrackController, masterSignals 
+from signals import (
+    trackControllerToCTC,
+    trackControllerToTrackModel,
+    ctcToTrackController,
+    masterSignals,
+)
+from signals import (
+    trackControllerToCTC,
+    trackControllerToTrackModel,
+    ctcToTrackController,
+    masterSignals,
+)
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
 from .trackcontrolui import MainUI
 
@@ -427,11 +437,11 @@ class Wayside:
     # This is the method that reads the PLC file and runs it accordingly
     def run_plc(self, plcFilepath):
         self.plcData = self.plc.parse_text_file(plcFilepath)
-        #print(self.plcData)
+        # print(self.plcData)
         self.refresh_plc()
 
     def refresh_plc(self):
-        #print("refreshing...")
+        # print("refreshing...")
         # check if it is in manual mode and exit the refresh if so
         if not self.plcState:
             return
@@ -459,7 +469,7 @@ class Wayside:
                 if isinstance(entry, int):
                     entry = [entry]  # Convert single integer to a list
 
-                #print("Wayside Number: ", self.waysideNum)
+                # print("Wayside Number: ", self.waysideNum)
 
                 if entry != 0:
                     # check for validity of conditon 1
@@ -483,7 +493,7 @@ class Wayside:
                             break
                 else:
                     condition2 = True
-                    #print("Here I set the condition2 to true")
+                    # print("Here I set the condition2 to true")
 
                 if condition2 == True and notExist:
                     condition2 = False
@@ -494,7 +504,6 @@ class Wayside:
                 if condition1 and condition2:
                     any_condition_satisfied = True
                     break
-                
 
             # If any condition is satisfied, execute the operations
             if any_condition_satisfied:
@@ -517,8 +526,8 @@ class Wayside:
                     # set the light value
                     elif parsedOperation["Type"] == "SIGNAL":
                         signalNumber = parsedOperation["Number"]
-                        #print("The number is: " + str(signalNumber))
-                        #print("The wayside is: " + str(self.waysideNum))
+                        # print("The number is: " + str(signalNumber))
+                        # print("The wayside is: " + str(self.waysideNum))
                         signalState = parsedOperation["State"]
                         if signalState == "G":
                             signalState = "green"
@@ -526,7 +535,7 @@ class Wayside:
                             signalState = "red"
 
                         self.get_block(signalNumber).set_lightstate(signalState)
-                        #print(self.line, self.waysideNum, signalNumber, signalState)
+                        # print(self.line, self.waysideNum, signalNumber, signalState)
                         # emit that a light value has been changed
                         trackControllerToTrackModel.lightState.emit(
                             self.line, self.waysideNum, int(signalNumber), signalState
@@ -538,7 +547,6 @@ class Wayside:
                         crossNumber = parsedOperation["Number"]
 
                         self.get_block(crossNumber).set_crosssingstate(crossValue)
-                        
 
                         # called again after the handler
                         # emit that a switch value has been changed
@@ -666,8 +674,8 @@ class Wayside:
                     notExist = True
                     break
 
-        #print("Entry: ", entry)
-        #print("Exit: ", exit)
+        # print("Entry: ", entry)
+        # print("Exit: ", exit)
         return entry, exit, notExist
 
     # This is the method that parses the operation following a condition within a PLC file
@@ -687,7 +695,7 @@ class Wayside:
             if int(block.get_number()) == int(blockNumber):
                 return block
         # print(self.blocks[28].get_number())
-        #print("Did not find block " + str(blockNumber))
+        # print("Did not find block " + str(blockNumber))
         return None  # Block not found
 
     # Function to get blocks of a specific type
@@ -700,12 +708,12 @@ class Wayside:
 
     def get_occupied_blocks(self):
         occupiedBlocks = []
-        if(self.waysideNum == 2):
+        if self.waysideNum == 2:
             print("Block State: ", self.get_block(0).get_occupancystate())
         for block in self.blocks:
             if block.get_occupancystate() == True:
                 occupiedBlocks.append(block)
-        #print("Here are the occupied blocks: ", occupiedBlocks)
+        # print("Here are the occupied blocks: ", occupiedBlocks)
         return occupiedBlocks
 
 
@@ -891,7 +899,6 @@ class TrackControl(QMainWindow):
         # self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
         # self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
 
-
         # REFRESH THE PLC ON THE TIME INTERVAL
         self.ui.timer.timeout.connect(lambda: self.wayside1G.refresh_plc())
         self.ui.timer.timeout.connect(lambda: self.wayside2G.refresh_plc())
@@ -926,7 +933,9 @@ class TrackControl(QMainWindow):
 
         """ This section of code is for the connections from signals from the Track Controller to the handler"""
         trackControllerToTrackModel.switchState.connect(self.set_switchstate_handler)
-        trackControllerToTrackModel.crossingState.connect(self.set_crossingstate_handler)
+        trackControllerToTrackModel.crossingState.connect(
+            self.set_crossingstate_handler
+        )
         trackControllerToTrackModel.lightState.connect(self.set_lightstate_handler)
 
         """ This section of code is for the connections from signals from the CTC to the handler"""
@@ -1065,20 +1074,22 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_suggested_speed(self, line, wayside, blockNum, suggestedSpeed):
-        self.lines[line - 1].get_wayside(wayside).get_block(blockNum).set_suggestedspeed(suggestedSpeed)
+        self.lines[line - 1].get_wayside(wayside).get_block(
+            blockNum
+        ).set_suggestedspeed(suggestedSpeed)
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_dispatch(self, line, wayside, trainID, authority):
-        #print("line #: ", line)
-        #print("wayside #:, ", wayside)
-        #print("trainID: ", trainID)
-        #print("authority: ", authority)
+        # print("line #: ", line)
+        # print("wayside #:, ", wayside)
+        # print("trainID: ", trainID)
+        # print("authority: ", authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_authority(authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_occupancystate(True)
-        self.set_occupancystate_handler(line,wayside,0,True)
+        self.set_occupancystate_handler(line, wayside, 0, True)
         self.ui.testBenchWindow.refreshed.emit(True)
 
-    """"""""""""""""""""""""""""""""""""""""""""""""""""""
+    """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
     # Method to disable or enable the PLC program for the wayside when the mode is switched to automatic or manual mode
     def handle_mode(self, mode):
@@ -1221,7 +1232,7 @@ class TrackControl(QMainWindow):
                 blockNum = int(match.group(1))
                 print(f"Block number: {blockNum}")
             else:
-                #print("Pattern not matched")
+                # print("Pattern not matched")
                 pass
 
             tempBlock = tempWayside.get_block(blockNum)
@@ -1267,7 +1278,7 @@ class TrackControl(QMainWindow):
                     tempBlock.get_number(),
                     tempBlock.get_switchstate(),
                 )
-            
+
                 trackControllerToTrackModel.lightState.emit(
                     self.ui.lineSelect,
                     self.ui.waysideSelect,
@@ -1371,9 +1382,8 @@ class TrackControl(QMainWindow):
                     block.get_number(), block.get_type(), block.get_failurestate()
                 )
 
-        #elif self.ui.occupancyBox.does_block_exist(num,self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate()):
-            
-        
+        # elif self.ui.occupancyBox.does_block_exist(num,self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate()):
+
         elif state:
             blockStr = "Block {}".format(num)
             self.ui.occupancyBox.add_item(
@@ -1406,7 +1416,7 @@ class TrackControl(QMainWindow):
                 else:
                     self.ui.blockStatus.set_status("Unoccupied")
         else:
-            #print("Pattern not matched")
+            # print("Pattern not matched")
             pass
 
         self.ui.testBenchWindow.refreshed.emit(True)
@@ -1422,7 +1432,11 @@ class TrackControl(QMainWindow):
         # check if the block is currently being displayed, if so, update the display accordingly
         blockNum = -1
         selectedItem = self.ui.comboboxBlockNum.currentText()
-        if selectedItem != "Select State" and selectedItem != "" and self.ui.lineSelect !=0:
+        if (
+            selectedItem != "Select State"
+            and selectedItem != ""
+            and self.ui.lineSelect != 0
+        ):
             try:
                 blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
             except Exception as e:
@@ -1430,7 +1444,7 @@ class TrackControl(QMainWindow):
 
         if blockNum == (num):
             self.ui.lightState.set_state(color)
-        
+
     def set_failurestate_handler(self, line, wayside, num, state):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_failurestate(state)
 
@@ -1508,7 +1522,9 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def set_speed_handler(self, line, wayside, num, speed):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_suggestedspeed(speed)
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_suggestedspeed(
+            speed
+        )
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def set_direction_handler(self, line, wayside, num, direction):
@@ -1520,22 +1536,21 @@ class TrackControl(QMainWindow):
     def set_suggested_authority_handler(self, line, wayside, num, suggestedAuthority):
         pass
 
-
     """ Main Testbench Input Handler """
+
     def handle_input_apply(self, action, line, blockNum, state):
-        
         if action == 0:
             print("You must select an input action.")
             return
-        
+
         if line == 0:
             print("You must select a line.")
             return
-        
+
         # green line selected
         elif line == 1:
             print(int(blockNum))
-            if not(int(blockNum) >= 0 and int(blockNum) <= 150):
+            if not (int(blockNum) >= 0 and int(blockNum) <= 150):
                 print("Enter a valid block number for the green line (0-150)")
                 print("You entered: ", blockNum)
                 return
@@ -1543,28 +1558,30 @@ class TrackControl(QMainWindow):
             # call the block
             block = self.wayside1G.get_block(blockNum)
             waysideNum = 1
-            if(block == None):
+            if block == None:
                 block = self.wayside2G.get_block(blockNum)
                 waysideNum = 2
 
             # set switch state
             if action == 1:
-                if (state == "true" or state == "True" or state == "1"):
+                if state == "true" or state == "True" or state == "1":
                     finalState = True
-                elif(state == "false" or state == "False" or state == "0"):
+                elif state == "false" or state == "False" or state == "0":
                     finalState = False
                 else:
                     print("This is not a valid input for the state. (True/False)")
                     return
-                    
+
                 try:
                     block.set_switchstate(finalState)
                 except Exception as e:
-                    print("This action cannot be performed on a block of type: ", block.get_type())
+                    print(
+                        "This action cannot be performed on a block of type: ",
+                        block.get_type(),
+                    )
                 else:
                     self.set_switchstate_handler(line, waysideNum, blockNum, finalState)
 
-                    
             # Set Crossing State
             elif action == 2:
                 pass
@@ -1576,45 +1593,53 @@ class TrackControl(QMainWindow):
                 pass
             # Set Occupancy State
             elif action == 5:
-                if (state == "true" or state == "True" or state == "1"):
+                if state == "true" or state == "True" or state == "1":
                     finalState = True
-                elif(state == "false" or state == "False" or state == "0"):
+                elif state == "false" or state == "False" or state == "0":
                     finalState = False
                 else:
                     print("This is not a valid input for the state. (True/False)")
                     return
-                    
+
                 try:
                     block.set_occupancystate(finalState)
                 except Exception as e:
                     print("This action cannot be performed on a block of type: ", None)
                 else:
-                    self.set_occupancystate_handler(line, waysideNum, blockNum, finalState)
-            
-            # Set Authority 
+                    self.set_occupancystate_handler(
+                        line, waysideNum, blockNum, finalState
+                    )
+
+            # Set Authority
             elif action == 6:
-                if (state == "true" or state == "True" or state == "1"):
+                if state == "true" or state == "True" or state == "1":
                     finalState = 1
-                elif(state == "false" or state == "False" or state == "0"):
+                elif state == "false" or state == "False" or state == "0":
                     finalState = 0
                 else:
-                    print("This is not a valid input for the state. (True/False or 1/0)")
+                    print(
+                        "This is not a valid input for the state. (True/False or 1/0)"
+                    )
                     return
-                    
+
                 try:
                     block.set_authority(finalState)
                 except Exception as e:
                     print("This action cannot be performed on a block of type: ", None)
                 else:
-                    self.set_authoritystate_handler(line, waysideNum, blockNum, finalState)
+                    self.set_authoritystate_handler(
+                        line, waysideNum, blockNum, finalState
+                    )
 
-            # Set Suggested Speed 
+            # Set Suggested Speed
             elif action == 7:
                 finalState = float(state)
-                if (finalState < 0 or finalState > block.get_speed()):
-                    print("This is not a valid input for the state. (Must range from 0 to block.get_speed)")
+                if finalState < 0 or finalState > block.get_speed():
+                    print(
+                        "This is not a valid input for the state. (Must range from 0 to block.get_speed)"
+                    )
                     return
-                    
+
                 try:
                     block.set_suggestedspeed(finalState)
                 except Exception as e:
@@ -1627,11 +1652,11 @@ class TrackControl(QMainWindow):
                 pass
 
         elif line == 2:
-            if not(blockNum >= 0 and blockNum <= 75):
+            if not (blockNum >= 0 and blockNum <= 75):
                 print("Enter a valid block number for the red line (0-75)")
                 return
-            
-            
+
+
 """
 if __name__ == "__main__":
     app = QApplication(sys.argv)
