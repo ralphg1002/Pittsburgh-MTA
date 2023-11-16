@@ -75,9 +75,9 @@ class Calculations:
         failure_2 = trainObject.failure_status["signal_pickup_failure"]
         failure_3 = trainObject.failure_status["brake_failure"]
         brakes = trainObject.vehicle_status["brakes"]
-        emergency_brake = self.trains.get_value("Train 1", "failure_status", "emergency_brake")
-        force = self.trains.get_value("Train 1", "calculations", "currForce")
-        mass = self.trains.get_value("Train 1", "calculations", "mass")
+        emergency_brake = trainObject.failure_status["emergency_brake"]
+        force = trainObject.calculations["currForce"]
+        mass = trainObject.calculations["mass"]
         power = self.trains.get_value("Train 1", "vehicle_status", "power")
         currVelocity = self.trains.get_value("Train 1", "calculations", "currVelocity")
 
