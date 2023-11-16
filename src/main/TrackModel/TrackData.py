@@ -8,7 +8,6 @@ from signals import (
     trackModelToTrainModel,
     trackModelToTrackController,
 )
-from PyQt5.QtCore import pyqtSignal, QObject
 
 class TrackData:
     redTrackData = {}
@@ -213,6 +212,8 @@ class TrackData:
         # stationName must be caps
         station = Station()
 
+        print(line, stationName, currentPassengers)
+        # print(self.greenTrackData)
         if line == "Red":
             for block in self.redTrackData:
                 if type(block["Infrastructure"]) == str:
@@ -232,12 +233,16 @@ class TrackData:
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
         elif line == "Green":
             for block in self.greenTrackData:
+                print(block["Block Number"])
                 if type(block["Infrastructure"]) == str:
                     if stationName in block["Infrastructure"]:
                         ticketSales = (
                             station.get_ticket_sales()
                         )  # random number generated
-                        block["Ticket Sales"] += ticketSales
+                        tempTicketSales = block["Ticket Sales"]
+                        tempTicketSales += ticketSales
+                        block["Ticket Sales"] = tempTicketSales
+                        print(block["Ticket Sales"])
 
                         waiting = block["Passengers Waiting"] + ticketSales
                         disembarkingPassengers, newPassengers, passengersWaiting = station.get_passenger_exchange(currentPassengers, waiting)
@@ -298,10 +303,10 @@ class TrackData:
     def set_switch_state(self, line, _, blockNum, state):
         # Initial Green Line Occupancy
         if blockNum == 62 and state == 1 and line == 1:
-            self.send_block_data("Green", 0, 0)
+            self.send_block_data("Green", 0, 999)
         # Initial Red Line Occupancy
         elif blockNum == 9 and state == 1 and line == 2:
-            self.send_block_data("Red", 0, 0)
+            self.send_block_data("Red", 0, 999)
         if line == 1:
             for block in self.greenTrackData:
                 if block["Block Number"] == blockNum:
@@ -335,7 +340,9 @@ class TrackData:
         greenBeforeStation = [3, 10, 30, 38, 47, 56, 64, 72, 87, 95, 113, 122, 131, 140]
         if line == "Green":
             # Regular block data emission
-            if curBlock == 0 and prevBlock == 0:
+            if curBlock == 999 and prevBlock == 999:
+                trackModelToTrainModel.blockInfo.emit(0, 0, 0, 0, 0, 0)
+            elif curBlock == 0 and prevBlock == 999:
                 # Set first block's occupancy, no need to clear any occupancy
                 for block in self.greenTrackData:
                     if block["Block Number"] == 62:
