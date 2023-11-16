@@ -241,10 +241,13 @@ class TCFunctions:
             # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
             return
-        elif trainObject.get_powerCommand() <= trainObject.piVariables["powerLimit"]:
+        elif (trainObject.get_powerCommand() < trainObject.piVariables["powerLimit"]) or (trainObject.get_powerCommand() > 0 and trainObject.get_setpointSpeed() < trainObject.get_currentSpeed()):
             newUk = trainObject.piVariables["uk"] + trainObject.piVariables[
                 "samplePeriod"
             ] / 2 * (newError + trainObject.piVariables["prevError"])
+
+            if newUk < 0:
+                newUk = 0
         else:
             newUk = trainObject.piVariables["uk"]
 
@@ -289,6 +292,8 @@ class TCFunctions:
             trainObject.set_powerCommand(self.power3["powerValue"])
             trainObject.piVariables["uk"] = self.power3["uk"]
             trainObject.piVariables["prevError"] = self.power3["prevError"]
+
+        # print(f'Power: {trainObject.powerCommand}, Uk: {trainObject.piVariables["uk"]}, prevError: {trainObject.piVariables["prevError"]}')
 
     def failure_operations(self, trainObject):
         if trainObject.get_engineFailure():
