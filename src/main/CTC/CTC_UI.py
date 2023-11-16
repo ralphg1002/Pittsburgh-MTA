@@ -1552,7 +1552,7 @@ class Routing:
             self.routeQ.append(blockNum)
 
         # F-A
-        for blockNum in range(28, 0, -1):
+        for blockNum in range(29, 0, -1):
             self.routeQ.append(blockNum)
 
         # D-I
