@@ -2671,8 +2671,8 @@ class Calculations:
     def limit_acceleration(self, trainObject):
         # Retrieve necessary values from self.trains
         failure_1 = trainObject.failure_status["engine_failure"]
-        failure_2 = trainObject.failure_status["signal_pickup_failure")
-        failure_3 = trainObject.failure_status["brake_failure")
+        failure_2 = trainObject.failure_status["signal_pickup_failure"]
+        failure_3 = trainObject.failure_status["brake_failure"]
         brakes = trainObject.vehicle_status["brakes"]
         emergency_brake = self.trains.get_value("Train 1", "failure_status", "emergency_brake")
         force = self.trains.get_value("Train 1", "calculations", "currForce")
