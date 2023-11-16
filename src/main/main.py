@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5 import QtGui
 
-#from TrackController.trackcontrol import TrackControl
+from TrackController.trackcontrol import TrackControl
 from TrainControllerSW.tcsw_ui import *
-# from TrackModel.track_model import TrackModel
+from TrackModel.track_model import TrackModel
 from CTC.CTC_UI import *
 from TrainModel.Train_Model import TrainModel
 
@@ -39,10 +39,10 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # Initialize all the different modules
-        #trackControl = TrackControl()
-        #trackControl.ui.hide()
+        trackControl = TrackControl()
+        trackControl.ui.hide()
         self.trainControllerSW = TrainControllerUI()
-        # trackModel = TrackModel()
+        trackModel = TrackModel()
         ctc = CTCWindow()
         trainModel = TrainModel()
 
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         self.box1 = QPushButton("Track Model", self)
         self.box_button(self.box1, 200, 200)
         self.set_relative_right(self.box1, self.logo, 20)
-        # self.box1.clicked.connect(lambda: trackModel.mainWindow.show())
+        self.box1.clicked.connect(lambda: trackModel.mainWindow.show())
 
         self.box2 = QPushButton("Train Model", self)
         self.box_button(self.box2, self.box1.width(), self.box1.height())
