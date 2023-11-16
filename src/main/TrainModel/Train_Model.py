@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import (
 from numpy import block
 from qtwidgets import AnimatedToggle
 from .TrainModel_Functions import *
+from .TrainModel_Calculations import *
 
 sys.path.append("../../main")
 from signals import (
@@ -58,6 +59,7 @@ class TrainModel(QMainWindow):
     def __init__(self):
         super().__init__()
         self.trainsList = []
+        self.functionsInstance = Calculations()
 
         self.time_interval = 1
         self.timer = QTimer(self)
@@ -285,7 +287,126 @@ class TrainModel(QMainWindow):
         )
 
         self.update_drop_down()
+        # Signals that connect from the train controller to the train model
+        trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
+        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(self.signal_emergency_brake)
+        trainControllerSWToTrainModel.sendDriverServiceBrake.connect(self.signal_brake)
+        trainControllerSWToTrainModel.sendAnnouncement.connect(self.signal_announcement)
+        trainControllerSWToTrainModel.sendHeadlightState.connect(self.signal_headlights)
+        trainControllerSWToTrainModel.sendInteriorLightState.connect(self.signal_interior_lights)
+        trainControllerSWToTrainModel.sendLeftDoorState.connect(self.signal_left_door)
+        trainControllerSWToTrainModel.sendRightDoorState.connect(self.signal_right_door)
+        trainControllerSWToTrainModel.sendSetpointTemperature.connect(self.signal_temperature)
+        trainControllerSWToTrainModel.sendAdvertisement.connect(self.signal_advertisements)
 
+        # Signals that connect from the track model to the train model
+        trackModelToTrainModel.blockInfo.connect(self.signal_blockInfo)
+        trackModelToTrainModel.beacon.connect(self.signal_beacon)
+        trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers)
+
+        # Send train controller information
+        for trainObject in self.trainsList:
+            self.functionsInstance.power(trainObject)
+            self.functionsInstance.temperature(trainObject)
+            self.functionsInstance.beacon(trainObject)
+            trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["speed_limit"])
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["current_speed"])
+            trainModelToTrainController.sendCommandedSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["suggested_speed"])
+            trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"], trainObject.navigation_status["authority"])
+            trainModelToTrainController.sendEngineFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["engine_failure"])
+            trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["signal_pickup_failure"])
+            trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
+            trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"], trainObject.failure_status["passenger_emergency_brake"])
+            trainModelToTrainController.sendTemperature.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["temperature"])
+            trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.passenger_status["passengers"], trainObject.calculations["trainID"])
+            trainModelToTrainController.sendNextStation1.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation1"])
+            trainModelToTrainController.sendNextStation2.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation2"])
+            trainModelToTrainController.sendCurrStation.emit(trainObject.calculations["trainID"], trainObject.calculations["currStation"])
+            trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
+            trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])
+            if trainObject.calculations["initialized"]:
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+            if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"]:
+                trainObject.calculations["distance"] = 0
+                trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
+            trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+            trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
+            trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
+            trainObject.navigation_status["prevBlock"] = trainObject.navigation_status["currBlock"]
+            trainObject.calculations["initialized"] = False
+
+    def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
+        for trainObject in self.trainsList:
+            trainObject.calculations["nextBlock"] = nextBlock
+            trainObject.navigation_status["block_length"] = blockLength
+            trainObject.navigation_status["block_grade"] = blockGrade
+            trainObject.vehicle_status["speed_limit"] = speedLimit
+            trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
+            trainObject.navigation_status["authority"] = authority
+        return
+
+    def signal_beacon(self, beaconDict):
+        for trainObject in self.trainsList:
+            trainObject.calculations["nextStation1"] = beaconDict["Next Station1"]
+            trainObject.calculations["nextStation2"] = beaconDict["Next Station2"]
+            trainObject.calculations["currStation"] = beaconDict["Current Station"]
+            trainObject.calculations["doorSide"] = beaconDict["Door Side"]
+        return
+
+    def signal_new_passengers(self, passengers):
+        for trainObject in self.trainsList:
+            trainObject.passenger_status["passengers"] = passengers
+        return
+    def signal_power(self, id, power):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.vehicle_status["power"] = power
+
+    def signal_interior_lights(self, id, status):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.passenger_status["lights_status"] = status
+
+    def signal_left_door(self, id, status):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.passenger_status["left_door"] = status
+
+    def signal_right_door(self, id, status):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.passenger_status["right_door"] = status
+
+    def signal_temperature(self, id, temp):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.calculations["setpoint_temp"] = temp
+
+    def signal_advertisements(self, id, val):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.passenger_status["advertisements"] = val
+
+    def signal_headlights(self, id, status):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.navigation_status["headlights"] = status
+
+    def signal_brake(self, id, eff):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.vehicle_status["brakes"] = eff
+
+    def signal_emergency_brake(self, id, status):
+        for train in self.trainsList:
+            if train.calculations["trainID"] == id:
+                train.failure_status["emergency_brake"] = status
+
+    def signal_announcement(self, id, ann):
+        for train in self.trains:
+            if train.calculations["trainID"] == id:
+                train.passenger_status["announcements"] = ann
 
 class ResultsWindow(QMainWindow):
     # Font variables
