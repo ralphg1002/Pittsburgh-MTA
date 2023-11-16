@@ -26,9 +26,9 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install
 
-      - name: Run Black
-        run: |
-          poetry run black ./src
+      # - name: Run Black
+      #   run: |
+      #     poetry run black ./src
           
       # - name: Run Pylint
         # run: |
