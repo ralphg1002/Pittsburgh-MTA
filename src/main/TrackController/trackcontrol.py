@@ -1,4 +1,5 @@
 import sys, re, os
+from time import sleep
 import pandas as pd
 
 # from PyQt5.QtCore import pyqtSignal
@@ -806,7 +807,7 @@ class TrackControl(QMainWindow):
                     block = blockClass(
                         blockNumber,
                         speedLimit,
-                        0,
+                        1,
                         False,
                         False,
                         False,
@@ -817,7 +818,7 @@ class TrackControl(QMainWindow):
                     block = blockClass(
                         blockNumber,
                         speedLimit,
-                        0,
+                        1,
                         False,
                         False,
                         False,
@@ -829,7 +830,7 @@ class TrackControl(QMainWindow):
                     block = blockClass(
                         blockNumber,
                         speedLimit,
-                        0,
+                        1,
                         False,
                         False,
                         False,
@@ -844,7 +845,7 @@ class TrackControl(QMainWindow):
                     block = blockClass(
                         blockNumber,
                         speedLimit,
-                        0,
+                        1,
                         False,
                         False,
                         False,
@@ -858,7 +859,7 @@ class TrackControl(QMainWindow):
                     block = blockClass(
                         blockNumber,
                         speedLimit,
-                        0,
+                        1,
                         False,
                         False,
                         False,
@@ -869,7 +870,7 @@ class TrackControl(QMainWindow):
                     block = blockClass(
                         blockNumber,
                         speedLimit,
-                        0,
+                        1,
                         False,
                         False,
                         False,
@@ -881,7 +882,7 @@ class TrackControl(QMainWindow):
                     block = blockClass(
                         blockNumber,
                         speedLimit,
-                        0,
+                        1,
                         False,
                         False,
                         False,
@@ -1066,7 +1067,8 @@ class TrackControl(QMainWindow):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
             state
         )
-
+        #print("Sending occupancy to CTC...")
+        trackControllerToCTC.occupancyState.emit(line, num, state)
         # update the occupancy table
         if state == False:
             self.ui.occupancyBox.clear_table()
@@ -1128,6 +1130,7 @@ class TrackControl(QMainWindow):
         self.lines[line - 1].get_wayside(wayside).get_block(num).set_crossingstate(
             state
         )
+        trackControllerToCTC.occupancyState.emit(line, num, state)
         # check if the block is currently being displayed, if so, update the display accordingly
         blockNum = 0
         selectedItem = self.ui.comboboxBlockNum.currentText()
@@ -1394,6 +1397,7 @@ class TrackControl(QMainWindow):
                 # blockStatus.shift_middle()
                 # self.ui.deviceBlock.show()
                 self.ui.blockStatus.show()
+                oldState = tempBlock.get_crossingstate()
                 self.ui.crossing.set_crossing_state(tempBlock.get_crossingstate())
                 self.ui.crossing.show_crossing()
                 self.ui.lightState.show()
@@ -1403,6 +1407,8 @@ class TrackControl(QMainWindow):
                         not tempBlock.get_crossingstate()
                     )
                 )
+
+                self.ui.crossing.switchCrossChanged.connect(lambda: self.set_crossingstate_handler())
 
                 self.ui.lightState.set_state(tempBlock.get_lightstate())
 

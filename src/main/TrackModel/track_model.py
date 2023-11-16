@@ -1904,7 +1904,7 @@ class TrackModel:
         self.ticketSalesOutput = QLabel(self.mainWindow)
         self.ticketSalesOutput.setFont(font)
         self.ticketSalesOutput.setStyleSheet(style)
-        self.ticketSalesOutput.setGeometry(800, 830, 200, 25)
+        self.ticketSalesOutput.setGeometry(850, 830, 200, 25)
 
         self.waitingLabel = QLabel(self.mainWindow)
         self.waitingLabel.setFont(font)
@@ -1916,7 +1916,7 @@ class TrackModel:
         self.waitingOutput = QLabel(self.mainWindow)
         self.waitingOutput.setFont(font)
         self.waitingOutput.setStyleSheet(style)
-        self.waitingOutput.setGeometry(800, 860, 200, 25)
+        self.waitingOutput.setGeometry(850, 860, 200, 25)
 
         self.boardingLabel = QLabel(self.mainWindow)
         self.boardingLabel.setFont(font)
@@ -1928,7 +1928,7 @@ class TrackModel:
         self.boardingOutput = QLabel(self.mainWindow)
         self.boardingOutput.setFont(font)
         self.boardingOutput.setStyleSheet(style)
-        self.boardingOutput.setGeometry(800, 890, 200, 25)
+        self.boardingOutput.setGeometry(850, 890, 200, 25)
 
         self.leavingLabel = QLabel(self.mainWindow)
         self.leavingLabel.setFont(font)
@@ -1940,7 +1940,7 @@ class TrackModel:
         self.leavingOutput = QLabel(self.mainWindow)
         self.leavingOutput.setFont(font)
         self.leavingOutput.setStyleSheet(style)
-        self.leavingOutput.setGeometry(800, 920, 200, 25)
+        self.leavingOutput.setGeometry(850, 920, 200, 25)
 
     def update_blockinfo(self):
         if self.selectedLine == "Green":
