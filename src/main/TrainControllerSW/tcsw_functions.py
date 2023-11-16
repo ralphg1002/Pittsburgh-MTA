@@ -177,10 +177,17 @@ class TCFunctions:
         )
         if trainObject.block["blockLength"] == 0:
             trainObject.distanceRatio = 0
+            trainObject.blockTravelled = 0
+        elif trainObject.block["blockLength"] == trainObject.blockTravelled:
+            trainObject.distanceRatio = 0
+            trainObject.blockTravelled = 0
         else:
             trainObject.distanceRatio = (
                 trainObject.blockTravelled / trainObject.block["blockLength"]
             )
+        trainObject.blockTravelled += trainObject.prevSpeed
+        trainObject.prevSpeed = trainObject.currentSpeed
+
 
         for block in blockDict:
             if block["Number"] == trainObject.block["blockNumber"]:
