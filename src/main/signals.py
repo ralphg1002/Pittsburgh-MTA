@@ -63,6 +63,7 @@ class TrainModelToTrainController(QObject):
     sendSignalPickupFailure = pyqtSignal(str, bool)
     sendBrakeFailure = pyqtSignal(str, bool)
     sendPolarity = pyqtSignal(str, bool)
+    sendBlockNumber = pyqtSignal(str, int)
 
 
 ##########################################################################################
