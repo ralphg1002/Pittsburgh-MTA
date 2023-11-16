@@ -23,6 +23,8 @@ from numpy import block
 from qtwidgets import AnimatedToggle
 from .TrainModel_Functions import *
 from .TrainModel_Calculations import *
+from .TrainModel_Functions import *
+from .TrainModel_Calculations import *
 
 sys.path.append("../../main")
 from signals import (
@@ -851,6 +853,74 @@ class ResultsWindow(QMainWindow):
             "Emergency Brake: {}",
         ]
 
+        # QLabel for engine failure
+        self.word_label_engine_failure = QLabel(
+            "Engine Failure {}".format(self.trainsList[0].failure_status["engine_failure"]),
+            self.failure_white_background_label
+        )
+        self.word_label_engine_failure.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_engine_failure.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_engine_failure.setContentsMargins(0, 0, 0, 0)
+        self.word_label_engine_failure.setFont(QFont("Arial", 9))
+
+        # QLabel for signal pickup failure
+        self.word_label_signal_pickup_failure = QLabel(
+            "Signal Pickup Failure {}".format(self.trainsList[0].failure_status["signal_pickup_failure"]),
+            self.failure_white_background_label
+        )
+        self.word_label_signal_pickup_failure.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_signal_pickup_failure.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_signal_pickup_failure.setContentsMargins(0, 0, 0, 0)
+        self.word_label_signal_pickup_failure.setFont(QFont("Arial", 9))
+
+        # QLabel for brake failure
+        self.word_label_brake_failure = QLabel(
+            "Brake Failure {}".format(self.trainsList[0].failure_status["brake_failure"]),
+            self.failure_white_background_label
+        )
+        self.word_label_brake_failure.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_brake_failure.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_brake_failure.setContentsMargins(0, 0, 0, 0)
+        self.word_label_brake_failure.setFont(QFont("Arial", 9))
+
+        # QLabel for emergency brake
+        self.word_label_emergency_brake = QLabel(
+            "Emergency Brake {}".format(self.trainsList[0].failure_status["emergency_brake"]),
+            self.failure_white_background_label
+        )
+        self.word_label_emergency_brake.setStyleSheet(
+            "color: #000000; background-color: transparent; border: none;"
+        )
+        self.word_label_emergency_brake.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.word_label_emergency_brake.setContentsMargins(0, 0, 0, 0)
+        self.word_label_emergency_brake.setFont(QFont("Arial", 9))
+
+        # Add QLabel widgets to layout
+        self.failure_white_background_layout.addWidget(
+            self.word_label_engine_failure, alignment=Qt.AlignTop
+        )
+
+        # Add QLabel widgets to layout
+        self.failure_white_background_layout.addWidget(
+            self.word_label_signal_pickup_failure, alignment=Qt.AlignTop
+        )
+
+        # Add QLabel widgets to layout
+        self.failure_white_background_layout.addWidget(
+            self.word_label_brake_failure, alignment=Qt.AlignTop
+        )
+
+        # Add QLabel widgets to layout
+        self.failure_white_background_layout.addWidget(
+            self.word_label_emergency_brake, alignment=Qt.AlignTop
+        )
+        
         # failure_status = {}
 
         # # Check if the selected train exists in the trains dictionary
@@ -1510,6 +1580,22 @@ class ResultsWindow(QMainWindow):
 
             self.word_label_power_limit.setText(
                 "Power Limit {} kW".format(trainObject.vehicle_status["power_limit"])
+            )
+
+            self.word_label_engine_failure.setText(
+                "Engine Failure {}".format(self.trainsList[0].failure_status["engine_failure"])
+            )
+
+            self.word_label_signal_pickup_failure.setText(
+                "Signal Pickup Failure {}".format(self.trainsList[0].failure_status["signal_pickup_failure"])
+            )
+
+            self.word_label_brake_failure.setText(
+                "Brake Failure {}".format(self.trainsList[0].failure_status["brake_failure"])
+            )
+
+            self.word_label_emergency_brake.setText(
+                "Emergency Brake {}".format(self.trainsList[0].failure_status["emergency_brake"])
             )
 
             self.word_label_passengers.setText(
