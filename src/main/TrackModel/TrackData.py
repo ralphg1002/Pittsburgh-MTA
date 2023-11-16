@@ -223,11 +223,7 @@ class TrackData:
                         block["Ticket Sales"] += ticketSales
 
                         waiting = block["Passengers Waiting"] + ticketSales
-                        (
-                            disembarkingPassengers,
-                            newPassengers,
-                            passengersWaiting,
-                        ) = station.get_passenger_exchange(currentPassengers, waiting)
+                        disembarkingPassengers, newPassengers, passengersWaiting = station.get_passenger_exchange(currentPassengers, waiting)
 
                         block["Passengers Disembarking"] = disembarkingPassengers
                         block["Passengers Boarding"] = newPassengers
@@ -244,16 +240,12 @@ class TrackData:
                         block["Ticket Sales"] += ticketSales
 
                         waiting = block["Passengers Waiting"] + ticketSales
-                        (
-                            disembarkingPassengers,
-                            newPassengers,
-                            passengersWaiting,
-                        ) = station.get_passenger_exchange(currentPassengers, waiting)
+                        disembarkingPassengers, newPassengers, passengersWaiting = station.get_passenger_exchange(currentPassengers, waiting)
 
                         block["Passengers Disembarking"] = disembarkingPassengers
                         block["Passengers Boarding"] = newPassengers
                         block["Passengers Waiting"] = passengersWaiting
-                        # print(ticketSales, passengersWaiting, disembarkingPassengers, newPassengers)
+                        print(ticketSales, passengersWaiting, disembarkingPassengers, newPassengers)
 
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
 

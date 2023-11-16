@@ -1886,8 +1886,66 @@ class TrackModel:
         self.trackHeaterLabel.setFont(font)
         self.trackHeaterLabel.setStyleSheet(style)
         self.trackHeaterLabel.setGeometry(750, 575, 110, 25)
+        
+        #Station Labels:
+        self.stationNameLabel = QLabel(self.mainWindow)
+        self.stationNameLabel.setFont(font)
+        self.stationNameLabel.setStyleSheet(style)
+        self.stationNameLabel.setGeometry(650, 800, 200, 25)
+        
+        self.ticketSalesLabel = QLabel(self.mainWindow)
+        self.ticketSalesLabel.setFont(font)
+        self.ticketSalesLabel.setStyleSheet(style)
+        self.ticketSalesLabel.setText("Ticket Sales:")
+        self.ticketSalesLabel.setGeometry(600, 830, 200, 25)
+        self.ticketSalesLabel.hide()
+        
+        self.ticketSalesOutput = QLabel(self.mainWindow)
+        self.ticketSalesOutput.setFont(font)
+        self.ticketSalesOutput.setStyleSheet(style)
+        self.ticketSalesOutput.setGeometry(800, 830, 200, 25)
+        
+        self.waitingLabel = QLabel(self.mainWindow)
+        self.waitingLabel.setFont(font)
+        self.waitingLabel.setStyleSheet(style)
+        self.waitingLabel.setText("Passengers Waiting:")
+        self.waitingLabel.setGeometry(600, 860, 200, 25)
+        self.waitingLabel.hide()
+        
+        self.waitingOutput = QLabel(self.mainWindow)
+        self.waitingOutput.setFont(font)
+        self.waitingOutput.setStyleSheet(style)
+        self.waitingOutput.setGeometry(800, 860, 200, 25)
+        
+        self.boardingLabel = QLabel(self.mainWindow)
+        self.boardingLabel.setFont(font)  
+        self.boardingLabel.setStyleSheet(style)
+        self.boardingLabel.setText("Passengers Boarding:")
+        self.boardingLabel.setGeometry(600, 890, 200, 25)
+        self.boardingLabel.hide()
+        
+        self.boardingOutput = QLabel(self.mainWindow)
+        self.boardingOutput.setFont(font)
+        self.boardingOutput.setStyleSheet(style)
+        self.boardingOutput.setGeometry(800, 890, 200, 25)
+        
+        self.leavingLabel = QLabel(self.mainWindow)
+        self.leavingLabel.setFont(font)
+        self.leavingLabel.setStyleSheet(style)
+        self.leavingLabel.setText("Passengers Disembarking:")
+        self.leavingLabel.setGeometry(600, 920, 200, 25)
+        self.leavingLabel.hide()
+        
+        self.leavingOutput = QLabel(self.mainWindow)
+        self.leavingOutput.setFont(font)
+        self.leavingOutput.setStyleSheet(style)
+        self.leavingOutput.setGeometry(800, 920, 200, 25)
 
     def update_blockinfo(self):
+        if self.selectedLine == "Green":
+            self.trackData = self.block.get_data("Green")
+        elif self.selectedLine == "Red":
+            self.trackData = self.block.get_data("Red")
         self.parse_block_info()
         self.set_blocklength()
         self.set_speedlimit()
@@ -1895,6 +1953,7 @@ class TrackModel:
         self.set_elevation()
         self.set_cumelevation()
         self.set_trackheater()
+        self.show_station_data()
 
     def set_blocklength(self):
         self.blockLengthLabel.setText(f"{self.blockLength} m")
@@ -1932,6 +1991,38 @@ class TrackModel:
                 ]  # Store new blocks data in self.failures
                 print(self.failures)
                 self.check_failures()
+    
+    def show_station_data(self):
+        blockNumber = self.entryField.text()
+        
+        if self.selectedLine == "Green":
+            for data in self.trackData:
+                if data["Block Number"] == int(blockNumber):
+                    if type(data["Infrastructure"]) == str:
+                        stationName = str(data["Infrastructure"])
+                        stationName = stationName.split(';')[0]
+                        print(stationName)
+                        # if stationName in data["Infrastructure"]:
+                        #     print(data["Infrasctructure"])#Left off here
+                        self.stationNameLabel.setText(f"{stationName}")
+                        self.ticketSalesLabel.show()
+                        self.waitingLabel.show()
+                        self.boardingLabel.show()
+                        self.leavingLabel.show()
+                        self.ticketSalesOutput.setText(f"{data['Ticket Sales']}")
+                        self.waitingOutput.setText(f"{data['Passengers Waiting']}")
+                        self.boardingOutput.setText(f"{data['Passengers Boarding']}")
+                        self.leavingOutput.setText(f"{data['Passengers Disembarking']}")
+                    else:
+                        self.stationNameLabel.setText(f"")
+                        self.ticketSalesOutput.hide()
+                        self.waitingOutput.hide()
+                        self.boardingOutput.hide()
+                        self.leavingOutput.hide()
+                        self.ticketSalesLabel.hide()
+                        self.waitingLabel.hide()
+                        self.boardingLabel.hide()
+                        self.leavingLabel.hide()
 
     def check_failures(self):
         if "Track Circuit Failure" in self.failures:
@@ -2133,6 +2224,7 @@ class TestbenchWindow:
         
         #New
         self.add_occupancy_test()
+        self.add_passenger_test()
 
     def add_mta_logo(self):
         mtaLogo = QLabel(self.testbench)
@@ -2380,6 +2472,41 @@ class TestbenchWindow:
             cur = ''
         next = int(self.occupancyNextBlock.text())
         trainModelToTrackModel.sendPolarity.emit(line, next, cur)
+        
+    def add_passenger_test(self):
+        selectLineLabel = QLabel("Select Line:", self.testbench)
+        selectLineLabel.setGeometry(500, 300, 75, 30)
+        selectLineLabel.setStyleSheet("font-weight: bold")
+        self.passengerLineInput = QLineEdit(self.testbench)
+        self.passengerLineInput.setGeometry(570, 300, 50, 30)
+        self.passengerLineInput.setStyleSheet("background-color: white")
+        
+        stationNameLabel = QLabel("Station Name:", self.testbench)
+        stationNameLabel.setGeometry(625, 300, 100, 30)
+        stationNameLabel.setStyleSheet("font-weight: bold")
+        self.passengerStationName = QLineEdit(self.testbench)
+        self.passengerStationName.setGeometry(710, 300, 50, 30)
+        self.passengerStationName.setStyleSheet("background-color: white")
+        
+        passengers = QLabel("Passengers:", self.testbench)
+        passengers.setGeometry(770, 300, 100, 30)
+        passengers.setStyleSheet("font-weight: bold")
+        self.trainPassengers = QLineEdit(self.testbench)
+        self.trainPassengers.setGeometry(840, 300, 50, 30)
+        self.trainPassengers.setStyleSheet("background-color: white")
+        
+        signalTest = QPushButton("Passenger Test", self.testbench)
+        signalTest.setGeometry(625, 340, 100, 30)
+        signalTest.setStyleSheet(
+            "background-color: green; color: white; font-weight: bold"
+        )
+        signalTest.clicked.connect(self.send_passenger_signal)
+        
+    def send_passenger_signal(self): 
+        line = self.passengerLineInput.text()
+        station = self.passengerStationName.text()
+        passengersOnBoard = int(self.trainPassengers.text())
+        trainModelToTrackModel.sendCurrentPassengers.emit(line, station, passengersOnBoard)
 
 
 if __name__ == "__main__":
