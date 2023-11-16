@@ -833,29 +833,28 @@ class TrainControllerUI(QMainWindow):
         self.box_label(self.authorityBox, self.commandedPowerBox.width(), 100)
         self.set_relative_below(self.authorityBox, self.currentSpeedBox, 20)
 
-        # self.authorityVal = QLabel(self)
-        # self.authorityVal.setText("888888888")
-        # self.regular_label(self.authorityVal)
-        # self.authorityVal.setText("0")
-        # self.authorityVal.setAlignment(Qt.AlignCenter)
-        # self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
-        # self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 10)
-
-        # self.miLabel = QLabel("Status", self)
-        # self.text_label(self.miLabel)
-        # self.set_relative_below_center(self.miLabel, self.authorityBox, 10)
-        # self.miLabel.move(self.miLabel.x(), self.authorityBox.y() + 10)
-
-
         self.authorityVal = QLabel(self)
-        self.png_label(self.authorityVal, self.pixmapGoSign)
-        self.authorityVal.adjustSize()
+        self.authorityVal.setText("888888888")
+        self.regular_label(self.authorityVal)
+        self.authorityVal.setText("0")
+        self.authorityVal.setAlignment(Qt.AlignCenter)
         self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
-        self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 5)
+        self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 10)
+
+        self.miLabel = QLabel("mi", self)
+        self.text_label(self.miLabel)
+        self.set_relative_below_center(self.miLabel, self.authorityVal, 10)
+
+        # self.authorityVal = QLabel(self)
+        # self.png_label(self.authorityVal, self.pixmapGoSign)
+        # self.authorityVal.adjustSize()
+        # self.set_relative_below_center(self.authorityVal, self.authorityBox, 10)
+        # self.authorityVal.move(self.authorityVal.x(), self.authorityBox.y() + 5)
 
         self.authorityLabel = QLabel("Authority", self)
         self.regular_label(self.authorityLabel)
-        self.set_relative_below_center(self.authorityLabel, self.authorityVal, 5)
+        self.set_relative_below_center(self.authorityLabel, self.miLabel, 10)
+        # self.set_relative_below_center(self.authorityLabel, self.authorityVal, 5)
 
         self.authorityBox.setFixedHeight(
             self.authorityLabel.y()
@@ -947,7 +946,8 @@ class TrainControllerUI(QMainWindow):
     def update(self):
         # Update Train ID list
         # from CTC
-        masterSignals.addTrain.connect(lambda: self.signal_addTrain)
+        # masterSignals.addTrain.emit("green", "test")
+        masterSignals.addTrain.connect(self.signal_addTrain)
 
         # from test bench
         for train in self.testWindow.testbenchVariables["trainList"]:
@@ -1026,6 +1026,11 @@ class TrainControllerUI(QMainWindow):
                 self.tcFunctions.automatic_operations(train)
             if train.block["blockNumber"] == 0:
                 train.nextStop = blockDict[0]["firstStation"]
+            else:
+                if train.prevStop != train.beacon["nextStop"][0]:
+                    train.nextStop = train.beacon["nextStop"][0]
+                else:
+                    train.nextStop = train.beacon["nextStop"][1]
             if train.get_trainID() == self.tcVariables["trainID"]:
                 # TRAIN MODEL INPUTS
                 # current temp
@@ -1034,32 +1039,6 @@ class TrainControllerUI(QMainWindow):
                 # speed limit
                 self.speedLimitLabel.setText("Limit: " + str(train.get_speedLimit()))
                 self.speedLimitLabel.adjustSize()
-
-                # authority
-                if not train.get_authority():
-                    self.png_label(self.authorityVal, self.pixmapStopSign)
-                    self.authorityVal.adjustSize()
-                    # self.authorityVal.setText(
-                    #     str(
-                    #         math.floor(
-                    #             self.tcFunctions.distance_between(
-                    #                 blockDict,
-                    #                 train.block["blockNumber"],
-                    #                 self.tcFunctions.find_block(
-                    #                     blockDict, train.nextStop
-                    #                 ),
-                    #             )
-                    #             / 1609
-                    #         )
-                    #     )
-                    # )
-                else:
-                    self.png_label(self.authorityVal, self.pixmapGoSign)
-                    self.authorityVal.adjustSize()
-                    # self.authorityVal.setText(
-                    #     str(math.floor(train.block["blockLength"] / 1609))
-                    # )
-                self.authorityVal.setAlignment(Qt.AlignCenter)
 
                 # commanded speed
                 self.suggestedSpeedLabel.setText(
@@ -1090,9 +1069,6 @@ class TrainControllerUI(QMainWindow):
                 # passenger brake
                 if train.get_paxEbrake():
                     self.emergencyBrakeButton.setChecked(True)
-
-                # setpoint speed range
-                self.setpointSpeedValue.setRange(0, train.get_speedLimit())
 
                 # ENGINEER INPUTS
                 train.set_kp(self.kpEdit.value())
@@ -1255,6 +1231,16 @@ class TrainControllerUI(QMainWindow):
                 self.prevStopLabel.setAlignment(Qt.AlignLeft)
                 self.prevStopLabel.adjustSize()
 
+                # authority
+                self.authorityVal.setText(str(math.floor(train.authorityVal / 1609)))
+                self.authorityVal.setAlignment(Qt.AlignCenter)
+
+                # setpoint speed range
+                self.setpointSpeedValue.setRange(0, train.get_speedLimit())
+                if train.safetyLimit < train.get_speedLimit():
+                    self.setpointSpeedValue.setRange(0, train.safetyLimit)
+
+                # lights
                 if train.get_interiorLights() and train.get_headlights():
                     self.png_label(self.trainLabel, self.pixmapTrainLts)
                 elif train.get_interiorLights():
@@ -1338,7 +1324,6 @@ class TrainControllerUI(QMainWindow):
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
 
     def signal_addTrain(self, line, name):
-        print("made it here")
         train = {line: name}
         idCheck = False
         for i in self.tcVariables["trainList"]:
@@ -1466,6 +1451,8 @@ class TrainControllerUI(QMainWindow):
             + "_"
             + self.trainNumberCombo.currentText()
         )
+        for train in self.tcFunctions.trainList:
+            train.set_auto(True)
 
     def send_announcement(self):
         self.tcVariables["customAnnouncement"] = self.announcementEdit.text()

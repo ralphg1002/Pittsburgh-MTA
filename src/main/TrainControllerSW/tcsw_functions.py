@@ -40,7 +40,6 @@ class TCFunctions:
         firstStationName = ""
 
         for block in data:
-            switchBlocks = []
             modifiedBlock = {"Line": "line",
                              "Section": "letter",
                              "Number": 0,
@@ -62,13 +61,15 @@ class TCFunctions:
                 modifiedStationName = modifiedStationName.replace("; UNDERGROUND", "")
                 modifiedStationName = modifiedStationName.replace(" (First)", "")
                 modifiedBlock["stationName"] = modifiedStationName
-                modifiedBlock["Infrastructure"] = modifiedStationName
+                modifiedBlock["Infrastructure"] = "STATION"
             if "UNDERGROUND" in block["Infrastructure"]:
                 modifiedBlock["isTunnel"] = True
             if "SWITCH" in block["Infrastructure"]:
                 modifiedBlock["Infrastructure"] = "SWITCH"
-                affectedBlocks = re.findall(r'\d+', block["Infrastructure"])
-                affectedBlocks = [int(num) for num in affectedBlocks]
+                switchBlocks = re.findall(r'\d+', block["Infrastructure"])
+                switchBlocks = [int(num) for num in switchBlocks]
+                for aBlock in switchBlocks:
+                    affectedBlocks.append(aBlock)
             if "RAILWAY CROSSING" in block["Infrastructure"]:
                 modifiedBlock["Infrastructure"] = "RAILWAY CROSSING"
             if "(First)" in block["Infrastructure"]:
@@ -76,6 +77,7 @@ class TCFunctions:
             if modifiedBlock["Infrastructure"] != "":
                 affectedBlocks.append(modifiedBlock["Number"] - 1)
                 affectedBlocks.append(modifiedBlock["Number"] + 1)
+
             affectedBlocks = list(set(affectedBlocks))
             for affected in affectedBlocks:
                 if affected == modifiedBlock["Number"]:
@@ -95,15 +97,17 @@ class TCFunctions:
         self.trainList.append(trainObject)
 
     def stopping_operations(self, trainObject):
+
         if not trainObject.get_authority():
+            # assumed in m
+            trainLength = 32.2
+            distance = (trainObject.block["blockLength"] + trainLength) / 2
+            speedLim = 2.73 * distance * 2 + trainObject.speedLimit
+            trainObject.safetyLimit = math.ceil(speedLim * 2.237)
             if trainObject.get_auto():
                 # assuming using imperial units
                 # mph to m/s
                 currentSpeed = trainObject.get_currentSpeed() / 2.237
-
-                # assumed in m
-                trainLength = 32.2
-                distance = (trainObject.block["blockLength"] + trainLength) / 2
 
                 deceleration = currentSpeed * currentSpeed / 2 / distance
 
@@ -117,8 +121,30 @@ class TCFunctions:
 
                 trainObject.set_driverSbrake(efficacy)
 
-            if trainObject.get_speedLimit() > 20:
-                trainObject.set_speedLimit(20)
+        if trainObject.block["limit"]:
+            # assumed in m
+            distance = trainObject.block["blockLength"]
+            speedLim = 13.6
+            trainObject.safetyLimit = math.ceil(speedLim * 2.237)
+
+            # a = (Vf * Vf - Vi * Vi) / (2 * d)
+            if trainObject.get_auto():
+                # assuming using imperial units
+                # mph to m/s
+                currentSpeed = trainObject.get_currentSpeed() / 2.237
+
+                # m/s^2
+                deceleration = (speedLim * speedLim - currentSpeed * currentSpeed) / 2 / distance
+
+                if deceleration < 0:
+                    efficacy = 0
+                elif deceleration > 1.2:
+                    trainObject.set_driverEbrake(True)
+                    return
+                else:
+                    efficacy = deceleration / 1.2
+
+                trainObject.set_driverSbrake(efficacy)
 
     def station_operations(self, trainObject):
         if (
@@ -138,87 +164,23 @@ class TCFunctions:
             trainObject.set_rightDoor(False)
             trainObject.set_announcement("")
 
-    def find_block_by_stationName(self, blockDict, stationName):
-        for block in blockDict:
-            if block["stationName"] == stationName:
-                return block["Number"]
-
-    def find_station_by_section(self, blockDict, section):
-        for block in blockDict:
-            if block["Section"] == section and block["isStation"] == True:
-                return block["stationName"]
-
-    def distance_between(self, blockDict, start, end):
-        distanceCounter = 0
-        if start < end:
-            for block in blockDict:
-                if start <= block["Number"] <= end:
-                    distanceCounter += block["Length"]
-        else:
-            for block in blockDict:
-                if end <= block["Number"] <= start:
-                    distanceCounter += block["Length"]
-
-        return distanceCounter
-
-    def location_tracker(self, blockDict, trainObject):
-        self.timeTravelled = 0
-        self.nextInfrastructure = ""
-        self.distanceToNextStation = 0
-        self.distanceToInfrastructure = 0
-        self.distanceTravelled = 0
-        self.distanceRatio = 0
-        if trainObject.block["isStation"]:
-            trainObject.distanceTravelled = 0
-            trainObject.distanceRatio = 0
-        #if trainObject.block["infrastructure"] == trainObject.nextInfrastructure:
-
-
-        if trainObject.prevStop != trainObject.beacon["currStop"]:
-            if trainObject.prevStop != trainObject.beacon["nextStop"][0]:
-                trainObject.nextStop = trainObject.beacon["nextStop"][0]
-            else:
-                trainObject.nextStop = trainObject.beacon["nextStop"][1]
-        trainObject.prevStop = trainObject.beacon["currStop"]
-
-        if (
-            trainObject.stationDistance == 0
-            or trainObject.prevStop == ""
-            or trainObject.nextStop == ""
-        ):
-            trainObject.distanceRatio = 0
-            return
-
-        trainObject.stationDistance = self.distance_between(
-            blockDict,
-            self.find_block_by_stationName(blockDict, trainObject.prevStop),
-            self.find_block_by_stationName(blockDict, trainObject.nextStop),
-        )
-        trainObject.distanceTravelled = self.distance_between(
-            blockDict,
-            self.find_block_by_stationName(blockDict, trainObject.prevStop),
-            trainObject.block["blockNumber"],
-        )
-        trainObject.distanceRatio = (
-            trainObject.distanceTravelled / trainObject.stationDistance
-        )
-
     def update_block_info(self, blockDict, trainObject):
-        if trainObject.prevPolarity != trainObject.polarity:
-            if trainObject.prevStop == trainObject.nextStop:
-                trainObject.block["blockNumber"] += 0
-            elif self.find_block_by_stationName(blockDict, trainObject.prevStop) < self.find_block_by_stationName(
-                    blockDict, trainObject.nextStop):
-                trainObject.block["blockNumber"] += 1
-            else:
-                trainObject.block["Number"] -= 1
-            trainObject.prevPolarity = trainObject.polarity
+        trainObject.authorityVal = trainObject.block["blockLength"] - trainObject.blockTravelled
+        if trainObject.block["blockLength"] == 0:
+            trainObject.distanceRatio = 0
+        else:
+            trainObject.distanceRatio = trainObject.blockTravelled / trainObject.block["blockLength"]
 
         for block in blockDict:
             if block["Number"] == trainObject.block["blockNumber"]:
                 trainObject.block["blockLength"] = block["Length"]
                 trainObject.block["isStation"] = block["isStation"]
                 trainObject.block["isTunnel"] = block["isTunnel"]
+
+        if trainObject.prevPolarity != trainObject.polarity:
+            trainObject.blockTravelled = 0
+            trainObject.authorityVal = trainObject.block["blockLength"]
+            trainObject.prevPolarity = trainObject.polarity
 
     def light_operations(self, trainObject):
         if trainObject.block["isTunnel"]:
@@ -246,8 +208,8 @@ class TCFunctions:
             return
 
     def pi_calculation(self, trainObject, powerDict):
-        # calculate new velocity error
-        newError = trainObject.get_setpointSpeed() - trainObject.get_currentSpeed()
+        # calculate new velocity error mph -> m/s
+        newError = (trainObject.get_setpointSpeed() - trainObject.get_currentSpeed()) / 2.237
 
         # calculate new uk
         if newError == 0 and trainObject.piVariables["prevError"] == 0:
@@ -328,7 +290,6 @@ class TCFunctions:
         trainObject.set_setpointTemp(70)
 
     def regular_operations(self, blockDict, trainObject):
-        self.location_tracker(blockDict, trainObject)
         self.update_block_info(blockDict, trainObject)
         self.failure_operations(trainObject)
         self.stopping_operations(trainObject)
