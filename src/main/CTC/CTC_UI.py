@@ -643,8 +643,8 @@ class CTCWindow(QMainWindow):
         # self.show()
         # self.blockDropDown.currentIndexChanged.connect(self.statusHandler)  # Connect the signal to update the dropdown
 
-    # def statusHandler(self):
-    # Block.updateStatusLabel(self)
+    #def statusHandler(self):
+        #Block.updateStatusLabel(self)
 
     def ticketRequest(self):
         beforeLine = self.selectLine.currentText()
@@ -652,9 +652,9 @@ class CTCWindow(QMainWindow):
             requestLine = "Green"
         else:
             requestLine = "Red"
-
+            
         ctcToTrackModel.requestThroughput.emit(requestLine)
-
+    
     def updateTickets(self, throughput):
         throughput_text = f"Throughput: {throughput}"
         self.throughput_label.setText(throughput_text)
@@ -1620,7 +1620,7 @@ class Routing:
         else:
             track = "Red"
         trainLine = self.main_window.selectLine.currentText()
-        # for train_id, routeQ in self.train_routes.items():
+        #for train_id, routeQ in self.train_routes.items():
         if occupancy == True and blockNum == self.routeQ[1] and trainLine == track:
             self.routeQ.pop(0)
             nextBlock = self.routeQ[1]
