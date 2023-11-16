@@ -882,7 +882,7 @@ class ResultsWindow(QMainWindow):
                 word_key = (
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
-
+                
                 label_text = word_placeholders.format(word_value)
 
                 # Update the text of the QLabel
@@ -893,7 +893,7 @@ class ResultsWindow(QMainWindow):
                 word_key = (
                     word_placeholders.split(":")[0].strip().lower().replace(" ", "_")
                 )
-
+                
                 label_text = word_placeholders.format(word_value)
 
                 # Update the text of the QLabel
@@ -993,12 +993,8 @@ class ResultsWindow(QMainWindow):
         self.trains.set_value("Train 1", "calculations", 17, train)
         self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
 
-    def signal_blockInfo(
-        self, next_block, length, grade, speed_limit, suggested_speed, authority
-    ):
-        self.calculations.blockInfo(
-            next_block, length, grade, speed_limit, suggested_speed, authority
-        )
+    def signal_blockInfo(self, next_block, length, grade, speed_limit, suggested_speed, authority):
+        self.calculations.blockInfo(next_block, length, grade, speed_limit, suggested_speed, authority)
 
     def signal_beacon(self, beacon):
         self.calculations.beacon(beacon)
@@ -2590,11 +2586,98 @@ class MurphyTestWindow(QMainWindow):
         self.clock_label.setText(time_text)
 
 
+# Output to track model module
+class OutputTrackModel:
+    train = SharedData()
+
+    currentPassengers = train.get_value("Train 1", "passenger_status", 1)
+    # TrackModelSignals.sendCurrentPassengers(currentPassengers)
+
+
+# Output to train controller module
+class OutputTrainController:
+    train = SharedData()
+
+    speedLimit = train.get_value("Train 1", "vehicle_status", 1)
+    # TrainControllerSignals.sendSpeedLimit(speedLimit)
+
+    currentSpeed = train.get_value("Train 1", "vehicle_status", 2)
+    # TrainControllerSignals.sendCurrentSpeed(currentSpeed)
+
+    engineFailure = train.get_value("Train 1", "failure_status", 1)
+    # TrainControllerSignals.sendEngineFailure(engineFailure)
+
+    signalPickupFailure = train.get_value("Train 1", "failure_status", 2)
+    # TrainControllerSignals.sendSignalPickupFailure(signalPickupFailure)
+
+    brakeFailure = train.get_value("Train 1", "failure_status", 3)
+    # TrainControllerSignals.sendBrakeFailure(brakeFailure)
+
+    left_door = train.get_value("Train 1", "passenger_status", 3)
+    # TrainControllerSignals.sendLeftDoor(left_door)
+
+    right_door = train.get_value("Train 1", "passenger_status", 4)
+    # TrainControllerSignals.sendRightDoor(right_door)
+
+    next_station = train.get_value("Train 1", "navigation_status", 5)
+    # TrainControllerSignals.sendNextStation(next_station)
+
+    prev_station = train.get_value("Train 1", "navigation_status", 6)
+    # TrainControllerSignals.sendPrevStation(prev_station)
+
+    tunnel = train.get_value("Train 1", "navigation_status", 7)
+    # TrainControllerSignals.sendEnterTunnel(tunnel)
+
+    temperature = train.get_value("Train 1", "passenger_status", 7)
+    # TrainControllerSignals.sendTemperature(temperature)
+
+    train_id = "Train 1"
+
+    def updateCurrentSpeed(new_speed):
+        OutputTrainController.currentSpeed = new_speed
+
+
+class InputsTrackModel:
+    def get_Track_Model_Inputs():
+        block = 9
+        if block["Block Number"] == 9:  # Section C, Edgebrook
+            block["Beacon"] = {
+                "Next Station1": "Pioneer",
+                "Next Station2": "",
+                "Current Station": "Edgebrook",
+                "Door Side": block["Station Side"],
+            }
+        return block
+
+
+class InputsTrainController:
+    def get_Train_Controller_Inputs():
+        Train_Control_Inputs = {
+            "Temperature": 75,
+            "Power": 80,
+            "Setpoint_speed": 30,
+            "Announcements": 2,
+            "Headlights": True,
+            "Internal_lights": True,
+            "Left_door": False,
+            "Right_door": False,
+            "Advertisements": "Buy this",
+            "Brakes": False,
+            "Emergency_brakes": False,
+        }
+        return Train_Control_Inputs
+
+
 class Calculations:
     def __init__(self, time_interval, sys_time, trains):
         self.time_interval = time_interval
         self.sys_time = sys_time
         self.trains = trains
+
+        self.train_control_in = InputsTrainController()
+        self.train_control_out = OutputTrainController()
+        self.track_model_in = InputsTrackModel()
+        self.track_model_out = OutputTrackModel()
 
     # Sets the power of the train through the train controller
     def power(self, power):
@@ -2766,22 +2849,13 @@ class Calculations:
             or brake_failure == True
         ):
             trainModelToTrainController.sendEngineFailure.emit(engine_failure)
-            trainModelToTrainController.sendSignalPickupFailure.emit(
-                signal_pickup_failure
-            )
+            trainModelToTrainController.sendSignalPickupFailure.emit(signal_pickup_failure)
             trainModelToTrainController.sendBrakeFailure.emit(brake_failure)
 
         if pass_emergency_brake == True:
-            trainModelToTrainController.sendPassengerEmergencyBrake.emit(
-                pass_emergency_brake
-            )
+            trainModelToTrainController.sendPassengerEmergencyBrake.emit(pass_emergency_brake)
 
-        return (
-            engine_failure,
-            signal_pickup_failure,
-            brake_failure,
-            pass_emergency_brake,
-        )
+        return engine_failure, signal_pickup_failure, brake_failure, pass_emergency_brake
 
     def temperature(self, temp):
         set_temp = temp
@@ -2825,7 +2899,7 @@ class Calculations:
         prev_block = self.trains.get_value("Train 1", "calculations", 11)
         trainID = self.trains.get_value("Train 1", "calculations", 17)
         line = self.trains.get_value("Train 1", "calculations", 16)
-
+        
         if initialized == 0:
             trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
 

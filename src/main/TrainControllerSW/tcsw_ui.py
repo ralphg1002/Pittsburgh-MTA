@@ -1314,7 +1314,7 @@ class TrainControllerUI(QMainWindow):
         hours, minutes, seconds = map(int, self.systemTimeInput.text().split(":"))
         self.tcFunctions.time = hours * 3600 + minutes * 60 + seconds
 
-        # print(self.sysTime.toString("HH:mm:ss"))
+        #print(self.sysTime.toString("HH:mm:ss"))
 
     def signal_addTrain(self, line, id):
         train = {line: id}
