@@ -14,6 +14,7 @@ class TCFunctions:
     def __init__(self):
         self.trainList = []
         self.time = 0
+        self.steelCoefficient = 0.42
 
         self.power1 = {"powerValue": 0, "uk": 0, "prevError": 0}
         self.power2 = {"powerValue": 0, "uk": 0, "prevError": 0}
@@ -116,13 +117,13 @@ class TCFunctions:
 
                 deceleration = currentSpeed * currentSpeed / 2 / distance
 
-                if deceleration < 0:
+                if deceleration < 0 + self.steelCoefficient:
                     efficacy = 0
-                elif deceleration > 1.2:
+                elif deceleration > 1.2 + self.steelCoefficient:
                     trainObject.set_driverEbrake(True)
                     return
                 else:
-                    efficacy = deceleration / 1.2
+                    efficacy = (deceleration - self.steelCoefficient) / 1.2
 
                 trainObject.set_driverSbrake(efficacy)
 
@@ -140,16 +141,16 @@ class TCFunctions:
 
                 # m/s^2
                 deceleration = (
-                    (speedLim * speedLim - currentSpeed * currentSpeed) / 2 / distance
+                    (speedLim * speedLim - currentSpeed * currentSpeed) / 2 / distance + self.steelCoefficient
                 )
 
-                if deceleration < 0:
+                if deceleration < self.steelCoefficient:
                     efficacy = 0
-                elif deceleration > 1.2:
+                elif deceleration > 1.2 + self.steelCoefficient:
                     trainObject.set_driverEbrake(True)
                     return
                 else:
-                    efficacy = deceleration / 1.2
+                    efficacy = (deceleration - self.steelCoefficient) / 1.2
 
                 trainObject.set_driverSbrake(efficacy)
 
@@ -175,12 +176,21 @@ class TCFunctions:
         trainObject.authorityVal = (
             trainObject.block["blockLength"] - trainObject.blockTravelled
         )
+        if trainObject.blockTravelled >= trainObject.block["blockLength"]:
+            trainObject.authorityVal = 0
         if trainObject.block["blockLength"] == 0:
             trainObject.distanceRatio = 0
+            trainObject.blockTravelled = 0
+        elif trainObject.blockTravelled >= trainObject.block["blockLength"]:
+            trainObject.distanceRatio = 1
+            trainObject.blockTravelled = trainObject.blockTravelled - trainObject.block["blockLength"]
         else:
             trainObject.distanceRatio = (
                 trainObject.blockTravelled / trainObject.block["blockLength"]
             )
+        trainObject.blockTravelled += trainObject.prevSpeed
+        trainObject.prevSpeed = trainObject.currentSpeed
+
 
         for block in blockDict:
             if block["Number"] == trainObject.block["blockNumber"]:
@@ -231,7 +241,7 @@ class TCFunctions:
             # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
             return
-        elif trainObject.get_powerCommand() < trainObject.piVariables["powerLimit"]:
+        elif trainObject.get_powerCommand() <= trainObject.piVariables["powerLimit"]:
             newUk = trainObject.piVariables["uk"] + trainObject.piVariables[
                 "samplePeriod"
             ] / 2 * (newError + trainObject.piVariables["prevError"])

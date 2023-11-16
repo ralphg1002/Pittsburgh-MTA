@@ -207,9 +207,19 @@ class TestWindow(QMainWindow):
         self.blockNumberVal.setFixedWidth(60)
         self.set_relative_before_right_end(self.blockNumberVal, self.buttonBox, 10)
 
+        self.blockLengthLabel = QLabel("Block Length", self)
+        self.text_label(self.blockLengthLabel)
+        self.set_relative_below(self.blockLengthLabel, self.blockNumberLabel, 10)
+
+        self.blockLengthVal = QSpinBox(self)
+        self.text_label(self.blockLengthVal)
+        self.set_relative_right(self.blockLengthVal, self.blockLengthLabel, 10)
+        self.blockLengthVal.setFixedWidth(60)
+        self.set_relative_before_right_end(self.blockLengthVal, self.buttonBox, 10)
+
         self.isStationButton = QPushButton("Station", self)
         self.text_label(self.isStationButton)
-        self.set_relative_below(self.isStationButton, self.blockNumberLabel, 10)
+        self.set_relative_below(self.isStationButton, self.blockLengthLabel, 10)
         self.isStationButton.setCheckable(True)
 
         self.authorityButton = QPushButton("Authority", self)
@@ -284,6 +294,7 @@ class TestWindow(QMainWindow):
         self.polarityButton.clicked.connect(lambda: self.send_polarity())
         self.passengerBrakeButton.clicked.connect(lambda: self.set_paxEbrake())
         self.blockNumberVal.valueChanged.connect(lambda: self.block_number())
+        self.blockLengthVal.valueChanged.connect(lambda: self.block_length())
 
     def select_train(self):
         self.testbenchVariables["trainID"] = self.selectTrainCombo.currentText()
@@ -300,6 +311,11 @@ class TestWindow(QMainWindow):
         self.tcObject.trainList.clear()
         for train in trainList:
             self.tcObject.add_train(train)
+
+    def block_length(self):
+        for train in self.tcObject.trainList:
+            if train.get_trainID() == self.testbenchVariables["trainID"]:
+                train.block["blockLength"] = self.blockLengthVal.value()
 
     def block_number(self):
         for train in self.tcObject.trainList:
