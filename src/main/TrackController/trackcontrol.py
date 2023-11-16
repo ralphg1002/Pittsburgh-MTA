@@ -524,7 +524,7 @@ class Wayside:
                         self.get_block(signalNumber).set_lightstate(signalState)
                         # emit that a light value has been changed
                         trackControllerToTrackModel.lightState.emit(
-                            self.line, self.waysideNum, signalNumber, signalState
+                            self.line, self.waysideNum, int(signalNumber), signalState
                         )
 
                     # Set the crossing value
