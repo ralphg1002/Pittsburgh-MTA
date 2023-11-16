@@ -1346,12 +1346,10 @@ class TrackControl(QMainWindow):
         if state == False:
             self.ui.occupancyBox.remove_item_by_blocknumber(num)
             print("trying to remove block ", num)
+
+        #elif self.ui.occupancyBox.does_block_exist(num,self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate()):
             
-        elif self.ui.occupancyBox.does_block_exist(
-            num,
-            self.lines[line - 1].get_wayside(wayside).get_block(num).get_failurestate(),
-        ):
-            pass
+        
         elif state:
             blockStr = "Block {}".format(num)
             self.ui.occupancyBox.add_item(
@@ -1384,10 +1382,14 @@ class TrackControl(QMainWindow):
                 else:
                     self.ui.blockStatus.set_status("Unoccupied")
         else:
-            print("Pattern not matched")
+            #print("Pattern not matched")
+            pass
 
         self.ui.testBenchWindow.refreshed.emit(True)
-
+        print("sending signal to CTC...")
+        print("line: ", line)
+        print("blocknumber: ", num)
+        print("state: ", state)
         trackControllerToCTC.occupancyState.emit(line, num, state)
 
     def set_lightstate_handler(self, line, wayside, num, color):
@@ -1395,7 +1397,7 @@ class TrackControl(QMainWindow):
         # check if the block is currently being displayed, if so, update the display accordingly
         blockNum = 0
         selectedItem = self.ui.comboboxBlockNum.currentText()
-        if selectedItem != "Select State" and selectedItem != "":
+        if selectedItem != "Select State" and selectedItem != "" and self.ui.lineSelect !=0:
             blockNum = int(selectedItem[6]) * 10 + int(selectedItem[7]) - 1
         if blockNum == (num - 1):
             self.ui.lightState.set_state(color)

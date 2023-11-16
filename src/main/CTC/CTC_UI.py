@@ -1610,8 +1610,8 @@ class Routing:
 
     def checkPosition(self, line, blockNum, occupancy):
         print(
-            "comparing current block of"
-            + str(blockNum)
+            "comparing current block of "
+            + int(blockNum)
             + " with destination at "
             + str(self.routeQ[1])
         )
