@@ -1,5 +1,3 @@
-from turtle import update
-from numpy import block
 import pandas as pd
 from .Station import Station
 from signals import (
@@ -15,7 +13,6 @@ from PyQt5.QtCore import pyqtSignal, QObject
 class TrackData:
     redTrackData = {}
     greenTrackData = {}
-    # updateOccupancyGUI = QObject.pyqtSignal(str, int)
 
     def __init__(self):
         self.redTrackData = self.read_track_data(
@@ -40,8 +37,6 @@ class TrackData:
         # From Train Model
         trainModelToTrackModel.sendCurrentPassengers.connect(self.update_station_data)
         trainModelToTrackModel.sendPolarity.connect(self.send_block_data)
-
-        #Test
 
     def read_track_data(self, filePath, lineName):
         excelData = pd.read_excel(filePath, sheet_name=lineName)
@@ -228,11 +223,7 @@ class TrackData:
                         block["Ticket Sales"] += ticketSales
 
                         waiting = block["Passengers Waiting"] + ticketSales
-                        (
-                            disembarkingPassengers,
-                            newPassengers,
-                            passengersWaiting,
-                        ) = station.get_passenger_exchange(currentPassengers, waiting)
+                        disembarkingPassengers, newPassengers, passengersWaiting = station.get_passenger_exchange(currentPassengers, waiting)
 
                         block["Passengers Disembarking"] = disembarkingPassengers
                         block["Passengers Boarding"] = newPassengers
@@ -249,16 +240,12 @@ class TrackData:
                         block["Ticket Sales"] += ticketSales
 
                         waiting = block["Passengers Waiting"] + ticketSales
-                        (
-                            disembarkingPassengers,
-                            newPassengers,
-                            passengersWaiting,
-                        ) = station.get_passenger_exchange(currentPassengers, waiting)
+                        disembarkingPassengers, newPassengers, passengersWaiting = station.get_passenger_exchange(currentPassengers, waiting)
 
                         block["Passengers Disembarking"] = disembarkingPassengers
                         block["Passengers Boarding"] = newPassengers
                         block["Passengers Waiting"] = passengersWaiting
-                        # print(ticketSales, passengersWaiting, disembarkingPassengers, newPassengers)
+                        print(ticketSales, passengersWaiting, disembarkingPassengers, newPassengers)
 
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
 
