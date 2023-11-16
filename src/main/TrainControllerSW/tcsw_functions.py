@@ -14,6 +14,7 @@ class TCFunctions:
     def __init__(self):
         self.trainList = []
         self.time = 0
+        self.steelCoefficient = 0.42
 
         self.power1 = {"powerValue": 0, "uk": 0, "prevError": 0}
         self.power2 = {"powerValue": 0, "uk": 0, "prevError": 0}
@@ -116,13 +117,13 @@ class TCFunctions:
 
                 deceleration = currentSpeed * currentSpeed / 2 / distance
 
-                if deceleration < 0:
+                if deceleration < 0 + self.steelCoefficient:
                     efficacy = 0
-                elif deceleration > 1.2:
+                elif deceleration > 1.2 + self.steelCoefficient:
                     trainObject.set_driverEbrake(True)
                     return
                 else:
-                    efficacy = deceleration / 1.2
+                    efficacy = (deceleration - self.steelCoefficient) / 1.2
 
                 trainObject.set_driverSbrake(efficacy)
 
@@ -140,16 +141,16 @@ class TCFunctions:
 
                 # m/s^2
                 deceleration = (
-                    (speedLim * speedLim - currentSpeed * currentSpeed) / 2 / distance
+                    (speedLim * speedLim - currentSpeed * currentSpeed) / 2 / distance + self.steelCoefficient
                 )
 
-                if deceleration < 0:
+                if deceleration < self.steelCoefficient:
                     efficacy = 0
-                elif deceleration > 1.2:
+                elif deceleration > 1.2 + self.steelCoefficient:
                     trainObject.set_driverEbrake(True)
                     return
                 else:
-                    efficacy = deceleration / 1.2
+                    efficacy = (deceleration - self.steelCoefficient) / 1.2
 
                 trainObject.set_driverSbrake(efficacy)
 
