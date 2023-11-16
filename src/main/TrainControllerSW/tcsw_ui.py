@@ -1332,10 +1332,6 @@ class TrainControllerUI(QMainWindow):
 
     def signal_addTrain(self, line, name):
         train = {line: name}
-        # print(self.sysTime.toString("HH:mm:ss"))
-
-    def signal_addTrain(self, line, id):
-        train = {line: id}
         idCheck = False
         for i in self.tcVariables["trainList"]:
             if i == train:
@@ -1348,98 +1344,98 @@ class TrainControllerUI(QMainWindow):
         return
 
     def signal_speedLimit(self, name, speedLimit):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_speedLimit(int(speedLimit * 2.237))
         return
 
     def signal_authority(self, name, authority):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_authority(authority)
         return
 
     def signal_leftDoor(self, name, leftStation):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.beacon["leftStation"] = leftStation
         return
 
     def signal_rightDoor(self, name, rightStation):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.beacon["rightStation"] = rightStation
         return
 
     def signal_nextStation1(self, name, nextStation):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.beacon["nextStop"][0] = nextStation
         return
 
     def signal_nextStation2(self, name, nextStation):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.beacon["nextStop"][1] = nextStation
         return
 
     def signal_currStation(self, name, currStation):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.beacon["currStop"] = currStation
         return
 
     def signal_commandedSpeed(self, name, commandedSpeed):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_commandedSpeed(commandedSpeed)
         return
 
     def signal_currSpeed(self, name, currSpeed):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.prevSpeed = train.currentSpeed
                 train.set_currentSpeed(currSpeed)
         return
 
     def signal_currTemp(self, name, currTemp):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_currentTemp(currTemp)
         return
 
     def signal_paxEbrake(self, name, status):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_paxEbrake(status)
         return
 
     def signal_engineFail(self, name, status):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_engineFailure(status)
         return
 
     def signal_signalFail(self, name, status):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_signalFailure(status)
         return
 
     def signal_brakeFail(self, name, status):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_brakeFailure(status)
         return
 
     def signal_polarity(self, name, state):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.polarity = state
         return
 
     def signal_blockNumber(self, name, number):
-        for train in self.tcVariables["trainList"]:
+        for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.block["blockNumber"] = number
         return

@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (
 )
 from numpy import block
 from qtwidgets import AnimatedToggle
+from .TrainModel_Functions import *
 
 sys.path.append("../../main")
 from signals import (
@@ -56,7 +57,7 @@ class TrainModel(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.trains = SharedData()
+        self.trainsList = []
 
         self.time_interval = 1
         self.timer = QTimer(self)
@@ -246,7 +247,7 @@ class TrainModel(QMainWindow):
         # This function is called when the search icon is clicked
         selected_item = self.comboBox.currentText()
         self.results_window = ResultsWindow(
-            selected_item, self.trains, self.calculations
+            selected_item, self.trainsList, self.calculations
         )
         self.results_window.show()
 
@@ -256,11 +257,16 @@ class TrainModel(QMainWindow):
     def signal_period(self, period):
         self.time_interval = period
 
+    def signal_addTrain(self, line, id):
+        name = line + "_" + id
+        self.trainsList.append(TrainModelAttributes(name))
+
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
+        masterSignals.addTrain.connect(self.signal_addTrain)
         self.timer.setInterval(self.time_interval)
 
         self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
@@ -294,7 +300,10 @@ class ResultsWindow(QMainWindow):
 
     def __init__(self, selected_text, trains, calculations):
         super().__init__()
-        self.trains = trains
+        # Trains List
+        self.trainsList = trains
+
+        ############
         self.calculations = calculations
 
         self.time_interval = 1
@@ -913,11 +922,18 @@ class ResultsWindow(QMainWindow):
     def signal_period(self, period):
         self.time_interval = period
 
+    def signal_addTrain(self, line, name):
+        id = line + "_" + name
+        self.trains.set_value("Train 1", "calculations", "line", line)
+        self.trains.set_value("Train 1", "calculations", "trainID", id)
+
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
+        masterSignals.addTrain.connect(self.signal_addTrain)
+
         self.timer.setInterval(self.time_interval)
 
         self.systemTimeInput.setText(self.sysTime.toString("HH:mm:ss"))
@@ -952,46 +968,46 @@ class ResultsWindow(QMainWindow):
 
     # Functions to set
     def signal_power(self, train, power):
-        train = self.trains.set_value("Train 1", "calculations", 17, train)
+        train = self.trains.set_value("Train 1", "calculations", "trainID", train)
         current_speed = self.calculations.power(power)
-        self.trains.set_value("Train 1", "vehicle_status", 2, current_speed)
+        self.trains.set_value("Train 1", "vehicle_status", "current_speed", current_speed)
         trainModelToTrainController.sendCurrentSpeed.emit(train, current_speed)
 
     def signal_emergency_brake(self, train, e_brake):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "failure_status", 4, e_brake)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "failure_status", "emergency_brake", e_brake)
 
     def signal_brake(self, train, brake):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "vehicle_status", 7, brake)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "vehicle_status", "brakes", brake)
 
     def signal_announcement(self, train, announcement):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "passenger_status", 6, announcement)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "passenger_status", "announcements", announcement)
 
     def signal_headlights(self, train, headlights):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "navigation_status", 7, headlights)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "navigation_status", "headlights", headlights)
 
     def signal_interrior_lights(self, train, in_lights):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "passenger_status", 5, in_lights)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "passenger_status", "lights_status", in_lights)
 
     def signal_left_door(self, train, left_door):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "passenger_status", 3, left_door)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "passenger_status", "left_door", left_door)
 
     def signal_right_door(self, train, right_door):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "passenger_status", 4, right_door)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "passenger_status", "right_door", right_door)
 
     def signal_temperature(self, train, temp):
-        self.trains.set_value("Train 1", "calculations", 17, train)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
         self.calculations.temperature(temp)
 
     def signal_advertisements(self, train, advertisements):
-        self.trains.set_value("Train 1", "calculations", 17, train)
-        self.trains.set_value("Train 1", "passenger_status", 9, advertisements)
+        self.trains.set_value("Train 1", "calculations", "trainID", train)
+        self.trains.set_value("Train 1", "passenger_status", "advertisements", advertisements)
 
     def signal_blockInfo(self, next_block, length, grade, speed_limit, suggested_speed, authority):
         self.calculations.blockID(next_block, length, grade, speed_limit, suggested_speed, authority)
@@ -2593,43 +2609,39 @@ class Calculations:
         self.trains = trains
 
     # Sets the power of the train through the train controller
-    def power(self, power):
+    def power(self, trainObject, power):
         # Ensure that power does not exceed 120
+        power /= 1000
         currPower = min(power, 120)
 
         # Update the "vehicle_status" of "Train 1" in self.trains
-        self.trains.set_value("Train 1", "vehicle_status", 8, currPower)
+        trainObject.vehicle_status["power"] = currPower
 
         # Calculate current_speed using the updated power
-        current_speed = self.current_speed(currPower)
+        self.current_speed(trainObject, currPower)
 
-        # Return a tuple containing the updated power and current_speed
-        return currPower, current_speed
-
-    def current_speed(self, currPower):
+    def current_speed(self, trainObject, currPower):
         # Retrieve necessary values from self.trains
-        lastVelocity = self.trains.get_value("Train 1", "calculations", 7)
-        mass = self.trains.get_value("Train 1", "calculations", 2)
+        lastVelocity = trainObject.calculations["lastVelocity"]
+        mass = trainObject.calculations["mass"]
 
-        # Calculate force from power input
-        try:
-            currForce = currPower / lastVelocity
-        except ZeroDivisionError:
-            # Handle division by zero appropriately (you might want to choose a default value or raise an exception)
-            currForce = currPower / 0.001
+        if lastVelocity == 0:
+            lastVelocity = 0.001
+
+        currForce = currPower / lastVelocity
 
         # Set calculated force and apply force limit
-        self.trains.set_value("Train 1", "calculations", 5, currForce)
-        currForce = self.limit_force()
+        trainObject.calculations["currForce"] = currForce
+
+        self.limit_force(trainObject)
 
         # Calculate acceleration from force and set it, applying acceleration limit
-        currAcceleration = currForce / mass
-        self.trains.set_value("Train 1", "calculations", 6, currAcceleration)
-        currAcceleration = self.limit_acceleration()
+        trainObject.calculations["currAcceleration"] = trainObject.calculations["currForce"] / mass
+        currAcceleration = self.limit_acceleration(trainObject)
 
         # Calculate velocity using the velocity function and set it
         currVelocity = self.velocity()
-        self.trains.set_value("Train 1", "calculations", 4, currVelocity)
+        self.trains.set_value("Train 1", "calculations", "currVelocity", currVelocity)
 
         # Calculate the distance traveled and set it
         new_position = self.total_distance()
@@ -2637,13 +2649,13 @@ class Calculations:
         # Return the current velocity
         return currVelocity
 
-    def limit_force(self):
+    def limit_force(self, trainObject):
         # Retrieve necessary values from self.trains
-        emergency_brake = self.trains.get_value("Train 1", "failure_status", 4)
-        mass = self.trains.get_value("Train 1", "calculations", 2)
-        force = self.trains.get_value("Train 1", "calculations", 5)
-        power = self.trains.get_value("Train 1", "vehicle_status", 8)
-        lastVelocity = self.trains.get_value("Train 1", "calculations", 7)
+        emergency_brake = trainObject.failure_status["emergency_brake"]
+        mass = trainObject.calculations["mass"]
+        force = trainObject.calculations["currForce"]
+        power = trainObject.vehicle_status["power"]
+        lastVelocity = trainObject.calculations["lastVelocity"]
 
         # Limit the force of the train
         if force > (mass * 0.5):
@@ -2654,21 +2666,19 @@ class Calculations:
             force = mass * 0.5
 
         # Set the limited force value
-        self.trains.set_value("Train 1", "calculations", 5, force)
+        trainObject.calculations["currForce"] = force
 
-        return force
-
-    def limit_acceleration(self):
+    def limit_acceleration(self, trainObject):
         # Retrieve necessary values from self.trains
-        failure_1 = self.trains.get_value("Train 1", "failure_status", 1)
-        failure_2 = self.trains.get_value("Train 1", "failure_status", 2)
-        failure_3 = self.trains.get_value("Train 1", "failure_status", 3)
-        brakes = self.trains.get_value("Train 1", "vehicle_status", 7)
-        emergency_brake = self.trains.get_value("Train 1", "failure_status", 4)
-        force = self.trains.get_value("Train 1", "calculations", 5)
-        mass = self.trains.get_value("Train 1", "calculations", 2)
-        power = self.trains.get_value("Train 1", "vehicle_status", 8)
-        currVelocity = self.trains.get_value("Train 1", "calculations", 4)
+        failure_1 = trainObject.failure_status["engine_failure"]
+        failure_2 = trainObject.failure_status["signal_pickup_failure")
+        failure_3 = trainObject.failure_status["brake_failure")
+        brakes = trainObject.vehicle_status["brakes"]
+        emergency_brake = self.trains.get_value("Train 1", "failure_status", "emergency_brake")
+        force = self.trains.get_value("Train 1", "calculations", "currForce")
+        mass = self.trains.get_value("Train 1", "calculations", "mass")
+        power = self.trains.get_value("Train 1", "vehicle_status", "power")
+        currVelocity = self.trains.get_value("Train 1", "calculations", "currVelocity")
 
         # Limit the acceleration of the train based on various conditions
         if (failure_1 or failure_2 or failure_3) and (brakes or emergency_brake):
@@ -2687,17 +2697,17 @@ class Calculations:
             acceleration = 0
 
         # Set the limited acceleration value
-        self.trains.set_value("Train 1", "calculations", 6, acceleration)
+        self.trains.set_value("Train 1", "calculations", "currAcceleration", acceleration)
 
         return acceleration
 
     def velocity(self):
         # Retrieve necessary values from self.trains
-        brake = self.trains.get_value("Train 1", "vehicle_status", 7)
-        emergency_brake = self.trains.get_value("Train 1", "failure_status", 4)
-        last_acceleration = self.trains.get_value("Train 1", "calculations", 8)
-        curr_acceleration = self.trains.get_value("Train 1", "calculations", 6)
-        last_velocity = self.trains.get_value("Train 1", "calculations", 7)
+        brake = self.trains.get_value("Train 1", "vehicle_status", "brakes")
+        emergency_brake = self.trains.get_value("Train 1", "failure_status", "emergency_brake")
+        last_acceleration = self.trains.get_value("Train 1", "calculations", "lastAcceleration")
+        curr_acceleration = self.trains.get_value("Train 1", "calculations", "currAcceleration")
+        last_velocity = self.trains.get_value("Train 1", "calculations", "lastVelocity")
 
         # Calculate the total acceleration and update velocity
         total_acceleration = last_acceleration + curr_acceleration
@@ -2712,34 +2722,34 @@ class Calculations:
             velocity = 0
 
         # Set the calculated velocity value
-        velocity = self.trains.set_value("Train 1", "calculations", 4, velocity)
+        velocity = self.trains.set_value("Train 1", "calculations", "currVelocity", velocity)
 
         return velocity
 
     def total_distance(self):
         # Retrieve necessary values from self.trains
-        curr_velocity = self.trains.get_value("Train 1", "calculations", 4)
-        last_position = self.trains.get_value("Train 1", "calculations", 9)
+        curr_velocity = self.trains.get_value("Train 1", "calculations", "currVelocity")
+        last_position = self.trains.get_value("Train 1", "calculations", "lastPosition")
 
         # Update total_velocity using the current velocity (consider whether this is necessary)
         total_velocity = curr_velocity
-        
+
         # Correct the distance calculation (multiply, not divide)
         distance = last_position + (self.time_interval * 2) * total_velocity
 
         return distance
 
     def blockID(
-        self, next_block, length, grade, speed_limit, suggested_speed, authority
+            self, next_block, length, grade, speed_limit, suggested_speed, authority
     ):
-        self.trains.set_value("Train 1", "calculations", 10, next_block)
-        self.trains.set_value("Train 1", "navigation_status", 3, length)
-        self.trains.set_value("Train 1", "navigation_status", 4, grade)
-        self.trains.set_value("Train 1", "vehicle_status", 0, speed_limit)
-        self.trains.set_value("Train 1", "vehicle_status", 4, suggested_speed)
-        self.trains.set_value("Train 1", "navigation_status", 0, authority)
-        
-        train = self.trains.get_value("Train 1", "calculations", 17)
+        self.trains.set_value("Train 1", "calculations", "nextBlock", next_block)
+        self.trains.set_value("Train 1", "navigation_status", "length", length)
+        self.trains.set_value("Train 1", "navigation_status", "grade", grade)
+        self.trains.set_value("Train 1", "vehicle_status", "speed_limit", speed_limit)
+        self.trains.set_value("Train 1", "vehicle_status", "suggested_speed", suggested_speed)
+        self.trains.set_value("Train 1", "navigation_status", "authority", authority)
+
+        train = self.trains.get_value("Train 1", "calculations", "trainID")
 
         self.occupancy(next_block)
 
@@ -2752,16 +2762,16 @@ class Calculations:
         return next_block, length, grade, speed_limit, suggested_speed, authority
 
     def failures(self):
-        engine_failure = self.trains.get_value("Train 1", "failure_status", 1)
-        signal_pickup_failure = self.trains.get_value("Train 1", "failure_status", 2)
-        brake_failure = self.trains.get_value("Train 1", "failure_status", 3)
-        pass_emergency_brake = self.trians.get_value("Train 1", "failure_status", 4)
-        train = self.trains.get_value("Train 1", "calculations", 17)
+        engine_failure = self.trains.get_value("Train 1", "failure_status", "engine_failure")
+        signal_pickup_failure = self.trains.get_value("Train 1", "failure_status", "signal_pickup_failure")
+        brake_failure = self.trains.get_value("Train 1", "failure_status", "brake_failure")
+        pass_emergency_brake = self.trains.get_value("Train 1", "failure_status", "passenger_emergency_brake")
+        train = self.trains.get_value("Train 1", "calculations", "trainID")
 
         if (
-            engine_failure == True
-            or signal_pickup_failure == True
-            or brake_failure == True
+                engine_failure == True
+                or signal_pickup_failure == True
+                or brake_failure == True
         ):
             trainModelToTrainController.sendEngineFailure.emit(train, engine_failure)
             trainModelToTrainController.sendSignalPickupFailure.emit(
@@ -2783,33 +2793,33 @@ class Calculations:
 
     def temperature(self, temp):
         set_temp = temp
-        curr_temp = self.trains.get_value("Train 1", "vehicle_status", 7)
-        train = self.trains.get_value("Train 1", "calculations", 17)
+        curr_temp = self.trains.get_value("Train 1", "vehicle_status", "temperature")
+        train = self.trains.get_value("Train 1", "calculations", "trainID")
 
         if curr_temp < set_temp:
             while curr_temp < set_temp:
                 curr_temp += 1
-                self.trains.set_value("Train 1", "vehicle_status", 7, curr_temp)
+                self.trains.set_value("Train 1", "vehicle_status", "temperature", curr_temp)
                 trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp > curr_temp:
             while curr_temp > set_temp:
                 curr_temp -= 1
-                self.trains.set_value("Train 1", "vehicle_status", 7, curr_temp)
+                self.trains.set_value("Train 1", "vehicle_status", "temperature", curr_temp)
                 trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp == curr_temp:
-            self.trains.set_value("Train 1", "vehicle_status", 7, curr_temp)
+            self.trains.set_value("Train 1", "vehicle_status", "temperature", curr_temp)
             trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         return curr_temp
 
     # Calculate the current number of passengers from the track model
     def passengers(self, passengers):
-        curr_passengers = self.trains.get_values("Train 1", "passenger_status", 1)
+        curr_passengers = self.trains.get_values("Train 1", "passenger_status", "passengers")
         trainModelToTrackModel.sendCurrentPassengers.emit(curr_passengers, "Train 1")
 
-        self.trains.set_values("Train 1", "passenger_status", 1, passengers)
+        self.trains.set_values("Train 1", "passenger_status", "passengers", passengers)
 
         return passengers
 
@@ -2818,12 +2828,12 @@ class Calculations:
         polarity = 0
         initialized = 0
         # distance = self.total_distance()
-        block_length = self.trains.get_value("Train 1", "navigation_stauts", 3)
-        next_block = self.trains.set_value("Train 1", "calculations", 10, next_block)
-        curr_block = self.trains.get_value("Train 1", "calculations", 11)
-        prev_block = self.trains.get_value("Train 1", "calculations", 11)
-        trainID = self.trains.get_value("Train 1", "calculations", 17)
-        line = self.trains.get_value("Train 1", "calculations", 16)
+        block_length = self.trains.get_value("Train 1", "navigation_status", "block_length")
+        next_block = self.trains.set_value("Train 1", "calculations", "nextBlock", next_block)
+        curr_block = self.trains.get_value("Train 1", "calculations", "currBlock")
+        prev_block = self.trains.get_value("Train 1", "calculations", "prevBlock")
+        trainID = self.trains.get_value("Train 1", "calculations", "trainID")
+        line = self.trains.get_value("Train 1", "calculations", "line")
 
         if initialized == 0:
             trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
@@ -2846,7 +2856,7 @@ class Calculations:
         next_station2 = beacon["Next Station2"]
         current_station = beacon["Current Station"]
         door_side = beacon["Door Side"]
-        train = self.trains.get_value("Train 1", "calculations", 17)
+        train = self.trains.get_value("Train 1", "calculations", "trainID")
 
         trainModelToTrainController.sendNextStation1.emit(train, next_station1)
         trainModelToTrainController.sendNextStation2.emit(train, next_station2)
@@ -2861,7 +2871,6 @@ class Calculations:
             trainModelToTrainController.sendRightDoor.emit(train, door_side)
 
         return next_station1, next_station2, current_station, door_side
-
 
 # def main():
 #     app = QApplication(sys.argv)
