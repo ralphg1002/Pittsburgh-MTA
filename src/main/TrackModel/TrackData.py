@@ -359,7 +359,7 @@ class TrackData:
             elif curBlock == 0 and prevBlock == 999:
                 # Set first block's occupancy, no need to clear any occupancy
                 for block in self.greenTrackData:
-                    if block["Block Number"] == 62:
+                    if block["Block Number"] == 63:
                         trackModelToTrainModel.blockInfo.emit(
                             block["Block Number"],
                             block["Block Length (m)"],
