@@ -948,6 +948,7 @@ class TrainControllerUI(QMainWindow):
         self.sysTime.setTime(QTime(0, 0, 0))
 
     def update(self):
+        masterSignals.addTrain.emit("green", "train")
         # Update Train ID list
         # from CTC
         # masterSignals.addTrain.emit("green", "test")
