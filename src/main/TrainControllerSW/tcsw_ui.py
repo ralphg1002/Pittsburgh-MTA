@@ -1468,8 +1468,10 @@ class TrainControllerUI(QMainWindow):
             + "_"
             + self.trainNumberCombo.currentText()
         )
+
         for train in self.tcFunctions.trainList:
             train.set_auto(True)
+        self.modeCombo.setCurrentIndex(0)
 
     def send_announcement(self):
         self.tcVariables["customAnnouncement"] = self.announcementEdit.text()
