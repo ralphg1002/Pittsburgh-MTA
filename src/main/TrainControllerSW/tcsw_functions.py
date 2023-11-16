@@ -187,6 +187,8 @@ class TCFunctions:
                 trainObject.block["blockLength"] = block["Length"]
                 trainObject.block["isStation"] = block["isStation"]
                 trainObject.block["isTunnel"] = block["isTunnel"]
+                trainObject.block["infrastructure"] = block["Infrastructure"]
+                trainObject.block["limit"] = block["Limit"]
 
         if trainObject.prevPolarity != trainObject.polarity:
             trainObject.blockTravelled = 0
