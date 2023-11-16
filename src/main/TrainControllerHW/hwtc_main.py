@@ -3,9 +3,9 @@ import pyfirmata
 import serial
 import time
 
+
 # board = pyfirmata.Arduino() TODO: Implement Arduino Communication
 # arduino = serial.Serial(port='COM4', baudrate=11520, timeout=.1)
-
 
 
 class HWTrainController:
@@ -22,8 +22,8 @@ class HWTrainController:
         # Location Variables
         self._currentBlock = 0
         self._currentPolarity = 0
-        self._stationList = np.zeros(20) # TODO: Once track model is finalized, hard code this
-                                         #       array with all stations' block numbers
+        self._stationList = np.zeros(20)  # TODO: Once track model is finalized, hard code this
+                                          #       array with all stations' block numbers
         self._stationList[0] = 9
 
         # Train State Variables
@@ -91,10 +91,10 @@ class HWTrainController:
         return self._currentTemp
 
     # function to send beacon data
-    def SetBeaconData(self, neighbor1, thisSt, neighbor2, doors): # stations will be sent in order of increasing
-        if self._lastStation == neighbor1:                        # distance from Yard, will be up to hwtc to
-            self._nextStation = neighbor2                         # determine which is next and last based on travel
-        elif self._lastStation == neighbor2:                      # direction
+    def SetBeaconData(self, neighbor1, thisSt, neighbor2, doors):  # stations will be sent in order of increasing
+        if self._lastStation == neighbor1:  # distance from Yard, will be up to hwtc to
+            self._nextStation = neighbor2  # determine which is next and last based on travel
+        elif self._lastStation == neighbor2:  # direction
             self._nextStation = neighbor1
 
         if self._thisStation == thisSt:
@@ -119,7 +119,14 @@ class HWTrainController:
     def atStation(self, currentBlock):
         result = False
         for i in self._stationList:
-            if i == currentBlock:
+            if currentBlock == i:
+                result = True
+        return result
+
+    def nearStation(self, currentBlock):
+        result = False
+        for i in self._stationList:
+            if abs(currentBlock - i) < 3:
                 result = True
         return result
 
@@ -135,7 +142,7 @@ class HWTrainController:
             self.station_operations()
 
     def PowerHandler(self):
-        newError = self._setpointSpeed - self._currentSpeed
+        newError = (self._setpointSpeed - self._currentSpeed) / 2.237
         if newError == 0 and self._lastError == 0:
             self._powerToSend = 0
             return
@@ -145,7 +152,7 @@ class HWTrainController:
         power1 = self._K_p * newError + self._K_i * newUk  # TODO: insert power calculation here
         power2 = self._K_p * newError + self._K_i * newUk
         power3 = self._K_p * newError + self._K_i * newUk
-        self._powerToSend = (power1 + power2 + power3)/3000  # TODO: change this from an average to a voting algorithm
+        self._powerToSend = (power1 + power2 + power3) / 3  # TODO: change this from an average to a voting algorithm
         self._uk = newUk
         self._lastError = newError
 
@@ -162,12 +169,15 @@ class HWTrainController:
     #     return board
 
     def AutoUpdate(self):
-        self._setpointSpeed = self._commandedSpeed
+        if self.nearStation(self._currentBlock):
+            self._setpointSpeed = self._commandedSpeed / 2
+        else:
+            self._setpointSpeed = self._commandedSpeed
         if self._currentSpeed == 0 and not self._authority:
             self.StoppedHandler()
         else:
             self.PowerHandler()
-            #self.UpdateUI()
+            # self.UpdateUI()
 
     def UpdateController(self, newAuth, newSpdCmd, currentSpeed, blockPolarity, failures=[0, 0, 0]):
         self._authority = newAuth
