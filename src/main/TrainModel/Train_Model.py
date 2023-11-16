@@ -242,7 +242,9 @@ class TrainModel(QMainWindow):
     def open_results_window(self, event):
         # This function is called when the search icon is clicked
         selected_item = self.comboBox.currentText()
-        self.results_window = ResultsWindow(selected_item, self.trainsList)
+        self.results_window = ResultsWindow(
+            selected_item, self.trainsList
+        )
         self.results_window.show()
 
     def show_gui(self):
@@ -256,9 +258,7 @@ class TrainModel(QMainWindow):
         self.trainsList.append(TrainModelAttributes(name))
 
     def update_drop_down(self):
-        existing_items = [
-            self.comboBox.itemText(i) for i in range(self.comboBox.count())
-        ]
+        existing_items = [self.comboBox.itemText(i) for i in range(self.comboBox.count())]
 
         all_trainIDs = []
         for trains in self.trainsList:
@@ -276,6 +276,7 @@ class TrainModel(QMainWindow):
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
+        masterSignals.addTrain.emit("green", "train1")
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
         masterSignals.addTrain.connect(self.signal_addTrain)
@@ -287,136 +288,58 @@ class TrainModel(QMainWindow):
         )
 
         self.update_drop_down()
+        
         # Signals that connect from the train controller to the train model
         trainControllerSWToTrainModel.sendPower.connect(self.signal_power)
-        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(
-            self.signal_emergency_brake
-        )
+        trainControllerSWToTrainModel.sendDriverEmergencyBrake.connect(self.signal_emergency_brake)
         trainControllerSWToTrainModel.sendDriverServiceBrake.connect(self.signal_brake)
         trainControllerSWToTrainModel.sendAnnouncement.connect(self.signal_announcement)
         trainControllerSWToTrainModel.sendHeadlightState.connect(self.signal_headlights)
-        trainControllerSWToTrainModel.sendInteriorLightState.connect(
-            self.signal_interior_lights
-        )
+        trainControllerSWToTrainModel.sendInteriorLightState.connect(self.signal_interior_lights)
         trainControllerSWToTrainModel.sendLeftDoorState.connect(self.signal_left_door)
         trainControllerSWToTrainModel.sendRightDoorState.connect(self.signal_right_door)
-        trainControllerSWToTrainModel.sendSetpointTemperature.connect(
-            self.signal_temperature
-        )
-        trainControllerSWToTrainModel.sendAdvertisement.connect(
-            self.signal_advertisements
-        )
+        trainControllerSWToTrainModel.sendSetpointTemperature.connect(self.signal_temperature)
+        trainControllerSWToTrainModel.sendAdvertisement.connect(self.signal_advertisements)
 
         # Signals that connect from the track model to the train model
         trackModelToTrainModel.blockInfo.connect(self.signal_blockInfo)
         trackModelToTrainModel.beacon.connect(self.signal_beacon)
         trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers)
-
+        
         # Send train controller information
         for trainObject in self.trainsList:
             trainObject.calculations["timeInterval"] = self.time_interval
             self.functionsInstance.power(trainObject)
             self.functionsInstance.temperature(trainObject)
             self.functionsInstance.beacon(trainObject)
-            trainModelToTrainController.sendSpeedLimit.emit(
-                trainObject.calculations["trainID"],
-                trainObject.vehicle_status["speed_limit"],
-            )
-            trainModelToTrainController.sendBlockNumber.emit(
-                trainObject.calculations["trainID"],
-                trainObject.vehicle_status["current_speed"],
-            )
-            trainModelToTrainController.sendCommandedSpeed.emit(
-                trainObject.calculations["trainID"],
-                trainObject.vehicle_status["commanded_speed"],
-            )
-            trainModelToTrainController.sendAuthority.emit(
-                trainObject.calculations["trainID"],
-                trainObject.navigation_status["authority"],
-            )
-            trainModelToTrainController.sendEngineFailure.emit(
-                trainObject.calculations["trainID"],
-                trainObject.failure_status["engine_failure"],
-            )
-            trainModelToTrainController.sendSignalPickupFailure.emit(
-                trainObject.calculations["trainID"],
-                trainObject.failure_status["signal_pickup_failure"],
-            )
-            trainModelToTrainController.sendBrakeFailure.emit(
-                trainObject.calculations["trainID"],
-                trainObject.failure_status["brake_failure"],
-            )
-            trainModelToTrainController.sendPassengerEmergencyBrake.emit(
-                trainObject.calculations["trainID"],
-                trainObject.navigation_status["passenger_emergency_brake"],
-            )
-            trainModelToTrainController.sendTemperature.emit(
-                trainObject.calculations["trainID"],
-                trainObject.passenger_status["temperature"],
-            )
-            trainModelToTrackModel.sendCurrentPassengers.emit(
-                trainObject.calculations["line"],
-                trainObject.calculations["currStation"],
-                trainObject.passenger_status["passengers"],
-            )
-            trainModelToTrainController.sendNextStation1.emit(
-                trainObject.calculations["trainID"],
-                trainObject.calculations["nextStation1"],
-            )
-            trainModelToTrainController.sendNextStation2.emit(
-                trainObject.calculations["trainID"],
-                trainObject.calculations["nextStation2"],
-            )
-            trainModelToTrainController.sendCurrStation.emit(
-                trainObject.calculations["trainID"],
-                trainObject.calculations["currStation"],
-            )
-            trainModelToTrainController.sendLeftDoor.emit(
-                trainObject.calculations["trainID"],
-                trainObject.passenger_status["left_door"],
-            )
-            trainModelToTrainController.sendRightDoor.emit(
-                trainObject.calculations["trainID"],
-                trainObject.passenger_status["right_door"],
-            )
-            trainModelToTrainController.sendBlockNumber.emit(
-                trainObject.calculations["trainID"],
-                trainObject.calculations["currBlock"],
-            )
+            trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["speed_limit"])
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["current_speed"])
+            trainModelToTrainController.sendCommandedSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["commanded_speed"])
+            trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"], trainObject.navigation_status["authority"])
+            trainModelToTrainController.sendEngineFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["engine_failure"])
+            trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["signal_pickup_failure"])
+            trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
+            trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"], trainObject.navigation_status["passenger_emergency_brake"])
+            trainModelToTrainController.sendTemperature.emit(trainObject.calculations["trainID"], trainObject.passenger_status["temperature"])
+            # trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.calculations["currStation"], trainObject.passenger_status["passengers"])
+            trainModelToTrainController.sendNextStation1.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation1"])
+            trainModelToTrainController.sendNextStation2.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation2"])
+            trainModelToTrainController.sendCurrStation.emit(trainObject.calculations["trainID"], trainObject.calculations["currStation"])
+            trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
+            trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])            
             if trainObject.calculations["initialized"]:
-                trainModelToTrackModel.sendPolarity.emit(
-                    trainObject.calculations["line"],
-                    trainObject.calculations["currBlock"],
-                    trainObject.calculations["prevBlock"],
-                )
-            if (
-                trainObject.calculations["distance"]
-                == trainObject.navigation_status["block_length"]
-            ):
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+                trainObject.calculations["initialized"] = False
+            if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"]:
                 trainObject.calculations["distance"] = 0
-                trainObject.calculations["polarity"] = not trainObject.calculations[
-                    "polarity"
-                ]
-            trainModelToTrackModel.sendPolarity.emit(
-                trainObject.calculations["line"],
-                trainObject.calculations["currBlock"],
-                trainObject.calculations["prevBlock"],
-            )
-            trainModelToTrainController.sendPolarity.emit(
-                trainObject.calculations["trainID"],
-                trainObject.calculations["polarity"],
-            )
-            trainObject.calculations["currBlock"] = trainObject.calculations[
-                "nextBlock"
-            ]
-            trainObject.calculations["prevBlock"] = trainObject.calculations[
-                "currBlock"
-            ]
-            trainObject.calculations["initialized"] = False
+                trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+            trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
+            # trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
+            trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
 
-    def signal_blockInfo(
-        self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority
-    ):
+    def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
             trainObject.calculations["nextBlock"] = nextBlock
             trainObject.navigation_status["block_length"] = blockLength
@@ -428,17 +351,26 @@ class TrainModel(QMainWindow):
 
     def signal_beacon(self, beaconDict):
         for trainObject in self.trainsList:
+            if trainObject.calulations["currStation"] == trainObject.navigation_status["next_station"]:
+                trainObject.navigation_status["prev_station"] = trainObject.calulations["currStation"]
+                trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.calculations["currStation"], trainObject.passenger_status["passengers"])
+            
             trainObject.calculations["nextStation1"] = beaconDict["Next Station1"]
             trainObject.calculations["nextStation2"] = beaconDict["Next Station2"]
             trainObject.calculations["currStation"] = beaconDict["Current Station"]
             trainObject.calculations["doorSide"] = beaconDict["Door Side"]
+
+            if trainObject.calculations["nextStation1"] == trainObject.navigation_status["prev_station"]:
+                trainObject.navigation_status["next_station"] = trainObject.calculations["nextStation2"]
+            else: 
+                trainObject.navigation_status["next_station"] = trainObject.calculations["nextStation1"]
+            
         return
 
     def signal_new_passengers(self, passengers):
         for trainObject in self.trainsList:
             trainObject.passenger_status["passengers"] = passengers
         return
-
     def signal_power(self, id, power):
         for train in self.trainsList:
             if train.calculations["trainID"] == id:
@@ -488,7 +420,6 @@ class TrainModel(QMainWindow):
         for train in self.trainsList:
             if train.calculations["trainID"] == id:
                 train.passenger_status["announcements"] = ann
-
 
 class ResultsWindow(QMainWindow):
     # Font variables
@@ -699,10 +630,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for speed limit
         self.word_label_speed_limit = QLabel(
-            "Speed Limit: {} mph".format(
-                self.trainsList[0].vehicle_status["speed_limit"]
-            ),
-            self.vehicle_white_background_label,
+            "Speed Limit: {} mph".format(self.trainsList[0].vehicle_status["speed_limit"]),
+            self.vehicle_white_background_label
         )
         self.word_label_speed_limit.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -713,10 +642,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for current speed
         self.word_label_current_speed = QLabel(
-            "Current Speed: {} mph".format(
-                self.trainsList[0].vehicle_status["current_speed"]
-            ),
-            self.vehicle_white_background_label,
+            "Current Speed: {} mph".format(self.trainsList[0].vehicle_status["current_speed"]),
+            self.vehicle_white_background_label
         )
         self.word_label_current_speed.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -727,10 +654,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for Setpoint Speed
         self.word_label_setpoint_speed = QLabel(
-            "Setpoint Speed: {} mph".format(
-                self.trainsList[0].vehicle_status["setpoint_speed"]
-            ),
-            self.vehicle_white_background_label,
+            "Setpoint Speed: {} mph".format(self.trainsList[0].vehicle_status["setpoint_speed"]),
+            self.vehicle_white_background_label
         )
         self.word_label_setpoint_speed.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -741,10 +666,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for commanded speed
         self.word_label_commanded_speed = QLabel(
-            "Commanded Speed: {} mph".format(
-                self.trainsList[0].vehicle_status["commanded_speed"]
-            ),
-            self.vehicle_white_background_label,
+            "Commanded Speed: {} mph".format(self.trainsList[0].vehicle_status["commanded_speed"]),
+            self.vehicle_white_background_label
         )
         self.word_label_commanded_speed.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -755,10 +678,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for acceleration
         self.word_label_acceleration = QLabel(
-            "Acceleration: {} ft/s".format(
-                self.trainsList[0].vehicle_status["acceleration"]
-            ),
-            self.vehicle_white_background_label,
+            "Acceleration: {} ft/s".format(self.trainsList[0].vehicle_status["acceleration"]),
+            self.vehicle_white_background_label
         )
         self.word_label_acceleration.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -770,7 +691,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for brakes
         self.word_label_brakes = QLabel(
             "Brakes: {}".format(self.trainsList[0].vehicle_status["brakes"]),
-            self.vehicle_white_background_label,
+            self.vehicle_white_background_label
         )
         self.word_label_brakes.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -782,7 +703,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for power
         self.word_label_power = QLabel(
             "Power: {} kW".format(self.trainsList[0].vehicle_status["power"]),
-            self.vehicle_white_background_label,
+            self.vehicle_white_background_label
         )
         self.word_label_power.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -793,10 +714,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for power limit
         self.word_label_power_limit = QLabel(
-            "Power Limit: {} kW".format(
-                self.trainsList[0].vehicle_status["power_limit"]
-            ),
-            self.vehicle_white_background_label,
+            "Power Limit: {} kW".format(self.trainsList[0].vehicle_status["power_limit"]),
+            self.vehicle_white_background_label
         )
         self.word_label_power_limit.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -840,7 +759,7 @@ class ResultsWindow(QMainWindow):
 
         # Add stretch
         self.vehicle_white_background_layout.addStretch(1)
-
+        
         # self.vehicle_status = {}
         # self.vehicle_labels = []
 
@@ -948,10 +867,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for engine failure
         self.word_label_engine_failure = QLabel(
-            "Engine Failure: {}".format(
-                self.trainsList[0].failure_status["engine_failure"]
-            ),
-            self.failure_white_background_label,
+            "Engine Failure: {}".format(self.trainsList[0].failure_status["engine_failure"]),
+            self.failure_white_background_label
         )
         self.word_label_engine_failure.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -962,26 +879,20 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for signal pickup failure
         self.word_label_signal_pickup_failure = QLabel(
-            "Signal Pickup Failure: {}".format(
-                self.trainsList[0].failure_status["signal_pickup_failure"]
-            ),
-            self.failure_white_background_label,
+            "Signal Pickup Failure: {}".format(self.trainsList[0].failure_status["signal_pickup_failure"]),
+            self.failure_white_background_label
         )
         self.word_label_signal_pickup_failure.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
         )
-        self.word_label_signal_pickup_failure.setAlignment(
-            Qt.AlignLeft | Qt.AlignVCenter
-        )
+        self.word_label_signal_pickup_failure.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.word_label_signal_pickup_failure.setContentsMargins(0, 0, 0, 0)
         self.word_label_signal_pickup_failure.setFont(QFont("Arial", 9))
 
         # QLabel for brake failure
         self.word_label_brake_failure = QLabel(
-            "Brake Failure: {}".format(
-                self.trainsList[0].failure_status["brake_failure"]
-            ),
-            self.failure_white_background_label,
+            "Brake Failure: {}".format(self.trainsList[0].failure_status["brake_failure"]),
+            self.failure_white_background_label
         )
         self.word_label_brake_failure.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -992,10 +903,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for emergency brake
         self.word_label_emergency_brake = QLabel(
-            "Emergency Brake: {}".format(
-                self.trainsList[0].failure_status["emergency_brake"]
-            ),
-            self.failure_white_background_label,
+            "Emergency Brake: {}".format(self.trainsList[0].failure_status["emergency_brake"]),
+            self.failure_white_background_label
         )
         self.word_label_emergency_brake.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1023,7 +932,7 @@ class ResultsWindow(QMainWindow):
         self.failure_white_background_layout.addWidget(
             self.word_label_emergency_brake, alignment=Qt.AlignTop
         )
-
+        
         # failure_status = {}
 
         # # Check if the selected train exists in the trains dictionary
@@ -1146,7 +1055,8 @@ class ResultsWindow(QMainWindow):
         # QLabel for passengers
         self.word_label_passengers = QLabel(
             "Passengers: {}".format(self.trainsList[0].passenger_status["passengers"]),
-            self.passenger_white_background_label,
+            self.passenger_white_background_label
+            
         )
         self.word_label_passengers.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1157,10 +1067,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for passenger limit
         self.word_label_passenger_limit = QLabel(
-            "Passenger Limit: {}".format(
-                self.trainsList[0].passenger_status["passenger_limit"]
-            ),
-            self.passenger_white_background_label,
+            "Passenger Limit: {}".format(self.trainsList[0].passenger_status["passenger_limit"]),
+            self.passenger_white_background_label
         )
         self.word_label_passenger_limit.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1172,7 +1080,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for left door
         self.word_label_left_door = QLabel(
             "Left Door: {}".format(self.trainsList[0].passenger_status["left_door"]),
-            self.passenger_white_background_label,
+            self.passenger_white_background_label
         )
         self.word_label_left_door.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1184,7 +1092,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for right door
         self.word_label_right_door = QLabel(
             "Right Door: {}".format(self.trainsList[0].passenger_status["right_door"]),
-            self.passenger_white_background_label,
+            self.passenger_white_background_label
         )
         self.word_label_right_door.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1195,10 +1103,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for lights status
         self.word_label_lights_status = QLabel(
-            "Lights Status: {}".format(
-                self.trainsList[0].passenger_status["lights_status"]
-            ),
-            self.passenger_white_background_label,
+            "Lights Status: {}".format(self.trainsList[0].passenger_status["lights_status"]),
+            self.passenger_white_background_label
         )
         self.word_label_lights_status.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1209,10 +1115,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for announcements
         self.word_label_announcements = QLabel(
-            "Announcements: {}".format(
-                self.trainsList[0].passenger_status["announcements"]
-            ),
-            self.passenger_white_background_label,
+            "Announcements: {}".format(self.trainsList[0].passenger_status["announcements"]),
+            self.passenger_white_background_label
         )
         self.word_label_announcements.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1223,10 +1127,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for temperature
         self.word_label_temperature = QLabel(
-            "Temperature: {}".format(
-                self.trainsList[0].passenger_status["temperature"]
-            ),
-            self.passenger_white_background_label,
+            "Temperature: {}".format(self.trainsList[0].passenger_status["temperature"]),
+            self.passenger_white_background_label
         )
         self.word_label_temperature.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1237,10 +1139,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for air conditioning
         self.word_label_air_conditioning = QLabel(
-            "Air Conditioning: {}".format(
-                self.trainsList[0].passenger_status["air_conditioning"]
-            ),
-            self.passenger_white_background_label,
+            "Air Conditioning: {}".format(self.trainsList[0].passenger_status["air_conditioning"]),
+            self.passenger_white_background_label
         )
         self.word_label_air_conditioning.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1251,10 +1151,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for advertisements
         self.word_label_advertisements = QLabel(
-            "Advertisements: {}".format(
-                self.trainsList[0].passenger_status["advertisements"]
-            ),
-            self.passenger_white_background_label,
+            "Advertisements: {}".format(self.trainsList[0].passenger_status["advertisements"]),
+            self.passenger_white_background_label
         )
         self.word_label_advertisements.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1302,7 +1200,7 @@ class ResultsWindow(QMainWindow):
 
         # Add stretch
         self.passenger_white_background_layout.addStretch(1)
-
+        
         # self.passenger_status = {}
         # self.passenger_labels = []
 
@@ -1414,7 +1312,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for authority
         self.word_label_authority = QLabel(
             "Authority: {}".format(self.trainsList[0].navigation_status["authority"]),
-            self.navigation_white_background_label,
+            self.navigation_white_background_label
         )
         self.word_label_authority.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1426,7 +1324,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for beacon
         self.word_label_beacon = QLabel(
             "Beacon: {}".format(self.trainsList[0].navigation_status["beacon"]),
-            self.navigation_white_background_label,
+            self.navigation_white_background_label
         )
         self.word_label_beacon.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1437,10 +1335,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for block length
         self.word_label_block_length = QLabel(
-            "Block Length: {}".format(
-                self.trainsList[0].navigation_status["block_length"]
-            ),
-            self.navigation_white_background_label,
+            "Block Length: {}".format(self.trainsList[0].navigation_status["block_length"]),
+            self.navigation_white_background_label
         )
         self.word_label_block_length.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1451,10 +1347,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for block grade
         self.word_label_block_grade = QLabel(
-            "Block Grade: {}".format(
-                self.trainsList[0].navigation_status["block_grade"]
-            ),
-            self.navigation_white_background_label,
+            "Block Grade: {}".format(self.trainsList[0].navigation_status["block_grade"]),
+            self.navigation_white_background_label
         )
         self.word_label_block_grade.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1465,10 +1359,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for next station
         self.word_label_next_station = QLabel(
-            "Next Station: {}".format(
-                self.trainsList[0].navigation_status["next_station"]
-            ),
-            self.navigation_white_background_label,
+            "Next Station: {}".format(self.trainsList[0].navigation_status["next_station"]),
+            self.navigation_white_background_label
         )
         self.word_label_next_station.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1479,10 +1371,8 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for prev station
         self.word_label_prev_station = QLabel(
-            "Previous Station: {}".format(
-                self.trainsList[0].navigation_status["prev_station"]
-            ),
-            self.navigation_white_background_label,
+            "Previous Station: {}".format(self.trainsList[0].navigation_status["prev_station"]),
+            self.navigation_white_background_label
         )
         self.word_label_prev_station.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1494,7 +1384,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for headlights
         self.word_label_headlights = QLabel(
             "Headlights: {}".format(self.trainsList[0].navigation_status["headlights"]),
-            self.navigation_white_background_label,
+            self.navigation_white_background_label
         )
         self.word_label_headlights.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1505,17 +1395,13 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for passenger emergency brake
         self.word_label_pass_emergency_brake = QLabel(
-            "Passenger Emergency Brake: {}".format(
-                self.trainsList[0].navigation_status["passenger_emergency_brake"]
-            ),
-            self.navigation_white_background_label,
+            "Passenger Emergency Brake: {}".format(self.trainsList[0].navigation_status["passenger_emergency_brake"]),
+            self.navigation_white_background_label
         )
         self.word_label_pass_emergency_brake.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
         )
-        self.word_label_pass_emergency_brake.setAlignment(
-            Qt.AlignLeft | Qt.AlignVCenter
-        )
+        self.word_label_pass_emergency_brake.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.word_label_pass_emergency_brake.setContentsMargins(5, 5, 5, 5)
         self.word_label_pass_emergency_brake.setFont(QFont("Arial", 9))
 
@@ -1554,7 +1440,7 @@ class ResultsWindow(QMainWindow):
 
         # Add stretch
         self.navigation_white_background_layout.addStretch(1)
-
+        
         # self.navigation_status = {}
         # self.navigation_labels = []
 
@@ -1681,33 +1567,25 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_current_speed.setText(
-                "Current Speed: {} mph".format(
-                    trainObject.vehicle_status["current_speed"]
-                )
+                "Current Speed: {} mph".format(trainObject.vehicle_status["current_speed"])
             )
 
             self.word_label_setpoint_speed.setText(
-                "Setpoint Speed: {} mph".format(
-                    trainObject.vehicle_status["setpoint_speed"]
-                )
+                "Setpoint Speed: {} mph".format(trainObject.vehicle_status["setpoint_speed"])
             )
 
             self.word_label_commanded_speed.setText(
-                "Commanded Speed: {} mph".format(
-                    trainObject.vehicle_status["commanded_speed"]
-                )
+                "Commanded Speed: {} mph".format(trainObject.vehicle_status["commanded_speed"])
             )
-
+            
             self.word_label_acceleration.setText(
-                "Acceleration: {} ft/s".format(
-                    trainObject.vehicle_status["acceleration"]
-                )
+                "Acceleration: {} ft/s".format(trainObject.vehicle_status["acceleration"])
             )
 
             self.word_label_brakes.setText(
                 "Brakes: {}".format(trainObject.vehicle_status["brakes"])
             )
-
+            
             self.word_label_power.setText(
                 "Power: {} kW".format(trainObject.vehicle_status["power"])
             )
@@ -1717,27 +1595,19 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_engine_failure.setText(
-                "Engine Failure: {}".format(
-                    self.trainsList[0].failure_status["engine_failure"]
-                )
+                "Engine Failure: {}".format(self.trainsList[0].failure_status["engine_failure"])
             )
 
             self.word_label_signal_pickup_failure.setText(
-                "Signal Pickup Failure: {}".format(
-                    self.trainsList[0].failure_status["signal_pickup_failure"]
-                )
+                "Signal Pickup Failure: {}".format(self.trainsList[0].failure_status["signal_pickup_failure"])
             )
 
             self.word_label_brake_failure.setText(
-                "Brake Failure: {}".format(
-                    self.trainsList[0].failure_status["brake_failure"]
-                )
+                "Brake Failure: {}".format(self.trainsList[0].failure_status["brake_failure"])
             )
 
             self.word_label_emergency_brake.setText(
-                "Emergency Brake: {}".format(
-                    self.trainsList[0].failure_status["emergency_brake"]
-                )
+                "Emergency Brake: {}".format(self.trainsList[0].failure_status["emergency_brake"])
             )
 
             self.word_label_passengers.setText(
@@ -1745,9 +1615,7 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_power_limit.setText(
-                "Passenger Limit: {}".format(
-                    trainObject.passenger_status["passenger_limit"]
-                )
+                "Passenger Limit: {}".format(trainObject.passenger_status["passenger_limit"])
             )
 
             self.word_label_left_door.setText(
@@ -1759,15 +1627,11 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_lights_status.setText(
-                "Lights Status: {}".format(
-                    trainObject.passenger_status["lights_status"]
-                )
+                "Lights Status: {}".format(trainObject.passenger_status["lights_status"])
             )
 
             self.word_label_announcements.setText(
-                "Announcements: {}".format(
-                    trainObject.passenger_status["announcements"]
-                )
+                "Announcements: {}".format(trainObject.passenger_status["announcements"])
             )
 
             self.word_label_temperature.setText(
@@ -1775,15 +1639,11 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_air_conditioning.setText(
-                "Air Conditioning: {}".format(
-                    trainObject.passenger_status["air_conditioning"]
-                )
+                "Air Conditioning: {}".format(trainObject.passenger_status["air_conditioning"])
             )
 
             self.word_label_advertisements.setText(
-                "Advertisements: {}".format(
-                    trainObject.passenger_status["advertisements"]
-                )
+                "Advertisements: {}".format(trainObject.passenger_status["advertisements"])
             )
 
             self.word_label_authority.setText(
@@ -1807,9 +1667,7 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_prev_station.setText(
-                "Previous Station: {}".format(
-                    trainObject.navigation_status["prev_station"]
-                )
+                "Previous Station: {}".format(trainObject.navigation_status["prev_station"])
             )
 
             self.word_label_headlights.setText(
@@ -1817,9 +1675,7 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_pass_emergency_brake.setText(
-                "Passenger Emergency Brake: {}".format(
-                    trainObject.navigation_status["passenger_emergency_brake"]
-                )
+                "Passenger Emergency Brake: {}".format(trainObject.navigation_status["passenger_emergency_brake"])
             )
 
 
@@ -1886,173 +1742,173 @@ class ResultsWindow(QMainWindow):
 #                 },
 #             },
 #         }
-# "Train 2": {
-#     "vehicle_status": {
-#         "speed_limit": 45,
-#         "current_speed": 45,
-#         "setpoint_speed": 55,
-#         "commanded_speed": 40,
-#         "acceleration": 3.5,
-#         "deceleration": 2.0,
-#         "brakes": True,
-#         "power": 75.0,
-#         "power_limit": 100.0,
-#     },
-#     "failure_status": {
-#         "engine_failure": False,
-#         "signal_pickup_failure": False,
-#         "brake_failure": False,
-#         "emergency_brake": False,
-#     },
-#     "passenger_status": {
-#         "passengers": 42,
-#         "passenger_limit": 50,
-#         "left_door": False,
-#         "right_door": True,
-#         "lights_status": True,
-#         "announcements": True,
-#         "temperature": 72,
-#         "air_conditioning": False,
-#         "advertisements": "Buy Drinks",
-#     },
-#     "navigation_status": {
-#         "authority": 5,
-#         "beacon": 6,
-#         "block_length": 2,
-#         "block_grade": 15,
-#         "next_station": 9,
-#         "prev_station": 5,
-#         "headlights": True,
-#         "passenger_emergency_brake": False,
-#     },
-# },
-# "Train 3": {
-#     "vehicle_status": {
-#         "speed_limit": 35,
-#         "current_speed": 45,
-#         "setpoint_speed": 55,
-#         "commanded_speed": 40,
-#         "acceleration": 3.5,
-#         "deceleration": 2.0,
-#         "brakes": True,
-#         "power": 75.0,
-#         "power_limit": 100.0,
-#     },
-#     "failure_status": {
-#         "engine_failure": False,
-#         "signal_pickup_failure": False,
-#         "brake_failure": False,
-#         "emergency_brake": False,
-#     },
-#     "passenger_status": {
-#         "passengers": 42,
-#         "passenger_limit": 50,
-#         "left_door": False,
-#         "right_door": True,
-#         "lights_status": True,
-#         "announcements": True,
-#         "temperature": 72,
-#         "air_conditioning": False,
-#         "advertisements": "Buy Drinks",
-#     },
-#     "navigation_status": {
-#         "authority": 5,
-#         "beacon": 6,
-#         "block_length": 2,
-#         "block_grade": 15,
-#         "next_station": 9,
-#         "prev_station": 5,
-#         "headlights": True,
-#         "passenger_emergency_brake": False,
-#     },
-# },
-# "Train 4": {
-#     "vehicle_status": {
-#         "speed_limit": 35,
-#         "current_speed": 45,
-#         "setpoint_speed": 55,
-#         "commanded_speed": 40,
-#         "acceleration": 3.5,
-#         "deceleration": 2.0,
-#         "brakes": True,
-#         "power": 75.0,
-#         "power_limit": 100.0,
-#     },
-#     "failure_status": {
-#         "engine_failure": False,
-#         "signal_pickup_failure": False,
-#         "brake_failure": False,
-#         "emergency_brake": False,
-#     },
-#     "passenger_status": {
-#         "passengers": 42,
-#         "passenger_limit": 50,
-#         "left_door": False,
-#         "right_door": True,
-#         "lights_status": True,
-#         "announcements": True,
-#         "temperature": 72,
-#         "air_conditioning": False,
-#         "advertisements": "Buy Drinks",
-#     },
-#     "navigation_status": {
-#         "authority": 5,
-#         "beacon": 6,
-#         "block_length": 2,
-#         "block_grade": 15,
-#         "next_station": 9,
-#         "prev_station": 5,
-#         "headlights": True,
-#         "passenger_emergency_brake": False,
-#     },
-# },
-# "Train 5": {
-#     "vehicle_status": {
-#         "speed_limit": 35,
-#         "current_speed": 45,
-#         "setpoint_speed": 55,
-#         "commanded_speed": 40,
-#         "acceleration": 3.5,
-#         "deceleration": 2.0,
-#         "brakes": True,
-#         "power": 75.0,
-#         "power_limit": 100.0,
-#     },
-#     "failure_status": {
-#         "engine_failure": False,
-#         "signal_pickup_failure": False,
-#         "brake_failure": False,
-#         "emergency_brake": False,
-#     },
-#     "passenger_status": {
-#         "passengers": 42,
-#         "passenger_limit": 50,
-#         "left_door": False,
-#         "right_door": True,
-#         "lights_status": True,
-#         "announcements": True,
-#         "temperature": 72,
-#         "air_conditioning": False,
-#         "advertisements": "Buy Drinks",
-#     },
-#     "navigation_status": {
-#         "authority": 5,
-#         "beacon": 6,
-#         "block_length": 2,
-#         "block_grade": 15,
-#         "next_station": 9,
-#         "prev_station": 5,
-#         "headlights": True,
-#         "passenger_emergency_brake": False,
-#     },
+        # "Train 2": {
+        #     "vehicle_status": {
+        #         "speed_limit": 45,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
+        # },
+        # "Train 3": {
+        #     "vehicle_status": {
+        #         "speed_limit": 35,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
+        # },
+        # "Train 4": {
+        #     "vehicle_status": {
+        #         "speed_limit": 35,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
+        # },
+        # "Train 5": {
+        #     "vehicle_status": {
+        #         "speed_limit": 35,
+        #         "current_speed": 45,
+        #         "setpoint_speed": 55,
+        #         "commanded_speed": 40,
+        #         "acceleration": 3.5,
+        #         "deceleration": 2.0,
+        #         "brakes": True,
+        #         "power": 75.0,
+        #         "power_limit": 100.0,
+        #     },
+        #     "failure_status": {
+        #         "engine_failure": False,
+        #         "signal_pickup_failure": False,
+        #         "brake_failure": False,
+        #         "emergency_brake": False,
+        #     },
+        #     "passenger_status": {
+        #         "passengers": 42,
+        #         "passenger_limit": 50,
+        #         "left_door": False,
+        #         "right_door": True,
+        #         "lights_status": True,
+        #         "announcements": True,
+        #         "temperature": 72,
+        #         "air_conditioning": False,
+        #         "advertisements": "Buy Drinks",
+        #     },
+        #     "navigation_status": {
+        #         "authority": 5,
+        #         "beacon": 6,
+        #         "block_length": 2,
+        #         "block_grade": 15,
+        #         "next_station": 9,
+        #         "prev_station": 5,
+        #         "headlights": True,
+        #         "passenger_emergency_brake": False,
+        #     },
 
-# def get_value(self, train_name, category, key):
-#     return self.trains.get(train_name, {}).get(category, {}).get(key)
+    # def get_value(self, train_name, category, key):
+    #     return self.trains.get(train_name, {}).get(category, {}).get(key)
 
-# def set_value(self, train_name, category, key, value):
-#     if train_name in self.trains:
-#         if category in self.trains[train_name]:
-#             self.trains[train_name][category][key] = value
+    # def set_value(self, train_name, category, key, value):
+    #     if train_name in self.trains:
+    #         if category in self.trains[train_name]:
+    #             self.trains[train_name][category][key] = value
 
 
 class TrainTest(QMainWindow):

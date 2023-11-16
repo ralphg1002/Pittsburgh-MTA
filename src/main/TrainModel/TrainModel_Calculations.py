@@ -20,6 +20,8 @@ class Calculations:
         # Calculate current_speed using the updated power
         self.current_speed(trainObject, currPower)
 
+        print("Power =", trainObject.vehicle_status["power"])
+
     def current_speed(self, trainObject, currPower):
         # Retrieve necessary values from self.trains
         lastVelocity = trainObject.calculations["lastVelocity"]
