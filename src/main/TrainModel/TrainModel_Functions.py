@@ -51,5 +51,10 @@ class TrainModelAttributes:
                             "nextStation1": "",
                             "nextStation2": "",
                             "currStation": "",
+                            "doorSide": "",
                             "line": "Green",
+                            "distance": 0,
+                            "initialized": True,
+                            "polarity": True,
+                            "setpoint_temp": 0,
                             "trainID": trainID}

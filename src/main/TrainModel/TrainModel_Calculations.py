@@ -38,17 +38,13 @@ class Calculations:
 
         # Calculate acceleration from force and set it, applying acceleration limit
         trainObject.calculations["currAcceleration"] = trainObject.calculations["currForce"] / mass
-        currAcceleration = self.limit_acceleration(trainObject)
+        self.limit_acceleration(trainObject)
 
         # Calculate velocity using the velocity function and set it
-        currVelocity = self.velocity()
-        self.trains.set_value("Train 1", "calculations", "currVelocity", currVelocity)
+        self.velocity(trainObject)
 
         # Calculate the distance traveled and set it
-        new_position = self.total_distance()
-
-        # Return the current velocity
-        return currVelocity
+        self.total_distance(trainObject)
 
     def limit_force(self, trainObject):
         # Retrieve necessary values from self.trains
@@ -78,8 +74,8 @@ class Calculations:
         emergency_brake = trainObject.failure_status["emergency_brake"]
         force = trainObject.calculations["currForce"]
         mass = trainObject.calculations["mass"]
-        power = self.trains.get_value("Train 1", "vehicle_status", "power")
-        currVelocity = self.trains.get_value("Train 1", "calculations", "currVelocity")
+        power = trainObject.vehicle_status["power"]
+        currVelocity = trainObject.calculations["currVelocity"]
 
         # Limit the acceleration of the train based on various conditions
         if (failure_1 or failure_2 or failure_3) and (brakes or emergency_brake):
@@ -98,17 +94,15 @@ class Calculations:
             acceleration = 0
 
         # Set the limited acceleration value
-        self.trains.set_value("Train 1", "calculations", "currAcceleration", acceleration)
+        trainObject.calculations["currAcceleration"] = acceleration
 
-        return acceleration
-
-    def velocity(self):
+    def velocity(self, trainObject):
         # Retrieve necessary values from self.trains
-        brake = self.trains.get_value("Train 1", "vehicle_status", "brakes")
-        emergency_brake = self.trains.get_value("Train 1", "failure_status", "emergency_brake")
-        last_acceleration = self.trains.get_value("Train 1", "calculations", "lastAcceleration")
-        curr_acceleration = self.trains.get_value("Train 1", "calculations", "currAcceleration")
-        last_velocity = self.trains.get_value("Train 1", "calculations", "lastVelocity")
+        brake = trainObject.vehicle_status["brakes"]
+        emergency_brake = trainObject.failure_status["emergency_brake"]
+        last_acceleration = trainObject.calculations["lastAcceleration"]
+        curr_acceleration = trainObject.calculations["currAcceleration"]
+        last_velocity = trainObject.calculations["lastVelocity"]
 
         # Calculate the total acceleration and update velocity
         total_acceleration = last_acceleration + curr_acceleration
@@ -123,14 +117,12 @@ class Calculations:
             velocity = 0
 
         # Set the calculated velocity value
-        velocity = self.trains.set_value("Train 1", "calculations", "currVelocity", velocity)
+        trainObject.calculations["currVelocity"] = velocity
 
-        return velocity
-
-    def total_distance(self):
+    def total_distance(self, trainObject):
         # Retrieve necessary values from self.trains
-        curr_velocity = self.trains.get_value("Train 1", "calculations", "currVelocity")
-        last_position = self.trains.get_value("Train 1", "calculations", "lastPosition")
+        curr_velocity = trainObject.calculations["currVelocity"]
+        last_position = trainObject.calculations["lastPosition"]
 
         # Update total_velocity using the current velocity (consider whether this is necessary)
         total_velocity = curr_velocity
@@ -138,137 +130,84 @@ class Calculations:
         # Correct the distance calculation (multiply, not divide)
         distance = last_position + (self.time_interval * 2) * total_velocity
 
-        return distance
+        trainObject.calculations["distance"] = distance
 
     def blockID(
-            self, next_block, length, grade, speed_limit, suggested_speed, authority
+            self, trainObject, next_block, length, grade, speed_limit, suggested_speed, authority
     ):
-        self.trains.set_value("Train 1", "calculations", "nextBlock", next_block)
-        self.trains.set_value("Train 1", "navigation_status", "length", length)
-        self.trains.set_value("Train 1", "navigation_status", "grade", grade)
-        self.trains.set_value("Train 1", "vehicle_status", "speed_limit", speed_limit)
-        self.trains.set_value("Train 1", "vehicle_status", "suggested_speed", suggested_speed)
-        self.trains.set_value("Train 1", "navigation_status", "authority", authority)
+        trainObject.calculations["nextBlock"] = next_block
+        trainObject.navigation_status["length"] = length
+        trainObject.navigation_status["grade"] = grade
+        trainObject.vehicle_status["speed_limit"] = speed_limit
+        trainObject.vehicle_status["suggested_speed"] = suggested_speed
+        trainObject.navigation_status["authority"] = authority
 
-        train = self.trains.get_value("Train 1", "calculations", "trainID")
+        self.occupancy(trainObject, next_block)
 
-        self.occupancy(next_block)
+        # # Send train controller information
+        # trainModelToTrainController.sendBlockLength.emit(length)
+        # trainModelToTrainController.sendSpeedLimit.emit(train, speed_limit)
+        # trainModelToTrainController.sendCommandedSpeed.emit(train, suggested_speed)
+        # trainModelToTrainController.sendAuthority.emit(train, authority)
 
-        # Send train controller information
-        trainModelToTrainController.sendBlockLength.emit(length)
-        trainModelToTrainController.sendSpeedLimit.emit(train, speed_limit)
-        trainModelToTrainController.sendCommandedSpeed.emit(train, suggested_speed)
-        trainModelToTrainController.sendAuthority.emit(train, authority)
+    def failures(self, trainObject):
+        # trainModelToTrainController.sendEngineFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["engine_failure"])
+        # trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["signal_pickup_failure"])
+        # trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
+        # trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"], trainObject.failure_status["passenger_emergency_brake"])
+        return
 
-        return next_block, length, grade, speed_limit, suggested_speed, authority
-
-    def failures(self):
-        engine_failure = self.trains.get_value("Train 1", "failure_status", "engine_failure")
-        signal_pickup_failure = self.trains.get_value("Train 1", "failure_status", "signal_pickup_failure")
-        brake_failure = self.trains.get_value("Train 1", "failure_status", "brake_failure")
-        pass_emergency_brake = self.trains.get_value("Train 1", "failure_status", "passenger_emergency_brake")
-        train = self.trains.get_value("Train 1", "calculations", "trainID")
-
-        if (
-                engine_failure == True
-                or signal_pickup_failure == True
-                or brake_failure == True
-        ):
-            trainModelToTrainController.sendEngineFailure.emit(train, engine_failure)
-            trainModelToTrainController.sendSignalPickupFailure.emit(
-                train, signal_pickup_failure
-            )
-            trainModelToTrainController.sendBrakeFailure.emit(train, brake_failure)
-
-        if pass_emergency_brake == True:
-            trainModelToTrainController.sendPassengerEmergencyBrake.emit(
-                train, pass_emergency_brake
-            )
-
-        return (
-            engine_failure,
-            signal_pickup_failure,
-            brake_failure,
-            pass_emergency_brake,
-        )
-
-    def temperature(self, temp):
-        set_temp = temp
-        curr_temp = self.trains.get_value("Train 1", "vehicle_status", "temperature")
-        train = self.trains.get_value("Train 1", "calculations", "trainID")
+    def temperature(self, trainObject):
+        set_temp = trainObject.calculations["setpoint_temp"]
+        curr_temp = trainObject.vehicle_status["temperature"]
+        train = trainObject.calculations["trainID"]
 
         if curr_temp < set_temp:
             while curr_temp < set_temp:
                 curr_temp += 1
-                self.trains.set_value("Train 1", "vehicle_status", "temperature", curr_temp)
-                trainModelToTrainController.sendTemperature.emit(train, curr_temp)
+                trainObject.vehicle_status["temperature"] = curr_temp
+                # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp > curr_temp:
             while curr_temp > set_temp:
                 curr_temp -= 1
-                self.trains.set_value("Train 1", "vehicle_status", "temperature", curr_temp)
-                trainModelToTrainController.sendTemperature.emit(train, curr_temp)
+                trainObject.vehicle_status["temperature"] = curr_temp
+                # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
         elif set_temp == curr_temp:
-            self.trains.set_value("Train 1", "vehicle_status", "temperature", curr_temp)
-            trainModelToTrainController.sendTemperature.emit(train, curr_temp)
+            trainObject.vehicle_status["temperature"] = curr_temp
+            # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
-        return curr_temp
+        return
 
     # Calculate the current number of passengers from the track model
-    def passengers(self, passengers):
-        curr_passengers = self.trains.get_values("Train 1", "passenger_status", "passengers")
-        trainModelToTrackModel.sendCurrentPassengers.emit(curr_passengers, "Train 1")
+    def passengers(self, trainObject):
+        # trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.passenger_status["passengers"], trainObject.calculations["trainID"])
+        return
+    def occupancy(self, trainObject, next_block):
+        # if trainObject.calculations["initialized"]:
+        #     trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
 
-        self.trains.set_values("Train 1", "passenger_status", "passengers", passengers)
+        # if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"]:
+        #     trainObject.calculations["distance"] = 0
+        #     trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
+        #     trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
+        #     trainModelToTrainController.sendPolarity.emit(trainID, polarity)
+        #
+        #     trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
+        #     trainObject.navigation_status["prevBlock"] = trainObject.navigation_status["currBlock"]
 
-        return passengers
+        #trainObject.calculations["initialized"] = False
+        return
 
-    def occupancy(self, next_block):
-        distance = 0
-        polarity = 0
-        initialized = 0
-        # distance = self.total_distance()
-        block_length = self.trains.get_value("Train 1", "navigation_status", "block_length")
-        next_block = self.trains.set_value("Train 1", "calculations", "nextBlock", next_block)
-        curr_block = self.trains.get_value("Train 1", "calculations", "currBlock")
-        prev_block = self.trains.get_value("Train 1", "calculations", "prevBlock")
-        trainID = self.trains.get_value("Train 1", "calculations", "trainID")
-        line = self.trains.get_value("Train 1", "calculations", "line")
-
-        if initialized == 0:
-            trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
-
-        if distance == block_length:
-            distance = 0
-            polarity = 1
-            trainModelToTrackModel.sendPolarity.emit(line, curr_block, prev_block)
-            trainModelToTrainController.sendPolarity.emit(trainID, polarity)
-
-            curr_block = next_block
-            prev_block = curr_block
-
-        initialized += 1
-        if initialized >= 999:
-            initialized = 1
-
-    def beacon(self, beacon):
-        next_station1 = beacon["Next Station1"]
-        next_station2 = beacon["Next Station2"]
-        current_station = beacon["Current Station"]
-        door_side = beacon["Door Side"]
-        train = self.trains.get_value("Train 1", "calculations", "trainID")
-
-        trainModelToTrainController.sendNextStation1.emit(train, next_station1)
-        trainModelToTrainController.sendNextStation2.emit(train, next_station2)
-        trainModelToTrainController.sendCurrStation.emit(train, current_station)
-
-        if door_side == "Left":
-            trainModelToTrainController.sendLeftDoor.emit(train, door_side)
-        elif door_side == "Right":
-            trainModelToTrainController.sendRightDoor.emit(train, door_side)
+    def beacon(self, trainObject):
+        if trainObject.calculations["doorSide"] == "Left":
+            trainObject.passenger_status["left_door"] = True
+            trainObject.passenger_status["right_door"] = False
+        elif trainObject.calculations["doorSide"] == "Right":
+            trainObject.passenger_status["left_door"] = False
+            trainObject.passenger_status["right_door"] = True
         else:
-            trainModelToTrainController.sendLeftDoor.emit(train, door_side)
-            trainModelToTrainController.sendRightDoor.emit(train, door_side)
+            trainObject.passenger_status["left_door"] = True
+            trainObject.passenger_status["right_door"] = True
 
-        return next_station1, next_station2, current_station, door_side
