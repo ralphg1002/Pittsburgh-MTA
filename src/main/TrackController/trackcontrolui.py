@@ -243,7 +243,7 @@ class ModeButton(QPushButton):
 class MapButton(QPushButton):
     def __init__(self):
         super().__init__()
-        self.clicked.connect(self.on_button_click)
+        #self.clicked.connect(self.on_button_click)
         self.defaultColor = QColor(255, 255, 255)  # White
         self.setText("Open Map")
         self.setFont(QFont("Segoe UI", 15, QFont.Bold))
@@ -258,7 +258,8 @@ class MapButton(QPushButton):
             self.mapWindow.setWindowFlags(
                 self.mapWindow.windowFlags() | Qt.WindowStaysOnTopHint
             )
-            self.mapWindow.set_map(line)
+        
+        self.mapWindow.set_map(line)
 
         self.mapWindow.show()
 
@@ -287,8 +288,10 @@ class MapWindow(QMainWindow):
     def set_map(self, line):
         if line == 1:
             self.mapLabel.setPixmap(self.scaledPixmapGreenLine)
+            print("greenline")
         else:
             self.mapLabel.setPixmap(self.scaledPixmapRedLine)
+            print("Red line: ", line)
 
 
 class DeviceBox(QWidget):

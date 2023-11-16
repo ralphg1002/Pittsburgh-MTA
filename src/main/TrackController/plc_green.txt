@@ -11,17 +11,17 @@ END
 
 SW1:
 IF
-    Condition: (12<-17)
+    Condition: (13<-17)
     Operation: SWITCH(0)
-    Operation: 11 R
-    Operation: 12 G
+    Operation: 12 R
+    Operation: 13 G
     Operation: 1 R
     end
 IF
-    Condition: (1<-6) AND NOT(12<-29)
+    Condition: (1<-6) AND NOT(13<-29)
     Operation: SWITCH(1)
-    Operation: 11 R
     Operation: 12 R
+    Operation: 13 R
     Operation: 1 G
     end
 END
