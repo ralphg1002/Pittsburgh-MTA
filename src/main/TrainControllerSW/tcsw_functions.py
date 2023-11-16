@@ -293,7 +293,7 @@ class TCFunctions:
             trainObject.piVariables["uk"] = self.power3["uk"]
             trainObject.piVariables["prevError"] = self.power3["prevError"]
 
-        print(f'Power: {trainObject.powerCommand}, Uk: {trainObject.piVariables["uk"]}, prevError: {trainObject.piVariables["prevError"]}')
+        # print(f'Power: {trainObject.powerCommand}, Uk: {trainObject.piVariables["uk"]}, prevError: {trainObject.piVariables["prevError"]}')
 
     def failure_operations(self, trainObject):
         if trainObject.get_engineFailure():
