@@ -1521,17 +1521,19 @@ class Routing:
         print(self.stations_to_stop)
         self.routeQ = []
         #self.routeQ = [0, 53, 54, 55, 56, 57, 0]
-        if self.main_window.selectLine == "Green Line":
+        #if self.main_window.selectLine == "Green Line":
         
-            self.routeQ = self.travelGreenBlocks()
+        self.routeQ = self.travelGreenBlocks()
 
+        """
             # Use stop_blocks to check if the train should stop at a block
             for i, block in enumerate(self.routeQ):
                 if isinstance(block, int):
                     for station_info in self.stations_to_stop:
                         stop_block, station_name = station_info[0], station_info[1]
                         if block == stop_block:
-                            self.routeQ[i] = f"{block}, {station_name}"
+                            self.routeQ[i] = f"{block}, {station_name}
+        """
                         
         self.temp_routes.append(self.routeQ)
         return self.routeQ
