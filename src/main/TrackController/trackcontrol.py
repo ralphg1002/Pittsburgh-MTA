@@ -1522,7 +1522,7 @@ class TrackControl(QMainWindow):
                     self.set_occupancystate_handler(
                         line, waysideNum, blockNum, finalState
                     )
-                    trackModelToTrackController.occupancyState.emit(line, waysideNum, blockNum, state)
+                    #trackModelToTrackController.occupancyState.emit(line, waysideNum, blockNum, state)
 
             # Set Authority
             elif action == 6:
