@@ -357,6 +357,7 @@ class TrackData:
             # Regular block data emission
             if curBlock == 999 and prevBlock == 999:
                 trackModelToTrainModel.blockInfo.emit(0, 0, 0, 0, 0, 0)
+                trackModelToTrackController.occupancyState.emit(1, self.get_wasyside_num(0), 0, True)
             elif curBlock == 0 and prevBlock == 999:
                 # Set first block's occupancy, no need to clear any occupancy
                 for block in self.greenTrackData:

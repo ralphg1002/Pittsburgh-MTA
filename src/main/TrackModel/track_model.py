@@ -1243,10 +1243,12 @@ class TrackView(QGraphicsView):
     # Change color of block based on occupancy toggle
     def change_color(self, on, off):
         print("works")
+        if on == 999:
+            on = 0
         onBlock = self.blocks.get(on)
         if onBlock:
             onBlock.toggle_occupancy(True)
-        if off != "":
+        if off != 999:
             offBlock = self.blocks.get(off)
             if offBlock:
                 offBlock.toggle_occupancy(False)
@@ -2129,7 +2131,6 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
-                    self.send_failure_alert(blockNumber)
                 else:
                     self.circuitSelection.hide()
                     self.failures.remove("Track Circuit Failure")
@@ -2150,7 +2151,6 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
-                    self.send_failure_alert(blockNumber)
                 else:
                     self.powerSelection.hide()
                     self.failures.remove("Power Failure")
@@ -2158,7 +2158,6 @@ class TrackModel:
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
         self.block.set_data(self.selectedLine, self.trackData)
-        self.update_signal()  ###temp###
 
     def set_broken_failure(self, event):
         # Obtain block number provided
@@ -2172,7 +2171,6 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
-                    self.send_failure_alert(blockNumber)
                 else:
                     self.brokenSelection.hide()
                     self.failures.remove("Broken Rail")
