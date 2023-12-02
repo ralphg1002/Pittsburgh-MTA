@@ -1,4 +1,5 @@
 # importing libraries
+from ntpath import join
 import sys
 import math
 from PyQt5.QtWidgets import *
@@ -173,6 +174,41 @@ WAYSIDE_2G_BLOCKS = [
     100,
     101,
 ]
+
+# initalizing switches
+switches = {
+    # normal, alt, state
+    44: [[43, 42, 41, 40, 39],[67, 68, 69, 70, 71], [0]],
+    38: [[39, 40, 41, 42, 43],[71, 70, 69, 68, 67], [0]],
+    33: [[32, 31, 30, 29, 28],[72, 73, 74, 75, 76], [0]],
+    27: [[28, 29, 30, 31, 32],[76, 75, 74, 73, 72], [0]]
+}
+
+lights_greenLine = {
+    0: [0, 63],
+    1: [0, 13],
+    12: [0, 11],
+    13: [1, 12],
+    29: [1, 30],
+    30: [0, 31],
+    57: [1, 0],
+    58: [0, 59],
+    62: [0, 63],
+    63: [0, 64],
+    76: [0, 77],
+    77: [1, 101],
+    85: [1, 86],
+    86: [0, 87],
+    100: [0, 85]
+    }
+
+lights_redLine = {
+    0: [0, 9],
+    1: [0, 16]
+    # STILL NEED TO FILL OUT THE REST OF THIS LIST
+}
+
+dispatchTrainsList = []
 
 # Global variable declaration
 global_block_occupancy = {}
@@ -1369,6 +1405,7 @@ class Routing:
         # self.scheduler_class = Scheduler(main_window)
         self.train_routes = {}  # Dictionary to map train IDs to their routes
         self.temp_routes = []  # temp dict
+        self.altRouteBool = False
 
         trackControllerToCTC.occupancyState.connect(self.checkPosition)
 
@@ -1670,15 +1707,6 @@ class Routing:
 
     def checkPosition(self, line, blockNum, occupancy):
 
-        # initalizing switches
-        switches = {
-            # normal, alt
-            44: [[43, 42, 41, 40, 39],[67, 68, 69, 70, 71]],
-            38: [[39, 40, 41, 42, 43],[71, 70, 69, 68, 67]],
-            33: [[32, 31, 30, 29, 28],[72, 73, 74, 75, 76]],
-            27: [[28, 29, 30, 31, 32],[76, 75, 74, 73, 72]]
-        }
-
         try:
             self.routeQ[0]
         except Exception as e:
@@ -1720,11 +1748,126 @@ class Routing:
             print("ROUTE Q")
             print(self.routeQ)
             
-            # Switch
 
-            # Occupancy
 
-            # Station Check
+            """ SWITCH CHECK """
+            # Check if switch is in next 5 and get its index within the route queue. 
+            for i in range(0, 5):
+                if i < len(self.routeQ) and self.routeQ[i] in switches:
+                    switch_index = i
+                    switch = switches[i]
+                    break
+                else:
+                    switch_index = None
+            # if the switch is in the next 5 
+            if switch_index != None:
+                # Check if the train is traveling in the right direction
+                correct_direction = False
+                for i in range (0,5):
+                    if i < len(self.routeQ) and self.routeQ[i] == switch[0][0]:
+                        correct_direction = True
+                        break
+                # if the train is  traveling in the right direction then proceed.
+                if(correct_direction):
+                    # check if switch is activated
+                    if switch[2] == 1:
+                        if self.altRouteBool == False:
+                            self.altRouteBool = True
+                            # remove the normal route from the routeQ
+                            self.routeQ.remove(switch_index+1, switch_index+1+len(switch[0]))
+                            # replace it with the alternative route
+                            self.routeQ.insert(switch_index+1, switch[1])
+                    # if switch is not activated
+                    else:
+                        if self.altRouteBool == True:
+                            self.altRouteBool = False
+                            # remove the alternative route from the routeQ
+                            self.routeQ.remove(switch_index+1, switch_index+1+len(switch[1]))
+                            # replace it with the normal route
+                            self.routeQ.insert(switch_index+1, switch[0])
+
+
+            """ OCCUPANCY CHECK """
+            # determine the index of the occupied block within the routeQ
+            for i in range(0, 5):
+                if i < len(self.routeQ) and self.routeQ[i] in global_block_occupancy:
+                    occupied_index = i
+                    occupied_block = self.routeQ[i]
+                    break
+                else:
+                    occupied_index = None
+            # If there is an occupied block within the next 6...
+            if occupied_index != None:
+                if(len(self.routeQ) >= 5 and occupied_block == self.routeQ[4]):
+                    suggestedSpeed = (
+                    int(0.75 * self.block_info_list[self.routeQ[0]].speedLimit)
+                    * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, self.routeQ[0], suggestedSpeed
+                    )
+                elif(len(self.routeQ) >= 4 and occupied_block == self.routeQ[3]):
+                    suggestedSpeed = (
+                    int(0.5 * self.block_info_list[self.routeQ[0]].speedLimit)
+                    * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, self.routeQ[0], suggestedSpeed
+                    )
+                elif(len(self.routeQ) >= 3 and occupied_block == self.routeQ[2]):
+                    suggestedSpeed = (
+                    int(0.25 * self.block_info_list[self.routeQ[0]].speedLimit)
+                    * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, self.routeQ[0], suggestedSpeed
+                    )
+                elif(len(self.routeQ) >= 2 and occupied_block == self.routeQ[1]):
+                    suggestedSpeed = 0
+                    authority = 0
+                
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, self.routeQ[0], suggestedSpeed
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                    line, wayside, self.routeQ[0], suggestedSpeed
+                    )
+                    ctcToTrackController.sendAuthority.emit(
+                    line, wayside, self.routeQ[0], authority
+                    )
+
+
+            """ LIGHT CHECK """
+            # STILL NEED TO DO THE CODE FOR THIS PART
+
+            """ STATION CHECK """
             if len(self.routeQ) >= 4 and self.stations_to_stop[0] == self.routeQ[3]:
                 suggestedSpeed = (
                     int(0.75 * self.block_info_list[self.routeQ[0]].speedLimit)
@@ -1915,7 +2058,7 @@ class Train:
         elif line == "Green Line":
             self.train_id = f'{"Green"}{trainNum}'
 
-        self.dispatchTrainsList = []
+        #self.dispatchTrainsList = []
         # self.signals.occupancy.connect(self.routing.checkPosition)
 
         self.departure_timer = QTimer()
@@ -1967,7 +2110,7 @@ class Train:
             departureTime = train.trainDeparture
             if departureTime == current_time_str:
                 # Add the train to the dispatched_trains list
-                self.dispatchTrainsList.append(train)
+                dispatchTrainsList.append(train)
                 if train.trackLine == "Green Line":
                     lineTrack = "green"
                 else:
