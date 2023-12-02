@@ -1064,9 +1064,7 @@ class TrackControl(QMainWindow):
     """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     """ Handler methods for the  Track Model input signals (and internally change gui) """
     def set_occupancystate_handler(self, line, wayside, num, state):
-        self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(
-            state
-        )
+        #self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(state)
         #print("Sending occupancy to CTC...")
         trackControllerToCTC.occupancyState.emit(line, num, state)
         # update the occupancy table

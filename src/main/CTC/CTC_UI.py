@@ -599,14 +599,14 @@ class CTCWindow(QMainWindow):
 
         # Displaying the occupancy status
         self.status_label = QLabel("Status: ", self)
-        self.status_label.setGeometry(165, 475, 100, 100)
+        self.status_label.setGeometry(150, 475, 300, 100)
         self.status_label.setStyleSheet("font-size: 16px; color: black;")
         self.status_label.setVisible(True)
 
-        self.blockStatus = QLabel("Occupied", self)
+        """self.blockStatus = QLabel("Occupied", self)
         self.blockStatus.setGeometry(220, 475, 100, 100)
         self.blockStatus.setStyleSheet("font-size: 16px; color: green;")
-        self.blockStatus.setVisible(True)
+        self.blockStatus.setVisible(True)"""
         # self.status_label.block.showBlockStatus(self.status_label)  # Pass the status_label as an argument
 
         # Dispatched Trains Table
@@ -629,22 +629,15 @@ class CTCWindow(QMainWindow):
         self.dispatchTable.setGeometry(35, 280, 600, 200)
 
         self.selectLine.currentIndexChanged.connect(self.ticketRequest)
-
         trackModelToCTC.throughput.connect(self.updateTickets)
 
-        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
-
-        trackModelToCTC.throughput.connect(self.updateTickets)
-
-        # self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
-        # self.blockDropDown.currentIndexChanged.connect(
-        # lambda: Block.updateStatusLabel(main_window, blocks)
-        # )
+        self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
+        self.blockDropDown.currentIndexChanged.connect(self.statusHandler)
         # self.show()
         # self.blockDropDown.currentIndexChanged.connect(self.statusHandler)  # Connect the signal to update the dropdown
 
-    # def statusHandler(self):
-    # Block.updateStatusLabel(self)
+    def statusHandler(self):
+        Block.updateStatusLabel(self)
 
     def ticketRequest(self):
         beforeLine = self.selectLine.currentText()
@@ -1403,6 +1396,8 @@ class Routing:
                 )
                 blockList.append(block)
 
+        Block.initialize_blocks(blockList)
+
         return blockList
 
     def find_station_info(self, arrival_station):
@@ -1521,20 +1516,18 @@ class Routing:
         print(self.stations_to_stop)
         self.routeQ = []
         #self.routeQ = [0, 53, 54, 55, 56, 57, 0]
-        #if self.main_window.selectLine == "Green Line":
+        # if self.main_window.selectLine == "Green Line":
         
         self.routeQ = self.travelGreenBlocks()
 
-        """
-            # Use stop_blocks to check if the train should stop at a block
-            for i, block in enumerate(self.routeQ):
-                if isinstance(block, int):
-                    for station_info in self.stations_to_stop:
-                        stop_block, station_name = station_info[0], station_info[1]
-                        if block == stop_block:
-                            self.routeQ[i] = f"{block}, {station_name}
-        """
-                        
+        # Use stop_blocks to check if the train should stop at a block
+        """for i, block in enumerate(self.routeQ):
+            if isinstance(block, int):
+                for station_info in self.stations_to_stop:
+                    stop_block, station_name = station_info[0], station_info[1]
+                    if block == stop_block:
+                        self.routeQ[i] = f"{block}, {station_name}"
+                        """
         self.temp_routes.append(self.routeQ)
         return self.routeQ
 
@@ -1681,6 +1674,8 @@ class Routing:
                 self.main_window.dispatchTable.setItem(
                     0, 1, QTableWidgetItem(str(blockNum))
                 )
+                Block.update_block_occupancy(blockNum, 1)
+
                 ctcToTrackController.sendSuggestedSpeed.emit(
                     line, wayside, self.routeQ[0], suggestedSpeed
                 )
@@ -1984,6 +1979,11 @@ class Block:
         self.occupancy = 0
         self.enable = 1
 
+    def initialize_blocks(blocks):
+        for block in blocks:
+            global_block_occupancy[block.blockNumber] = block.occupancy 
+
+    @staticmethod
     def update_block_occupancy(block_num, occupancy):
         global global_block_occupancy
         global_block_occupancy[block_num] = occupancy
@@ -2008,18 +2008,26 @@ class Block:
             main_window.blockDropDown.addItems(block_items)
 
     @staticmethod
-    def updateStatusLabel(self, main_window):
-        selected_block_num = int(main_window.blockDropDown.currentText())
-        block_status = None
+    def updateStatusLabel(main_window):
+        global global_block_occupancy  # Declare the global variable
 
-        for block in self.blockList:
-            if block.blockNumber == selected_block_num:
-                block_status = self.getBlockStatus(block)
-                break
+        selected_block_num_text = main_window.blockDropDown.currentText()
+        block_status = "Select a block"  # Default status
 
-        status_text = (
-            f"Status: {block_status}" if block_status is not None else "Block not found"
-        )
+        # Check if the selected text is a number
+        if selected_block_num_text.isdigit():
+            selected_block_num = int(selected_block_num_text)
+
+            for block_num in global_block_occupancy.keys():
+                if block_num == selected_block_num:
+                    # Assuming you want to check the occupancy status
+                    occupancy = global_block_occupancy[block_num]
+                    block_status = "Occupied" if occupancy else "Unoccupied"
+                    break
+            else:
+                block_status = "Block not found"
+
+        status_text = f"Status: {block_status}"
         main_window.status_label.setText(status_text)
 
     @staticmethod
