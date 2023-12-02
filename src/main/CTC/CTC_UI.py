@@ -1119,6 +1119,7 @@ class Scheduler:
                 arrival_stations,
                 train_id,
                 suggested_speed,
+                self.travel
             )
 
             self.trainList.append(train)
@@ -1133,7 +1134,7 @@ class Scheduler:
                 print("Suggested Speed:", train.sugg_speed)
                 print("-----------")  # Add a separator between trains
 
-            self.assign_route_to_train(self.travel, train.train_id)
+            #self.assign_route_to_train(self.travel, train.train_id)
 
             self.update_schedule_table(
                 departing_station, departureTime, arrivalTime, train.train_id
@@ -1516,8 +1517,10 @@ class Routing:
         print(self.stations_to_stop)
         self.routeQ = []
         #self.routeQ = [0, 53, 54, 55, 56, 57, 0]
-        # if self.main_window.selectLine == "Green Line":
-        
+        if self.main_window.selectLine == "Green Line":
+            self.routeQ = self.travelGreenBlocks()
+            print("ROUTEQ IS FOUND")
+
         self.routeQ = self.travelGreenBlocks()
 
         # Use stop_blocks to check if the train should stop at a block
@@ -1620,6 +1623,16 @@ class Routing:
         return lastStopTime
 
     def checkPosition(self, line, blockNum, occupancy):
+
+        # initalizing switches
+        switches = {
+            # normal, alt
+            44: [[43, 42, 41, 40, 39],[67, 68, 69, 70, 71]],
+            38: [[39, 40, 41, 42, 43],[71, 70, 69, 68, 67]],
+            33: [[32, 31, 30, 29, 28],[72, 73, 74, 75, 76]],
+            27: [[28, 29, 30, 31, 32],[76, 75, 74, 73, 72]]
+        }
+
         try:
             self.routeQ[0]
         except Exception as e:
@@ -1659,9 +1672,13 @@ class Routing:
             print("STATIONS TO STOP:")
             print(self.stations_to_stop[0])
             print("ROUTE Q")
-            #print(self.routeQ[1])
-            print(self.block_info_list[65].speedLimit)
             print(self.routeQ)
+            
+            # Switch
+
+            # Occupancy
+
+            # Station Check
             if len(self.routeQ) >= 4 and self.stations_to_stop[0] == self.routeQ[3]:
                 suggestedSpeed = (
                     int(0.75 * self.block_info_list[self.routeQ[0]].speedLimit)
@@ -1830,6 +1847,7 @@ class Train:
         stops,
         trainID,
         suggested_speed,
+        travel
     ):
         self.scheduler = scheduler
         self.main_window = CTCwindow
@@ -1841,6 +1859,8 @@ class Train:
         self.trainStops = stops
         self.authority = 1
         trainNum = trainNum + 1
+        self.routeQ = travel
+        self.altRouteBool = False
 
         self.sugg_speed = int(suggested_speed) if suggested_speed else 43.50
 
@@ -2039,3 +2059,5 @@ class Block:
     def setSelectedBlock(main_window):
         selected_block = main_window.blockDropDown.currentText()
         return selected_block
+
+
