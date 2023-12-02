@@ -1052,31 +1052,42 @@ class Scheduler:
             print(arrival_stations)
             for arrival_station in arrival_stations:
                 if selected_line == "Red Line":
-                    print("red line")
-                elif selected_line == "Blue Line":
-                    print("blue line")
-                elif selected_line == "Green Line":
-                    routing = Routing("src/main/CTC/GreenLine.csv", CTCWindow)
+                    routing = Routing("src/main/CTC/RedLine.csv", CTCWindow)
                     arrival_station_to_find = arrival_station
                     station_info = routing.find_station_info(arrival_station_to_find)
-
                     if station_info:
                         # Add station and its information as a dictionary to the list
                         station_info_list.append(
                             {"Station": arrival_station_to_find, "Info": station_info}
                         )
+                        print(station_info_list)
+                    else:
+                        print(f"Station '{arrival_station_to_find}' not found.")
+
+                elif selected_line == "Green Line":
+                    routing = Routing("src/main/CTC/GreenLine.csv", CTCWindow)
+                    arrival_station_to_find = arrival_station
+                    station_info = routing.find_station_info(arrival_station_to_find)
+                    if station_info:
+                        # Add station and its information as a dictionary to the list
+                        station_info_list.append(
+                            {"Station": arrival_station_to_find, "Info": station_info}
+                        )
+                        print(station_info_list)
                     else:
                         print(f"Station '{arrival_station_to_find}' not found.")
 
             if station_info_list:
-                departure_station_info = routing.find_station_info(departing_station)
-                if departure_station_info:
-                    self.path = self.routing.find_path(
-                        departing_station, arrival_stations, station_info
-                    )
-                    print("Path: ", self.path)
-                    self.travel = self.routing.find_travel_path(self.path)
-                    print("Travel: ", self.travel)
+                #departure_station_info = routing.find_station_info(departing_station)
+                #print("FOUND DEPATURE INFO")
+                #print(departure_station_info)
+                #if departure_station_info:
+                self.path = self.routing.find_path(
+                    departing_station, arrival_stations, station_info
+                )
+                print("Path: ", self.path)
+                self.travel = self.routing.find_travel_path(self.path)
+                print("Travel: ", self.travel)
 
             # case if no arrival time is input, needs to be calculated
             if arrival_time == "":
@@ -1403,13 +1414,13 @@ class Routing:
 
     def find_station_info(self, arrival_station):
         station_info = []
-        arrival_station = (
+        arrival_station1 = (
             arrival_station.lower()
         )  # Convert the input to lowercase for case-insensitive search
-
+        print(arrival_station1)
         for row in self.data:
             if len(row) >= 8:
-                if arrival_station in row[6].lower():
+                if arrival_station1 in row[6].lower():
                     Line = row[0]
                     Block_Number = int(row[2])
                     Block_Length = float(row[3])
@@ -1448,9 +1459,12 @@ class Routing:
 
         for arrival_station in arrival_stations:
             # Find the station information for the current and arrival stations
+            print(arrival_station)
+            arrival_station.lower()
             current_station_info = self.find_station_info(current_station)
             arrival_station_info = self.find_station_info(arrival_station)
-
+            print("ARRIVAL STATION INFO")
+            print(arrival_station_info)
             # If either station's information is missing, we can't continue the path
             if current_station_info is None or arrival_station_info is None:
                 return None
@@ -1471,7 +1485,8 @@ class Routing:
         max_block = 0
         if self.main_window.selectLine == "Green Line":
             max_block = 150
-
+        else:
+            max_block = 76
         # Extract the block numbers and station names from the path
         block_stations = [(block, station) for station, block in path]
 
@@ -1516,12 +1531,14 @@ class Routing:
         print("BLOCKS TO STOP AT")
         print(self.stations_to_stop)
         self.routeQ = []
+
+        trainLine = self.main_window.selectLine.currentText()
         #self.routeQ = [0, 53, 54, 55, 56, 57, 0]
-        if self.main_window.selectLine == "Green Line":
+        if trainLine == "Green Line":
             self.routeQ = self.travelGreenBlocks()
             print("ROUTEQ IS FOUND")
-
-        self.routeQ = self.travelGreenBlocks()
+        else:
+            self.routeQ = self.travelRedBlocks()
 
         # Use stop_blocks to check if the train should stop at a block
         """for i, block in enumerate(self.routeQ):
@@ -1557,6 +1574,35 @@ class Routing:
 
         # D-I
         for blockNum in range(13, 58):
+            self.routeQ.append(blockNum)
+
+        self.routeQ.append(0)
+
+        return self.routeQ
+    
+    def travelRedBlocks(self):
+        self.routeQ = []
+        # Add all blocks to a path the train will have to go through
+        self.routeQ.append(0)
+
+        # K-Q
+        for blockNum in range(9, 1, -1):
+            self.routeQ.append(blockNum)
+
+        # N
+        for blockNum in range(1, 16):
+            self.routeQ.append(blockNum)
+
+        # R-Z
+        for blockNum in range(16, 66):
+            self.routeQ.append(blockNum)
+
+        # F-A
+        for blockNum in range(66, 1, -1):
+            self.routeQ.append(blockNum)
+
+        # D-I
+        for blockNum in range(1, 9):
             self.routeQ.append(blockNum)
 
         self.routeQ.append(0)
