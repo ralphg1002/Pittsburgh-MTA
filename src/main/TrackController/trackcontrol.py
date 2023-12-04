@@ -975,10 +975,10 @@ class TrackControl(QMainWindow):
         self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_dispatch(self, line, wayside, trainID, authority):
-        #print("line #: ", line)
-        #print("wayside #:, ", wayside)
-        #print("trainID: ", trainID)
-        #print("authority: ", authority)
+        print("line #: ", line)
+        print("wayside #:, ", wayside)
+        print("trainID: ", trainID)
+        print("authority: ", authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_authority(authority)
         self.lines[line - 1].get_wayside(wayside).get_block(0).set_occupancystate(True)
         self.set_occupancystate_handler(line,wayside,0,True)
@@ -1064,7 +1064,8 @@ class TrackControl(QMainWindow):
     """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     """ Handler methods for the  Track Model input signals (and internally change gui) """
     def set_occupancystate_handler(self, line, wayside, num, state):
-        #self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(state)
+        print(line,wayside,num,state)
+        self.lines[line - 1].get_wayside(wayside).get_block(num).set_occupancystate(state)
         #print("Sending occupancy to CTC...")
         trackControllerToCTC.occupancyState.emit(line, num, state)
         # update the occupancy table
@@ -1520,7 +1521,7 @@ class TrackControl(QMainWindow):
                     self.set_occupancystate_handler(
                         line, waysideNum, blockNum, finalState
                     )
-                    trackModelToTrackController.occupancyState.emit(line, waysideNum, blockNum, state)
+                    #trackModelToTrackController.occupancyState.emit(line, waysideNum, blockNum, state)
 
             # Set Authority
             elif action == 6:
