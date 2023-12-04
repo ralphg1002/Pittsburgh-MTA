@@ -1,0 +1,51 @@
+import unittest
+from src.main.TrackController.trackcontrol import TrackControl
+from src.main.signals import ctcToTrackController
+
+class YourClassToTest:
+    def your_method_to_test(self, input_value):
+        pass
+        # Your method implementation
+        # Return the result or perform the necessary actions
+
+class TestYourClass(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        # Optional: Clean up resources after the tests
+        pass
+
+    def test_your_method_to_test_valid_input(self):
+        # Arrange
+        trackControl = TrackControl()
+        # Emit a signal from the CTC that a train is dispatched
+        ctcToTrackController.sendTrainDispatched.emit(1, 2, " ", True)
+        # Refresh the PLC so that the result is consistent
+        trackControl.wayside2G.refresh_plc()
+
+        # Act
+        result1 = trackControl.wayside2G.get_block(0).get_switchstate()
+        result2 = trackControl.wayside2G.get_block(0).get_lightstate()
+        result3 = trackControl.wayside2G.get_block(62).get_lightstate()
+        result4 = trackControl.wayside2G.get_block(63).get_lightstate()
+
+
+        # Assert
+        self.assertEqual(result1, True)  # Replace with the expected result
+        self.assertEqual(result2, "Green")  # Replace with the expected result
+        self.assertEqual(result3, "Red")  # Replace with the expected result
+        self.assertEqual(result4, "Red")  # Replace with the expected result
+
+    def test_your_method_to_test_invalid_input(self):
+        """# Arrange
+        your_instance = YourClassToTest()
+        input_value = "invalid input"  # Replace with an invalid input for your method
+
+        # Act & Assert
+        with self.assertRaises(ValueError):  # Replace with the expected exception type
+            your_instance.your_method_to_test(input_value)"""
+        pass
+
+if __name__ == '__main__':
+    unittest.main()
