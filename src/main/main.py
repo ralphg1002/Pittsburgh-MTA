@@ -8,7 +8,7 @@ from PyQt5 import QtGui
 
 from TrackController.trackcontrol import TrackControl
 from TrainControllerSW.tcsw_ui import *
-#from TrackModel.track_model import TrackModel
+from TrackModel.track_model import TrackModel
 from CTC.CTC_UI import *
 from TrainModel.Train_Model import TrainModel
 from TrainModel.Train_Model import TrainModel

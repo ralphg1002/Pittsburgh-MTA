@@ -930,12 +930,14 @@ class TrackControl(QMainWindow):
         # Load the default plc programs for all wayside controllers
         self.wayside1G.run_plc("src/main/TrackController/plc_green.txt")
         self.wayside2G.run_plc("src/main/TrackController/plc_green.txt")
-        # self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
-        # self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
+        self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
+        self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
 
         """ REFRESH THE PLCS FOR EACH WAYSIDE ON THE TIME INTERVAL """
         self.ui.timer.timeout.connect(lambda: self.wayside1G.refresh_plc())
         self.ui.timer.timeout.connect(lambda: self.wayside2G.refresh_plc())
+        self.ui.timer.timeout.connect(lambda: self.wayside1R.refresh_plc())
+        self.ui.timer.timeout.connect(lambda: self.wayside2R.refresh_plc())
 
         """ Connect handlers for GUI actions """
         # Connect the signal (currentIndexChanged) to display the proper mode in the GUI
