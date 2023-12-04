@@ -340,6 +340,7 @@ class TrackData:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Light State"] == state
+        print(line, blockNum, state)
 
     def set_crossing_state(self, line, _, blockNum, state):
         if line == 1:

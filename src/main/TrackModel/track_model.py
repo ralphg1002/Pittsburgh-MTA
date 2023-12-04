@@ -41,7 +41,7 @@ class TrackView(QGraphicsView):
         yardImage = QPixmap("src/main/TrackModel/pngs/yard.jpg")
         yardImage = yardImage.scaledToWidth(100)
         yardScene = QGraphicsPixmapItem(yardImage)
-        yardScene.setPos(90, 180)
+        yardScene.setPos(100, 180)
         self.scene.addItem(yardScene)
 
         path_0 = QPainterPath()
@@ -52,8 +52,8 @@ class TrackView(QGraphicsView):
         self.blocks[0] = block_0
 
         path_151 = QPainterPath()
-        path_151.moveTo(106, 278)
-        path_151.cubicTo(107, 278, 130, 251, 130, 250)
+        path_151.moveTo(96, 278)
+        path_151.cubicTo(97, 278, 120, 251, 120, 250)
         block_151 = self.createTrackBlock(path_151, "Block 151")
         self.scene.addItem(block_151)
 
@@ -1081,31 +1081,195 @@ class TrackView(QGraphicsView):
 
         path_147 = QPainterPath()
         path_147.moveTo(-207, 273)
-        path_147.lineTo(-207, 263)
+        path_147.lineTo(-207, 268)
         block_147 = self.createTrackBlock(path_147, "Block 147")
         self.scene.addItem(block_147)
         self.blocks[147] = block_147
 
         path_148 = QPainterPath()
-        path_148.moveTo(-207, 253)
-        path_148.lineTo(-207, 233)
+        path_148.moveTo(-207, 258)
+        path_148.lineTo(-207, 240)
         block_148 = self.createTrackBlock(path_148, "Block 148")
         self.scene.addItem(block_148)
         self.blocks[148] = block_148
 
         path_149 = QPainterPath()
-        path_149.moveTo(-207, 223)
-        path_149.lineTo(-207, 213)
+        path_149.moveTo(-207, 230)
+        path_149.lineTo(-207, 225)
         block_149 = self.createTrackBlock(path_149, "Block 149")
         self.scene.addItem(block_149)
         self.blocks[149] = block_149
 
         path_150 = QPainterPath()
-        path_150.moveTo(-207, 203)
-        path_150.cubicTo(-207, 202, -179, 188, -177, 188)
+        path_150.moveTo(-207, 215)
+        path_150.cubicTo(-207, 214, -179, 200, -177, 200)
         block_150 = self.createTrackBlock(path_150, "Block 150")
         self.scene.addItem(block_150)
         self.blocks[150] = block_150
+
+        #SWITCHES -> 0 by default, means continuation of number
+
+
+        #TRAFFIC LIGHTS
+        lightPole1 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole1 = lightPole1.scaledToWidth(15)
+        pole1 = QGraphicsPixmapItem(lightPole1)
+        pole1.setPos(-5, 35)
+        self.scene.addItem(pole1)
+        lightCircle1 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle1 = lightCircle1.scaledToWidth(17)
+        circle1 = QGraphicsPixmapItem(lightCircle1)
+        circle1.setPos(-6, 20)
+        self.scene.addItem(circle1)
+        light1 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light1 = light1.scaledToWidth(35)
+        self.signal1 = QGraphicsPixmapItem(light1)
+        self.signal1.setPos(-15, 16)
+        self.scene.addItem(self.signal1)
+
+        # lightPole13 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        # lightPole13 = lightPole13.scaledToWidth(15)
+        # pole13 = QGraphicsPixmapItem(lightPole13)
+        # pole13.setPos(-20, -30)
+        # self.scene.addItem(pole13)
+        # lightCircle13 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        # lightCircle13 = lightCircle1.scaledToWidth(17)
+        # circle13 = QGraphicsPixmapItem(lightCircle13)
+        # circle13.setPos(-21, -45)
+        # self.scene.addItem(circle13)
+        # light13 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        # light13 = light1.scaledToWidth(35)
+        # signal13 = QGraphicsPixmapItem(light13)
+        # signal13.setPos(-30, -49)
+        # self.scene.addItem(signal13)
+
+        # lightPole29 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        # lightPole29 = lightPole29.scaledToWidth(15)
+        # pole29 = QGraphicsPixmapItem(lightPole29)
+        # pole29.setPos(-155, 188)
+        # self.scene.addItem(pole29)
+        # lightCircle29 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        # lightCircle29 = lightCircle1.scaledToWidth(17)
+        # circle29 = QGraphicsPixmapItem(lightCircle29)
+        # circle29.setPos(-156, 173)
+        # self.scene.addItem(circle29)
+        # light29 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        # light29 = light1.scaledToWidth(35)
+        # signal29 = QGraphicsPixmapItem(light29)
+        # signal29.setPos(-165, 169)
+        # self.scene.addItem(signal29)
+
+        lightPole150 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole150 = lightPole150.scaledToWidth(15)
+        pole150 = QGraphicsPixmapItem(lightPole150)
+        pole150.setPos(-215, 180)
+        self.scene.addItem(pole150)
+        lightCircle150 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle150 = lightCircle1.scaledToWidth(17)
+        circle150 = QGraphicsPixmapItem(lightCircle150)
+        circle150.setPos(-216, 165)
+        self.scene.addItem(circle150)
+        light150 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light150 = light1.scaledToWidth(35)
+        signal150 = QGraphicsPixmapItem(light150)
+        signal150.setPos(-225, 161)
+        self.scene.addItem(signal150)
+
+        # lightPole57 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        # lightPole57 = lightPole57.scaledToWidth(15)
+        # pole57 = QGraphicsPixmapItem(lightPole57)
+        # pole57.setPos(75, 248)
+        # self.scene.addItem(pole57)
+        # lightCircle57 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        # lightCircle57 = lightCircle1.scaledToWidth(17)
+        # circle57 = QGraphicsPixmapItem(lightCircle57)
+        # circle57.setPos(74, 233)
+        # self.scene.addItem(circle57)
+        # light57 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        # light57 = light1.scaledToWidth(35)
+        # signal57 = QGraphicsPixmapItem(light57)
+        # signal57.setPos(65, 229)
+        # self.scene.addItem(signal57)
+
+        lightPole0 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole0 = lightPole0.scaledToWidth(15)
+        pole0 = QGraphicsPixmapItem(lightPole0)
+        pole0.setPos(175, 310)
+        self.scene.addItem(pole0)
+        lightCircle0 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle0 = lightCircle1.scaledToWidth(17)
+        circle0 = QGraphicsPixmapItem(lightCircle0)
+        circle0.setPos(174, 295)
+        self.scene.addItem(circle0)
+        light0 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light0 = light1.scaledToWidth(35)
+        signal0 = QGraphicsPixmapItem(light0)
+        signal0.setPos(165, 291)
+        self.scene.addItem(signal0)
+
+        lightPole62 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole62 = lightPole62.scaledToWidth(15)
+        pole62 = QGraphicsPixmapItem(lightPole62)
+        pole62.setPos(130, 320)
+        self.scene.addItem(pole62)
+        lightCircle62 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle62 = lightCircle1.scaledToWidth(17)
+        circle62 = QGraphicsPixmapItem(lightCircle62)
+        circle62.setPos(129, 305)
+        self.scene.addItem(circle62)
+        light62 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light62 = light1.scaledToWidth(35)
+        signal62 = QGraphicsPixmapItem(light62)
+        signal62.setPos(120, 301)
+        self.scene.addItem(signal62)
+
+        lightPole76 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole76 = lightPole76.scaledToWidth(15)
+        pole76 = QGraphicsPixmapItem(lightPole76)
+        pole76.setPos(30, 580)
+        self.scene.addItem(pole76)
+        lightCircle76 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle76 = lightCircle1.scaledToWidth(17)
+        circle76 = QGraphicsPixmapItem(lightCircle76)
+        circle76.setPos(29, 565)
+        self.scene.addItem(circle76)
+        light76 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light76 = light1.scaledToWidth(35)
+        signal76 = QGraphicsPixmapItem(light76)
+        signal76.setPos(20, 561)
+        self.scene.addItem(signal76)
+
+        # lightPole77 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        # lightPole77 = lightPole77.scaledToWidth(15)
+        # pole77 = QGraphicsPixmapItem(lightPole77)
+        # pole77.setPos(-5, 525)
+        # self.scene.addItem(pole77)
+        # lightCircle77 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        # lightCircle77 = lightCircle1.scaledToWidth(17)
+        # circle77 = QGraphicsPixmapItem(lightCircle77)
+        # circle77.setPos(-6, 510)
+        # self.scene.addItem(circle77)
+        # light77 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        # light77 = light1.scaledToWidth(35)
+        # signal77 = QGraphicsPixmapItem(light77)
+        # signal77.setPos(-15, 506)
+        # self.scene.addItem(signal77)
+
+        lightPole100 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole100 = lightPole100.scaledToWidth(15)
+        pole100 = QGraphicsPixmapItem(lightPole100)
+        pole100.setPos(-142, 520)
+        self.scene.addItem(pole100)
+        lightCircle100 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle100 = lightCircle1.scaledToWidth(17)
+        circle100 = QGraphicsPixmapItem(lightCircle100)
+        circle100.setPos(-143, 505)
+        self.scene.addItem(circle100)
+        light100 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light100 = light1.scaledToWidth(35)
+        signal100 = QGraphicsPixmapItem(light100)
+        signal100.setPos(-152, 501)
+        self.scene.addItem(signal100)
 
     def drawRedLine(self):
         path1 = QPainterPath()
@@ -1304,6 +1468,7 @@ class TrackModel:
     beacon = "---"
     ticketSales = 0
     waiting = 0
+    signals = []
 
     def __init__(self):
         self.block = TrackData()
@@ -1311,7 +1476,8 @@ class TrackModel:
         self.load_data()
 
         trainModelToTrackModel.sendPolarity.connect(self.update_occupancy)
-        trackControllerToTrackModel.switchState.connect(self.update_switch_state)
+        # trackControllerToTrackModel.switchState.connect(self.update_switch_state)
+        trackControllerToTrackModel.lightState.connect(self.update_light_state)
 
         self.setup_selection_window()
 
@@ -1425,11 +1591,11 @@ class TrackModel:
 
     def add_testbench_button(self):
         # icon
-        gearPng = QPixmap("src/main/TrackModel/pngs/MTA_logo.png")
-        gearPng = gearPng.scaledToWidth(25, 25)
+        gearPng = QPixmap("src/main/TrackModel/pngs/gear.svg")
+        gearPng = gearPng.scaledToWidth(20, 20)
         testbenchIcon = QLabel(self.mainWindow)
         testbenchIcon.setPixmap(gearPng)
-        testbenchIcon.setGeometry(30, 130, gearPng.width(), gearPng.height())
+        testbenchIcon.setGeometry(40, 135, gearPng.width(), gearPng.height())
 
         # button
         testbenchButton = QPushButton("Test Bench", self.mainWindow)
@@ -1612,6 +1778,21 @@ class TrackModel:
 
     def update_occupancy(self, _, curBlock, prevBlock):
         self.trackView.change_color(curBlock, prevBlock)
+    
+    def update_light_state(self, line, _, blockNum, state):
+        print(line)
+        if state == "Green":
+            if blockNum == 3:
+                self.trackView.scene.removeItem(self.signals[0])
+                self.signals.remove(self.signals[0])
+        if state == "Red":
+            if blockNum == 3:
+                redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
+                redLight = redLight.scaledToWidth(35)
+                signal3 = QGraphicsPixmapItem(redLight)
+                self.signals.append(signal3)
+                signal3.setPos(-15, 16)
+                self.trackView.scene.addItem(signal3)
 
     # def add_line_panel(self, parentWindow):
     #     selectLine = QLabel("Select Line:", parentWindow)
@@ -1811,7 +1992,7 @@ class TrackModel:
         self.errorLabel = QLabel("", self.mainWindow)
         errorLabelFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
         self.errorLabel.setFont(errorLabelFont)
-        self.errorLabel.setGeometry(720, 290, 210, 30)
+        self.errorLabel.setGeometry(750, 290, 210, 30)
         self.errorLabel.setStyleSheet(f'color: {MTA_STYLING["red"]}; font-size: 14px')
 
         blockInfoLabel = QLabel("Block Information:", self.mainWindow)
@@ -1894,7 +2075,7 @@ class TrackModel:
         self.stationNameLabel = QLabel(self.mainWindow)
         self.stationNameLabel.setFont(font)
         self.stationNameLabel.setStyleSheet(style)
-        self.stationNameLabel.setGeometry(650, 800, 200, 25)
+        self.stationNameLabel.setGeometry(650, 800, 250, 25)
 
         self.ticketSalesLabel = QLabel(self.mainWindow)
         self.ticketSalesLabel.setFont(font)
@@ -1945,18 +2126,26 @@ class TrackModel:
         self.leavingOutput.setGeometry(850, 920, 200, 25)
 
     def update_blockinfo(self):
-        if self.selectedLine == "Green":
-            self.trackData = self.block.get_data("Green")
-        elif self.selectedLine == "Red":
-            self.trackData = self.block.get_data("Red")
-        self.parse_block_info()
-        self.set_blocklength()
-        self.set_speedlimit()
-        self.set_grade()
-        self.set_elevation()
-        self.set_cumelevation()
-        self.set_trackheater()
-        self.show_station_data()
+        if self.entryField.text() == "":
+            self.errorLabel.setText("Please enter a block number")
+        elif self.entryField.text().isnumeric() == False:
+            self.errorLabel.setText("Please enter a valid block number")
+        elif ((int(self.entryField.text()) > 150 or int(self.entryField.text()) < 1) and self.selectedLine == "Green") or (int(self.entryField.text()) > 75 and self.selectedLine == "Red"):
+            self.errorLabel.setText("Block Number does not exist")
+        else:
+            self.errorLabel.setText("") #Clear error message
+            if self.selectedLine == "Green":
+                self.trackData = self.block.get_data("Green")
+            elif self.selectedLine == "Red":
+                self.trackData = self.block.get_data("Red")
+            self.parse_block_info()
+            self.set_blocklength()
+            self.set_speedlimit()
+            self.set_grade()
+            self.set_elevation()
+            self.set_cumelevation()
+            self.set_trackheater()
+            self.show_station_data()          
 
     def set_blocklength(self):
         self.blockLengthLabel.setText(f"{self.blockLength} m")
@@ -2001,7 +2190,7 @@ class TrackModel:
         if self.selectedLine == "Green":
             for data in self.trackData:
                 if data["Block Number"] == int(blockNumber):
-                    if type(data["Infrastructure"]) == str:
+                    if type(data["Infrastructure"]) == str and "STATION" in data["Infrastructure"]:
                         stationName = str(data["Infrastructure"])
                         stationName = stationName.split(";")[0]
                         print(stationName)
@@ -2013,9 +2202,13 @@ class TrackModel:
                         self.boardingLabel.show()
                         self.leavingLabel.show()
                         self.ticketSalesOutput.setText(f"{data['Ticket Sales']}")
+                        self.ticketSalesOutput.show()
                         self.waitingOutput.setText(f"{data['Passengers Waiting']}")
+                        self.waitingOutput.show()
                         self.boardingOutput.setText(f"{data['Passengers Boarding']}")
+                        self.boardingOutput.show()
                         self.leavingOutput.setText(f"{data['Passengers Disembarking']}")
+                        self.leavingOutput.show()
                     else:
                         self.stationNameLabel.setText(f"")
                         self.ticketSalesOutput.hide()
@@ -2224,6 +2417,7 @@ class TestbenchWindow:
         # New
         self.add_occupancy_test()
         self.add_passenger_test()
+        self.add_lightstate_test()
 
     def add_mta_logo(self):
         mtaLogo = QLabel(self.testbench)
@@ -2432,7 +2626,7 @@ class TestbenchWindow:
 
     def add_occupancy_test(self):
         selectLineLabel = QLabel("Select Line:", self.testbench)
-        selectLineLabel.setGeometry(500, 210, 75, 30)
+        selectLineLabel.setGeometry(490, 210, 75, 30)
         selectLineLabel.setStyleSheet("font-weight: bold")
         self.occupancyLineInput = QLineEdit(self.testbench)
         self.occupancyLineInput.setGeometry(570, 210, 50, 30)
@@ -2442,14 +2636,14 @@ class TestbenchWindow:
         currentBlockLabel.setGeometry(625, 210, 100, 30)
         currentBlockLabel.setStyleSheet("font-weight: bold")
         self.occupancyCurrentBlock = QLineEdit(self.testbench)
-        self.occupancyCurrentBlock.setGeometry(710, 210, 50, 30)
+        self.occupancyCurrentBlock.setGeometry(720, 210, 50, 30)
         self.occupancyCurrentBlock.setStyleSheet("background-color: white")
 
         nextBlockLabel = QLabel("Next Block:", self.testbench)
-        nextBlockLabel.setGeometry(770, 210, 100, 30)
+        nextBlockLabel.setGeometry(780, 210, 100, 30)
         nextBlockLabel.setStyleSheet("font-weight: bold")
         self.occupancyNextBlock = QLineEdit(self.testbench)
-        self.occupancyNextBlock.setGeometry(840, 210, 50, 30)
+        self.occupancyNextBlock.setGeometry(860, 210, 50, 30)
         self.occupancyNextBlock.setStyleSheet("background-color: white")
 
         # self.lineInput.addItem("Green")
@@ -2457,7 +2651,7 @@ class TestbenchWindow:
         # self.lineInput.currentIndexChanged.connect(self.send_occupancy_signal)
 
         signalTest = QPushButton("Occupancy Test", self.testbench)
-        signalTest.setGeometry(625, 250, 100, 30)
+        signalTest.setGeometry(615, 250, 150, 30)
         signalTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
@@ -2474,7 +2668,7 @@ class TestbenchWindow:
 
     def add_passenger_test(self):
         selectLineLabel = QLabel("Select Line:", self.testbench)
-        selectLineLabel.setGeometry(500, 300, 75, 30)
+        selectLineLabel.setGeometry(490, 300, 75, 30)
         selectLineLabel.setStyleSheet("font-weight: bold")
         self.passengerLineInput = QLineEdit(self.testbench)
         self.passengerLineInput.setGeometry(570, 300, 50, 30)
@@ -2484,18 +2678,18 @@ class TestbenchWindow:
         stationNameLabel.setGeometry(625, 300, 100, 30)
         stationNameLabel.setStyleSheet("font-weight: bold")
         self.passengerStationName = QLineEdit(self.testbench)
-        self.passengerStationName.setGeometry(710, 300, 50, 30)
+        self.passengerStationName.setGeometry(720, 300, 50, 30)
         self.passengerStationName.setStyleSheet("background-color: white")
 
         passengers = QLabel("Passengers:", self.testbench)
-        passengers.setGeometry(770, 300, 100, 30)
+        passengers.setGeometry(780, 300, 100, 30)
         passengers.setStyleSheet("font-weight: bold")
         self.trainPassengers = QLineEdit(self.testbench)
-        self.trainPassengers.setGeometry(840, 300, 50, 30)
+        self.trainPassengers.setGeometry(860, 300, 50, 30)
         self.trainPassengers.setStyleSheet("background-color: white")
 
         signalTest = QPushButton("Passenger Test", self.testbench)
-        signalTest.setGeometry(625, 340, 100, 30)
+        signalTest.setGeometry(615, 340, 150, 30)
         signalTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
@@ -2508,6 +2702,42 @@ class TestbenchWindow:
         trainModelToTrackModel.sendCurrentPassengers.emit(
             line, station, passengersOnBoard
         )
+    
+    def add_lightstate_test(self):
+        selectLineLabel = QLabel("Line Number:", self.testbench)
+        selectLineLabel.setGeometry(490, 390, 85, 30)
+        selectLineLabel.setStyleSheet("font-weight: bold")
+        self.lightLineInput = QLineEdit(self.testbench)
+        self.lightLineInput.setGeometry(580, 390, 50, 30)
+        self.lightLineInput.setStyleSheet("background-color: white")
+
+        blockLabel = QLabel("Select Block:", self.testbench)
+        blockLabel.setGeometry(635, 390, 100, 30)
+        blockLabel.setStyleSheet("font-weight: bold")
+        self.lightBlock = QLineEdit(self.testbench)
+        self.lightBlock.setGeometry(720, 390, 50, 30)
+        self.lightBlock.setStyleSheet("background-color: white")
+
+        lightColorLabel = QLabel("Light State:", self.testbench)
+        lightColorLabel.setGeometry(780, 390, 100, 30)
+        lightColorLabel.setStyleSheet("font-weight: bold")
+        self.lightColor = QLineEdit(self.testbench)
+        self.lightColor.setGeometry(860, 390, 50, 30)
+        self.lightColor.setStyleSheet("background-color: white")
+
+        lightTest = QPushButton("Light State Test", self.testbench)
+        lightTest.setGeometry(615, 430, 150, 30)
+        lightTest.setStyleSheet(
+            "background-color: green; color: white; font-weight: bold"
+        )
+        lightTest.clicked.connect(self.send_light_signal)
+
+    def send_light_signal(self):
+        line = int(self.lightLineInput.text())
+        print(line)
+        blockNum = int(self.lightBlock.text())
+        color = self.lightColor.text()
+        trackControllerToTrackModel.lightState.emit(line, 1, blockNum, color)
 
 
 if __name__ == "__main__":
