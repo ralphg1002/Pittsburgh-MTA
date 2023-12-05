@@ -168,6 +168,7 @@ app = QApplication(sys.argv)
 
 # create window instance
 window = MainWindow()
+
 app.setWindowIcon(QIcon("src/main/MTA_NYC_logo.png"))
 
 # run app
