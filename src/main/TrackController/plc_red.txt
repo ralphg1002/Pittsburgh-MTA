@@ -1,0 +1,117 @@
+SW1:
+IF
+    Condition: (16<-27)
+    Operation: SWITCH(0)
+    Operation: 0 R
+    Operation: 9 G
+    Operation: 1 G
+    Operation: 16 G
+    end
+IF
+    Condition: (1->9)
+    Operation: SWITCH(0)
+    Operation: 0 R
+    Operation: 9 G
+    Operation: 1 G
+    Operation: 16 G
+    end
+IF
+    Condition: 0
+    Operation: SWITCH(1)
+    Operation: 0 G
+    Operation: 9 G
+    Operation: 1 G
+    Operation: 16 G
+    Operation: 76 G
+    end
+END
+
+SW2:
+IF
+    Condition: (1<-9) 
+    Operation: SWITCH(1)
+    Operation: 1 G
+    Operation: 76 R
+    Operation: 16 G
+    end
+END
+
+SW3:
+IF
+    Condition: (16->27)
+    Operation: SWITCH(0)
+    Operation: 27 G
+    Operation: 76 R
+    end
+IF
+    Condition: (1<-9)
+    Operation: SWITCH(0)
+    Operation: 27 G
+    Operation: 76 R
+    end
+IF
+    Condition: (72->76)
+    Operation: SWITCH(1)
+    Operation: 0 R
+    Operation: 76 G
+    end
+END
+
+SW4:
+IF
+    Condition: (33<-38)
+    Operation: SWITCH(1)
+    Operation: 33 G
+    Operation: 32 R
+    end
+IF
+    Condition: (28->32)
+    Operation: SWITCH(0)
+    Operation: 32 G
+    end
+END
+
+SW5:
+IF
+    Condition: (33->38)
+    Operation: SWITCH(0)
+    Operation: 38 G
+    Operation: 71 R
+    end
+IF
+    Condition: (67->71)
+    Operation: SWITCH(1)
+    Operation: 33 R
+    Operation: 71 G
+    end
+END
+
+SW6:
+IF
+    Condition: (44<-52)
+    Operation: SWITCH(1)
+    Operation: 43 R
+    Operation: 44 G
+    end
+IF
+    Condition: (39->43)
+    Operation: SWITCH(0)
+    Operation: 43 G
+    Operation: 66 R
+    end
+END
+
+SW7:
+IF
+    Condition: (44->52)
+    Operation: SWITCH(0)
+    Operation: 52 G
+    Operation: 66 R
+    end
+IF
+    Condition: (61->66)
+    Operation: SWITCH(1)
+    Operation: 43 R
+    Operation: 66 G
+    end
+END
