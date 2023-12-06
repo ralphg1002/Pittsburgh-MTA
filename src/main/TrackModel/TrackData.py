@@ -316,13 +316,12 @@ class TrackData:
                     block["Maintenance"] == maintenance
 
     def set_switch_state(self, line, _, blockNum, state):
-        # Initial Green Line Occupancy
-        if blockNum == 62 and state == 1 and line == 1:
-            #self.send_block_data("Green", 0, 999)
-            pass
-        # Initial Red Line Occupancy
-        elif blockNum == 9 and state == 1 and line == 2:
-            self.send_block_data("Red", 0, 999)
+        # # Initial Green Line Occupancy
+        # if blockNum == 62 and state == 1 and line == 1:
+        #     self.send_block_data("Green", 0, 999)
+        # # Initial Red Line Occupancy
+        # elif blockNum == 9 and state == 1 and line == 2:
+        #     self.send_block_data("Red", 0, 999)
         if line == 1:
             for block in self.greenTrackData:
                 if block["Block Number"] == blockNum:
