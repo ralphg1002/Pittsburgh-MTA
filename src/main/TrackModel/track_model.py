@@ -1113,6 +1113,12 @@ class TrackView(QGraphicsView):
 
         #SWITCHES -> 0 by default, means continuation of number
 
+        #CROSSING
+        crossing = QPixmap("src/main/TrackModel/pngs/crossing.png")
+        crossing = crossing.scaledToWidth(70)
+        self.crossing = QGraphicsPixmapItem(crossing)
+        self.crossing.setPos(-210, -20)
+        self.greenTrack.addItem(self.crossing)
 
         #TRAFFIC LIGHTS
         lightPole1 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
@@ -1401,6 +1407,7 @@ class TrackModel:
         trainModelToTrackModel.sendPolarity.connect(self.update_occupancy)
         # trackControllerToTrackModel.switchState.connect(self.update_switch_state)
         trackControllerToTrackModel.lightState.connect(self.update_light_state)
+        trackControllerToTrackModel.crossingState.connect(self.update_crossing_state)
 
         self.setup_selection_window()
 
@@ -1689,7 +1696,7 @@ class TrackModel:
                     self.trackView.greenTrack.removeItem(self.signals[blockNum])
                     del self.signals[blockNum]
                     print(self.signals)
-            if state == "Red":
+            elif state == "Red":
                 redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
                 redLight = redLight.scaledToWidth(35)
                 signal = QGraphicsPixmapItem(redLight)
@@ -1706,6 +1713,26 @@ class TrackModel:
                     signal.setPos(-225, 161)              
                 self.trackView.greenTrack.addItem(signal)
 
+    def update_crossing_state(self, line, _, __, state):
+        if line == 1:
+            if state == 0:
+                self.trackView.greenTrack.removeItem(self.signals[19.1])
+                self.trackView.greenTrack.removeItem(self.signals[19.2])
+                del self.signals[19.1]
+                del self.signals[19.2]
+                print(self.signals)
+            elif state == 1:
+                redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
+                redLight = redLight.scaledToWidth(20)
+                crossing = QGraphicsPixmapItem(redLight)
+                crossing2 = QGraphicsPixmapItem(redLight)
+                self.signals[19.1] = crossing
+                self.signals[19.2] = crossing2
+                crossing.setPos(-194, 12)
+                crossing2.setPos(-175, 12)
+                self.trackView.greenTrack.addItem(crossing)
+                self.trackView.greenTrack.addItem(crossing2)
+                
     def add_import_button(self):
         importButton = QPushButton("Import Track Data", self.mainWindow)
         importButtonFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
@@ -2174,17 +2201,6 @@ class TrackModel:
 
 
 class TestbenchWindow:
-    speed = ""
-    authority = ""
-    railwayState = 0
-    switchState = 0
-    trackHeaterState = 0
-    trackState = "Open"
-    ticketSales = ""
-    waiting = ""
-    lightState = "Green"
-    failures = []
-
     def __init__(self):
         self.testbench = QDialog()
         self.setup_testbench()
@@ -2206,6 +2222,7 @@ class TestbenchWindow:
         self.add_occupancy_test()
         self.add_passenger_test()
         self.add_lightstate_test()
+        self.add_crossingstate_test()
 
     def add_mta_logo(self):
         mtaLogo = QLabel(self.testbench)
@@ -2525,6 +2542,35 @@ class TestbenchWindow:
         blockNum = int(self.lightBlock.text())
         color = self.lightColor.text()
         trackControllerToTrackModel.lightState.emit(line, 1, blockNum, color)
+
+    def add_crossingstate_test(self):
+        selectLineLabel = QLabel("Line Number:", self.testbench)
+        selectLineLabel.setGeometry(530, 480, 85, 30)
+        selectLineLabel.setStyleSheet("font-weight: bold")
+        self.crossingLineInput = QLineEdit(self.testbench)
+        self.crossingLineInput.setGeometry(620, 480, 50, 30)
+        self.crossingLineInput.setStyleSheet("background-color: white")
+
+        stateLabel = QLabel("Crossing State:", self.testbench)
+        stateLabel.setGeometry(680, 480, 100, 30)
+        stateLabel.setStyleSheet("font-weight: bold")
+        self.crossingState = QLineEdit(self.testbench)
+        self.crossingState.setGeometry(780, 480, 50, 30)
+        self.crossingState.setStyleSheet("background-color: white")
+
+        crossingTest = QPushButton("Crossing State Test", self.testbench)
+        crossingTest.setGeometry(615, 520, 150, 30)
+        crossingTest.setStyleSheet(
+            "background-color: green; color: white; font-weight: bold"
+        )
+        crossingTest.clicked.connect(self.send_crossing_signal)
+
+    def send_crossing_signal(self):
+        line = int(self.crossingLineInput.text())
+        state = True
+        if self.crossingState.text() == '0':
+            state = False
+        trackControllerToTrackModel.crossingState.emit(line, None, None, state)
 
 
 if __name__ == "__main__":
