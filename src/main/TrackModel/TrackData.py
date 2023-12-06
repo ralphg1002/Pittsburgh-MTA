@@ -236,6 +236,12 @@ class TrackData:
                         block["Passengers Waiting"] = passengersWaiting
 
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
+
+                        # blockNumber = block["Block Number"]
+                        # for block in self.
+                        # if stationName in block["Infrastructure"] and blockNumber != block["Block Number"]:
+                        #     print(f"Another Block Found: {block['Block Number']}")
+                        # return
         elif line == "Green":
             for block in self.greenTrackData:
                 # print(block["Block Number"])
@@ -267,6 +273,24 @@ class TrackData:
                         )
 
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
+
+                        # Check if another block has the same station
+                        blockNumRepeat = block["Block Number"]
+                        for block in self.greenTrackData:
+                            if type(block["Infrastructure"]) == str:
+                                if stationName in block["Infrastructure"] and block["Block Number"] != blockNumRepeat:
+                                    print(f"Another Block Found: {block['Block Number']}")
+                                    block["Ticket Sales"] = tempTicketSales
+                                    block["Passengers Disembarking"] = disembarkingPassengers
+                                    block["Passengers Boarding"] = newPassengers
+                                    block["Passengers Waiting"] = passengersWaiting
+                                    print(
+                                        block["Ticket Sales"],
+                                        block["Passengers Waiting"],
+                                        block["Passengers Disembarking"],
+                                        block["Passengers Boarding"]                                        
+                                    )
+                                    return                      
 
     def get_ticket_sales(self, line):
         throughput = 0  # Reset
