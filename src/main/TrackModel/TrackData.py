@@ -238,7 +238,7 @@ class TrackData:
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
         elif line == "Green":
             for block in self.greenTrackData:
-                print(block["Block Number"])
+                # print(block["Block Number"])
                 if type(block["Infrastructure"]) == str:
                     if stationName in block["Infrastructure"]:
                         ticketSales = (
@@ -360,7 +360,7 @@ class TrackData:
                 trackModelToTrainModel.blockInfo.emit(0, 0, 0, 0, 0, 0)
                 trackModelToTrackController.occupancyState.emit(
                             1,
-                            self.get_wasyside_num(block["Block Number"]),
+                            self.get_wasyside_num(0),
                             0,
                             True,
                         )
