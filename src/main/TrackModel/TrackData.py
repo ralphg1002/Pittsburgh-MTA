@@ -281,7 +281,8 @@ class TrackData:
                 if type(block["Infrastructure"]) == str:
                     if "STATION" in block["Infrastructure"]:
                         throughput += block["Ticket Sales"]
-                        block["Ticket Sales"] = 0  # Reset
+                        #block["Ticket Sales"] = 0  # Reset Temporarily commented for Iteration 3
+        print("SENDING THROUGHPUT", throughput)
         trackModelToCTC.throughput.emit(throughput)
 
     def set_suggested_speed(self, line, _, blockNum, suggestedSpeed):
@@ -317,7 +318,8 @@ class TrackData:
     def set_switch_state(self, line, _, blockNum, state):
         # Initial Green Line Occupancy
         if blockNum == 62 and state == 1 and line == 1:
-            self.send_block_data("Green", 0, 999)
+            #self.send_block_data("Green", 0, 999)
+            pass
         # Initial Red Line Occupancy
         elif blockNum == 9 and state == 1 and line == 2:
             self.send_block_data("Red", 0, 999)
@@ -356,10 +358,16 @@ class TrackData:
             # Regular block data emission
             if curBlock == 999 and prevBlock == 999:
                 trackModelToTrainModel.blockInfo.emit(0, 0, 0, 0, 0, 0)
+                trackModelToTrackController.occupancyState.emit(
+                            1,
+                            self.get_wasyside_num(block["Block Number"]),
+                            0,
+                            True,
+                        )
             elif curBlock == 0 and prevBlock == 999:
                 # Set first block's occupancy, no need to clear any occupancy
                 for block in self.greenTrackData:
-                    if block["Block Number"] == 62:
+                    if block["Block Number"] == 63:
                         trackModelToTrainModel.blockInfo.emit(
                             block["Block Number"],
                             block["Block Length (m)"],
@@ -397,11 +405,11 @@ class TrackData:
                         trackModelToTrackController.occupancyState.emit(
                             1,
                             self.get_wasyside_num(block["Block Number"]),
-                            block["Block Number"],
+                            block["Block Number"] - 1,
                             True,
                         )
                         trackModelToTrackController.occupancyState.emit(
-                            1, self.get_wasyside_num(curBlock), curBlock, False
+                            1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
             elif curBlock == 100:
@@ -418,11 +426,11 @@ class TrackData:
                         trackModelToTrackController.occupancyState.emit(
                             1,
                             self.get_wasyside_num(block["Block Number"]),
-                            block["Block Number"],
+                            block["Block Number"] - 1,
                             True,
                         )
                         trackModelToTrackController.occupancyState.emit(
-                            1, self.get_wasyside_num(curBlock), curBlock, False
+                            1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
             elif curBlock == 77 and prevBlock == 78:
@@ -439,11 +447,11 @@ class TrackData:
                         trackModelToTrackController.occupancyState.emit(
                             1,
                             self.get_wasyside_num(block["Block Number"]),
-                            block["Block Number"],
+                            block["Block Number"] - 1,
                             True,
                         )
                         trackModelToTrackController.occupancyState.emit(
-                            1, self.get_wasyside_num(curBlock), curBlock, False
+                            1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
             elif curBlock == 150:
@@ -460,11 +468,11 @@ class TrackData:
                         trackModelToTrackController.occupancyState.emit(
                             1,
                             self.get_wasyside_num(block["Block Number"]),
-                            block["Block Number"],
+                            block["Block Number"] - 1,
                             True,
                         )
                         trackModelToTrackController.occupancyState.emit(
-                            1, self.get_wasyside_num(curBlock), curBlock, False
+                            1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
             elif curBlock > prevBlock:
@@ -481,11 +489,11 @@ class TrackData:
                         trackModelToTrackController.occupancyState.emit(
                             1,
                             self.get_wasyside_num(block["Block Number"]),
-                            block["Block Number"],
+                            block["Block Number"] - 1,
                             True,
                         )
                         trackModelToTrackController.occupancyState.emit(
-                            1, self.get_wasyside_num(curBlock), curBlock, False
+                            1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
             elif curBlock < prevBlock:
@@ -502,11 +510,11 @@ class TrackData:
                         trackModelToTrackController.occupancyState.emit(
                             1,
                             self.get_wasyside_num(block["Block Number"]),
-                            block["Block Number"],
+                            block["Block Number"] - 1,
                             True,
                         )
                         trackModelToTrackController.occupancyState.emit(
-                            1, self.get_wasyside_num(curBlock), curBlock, False
+                            1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
             # Beacon data emission below
@@ -550,11 +558,11 @@ class TrackData:
                         trackModelToTrackController.occupancyState.emit(
                             1,
                             self.get_wasyside_num(block["Block Number"]),
-                            block["Block Number"],
+                            block["Block Number"] - 1,
                             True,
                         )
                         trackModelToTrackController.occupancyState.emit(
-                            1, self.get_wasyside_num(curBlock), curBlock, False
+                            1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
                         # self.updateOccupancyGUI.emit("Green", 62)

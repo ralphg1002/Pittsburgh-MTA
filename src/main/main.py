@@ -43,10 +43,10 @@ class MainWindow(QMainWindow):
         trackControl = TrackControl()
         trackControl.ui.hide()
         self.trainControllerSW = TrainControllerUI()
-        trackModel = TrackModel()
+        #trackModel = TrackModel()
         ctc = CTCWindow()
         trainModel = TrainModel()
-        trainModel = TrainModel()
+        
 
         # setting title
         self.setWindowTitle(self.moduleName)
@@ -95,12 +95,11 @@ class MainWindow(QMainWindow):
         self.box1 = QPushButton("Track Model", self)
         self.box_button(self.box1, 200, 200)
         self.set_relative_right(self.box1, self.logo, 20)
-        self.box1.clicked.connect(lambda: trackModel.mainWindow.show())
+        #self.box1.clicked.connect(lambda: trackModel.mainWindow.show())
 
         self.box2 = QPushButton("Train Model", self)
         self.box_button(self.box2, self.box1.width(), self.box1.height())
         self.set_relative_right(self.box2, self.box1, 20)
-        self.box2.clicked.connect(lambda: trainModel.show_gui())
         self.box2.clicked.connect(lambda: trainModel.show_gui())
 
         self.box3 = QPushButton("CTC", self)
