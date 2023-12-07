@@ -3399,11 +3399,11 @@ class MurphyTestWindow(QMainWindow):
         self.clock_label.setText(time_text)
 
 
-def main():
-    app = QApplication(sys.argv)
-    ui = TrainTest()
-    ui.show_gui()
-    sys.exit(app.exec_())
+# def main():
+#     app = QApplication(sys.argv)
+#     ui = TrainTest()
+#     ui.show_gui()
+#     sys.exit(app.exec_())
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
