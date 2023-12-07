@@ -293,6 +293,7 @@ class TrackData:
                                     return                      
 
     def get_ticket_sales(self, line):
+        greenRepeats = [105, 114, 123, 132, 141] # Avoid double counted ticket sales
         throughput = 0  # Reset
         if line == "Red":
             for block in self.redTrackData:
@@ -303,9 +304,12 @@ class TrackData:
         elif line == "Green":
             for block in self.greenTrackData:
                 if type(block["Infrastructure"]) == str:
-                    if "STATION" in block["Infrastructure"]:
+                    if "STATION" in block["Infrastructure"] and block["Block Number"] not in greenRepeats:
                         throughput += block["Ticket Sales"]
-                        #block["Ticket Sales"] = 0  # Reset Temporarily commented for Iteration 3
+                        block["Ticket Sales"] = 0  # Reset
+                        print(f"block num: {block['Block Number']}")
+                    elif "STATION" in block["Infrastructure"] and block["Block Number"] in greenRepeats:
+                        block["Ticket Sales"] = 0  # Reset
         print("SENDING THROUGHPUT", throughput)
         trackModelToCTC.throughput.emit(throughput)
 
