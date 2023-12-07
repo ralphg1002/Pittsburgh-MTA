@@ -503,6 +503,17 @@ class TrackData:
                             1, self.get_wasyside_num(curBlock), curBlock - 1, False
                         )
                         block["Occupancy"] = 1
+            # if curBlock == 57:
+            #     trackModelToTrackController.occupancyState.emit(
+            #                 1,
+            #                 self.get_wasyside_num(151),
+            #                 151,
+            #                 True,
+            #             )
+            #     trackModelToTrackController.occupancyState.emit(
+            #         1, self.get_wasyside_num(curBlock), curBlock - 1, False
+            #     )
+            #     return # Exit out of function, no need to emit block data
             elif curBlock > prevBlock:
                 for block in self.greenTrackData:
                     if block["Block Number"] == curBlock + 1:

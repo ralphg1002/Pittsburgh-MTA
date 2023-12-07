@@ -32,6 +32,7 @@ class TrackView(QGraphicsView):
         path_151.cubicTo(97, 278, 120, 251, 120, 250)
         block_151 = self.createTrackBlock(path_151, "Block 151")
         self.greenTrack.addItem(block_151)
+        self.blocks[151] = block_151
 
         path_1 = QPainterPath()
         path_1.moveTo(0, 0)
