@@ -11,7 +11,7 @@ class Train:
     def __init__(self, trainID):
         # system inputs
         self.trainID = trainID
-g        self.block = {
+        self.block = {
             "blockNumber": 0,
             "blockLength": 0,
             "isStation": False,
