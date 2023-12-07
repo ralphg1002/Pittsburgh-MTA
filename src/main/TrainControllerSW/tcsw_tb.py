@@ -206,6 +206,7 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.blockNumberLabel, self.currStopLabel, 10)
 
         self.blockNumberVal = QSpinBox(self)
+        self.blockNumberVal.setRange(0, 1000000)
         self.text_label(self.blockNumberVal)
         self.set_relative_right(self.blockNumberVal, self.blockNumberLabel, 10)
         self.blockNumberVal.setFixedWidth(60)
@@ -216,6 +217,7 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.blockLengthLabel, self.blockNumberLabel, 10)
 
         self.blockLengthVal = QSpinBox(self)
+        self.blockLengthVal.setRange(0, 1000000)
         self.blockLengthVal.setSuffix(" m")
         self.text_label(self.blockLengthVal)
         self.set_relative_right(self.blockLengthVal, self.blockLengthLabel, 10)

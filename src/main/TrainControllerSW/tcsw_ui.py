@@ -408,6 +408,7 @@ class TrainControllerUI(QMainWindow):
         self.kpLabel.move(self.kpLabel.x(), self.kpLabel.y() + 10)
 
         self.kpEdit = QSpinBox(self)
+        self.kpEdit.setRange(0, 1000000)
         self.kpEdit.setValue(1)
         self.kpEdit.setFont(QFont(self.fontStyle, self.textFontSize))
         self.set_relative_right(self.kpEdit, self.kpLabel, 20)
@@ -418,6 +419,7 @@ class TrainControllerUI(QMainWindow):
         self.set_relative_below(self.kiLabel, self.kpLabel, 20)
 
         self.kiEdit = QSpinBox(self)
+        self.kiEdit.setRange(0, 1000000)
         self.kiEdit.setValue(1)
         self.kiEdit.setFont(QFont(self.fontStyle, self.textFontSize))
         self.set_relative_right(self.kiEdit, self.kiLabel, 20)
