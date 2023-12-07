@@ -28,7 +28,7 @@ class TestWindow(QMainWindow):
     colorDarkGrey = "#666666"
 
     # dimensions
-    w = 770
+    w = 790
     h = 470
 
     # variables
@@ -51,7 +51,7 @@ class TestWindow(QMainWindow):
 
         """test window template layout"""
         self.headerBlock = QLabel(self)
-        self.box_label(self.headerBlock, 770, 73)
+        self.box_label(self.headerBlock, 790, 73)
         self.headerBlock.setStyleSheet(
             "background-color: " + self.colorDarkBlue + ";border: 0px"
         )
@@ -69,7 +69,7 @@ class TestWindow(QMainWindow):
         )
 
         self.editBox = QLabel(self)
-        self.box_label(self.editBox, 230, 492 - self.headerBlock.height() - 40)
+        self.box_label(self.editBox, 250, 492 - self.headerBlock.height() - 40)
         self.set_relative_below_right(self.editBox, self.headerBlock, 20)
         self.set_relative_right(self.editBox, self.trainBox, 20)
 
@@ -132,9 +132,10 @@ class TestWindow(QMainWindow):
         self.set_relative_below_right(self.speedLimitLabel, self.editBox, 10)
 
         self.speedLimitVal = QSpinBox(self)
+        self.speedLimitVal.setSuffix(" mph")
         self.text_label(self.speedLimitVal)
         self.set_relative_right(self.speedLimitVal, self.speedLimitLabel, 10)
-        self.speedLimitVal.setFixedWidth(60)
+        self.speedLimitVal.setFixedWidth(80)
         self.set_relative_before_right_end(self.speedLimitVal, self.editBox, 10)
 
         self.commandedSpeedLabel = QLabel("Commanded Speed", self)
@@ -142,9 +143,10 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.commandedSpeedLabel, self.speedLimitLabel, 10)
 
         self.commandedSpeedVal = QSpinBox(self)
+        self.commandedSpeedVal.setSuffix(" mph")
         self.text_label(self.commandedSpeedVal)
         self.set_relative_right(self.commandedSpeedVal, self.commandedSpeedLabel, 10)
-        self.commandedSpeedVal.setFixedWidth(60)
+        self.commandedSpeedVal.setFixedWidth(80)
         self.set_relative_before_right_end(self.commandedSpeedVal, self.editBox, 10)
 
         self.currentSpeedLabel = QLabel("Current Speed", self)
@@ -152,9 +154,10 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.currentSpeedLabel, self.commandedSpeedLabel, 10)
 
         self.currentSpeedVal = QSpinBox(self)
+        self.currentSpeedVal.setSuffix(" mph")
         self.text_label(self.currentSpeedVal)
         self.set_relative_right(self.currentSpeedVal, self.currentSpeedLabel, 10)
-        self.currentSpeedVal.setFixedWidth(60)
+        self.currentSpeedVal.setFixedWidth(80)
         self.set_relative_before_right_end(self.currentSpeedVal, self.editBox, 10)
 
         self.currentTempLabel = QLabel("Current Temp", self)
@@ -162,9 +165,10 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.currentTempLabel, self.currentSpeedLabel, 10)
 
         self.currentTempVal = QSpinBox(self)
+        self.currentTempVal.setSuffix(" °F")
         self.text_label(self.currentTempVal)
         self.set_relative_right(self.currentTempVal, self.currentTempLabel, 10)
-        self.currentTempVal.setFixedWidth(60)
+        self.currentTempVal.setFixedWidth(80)
         self.set_relative_before_right_end(self.currentTempVal, self.editBox, 10)
 
         self.prevStopLabel = QLabel("Next Stop 0:", self)
@@ -212,6 +216,7 @@ class TestWindow(QMainWindow):
         self.set_relative_below(self.blockLengthLabel, self.blockNumberLabel, 10)
 
         self.blockLengthVal = QSpinBox(self)
+        self.blockLengthVal.setSuffix(" m")
         self.text_label(self.blockLengthVal)
         self.set_relative_right(self.blockLengthVal, self.blockLengthLabel, 10)
         self.blockLengthVal.setFixedWidth(60)

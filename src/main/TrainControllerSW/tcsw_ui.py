@@ -1244,7 +1244,13 @@ class TrainControllerUI(QMainWindow):
                 self.authorityVal.setAlignment(Qt.AlignCenter)
 
                 # setpoint speed range
+                if train.get_speedLimit() > 70:
+                    train.speedLimit = 70
+                if train.get_speedLimit() < 0:
+                    train.speedLimit = 0
                 self.setpointSpeedValue.setRange(0, train.get_speedLimit())
+                if train.safetyLimit < 0:
+                    train.safetyLimit = 0
                 if train.safetyLimit < train.get_speedLimit():
                     self.setpointSpeedValue.setRange(0, train.safetyLimit)
 
