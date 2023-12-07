@@ -1084,33 +1084,76 @@ class TrackView(QGraphicsView):
         self.blocks[150] = block_150
 
         #SWITCHES -> 0 by default, means continuation of number
-        # path_12 = QPainterPath()
-        # path_12.moveTo(23, 2)
-        # path_12.cubicTo(23, 2, 13, 1, 10, 1)
-        # block_12 = self.createTrackBlock(path_12, "Block 12")
-        # self.greenTrack.addItem(block_12)
-        # self.blocks[12] = block_12
-
-        # path_13 = QPainterPath()
-        # path_13.moveTo(-10, 0)
-        # path_13.lineTo(-25, 0)
-        # block_13 = self.createTrackBlock(path_13, "Block 13")
-        # self.greenTrack.addItem(block_13)
-        # self.blocks[13] = block_13
-
-        # path_1 = QPainterPath()
-        # path_1.moveTo(0, 0)
-        # path_1.cubicTo(0, 0, 5, 0, 10, 10)
-        # block_1 = self.createTrackBlock(path_1, "Block 1")
-        # self.greenTrack.addItem(block_1)
-        # self.blocks[1] = block_1
-
         switchPath13 = QPainterPath()
         switchPath13.moveTo(-25, 0)
         switchPath13.cubicTo(-10, 0, 10, 1, 23, 2)
         switch13 = self.createSwitch(switchPath13)
         self.greenTrack.addItem(switch13)
         self.switches[13] = switch13
+
+        switchPath29 = QPainterPath()
+        switchPath29.moveTo(-167, 193)
+        switchPath29.lineTo(-167, 213)
+        switch29 = self.createSwitch(switchPath29)
+        self.greenTrack.addItem(switch29)
+        self.switches[29] = switch29
+
+        switchPath57 = QPainterPath()
+        switchPath57.moveTo(95, 278)
+        switchPath57.quadTo(107, 278, 111, 279)
+        switch57 = self.createSwitch(switchPath57)
+        self.greenTrack.addItem(switch57)
+        self.switches[57] = switch57
+
+        switchPath63 = QPainterPath()
+        switchPath63.moveTo(163, 350)
+        switchPath63.cubicTo(163, 340, 163, 330, 161, 322)
+        switch63 = self.createSwitch(switchPath63)
+        self.greenTrack.addItem(switch63)
+        self.switches[63] = switch63
+
+        switchPath77 = QPainterPath()
+        switchPath77.moveTo(12, 556)
+        switchPath77.lineTo(50, 556)
+        switch77 = self.createSwitch(switchPath77)
+        self.greenTrack.addItem(switch77)
+        self.switches[77] = switch77
+
+        # path_85 = QPainterPath()
+        # path_85.moveTo(-124, 556)
+        # path_85.lineTo(-132, 556)
+        # block_85 = self.createTrackBlock(path_85, "Block 85")
+        # self.greenTrack.addItem(block_85)
+        # self.blocks[85] = block_85
+
+        # path_86 = QPainterPath()
+        # path_86.moveTo(-142, 556)
+        # path_86.lineTo(-149, 556)
+        # block_86 = self.createTrackBlock(path_86, "Block 86")
+        # self.greenTrack.addItem(block_86)
+        # self.blocks[86] = block_86
+
+        # path_100 = QPainterPath()
+        # path_100.moveTo(-148, 546)
+        # path_100.quadTo(-147, 547, -142, 551)
+        # block_100 = self.createTrackBlock(path_100, "Block 100")
+        # self.greenTrack.addItem(block_100)
+        # self.blocks[100] = block_100
+
+        switchpath85 = QPainterPath()
+        switchpath85.moveTo(-124, 556)
+        switchpath85.lineTo(-149, 556)
+        switch85 = self.createSwitch(switchpath85)
+        self.greenTrack.addItem(switch85)
+        self.switches[85] = switch85
+
+        # switchpath85 = QPainterPath()
+        # switchpath85.moveTo(-124, 556)
+        # switchpath85.cubicTo(-132, 556, -142, 551, -148, 546)
+        # switch85 = self.createSwitch(switchpath85)
+        # self.greenTrack.addItem(switch85)
+        # self.switches[85] = switch85
+        
 
         #CROSSING
         crossing = QPixmap("src/main/TrackModel/pngs/crossing.png")
@@ -1370,6 +1413,76 @@ class TrackView(QGraphicsView):
                     switch13 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch13)
                 self.switches[switchNum] = switch13
+            elif switchNum == 29:
+                if state == 0:
+                    # 29 -> 30
+                    switch.moveTo(-167, 193)
+                    switch.lineTo(-167, 213)
+                    switch29 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch29)  
+                elif state == 1:
+                    # 29 -> 150
+                    switch.moveTo(-167, 193)
+                    switch.cubicTo(-167, 198, -177, 200, -204, 214)
+                    switch29 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch29)
+                self.switches[switchNum] = switch29
+            elif switchNum == 57:
+                if state == 0:
+                    # 57 -> 58
+                    switch.moveTo(95, 278)
+                    switch.quadTo(107, 278, 111, 279)
+                    switch57 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch57)
+                elif state == 1:
+                    # 57 -> 151
+                    switch.moveTo(95, 278)
+                    switch.quadTo(97, 278, 112, 260)
+                    switch57 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch57)
+                self.switches[switchNum] = switch57
+            elif switchNum == 63:
+                if state == 0:
+                    # 63 -> 62
+                    switch.moveTo(163, 350)
+                    switch.cubicTo(163, 340, 163, 330, 161, 322)
+                    switch63 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch63)
+                elif state == 1:
+                    # 63 -> 0
+                    switch.moveTo(163, 350)
+                    switch.lineTo(163, 310)
+                    switch63 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch63)
+                self.switches[switchNum] = switch63
+            elif switchNum == 77:
+                if state == 0:
+                    # 77 -> 76
+                    switch.moveTo(12, 556)
+                    switch.lineTo(50, 556)
+                    switch77 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch77)
+                elif state == 1:
+                    # 77 -> 101
+                    switch.moveTo(12, 556)
+                    switch.cubicTo(20, 556, 24, 546, 28, 540)
+                    switch77 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch77)
+                self.switches[switchNum] = switch77
+            elif switchNum == 85:
+                if state == 0:
+                    # 85 -> 86
+                    switch.moveTo(-124, 556)
+                    switch.lineTo(-149, 556)
+                    switch85 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch85)
+                elif state == 1:
+                    # 85 -> 100
+                    switch.moveTo(-124, 556)
+                    switch.cubicTo(-132, 556, -142, 551, -148, 546)
+                    switch85 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch85)
+                self.switches[switchNum] = switch85
         print(self.switches)
         
 
@@ -1390,7 +1503,6 @@ class TrackBlock(QGraphicsPathItem):
 
     def mousePressEvent(self, event):
         print(f"Clicked on {self.number}")
-        # trackModeltoTrainModel.sendTest.emit(self.number)
 
     def hoverEnterEvent(self, event):
         self.current_pen = self.pen()
