@@ -76,6 +76,9 @@ class TrainControllerUI(QMainWindow):
             "number": "",
             "trainList": [],
             "customAnnouncement": "",
+            "prevLine": "",
+            "redLine": [],
+            "greenLine": []
         }
 
         super().__init__()
@@ -964,21 +967,36 @@ class TrainControllerUI(QMainWindow):
                 self.tcVariables["trainList"].append(train)
 
         blockDict = []
+        if self.trainLineCombo.currentText() != self.tcVariables["prevLine"]:
+            self.trainNumberCombo.clear()
+            self.tcVariables["redLine"].clear()
+            self.tcVariables["greenLine"].clear()
+
         if self.trainLineCombo.currentText() == "red":
             blockDict = self.tcFunctions.redBlockDict
-            self.trainNumberCombo.clear()
-
             for train in self.tcVariables["trainList"]:
                 if isinstance(train, dict) and "red" in train:
-                    self.trainNumberCombo.addItem(train["red"])
+                    nameChecker = True
+                    for name in self.tcVariables["redLine"]:
+                        if train["red"] == name:
+                            nameChecker = False
+                    if nameChecker:
+                        self.tcVariables["redLine"].append(train["red"])
+                        self.trainNumberCombo.addItem(train["red"])
 
         if self.trainLineCombo.currentText() == "green":
             blockDict = self.tcFunctions.greenBlockDict
-            self.trainNumberCombo.clear()
-
             for train in self.tcVariables["trainList"]:
                 if isinstance(train, dict) and "green" in train:
-                    self.trainNumberCombo.addItem(train["green"])
+                    nameChecker = True
+                    for name in self.tcVariables["greenLine"]:
+                        if train["green"] == name:
+                            nameChecker = False
+                    if nameChecker:
+                        self.tcVariables["greenLine"].append(train["green"])
+                        self.trainNumberCombo.addItem(train["green"])
+
+        self.tcVariables["prevLine"] = self.trainLineCombo.currentText()
 
         updatedTrainList = []
         for train in self.tcVariables["trainList"]:
