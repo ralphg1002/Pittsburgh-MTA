@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, 
 
 class TrackView(QGraphicsView):
     blocks = {}
+    switches = {}
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -1083,6 +1084,33 @@ class TrackView(QGraphicsView):
         self.blocks[150] = block_150
 
         #SWITCHES -> 0 by default, means continuation of number
+        # path_12 = QPainterPath()
+        # path_12.moveTo(23, 2)
+        # path_12.cubicTo(23, 2, 13, 1, 10, 1)
+        # block_12 = self.createTrackBlock(path_12, "Block 12")
+        # self.greenTrack.addItem(block_12)
+        # self.blocks[12] = block_12
+
+        # path_13 = QPainterPath()
+        # path_13.moveTo(-10, 0)
+        # path_13.lineTo(-25, 0)
+        # block_13 = self.createTrackBlock(path_13, "Block 13")
+        # self.greenTrack.addItem(block_13)
+        # self.blocks[13] = block_13
+
+        # path_1 = QPainterPath()
+        # path_1.moveTo(0, 0)
+        # path_1.cubicTo(0, 0, 5, 0, 10, 10)
+        # block_1 = self.createTrackBlock(path_1, "Block 1")
+        # self.greenTrack.addItem(block_1)
+        # self.blocks[1] = block_1
+
+        switchPath13 = QPainterPath()
+        switchPath13.moveTo(-25, 0)
+        switchPath13.cubicTo(-10, 0, 10, 1, 23, 2)
+        switch13 = self.createSwitch(switchPath13)
+        self.greenTrack.addItem(switch13)
+        self.switches[13] = switch13
 
         #CROSSING
         crossing = QPixmap("src/main/TrackModel/pngs/crossing.png")
@@ -1299,6 +1327,13 @@ class TrackView(QGraphicsView):
         track_block = TrackBlock(path, number)
         return track_block
 
+    def createSwitch(self, path):
+        switch = QGraphicsPathItem(path)
+        switchPen = QPen(QColor(0, 0, 255))
+        switchPen.setWidth(12)
+        switch.setPen(switchPen)
+        return switch
+    
     def showGreenLineLayout(self):
         self.setScene(self.greenTrack)
 
@@ -1316,6 +1351,27 @@ class TrackView(QGraphicsView):
             offBlock = self.blocks.get(off)
             if offBlock:
                 offBlock.toggle_occupancy(False)
+
+    def change_switch(self, line, switchNum, state):
+        switch = QPainterPath()
+        self.greenTrack.removeItem(self.switches[switchNum])
+        if line == 1:
+            if switchNum == 13:
+                if state == 0:
+                    # 13 -> 12
+                    switch.moveTo(-25, 0)
+                    switch.cubicTo(-10, 0, 10, 1, 23, 2)
+                    switch13 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch13)
+                elif state == 1:
+                    # 13 -> 1
+                    switch.moveTo(-25, 0)
+                    switch.cubicTo(-10, 0, 0, 0, 10, 10)
+                    switch13 = self.createSwitch(switch)
+                    self.greenTrack.addItem(switch13)
+                self.switches[switchNum] = switch13
+        print(self.switches)
+        
 
 
 class TrackBlock(QGraphicsPathItem):

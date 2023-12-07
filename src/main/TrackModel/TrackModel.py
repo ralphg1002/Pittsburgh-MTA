@@ -53,7 +53,7 @@ class TrackModel:
         self.load_data()
 
         trainModelToTrackModel.sendPolarity.connect(self.update_occupancy)
-        # trackControllerToTrackModel.switchState.connect(self.update_switch_state)
+        trackControllerToTrackModel.switchState.connect(self.update_switch_state)
         trackControllerToTrackModel.lightState.connect(self.update_light_state)
         trackControllerToTrackModel.crossingState.connect(self.update_crossing_state)
 
@@ -836,12 +836,7 @@ class TrackModel:
         self.block.set_data(self.selectedLine, self.trackData)
 
     def update_switch_state(self, line, _, blockNum, state):
-        # Initial Green Line Occupancy
-        if blockNum == 62 and state == 1 and line == 1:
-            self.update_occupancy("Green", 0, "")
-        # # Initial Red Line Occupancy
-        # elif blockNum == 9 and state == 1 and line == 2:
-        #     self.update_occupancy("Red", 0, '')
+        self.trackView.change_switch(line, blockNum, state)
 
     def show_testbench(self):
         testbenchWindow = TestbenchWindow()

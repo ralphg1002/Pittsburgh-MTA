@@ -19,13 +19,14 @@ class TestbenchWindow:
 
         # Inputs
         self.setup_inputs()
-        self.setup_failure_inputs()
+        # self.setup_failure_inputs()
 
         # New
         self.add_occupancy_test()
         self.add_passenger_test()
         self.add_lightstate_test()
         self.add_crossingstate_test()
+        self.add_switchstate_test()
 
     def add_mta_logo(self):
         mtaLogo = QLabel(self.testbench)
@@ -170,29 +171,29 @@ class TestbenchWindow:
         self.lightStateButtons.addButton(self.yellowRadio)
         self.lightStateButtons.addButton(self.redRadio)
 
-    def setup_failure_inputs(self):
-        redBackground = QWidget(self.testbench)
-        redBackground.setGeometry(500, 120, 350, 80)
-        redBackground.setStyleSheet("background-color: #ffd6d6;")
+    # def setup_failure_inputs(self):
+    #     redBackground = QWidget(self.testbench)
+    #     redBackground.setGeometry(500, 120, 350, 80)
+    #     redBackground.setStyleSheet("background-color: #ffd6d6;")
 
-        failureLabel = QLabel("Set Failure Input:", redBackground)
-        failureLabel.setGeometry(0, 0, 350, 30)
-        failureLabel.setStyleSheet(
-            "background-color: red; color: white; font-weight: bold"
-        )
-        failureLabel.setAlignment(Qt.AlignCenter)
+    #     failureLabel = QLabel("Set Failure Input:", redBackground)
+    #     failureLabel.setGeometry(0, 0, 350, 30)
+    #     failureLabel.setStyleSheet(
+    #         "background-color: red; color: white; font-weight: bold"
+    #     )
+    #     failureLabel.setAlignment(Qt.AlignCenter)
 
-        self.failureCheckboxes = []
-        failures = ["Track Circuit Failure", "Power Failure", "Broken Rail"]
-        xOffset = 0
-        for failure in failures:
-            option = QCheckBox(failure, redBackground)
-            option.setGeometry(xOffset, 40, 150, 30)
-            if failure == "Broken Rail":
-                option.setGeometry(xOffset - 40, 40, 150, 30)
-            option.setStyleSheet("background-color: #ffd6d6")
-            self.failureCheckboxes.append(option)
-            xOffset += 150
+    #     self.failureCheckboxes = []
+    #     failures = ["Track Circuit Failure", "Power Failure", "Broken Rail"]
+    #     xOffset = 0
+    #     for failure in failures:
+    #         option = QCheckBox(failure, redBackground)
+    #         option.setGeometry(xOffset, 40, 150, 30)
+    #         if failure == "Broken Rail":
+    #             option.setGeometry(xOffset - 40, 40, 150, 30)
+    #         option.setStyleSheet("background-color: #ffd6d6")
+    #         self.failureCheckboxes.append(option)
+    #         xOffset += 150
 
     def update_display(self):
         self.selectedBlock = self.blockInput.value()
@@ -234,24 +235,24 @@ class TestbenchWindow:
 
     def add_occupancy_test(self):
         selectLineLabel = QLabel("Select Line:", self.testbench)
-        selectLineLabel.setGeometry(490, 210, 75, 30)
+        selectLineLabel.setGeometry(490, 100, 75, 30)
         selectLineLabel.setStyleSheet("font-weight: bold")
         self.occupancyLineInput = QLineEdit(self.testbench)
-        self.occupancyLineInput.setGeometry(570, 210, 50, 30)
+        self.occupancyLineInput.setGeometry(570, 100, 50, 30)
         self.occupancyLineInput.setStyleSheet("background-color: white")
 
         currentBlockLabel = QLabel("Current Block:", self.testbench)
-        currentBlockLabel.setGeometry(625, 210, 100, 30)
+        currentBlockLabel.setGeometry(625, 100, 100, 30)
         currentBlockLabel.setStyleSheet("font-weight: bold")
         self.occupancyCurrentBlock = QLineEdit(self.testbench)
-        self.occupancyCurrentBlock.setGeometry(720, 210, 50, 30)
+        self.occupancyCurrentBlock.setGeometry(720, 100, 50, 30)
         self.occupancyCurrentBlock.setStyleSheet("background-color: white")
 
         nextBlockLabel = QLabel("Next Block:", self.testbench)
-        nextBlockLabel.setGeometry(780, 210, 100, 30)
+        nextBlockLabel.setGeometry(780, 100, 100, 30)
         nextBlockLabel.setStyleSheet("font-weight: bold")
         self.occupancyNextBlock = QLineEdit(self.testbench)
-        self.occupancyNextBlock.setGeometry(860, 210, 50, 30)
+        self.occupancyNextBlock.setGeometry(860, 100, 50, 30)
         self.occupancyNextBlock.setStyleSheet("background-color: white")
 
         # self.lineInput.addItem("Green")
@@ -259,7 +260,7 @@ class TestbenchWindow:
         # self.lineInput.currentIndexChanged.connect(self.send_occupancy_signal)
 
         signalTest = QPushButton("Occupancy Test", self.testbench)
-        signalTest.setGeometry(615, 250, 150, 30)
+        signalTest.setGeometry(615, 140, 150, 30)
         signalTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
@@ -276,28 +277,28 @@ class TestbenchWindow:
 
     def add_passenger_test(self):
         selectLineLabel = QLabel("Select Line:", self.testbench)
-        selectLineLabel.setGeometry(490, 300, 75, 30)
+        selectLineLabel.setGeometry(490, 190, 75, 30)
         selectLineLabel.setStyleSheet("font-weight: bold")
         self.passengerLineInput = QLineEdit(self.testbench)
-        self.passengerLineInput.setGeometry(570, 300, 50, 30)
+        self.passengerLineInput.setGeometry(570, 190, 50, 30)
         self.passengerLineInput.setStyleSheet("background-color: white")
 
         stationNameLabel = QLabel("Station Name:", self.testbench)
-        stationNameLabel.setGeometry(625, 300, 100, 30)
+        stationNameLabel.setGeometry(625, 190, 100, 30)
         stationNameLabel.setStyleSheet("font-weight: bold")
         self.passengerStationName = QLineEdit(self.testbench)
-        self.passengerStationName.setGeometry(720, 300, 50, 30)
+        self.passengerStationName.setGeometry(720, 190, 50, 30)
         self.passengerStationName.setStyleSheet("background-color: white")
 
         passengers = QLabel("Passengers:", self.testbench)
-        passengers.setGeometry(780, 300, 100, 30)
+        passengers.setGeometry(780, 190, 100, 30)
         passengers.setStyleSheet("font-weight: bold")
         self.trainPassengers = QLineEdit(self.testbench)
-        self.trainPassengers.setGeometry(860, 300, 50, 30)
+        self.trainPassengers.setGeometry(860, 190, 50, 30)
         self.trainPassengers.setStyleSheet("background-color: white")
 
         signalTest = QPushButton("Passenger Test", self.testbench)
-        signalTest.setGeometry(615, 340, 150, 30)
+        signalTest.setGeometry(615, 230, 150, 30)
         signalTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
@@ -313,28 +314,28 @@ class TestbenchWindow:
     
     def add_lightstate_test(self):
         selectLineLabel = QLabel("Line Number:", self.testbench)
-        selectLineLabel.setGeometry(490, 390, 85, 30)
+        selectLineLabel.setGeometry(490, 280, 85, 30)
         selectLineLabel.setStyleSheet("font-weight: bold")
         self.lightLineInput = QLineEdit(self.testbench)
-        self.lightLineInput.setGeometry(580, 390, 50, 30)
+        self.lightLineInput.setGeometry(580, 280, 50, 30)
         self.lightLineInput.setStyleSheet("background-color: white")
 
         blockLabel = QLabel("Select Block:", self.testbench)
-        blockLabel.setGeometry(635, 390, 100, 30)
+        blockLabel.setGeometry(635, 280, 100, 30)
         blockLabel.setStyleSheet("font-weight: bold")
         self.lightBlock = QLineEdit(self.testbench)
-        self.lightBlock.setGeometry(720, 390, 50, 30)
+        self.lightBlock.setGeometry(720, 280, 50, 30)
         self.lightBlock.setStyleSheet("background-color: white")
 
         lightColorLabel = QLabel("Light State:", self.testbench)
-        lightColorLabel.setGeometry(780, 390, 100, 30)
+        lightColorLabel.setGeometry(780, 280, 100, 30)
         lightColorLabel.setStyleSheet("font-weight: bold")
         self.lightColor = QLineEdit(self.testbench)
-        self.lightColor.setGeometry(860, 390, 50, 30)
+        self.lightColor.setGeometry(860, 280, 50, 30)
         self.lightColor.setStyleSheet("background-color: white")
 
         lightTest = QPushButton("Light State Test", self.testbench)
-        lightTest.setGeometry(615, 430, 150, 30)
+        lightTest.setGeometry(615, 320, 150, 30)
         lightTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
@@ -348,21 +349,21 @@ class TestbenchWindow:
 
     def add_crossingstate_test(self):
         selectLineLabel = QLabel("Line Number:", self.testbench)
-        selectLineLabel.setGeometry(530, 480, 85, 30)
+        selectLineLabel.setGeometry(530, 370, 85, 30)
         selectLineLabel.setStyleSheet("font-weight: bold")
         self.crossingLineInput = QLineEdit(self.testbench)
-        self.crossingLineInput.setGeometry(620, 480, 50, 30)
+        self.crossingLineInput.setGeometry(620, 370, 50, 30)
         self.crossingLineInput.setStyleSheet("background-color: white")
 
         stateLabel = QLabel("Crossing State:", self.testbench)
-        stateLabel.setGeometry(680, 480, 100, 30)
+        stateLabel.setGeometry(680, 370, 100, 30)
         stateLabel.setStyleSheet("font-weight: bold")
         self.crossingState = QLineEdit(self.testbench)
-        self.crossingState.setGeometry(780, 480, 50, 30)
+        self.crossingState.setGeometry(780, 370, 50, 30)
         self.crossingState.setStyleSheet("background-color: white")
 
         crossingTest = QPushButton("Crossing State Test", self.testbench)
-        crossingTest.setGeometry(615, 520, 150, 30)
+        crossingTest.setGeometry(615, 410, 150, 30)
         crossingTest.setStyleSheet(
             "background-color: green; color: white; font-weight: bold"
         )
@@ -374,3 +375,40 @@ class TestbenchWindow:
         if self.crossingState.text() == '0':
             state = False
         trackControllerToTrackModel.crossingState.emit(line, None, None, state)
+
+    def add_switchstate_test(self):
+        selectLineLabel = QLabel("Line Number:", self.testbench)
+        selectLineLabel.setGeometry(490, 460, 85, 30)
+        selectLineLabel.setStyleSheet("font-weight: bold")
+        self.switchLineInput = QLineEdit(self.testbench)
+        self.switchLineInput.setGeometry(580, 460, 50, 30)
+        self.switchLineInput.setStyleSheet("background-color: white")
+
+        blockLabel = QLabel("Select Block:", self.testbench)
+        blockLabel.setGeometry(635, 460, 100, 30)
+        blockLabel.setStyleSheet("font-weight: bold")
+        self.switchBlock = QLineEdit(self.testbench)
+        self.switchBlock.setGeometry(720, 460, 50, 30)
+        self.switchBlock.setStyleSheet("background-color: white")
+
+        switchStateLabel = QLabel("Switch State:", self.testbench)
+        switchStateLabel.setGeometry(780, 460, 100, 30)
+        switchStateLabel.setStyleSheet("font-weight: bold")
+        self.switchState = QLineEdit(self.testbench)
+        self.switchState.setGeometry(860, 460, 50, 30)
+        self.switchState.setStyleSheet("background-color: white")
+
+        switchTest = QPushButton("Switch State Test", self.testbench)
+        switchTest.setGeometry(615, 510, 150, 30)
+        switchTest.setStyleSheet(
+            "background-color: green; color: white; font-weight: bold"
+        )
+        switchTest.clicked.connect(self.send_switch_signal)
+
+    def send_switch_signal(self):
+        line = int(self.switchLineInput.text())
+        blockNum = int(self.switchBlock.text())
+        state = True
+        if self.switchState.text() == '0':
+            state = False
+        trackControllerToTrackModel.switchState.emit(line, None, blockNum, state)
