@@ -1,4 +1,5 @@
 # importing libraries
+from multiprocessing import managers
 from re import L
 import sys
 import math
@@ -215,6 +216,8 @@ dispatchTrainsList = []
 # Global variable declaration
 global_block_occupancy = {}
 
+train_routes = {}  # Class attribute for train routes
+
 
 class CTCWindow(QMainWindow):
     # font variables
@@ -301,6 +304,7 @@ class CTCWindow(QMainWindow):
         self.testbenchButton.setStyleSheet(
             "color:" + self.colorDarkBlue + ";border: 1px solid white"
         )
+        self.testbenchButton.clicked.connect(self.openTestBench)
 
         # system time input
         self.systemTimeInput = QLabel("00:00:00", self)
@@ -431,14 +435,14 @@ class CTCWindow(QMainWindow):
         # Schedule Table
         self.schedule_header = QLabel("Schedule:", self)
         self.schedule_header.setFont(QFont(self.fontStyle, self.textFontSize))
-        self.schedule_header.setGeometry(30, 610, 100, 100)
+        self.schedule_header.setGeometry(30, 690, 100, 100)
         self.schedule_table = QTableWidget(self)
         self.schedule_table.setColumnCount(5)
         self.schedule_table.setHorizontalHeaderLabels(
             ["Train ID", "Departing From", "Stops", "Departure Time", "Arrival Time"]
         )
         self.schedule_table.setStyleSheet("background-color: white;")
-        self.schedule_table.setGeometry(35, 680, 890, 240)
+        self.schedule_table.setGeometry(35, 750, 890, 180)
         self.schedule_table.setColumnWidth(0, 150)
         self.schedule_table.setColumnWidth(1, 150)
         self.schedule_table.setColumnWidth(2, 250)
@@ -454,7 +458,9 @@ class CTCWindow(QMainWindow):
         self.occupancy_table.setColumnCount(2)
         self.occupancy_table.setHorizontalHeaderLabels(["Block", "Line"])
         self.occupancy_table.setStyleSheet("background-color: white;")
-        self.occupancy_table.setGeometry(360, 510, 252, 100)
+        self.occupancy_table.setColumnWidth(0, 120)
+        self.occupancy_table.setColumnWidth(1, 120)
+        self.occupancy_table.setGeometry(360, 510, 273, 200)
 
         # Throughput per line
         self.throughput_label = QLabel("Throughput: ", self)
@@ -493,12 +499,13 @@ class CTCWindow(QMainWindow):
         self.sendTrain.setStyleSheet(
             "background-color: " + self.colorLightGrey + "; color: " + self.colorBlack
         )
+        self.sendTrain.setEnabled(False)
         self.sendTrain.clicked.connect(self.scheduler.sendTrainClicked)
         self.sendTrain.setEnabled(False)
 
         # Set schedule
         self.setSchedule = QPushButton("Set Schedule", self)
-        self.setSchedule.setGeometry(350, 625, 275, 50)
+        self.setSchedule.setGeometry(650, 685, 275, 50)
         self.setSchedule.setFont(QFont(self.fontStyle, self.textFontSize + 4))
         self.setSchedule.setStyleSheet(
             "background-color: " + self.colorLightRed + "; color: " + self.colorBlack
@@ -620,7 +627,9 @@ class CTCWindow(QMainWindow):
             + self.colorDarkBlue
             + "; border: 1px solid black"
         )
-        # self.repairBlockButton.clicked.connect(self.scheduler.repairBlockButton)
+        self.repairBlockButton.setEnabled(False)
+        self.blockDropDown.currentIndexChanged.connect(self.updateRepairButtonStatus)
+        self.repairBlockButton.clicked.connect(self.handleRepairBlockButton)
 
         # close block button
         self.closeBlockButton = QPushButton("Close Block", self)
@@ -632,7 +641,9 @@ class CTCWindow(QMainWindow):
             + self.colorDarkBlue
             + "; border: 1px solid black"
         )
-        # self.closeBlockButton.clicked.connect(Block.closeBlockButton)
+        self.closeBlockButton.setEnabled(False)
+        self.blockDropDown.currentIndexChanged.connect(self.updateCloseButtonStatus)
+        self.closeBlockButton.clicked.connect(self.handleCloseBlockButton)
 
         # Displaying the occupancy status
         self.status_label = QLabel("Status: ", self)
@@ -673,55 +684,64 @@ class CTCWindow(QMainWindow):
         
         #self.scheduler = Scheduler(self)
         self.selectLine.currentIndexChanged.connect(self.update_global_select_line)
-        """self.scheduler = Scheduler(self)
-        self.scheduler.updateDepartingStations()
+        self.blockDropDown.currentIndexChanged.connect(self.handleBlockStatus)
 
-        self.selectLine.currentIndexChanged.connect(self.scheduler.updateStopDropDown)
-        self.inputSchedule.clicked.connect(self.scheduler.load_file)
-        self.sendTrain.clicked.connect(self.scheduler.sendTrainClicked)
-        self.addStopButton.clicked.connect(self.scheduler.addStopPressed)
-        self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
-        self.blockDropDown.currentIndexChanged.connect(self.statusHandler)
-        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
-        trackModelToCTC.throughput.connect(self.updateTickets)
-        self.selectLine.currentIndexChanged.connect(self.updateInfoBlock)
+        # Create a refresh button
+        self.refreshButton = QPushButton(self)
+        self.refreshButton.setIcon(QIcon("src/main/CTC/change.svg"))  # Set the path to your icon image
+        self.refreshButton.setGeometry(525, 170, 50, 50)  # Adjust the position and size as needed
+        self.refreshButton.setStyleSheet("border: 2px solid white;")  # Set border color to white
+        self.refreshButton.clicked.connect(self.ticketRequest)
 
-        self.automatic.clicked.connect(self.mode_handler.automaticButtonClicked)
-        self.manual.clicked.connect(self.mode_handler.manualButtonClicked)
-        #self.selectLine.currentIndexChanged.connect(self.updateScheduler)"""
-
-    """def updateScheduler(self):
-        self.scheduler = Scheduler(self)
-        self.scheduler.updateStopDropDown()
-        self.inputSchedule.clicked.connect(self.scheduler.load_file)
-        self.sendTrain.clicked.connect(self.scheduler.sendTrainClicked)
-        self.addStopButton.clicked.connect(self.scheduler.addStopPressed)
-        self.blockDropDown.currentIndexChanged.connect(self.blockHandler)
-        self.blockDropDown.currentIndexChanged.connect(self.statusHandler)
-        self.selectLine.currentIndexChanged.connect(self.ticketRequest)
-        trackModelToCTC.throughput.connect(self.updateTickets)
-        self.selectLine.currentIndexChanged.connect(self.updateInfoBlock)"""
+    def openTestBench(self):
+        self.testBenchWindow = TestBench()
+        self.testBenchWindow.show()
 
     def update_global_select_line(self):
         global globalSelectLine
         globalSelectLine = self.selectLine.currentText()
+    
+    def handleRepairBlockButton(self):
+        Block.repairBlock(self)
 
+    def handleCloseBlockButton(self):
+        Block.closeBlock(self)
 
+    def updateRepairButtonStatus(self):
+        # Check if both line and block are selected
+        line_selected = self.selectLine.currentText() not in ["", "Select Line"]
+        block_selected = self.blockDropDown.currentText() not in ["", "Select Block"]
+
+        # Enable button only if both line and block are selected
+        self.repairBlockButton.setEnabled(line_selected and block_selected)
+    
+    def updateCloseButtonStatus(self):
+        # Check if both line and block are selected
+        line_selected = self.selectLine.currentText() not in ["", "Select Line"]
+        block_selected = self.blockDropDown.currentText() not in ["", "Select Block"]
+
+        # Enable button only if both line and block are selected
+        self.closeBlockButton.setEnabled(line_selected and block_selected)
+    
     def statusHandler(self):
         Block.updateStatusLabel(self)
 
     def ticketRequest(self):
         beforeLine = self.selectLine.currentText()
-        if beforeLine == "Green Line":
-            requestLine = "Green"
-        else:
-            requestLine = "Red"
+        if beforeLine != "Select a Line":
+            if beforeLine == "Green Line":
+                requestLine = "Green"
+            else:
+                requestLine = "Red"
 
-        ctcToTrackModel.requestThroughput.emit(requestLine)
+            ctcToTrackModel.requestThroughput.emit(requestLine)
 
     def updateTickets(self, throughput):
         throughput_text = f"Throughput: {throughput}"
         self.throughput_label.setText(throughput_text)
+
+    def handleBlockStatus(self):
+        Block.updateStatusLabel(self)
 
     def blockHandler(self):
         Block.setSelectedBlock(self)
@@ -757,6 +777,184 @@ class CTCWindow(QMainWindow):
             "x" + format(1 / (self.timer_interval / 1000), ".3f")
         )
 
+class TestBench(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.fontStyle = 'Arial'
+        self.textFontSize = 12  # Increased font size
+        self.colorLightGrey = '#d3d3d3'  # Example color for the buttons
+        self.colorBlack = '#000000'
+        self.initUI()
+
+    def initUI(self):
+        font = QFont(self.fontStyle, self.textFontSize)
+
+        # Update Block Occupancy Section
+        self.occupancyLabel = QLabel("Update block occupancy:", self)
+        self.occupancyLabel.setFont(font)
+        self.occupancyLabel.move(20, 20)
+        self.occupancyLabel.resize(300, 30)  # Increased width
+
+        self.lineSelectionDropdown = QComboBox(self)
+        self.lineSelectionDropdown.setFont(font)
+        self.lineSelectionDropdown.addItems(["Red Line", "Green Line"])
+        self.lineSelectionDropdown.move(20, 60)
+        self.lineSelectionDropdown.resize(200, 30)
+
+        self.blockNumberInput = QLineEdit(self)
+        self.blockNumberInput.setFont(font)
+        self.blockNumberInput.setPlaceholderText("Block Number")
+        self.blockNumberInput.move(20, 100)
+        self.blockNumberInput.resize(200, 30)
+
+        self.occupancyInput = QLineEdit(self)
+        self.occupancyInput.setFont(font)
+        self.occupancyInput.setPlaceholderText("Occupancy (0 or 1)")
+        self.occupancyInput.move(20, 140)
+        self.occupancyInput.resize(200, 30)
+
+        self.sendOccupancyButton = QPushButton("Send Occupancy", self)
+        self.sendOccupancyButton.setFont(font)
+        self.sendOccupancyButton.move(20, 180)
+        self.sendOccupancyButton.resize(200, 40)
+        self.sendOccupancyButton.setStyleSheet(
+            "background-color: " + self.colorLightGrey + "; color: " + self.colorBlack
+        )        
+        self.sendOccupancyButton.clicked.connect(self.sendOccupancyData)
+
+        # Set Ticket Sales Section
+        self.ticketSalesLabel = QLabel("Set ticket sales:", self)
+        self.ticketSalesLabel.setFont(font)
+        self.ticketSalesLabel.move(20, 230)
+        self.ticketSalesLabel.resize(300, 30)  # Increased width
+
+        self.lineDropdown = QComboBox(self)
+        self.lineDropdown.setFont(font)
+        self.lineDropdown.addItems(["Green Line", "Red Line"])
+        self.lineDropdown.move(20, 270)
+        self.lineDropdown.resize(200, 30)
+
+        self.salesInput = QLineEdit(self)
+        self.salesInput.setFont(font)
+        self.salesInput.setPlaceholderText("Ticket Sales")
+        self.salesInput.move(20, 320)
+        self.salesInput.resize(200, 30)
+
+        self.sendSalesButton = QPushButton("Send Ticket Sales", self)
+        self.sendSalesButton.setFont(font)
+        self.sendSalesButton.move(20, 360)
+        self.sendSalesButton.resize(200, 40)
+        self.sendSalesButton.setStyleSheet(
+            "background-color: " + self.colorLightGrey + "; color: " + self.colorBlack
+        )        
+        self.sendSalesButton.clicked.connect(self.sendTicketSales)
+
+        # Update Switch Section
+        self.updateSwitchLabel = QLabel("Update Switch:", self)
+        self.updateSwitchLabel.setFont(font)
+        self.updateSwitchLabel.move(250, 20)
+        self.updateSwitchLabel.resize(300, 30)
+
+        self.switchBlockDropdown = QComboBox(self)
+        self.switchBlockDropdown.setFont(font)
+        self.switchBlockDropdown.addItems(["Block 1", "Block 2", "Block 3"])  # Example items
+        self.switchBlockDropdown.move(250, 60)
+        self.switchBlockDropdown.resize(200, 30)
+
+        self.switchStatusLabel = QLabel("Status:", self)
+        self.switchStatusLabel.setFont(font)
+        self.switchStatusLabel.move(250, 110)
+        self.switchStatusLabel.resize(200, 30)
+
+        self.flipSwitchButton = QPushButton("Flip Switch", self)
+        self.flipSwitchButton.setFont(font)
+        self.flipSwitchButton.move(250, 160)
+        self.flipSwitchButton.resize(200, 40)
+        self.flipSwitchButton.setStyleSheet(
+            "background-color: " + self.colorLightGrey + "; color: " + self.colorBlack
+        )
+        self.flipSwitchButton.clicked.connect(self.flipSwitch)
+
+        # Change Train Data Section
+        self.changeTrainLabel = QLabel("Change Train Data:", self)
+        self.changeTrainLabel.setFont(font)
+        self.changeTrainLabel.move(250, 220)
+        self.changeTrainLabel.resize(300, 30)
+
+        self.trainDropdown = QComboBox(self)
+        self.trainDropdown.setFont(font)
+        self.trainDropdown.addItems(["Train 1", "Train 2", "Train 3"])  # Example items
+        self.trainDropdown.move(250, 260)
+        self.trainDropdown.resize(200, 30)
+
+        self.suggestedSpeedInput = QLineEdit(self)
+        self.suggestedSpeedInput.setFont(font)
+        self.suggestedSpeedInput.setPlaceholderText("Suggested Speed")
+        self.suggestedSpeedInput.move(250, 310)
+        self.suggestedSpeedInput.resize(200, 30)
+
+        self.authorityInput = QLineEdit(self)
+        self.authorityInput.setFont(font)
+        self.authorityInput.setPlaceholderText("Authority")
+        self.authorityInput.move(250, 360)
+        self.authorityInput.resize(200, 30)
+
+        self.updateTrainButton = QPushButton("Update Train", self)
+        self.updateTrainButton.setFont(font)
+        self.updateTrainButton.move(250, 410)
+        self.updateTrainButton.resize(200, 40)
+        self.updateTrainButton.setStyleSheet(
+            "background-color: " + self.colorLightGrey + "; color: " + self.colorBlack
+        )
+        self.updateTrainButton.clicked.connect(self.updateTrainData)
+        
+        self.setGeometry(300, 300, 500, 500)  
+        self.setWindowTitle("Test Bench")
+
+    def sendOccupancyData(self):
+        # Logic to handle occupancy data
+        selectedLine = self.lineSelectionDropdown.currentText()
+        blockNumber = self.blockNumberInput.text()
+        occupancy = self.occupancyInput.text()
+        print(f"{selectedLine} Block {blockNumber} Occupancy Update: {occupancy}")
+
+        if selectedLine == "Green Line":
+            lineNum = 1
+        else:
+            lineNum = 2
+        #occupancyState = pyqtSignal(int, int, bool)  # line, block number, state
+
+        self.occupancyState.emit(lineNum, blockNumber, occupancy)
+
+    def sendTicketSales(self):
+        # Logic to handle ticket sales data
+        line = self.lineDropdown.currentText()
+        sales = self.salesInput.text()
+        print(f"Ticket Sales for {line}: {sales}")
+
+    def flipSwitch(self):
+        # Logic to handle switch flipping
+        selectedBlock = self.switchBlockDropdown.currentText()
+        print(f"Flipping switch for {selectedBlock}")
+
+    def updateTrainData(self):
+        # Logic to handle updating train data
+        selectedTrain = self.trainDropdown.currentText()
+        suggestedSpeed = self.suggestedSpeedInput.text()
+        authority = self.authorityInput.text()
+        print(f"Updating data for {selectedTrain}: Speed {suggestedSpeed}, Authority {authority}")
+
+    def sendOccupancyData(self):
+        # Logic to handle occupancy data
+        blockNumber = self.blockNumberInput.text()
+        occupancy = self.occupancyInput.text()
+        print(f"Block {blockNumber} Occupancy Update: {occupancy}")
+
+    def sendTicketSales(self):
+        # Logic to handle ticket sales data
+        line = self.lineDropdown.currentText()
+        sales = self.salesInput.text()
+        print(f"Ticket Sales for {line}: {sales}")
 
 class ModeHandler:
     def __init__(self, main_window):
@@ -883,15 +1081,15 @@ class ModeHandler:
         main_window.occupancy_table.setVisible(False)"""
         main_window.schedule_table.setVisible(True)
         main_window.schedule_table.setRowCount(0)
-        main_window.schedule_table.setGeometry(35, 680, 890, 240)
+        #main_window.schedule_table.setGeometry(35, 680, 890, 240)
         main_window.schedule_header.setVisible(True)
-        main_window.schedule_header.setGeometry(30, 610, 100, 100)
+        #main_window.schedule_header.setGeometry(30, 610, 100, 100)
         main_window.selectLine.setVisible(True)
         # main_window.selectLine.setCurrentIndex(0)
         main_window.inputSchedule.setVisible(True)
         main_window.departingStation.setEnabled(True)
         main_window.departingStation.setStyleSheet("background-color: white")
-        main_window.sendTrain.setEnabled(True)
+        main_window.sendTrain.setEnabled(False)
         main_window.arrivalHeader.setVisible(True)
         main_window.arrivalTime.setVisible(True)
         main_window.arrivalTime.setEnabled(True)
@@ -912,7 +1110,6 @@ class ModeHandler:
             + "; color: "
             + main_window.colorBlack
         )
-        main_window.sendTrain.setEnabled(True)
         main_window.setSchedule.setEnabled(False)
         main_window.setSchedule.setStyleSheet(
             "background-color: "
@@ -920,47 +1117,6 @@ class ModeHandler:
             + "; color: "
             + main_window.colorDarkGrey
         )
-
-    # function for if maintenance button is pressed
-    def maintenanceButtonClicked(self):
-        main_window = self.main_window
-
-        main_window.automatic.setStyleSheet(
-            "background-color: white; color:"
-            + main_window.colorBlack
-            + "; border: 1px solid black"
-        )
-        # Unhighlight the last clicked button, if any
-        if main_window.last_clicked_button:
-            main_window.last_clicked_button.setStyleSheet("")
-
-        main_window.last_clicked_button = main_window.self.maintenance
-        main_window.maintenance.setStyleSheet(
-            "background-color: "
-            + main_window.colorLightGrey
-            + "; color: "
-            + main_window.colorDarkBlue
-            + "; border: 1px solid black"
-        )
-
-        main_window.throughput_label.setVisible(False)
-        main_window.speed_label.setVisible(False)
-        main_window.authority_label.setVisible(False)
-        main_window.occupancy_header.setVisible(False)
-        main_window.occupancy_table.setVisible(False)
-        main_window.schedule_table.setVisible(False)
-        main_window.schedule_header.setVisible(False)
-        main_window.selectLine.setVisible(False)
-        main_window.inputSchedule.setVisible(False)
-        main_window.departingStation.setVisible(False)
-        # main_window.arrivalStation.setVisible(False)
-        main_window.sendTrain.setVisible(False)
-        main_window.arrivalHeader.setVisible(False)
-        main_window.arrivalTime.setVisible(False)
-        main_window.addStopButton.setVisible(False)
-        main_window.addStopDropdown.setVisible(False)
-        main_window.stopsQueueHeader.setVisible(False)
-        main_window.stopsTable.setVisible(False)
 
 
 class Scheduler:
@@ -1429,6 +1585,7 @@ class Scheduler:
 
             # Update the dropdown to exclude the newly added stop
             self.updateStopDropDown()
+            self.main_window.sendTrain.setEnabled(True)
             # Reset the dropdown to index 0
             self.main_window.addStopDropdown.setCurrentIndex(0)
             print("Stops:", self.main_window.stops)
@@ -1455,7 +1612,6 @@ class Routing:
         self.data = self.load_data()
         self.main_window = main_window
         # self.scheduler_class = Scheduler(main_window)
-        self.train_routes = {}  # Dictionary to map train IDs to their routes
         self.temp_routes = []  # temp dict
         trackControllerToCTC.occupancyState.connect(self.checkPosition)
         trackControllerToCTC.occupancyState.connect(self.handleBlockOccupancy)
@@ -1762,6 +1918,265 @@ class Routing:
         # print(total_time)
         return lastStopTime
 
+    """def checkPosition(self, line, blockNum, occupancy):
+        for train_id, routeQ in train_routes.items():
+            try:
+                routeQ[0]
+            except Exception as e:
+                return
+            try:
+                print(
+                    "comparing current block of "
+                    + str(blockNum)
+                    + " with destination at "
+                    + str(routeQ[1])
+                )
+            except Exception as e:
+                pass
+
+            if line == 1:
+                track = "Green"
+            else:
+                track = "Red"
+
+            trainLine = globalSelectLine
+            print("GLOBAL SELECT LINE IS")
+            print(globalSelectLine)
+            #trainLine = self.main_window.selectLine.currentText()
+            # for train_id, routeQ in self.train_routes.items():
+            print(f"{trainLine}, {track}")
+            if trainLine == "Green Line":
+                trainTrack = "Green"
+            else:
+                trainTrack = "Red"
+
+            if occupancy == True and blockNum == routeQ[1] and trainTrack == track:
+                print("inside check position")
+                self.routeQ.pop(0)
+                train_routes[train_id] = routeQ
+
+                if(len(routeQ) == 1):
+                    self.main_window.dispatchTable.removeRow(0)
+                    print("removing row...")
+                    return
+                # nextBlock = self.routeQ[1]
+                wayside = self.find_wayside(routeQ[0])
+                print("STATIONS TO STOP:")
+                print(self.stations_to_stop[0])
+                print("ROUTE Q")
+                print(routeQ)
+                
+                ########## SWITCH CHECK ##################
+                # Check if switch is in next 5 and get its index within the route queue. 
+                for i in range(0, 5):
+                    if i < len(self.routeQ) and routeQ[i] in switches:
+                        switch_index = i
+                        switch = switches[i]
+                        break
+                    else:
+                        switch_index = None
+                # if the switch is in the next 5 
+                if switch_index != None:
+                    # Check if the train is traveling in the right direction
+                    correct_direction = False
+                    for i in range (0,5):
+                        if i < len(routeQ) and routeQ[i] == switch[0][0]:
+                            correct_direction = True
+                            break
+                    # if the train is  traveling in the right direction then proceed.
+                    if(correct_direction):
+                        # check if switch is activated
+                        if switch[2] == 1:
+                            if self.altRouteBool == False:
+                                self.altRouteBool = True
+                                # remove the normal route from the routeQ
+                                routeQ.remove(switch_index+1, switch_index+1+len(switch[0]))
+                                # replace it with the alternative route
+                                routeQ.insert(switch_index+1, switch[1])
+                        # if switch is not activated
+                        else:
+                            if self.altRouteBool == True:
+                                self.altRouteBool = False
+                                # remove the alternative route from the routeQ
+                                routeQ.remove(switch_index+1, switch_index+1+len(switch[1]))
+                                # replace it with the normal route
+                                routeQ.insert(switch_index+1, switch[0])
+
+
+                ############## OCCUPANCY CHECK ############
+                # determine the index of the occupied block within the routeQ
+                for i in range(0, 5):
+                    if i < len(self.routeQ) and routeQ[i] in global_block_occupancy:
+                        occupied_index = i
+                        occupied_block = self.routeQ[i]
+                        break
+                    else:
+                        occupied_index = None
+                # If there is an occupied block within the next 6...
+                if occupied_index != None:
+                    if(len(routeQ) >= 5 and occupied_block == routeQ[4]):
+                        suggestedSpeed = (
+                        int(0.75 * self.block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            0, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                    elif(len(routeQ) >= 4 and occupied_block == routeQ[3]):
+                        suggestedSpeed = (
+                        int(0.5 * self.block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            0, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                    elif(len(routeQ) >= 3 and occupied_block == routeQ[2]):
+                        suggestedSpeed = (
+                        int(0.25 * self.block_info_list[self.routeQ[0]].speedLimit)
+                        * 0.621371
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            0, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                    elif(len(routeQ) >= 2 and occupied_block == routeQ[1]):
+                        suggestedSpeed = 0
+                        authority = 0
+
+                        self.main_window.dispatchTable.setItem(
+                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            0, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                        ctcToTrackController.sendAuthority.emit(
+                        line, wayside, routeQ[0], authority
+                        )
+
+
+                ############ LIGHT CHECK ##########
+                # STILL NEED TO DO THE CODE FOR THIS PART
+
+                ######### STATION CHECK ############
+                if len(routeQ) >= 4 and self.stations_to_stop[0] == routeQ[3]:
+                    suggestedSpeed = (
+                        int(0.75 * self.block_info_list[self.routeQ[0]].speedLimit)
+                        * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    #Block.update_block_occupancy(blockNum, 1, self.main_window)
+
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                elif len(routeQ) >= 3 and self.stations_to_stop[0] == routeQ[2]:
+                    suggestedSpeed = (
+                        int(0.50 * self.block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                elif len(routeQ) >= 2 and self.stations_to_stop[0] == routeQ[1]:
+                    suggestedSpeed = (
+                        int(0.25 * self.block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                elif len(routeQ) >= 1 and self.stations_to_stop[0] == routeQ[0]:
+                    suggestedSpeed = 0
+                    station_name = self.find_station_name_by_block(self.stations_to_stop[0])
+
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("0"))
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                    ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 0)
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(station_name))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 2, QTableWidgetItem("Dwelling")
+                    )
+                    QTimer.singleShot(60000, self.leaveStop)
+                
+
+                else:
+                    print(
+                        "Top of route queue: ",
+                        self.block_info_list[int(routeQ[0])].speedLimit,
+                    )
+                    print(
+                        "Suggested Speed Before: ",
+                        (self.block_info_list[int(routeQ[0])].speedLimit) * 0.621371,
+                    )
+                    #print("Block 65: ", self.block_info_list[65].speedLimit)
+                    #print("Block 65: ", self.block_info_list[66].speedLimit)
+
+                    suggestedSpeed = (
+                        self.block_info_list[int(routeQ[0])].speedLimit
+                    ) * 0.621371
+                    suggestedSpeed = round(suggestedSpeed, 2)
+
+                    self.main_window.dispatchTable.setItem(
+                        0, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        0, 1, QTableWidgetItem(str(blockNum))
+                    )"""
+
     def checkPosition(self, line, blockNum, occupancy):
         try:
             self.routeQ[0]
@@ -1792,11 +2207,11 @@ class Routing:
             trainTrack = "Green"
         else:
             trainTrack = "Red"
+
         if occupancy == True and blockNum == self.routeQ[1] and trainTrack == track:
             print("inside check position")
-            Block.update_block_occupancy(self.routeQ[0], 0, self.main_window, trainTrack)
             self.routeQ.pop(0)
-            Block.update_block_occupancy(self.routeQ[0], 1, self.main_window, trainTrack)
+            #train_routes[train_id] = self.routeQ
 
             if(len(self.routeQ) == 1):
                 self.main_window.dispatchTable.removeRow(0)
@@ -1809,7 +2224,7 @@ class Routing:
             print("ROUTE Q")
             print(self.routeQ)
             
-            """ SWITCH CHECK """
+            ########## SWITCH CHECK ##################
             # Check if switch is in next 5 and get its index within the route queue. 
             for i in range(0, 5):
                 if i < len(self.routeQ) and self.routeQ[i] in switches:
@@ -1846,7 +2261,7 @@ class Routing:
                             self.routeQ.insert(switch_index+1, switch[0])
 
 
-            """ OCCUPANCY CHECK """
+            ############## OCCUPANCY CHECK ############
             # determine the index of the occupied block within the routeQ
             for i in range(0, 5):
                 if i < len(self.routeQ) and self.routeQ[i] in global_block_occupancy:
@@ -1923,10 +2338,10 @@ class Routing:
                     )
 
 
-            """ LIGHT CHECK """
+            ############ LIGHT CHECK ##########
             # STILL NEED TO DO THE CODE FOR THIS PART
 
-            """ STATION CHECK """
+            ######### STATION CHECK ############
             if len(self.routeQ) >= 4 and self.stations_to_stop[0] == self.routeQ[3]:
                 suggestedSpeed = (
                     int(0.75 * self.block_info_list[self.routeQ[0]].speedLimit)
@@ -1939,7 +2354,7 @@ class Routing:
                 self.main_window.dispatchTable.setItem(
                     0, 1, QTableWidgetItem(str(blockNum))
                 )
-                Block.update_block_occupancy(blockNum, 1, self.main_window)
+                #Block.update_block_occupancy(blockNum, 1, self.main_window)
 
                 ctcToTrackController.sendSuggestedSpeed.emit(
                     line, wayside, self.routeQ[0], suggestedSpeed
@@ -2081,6 +2496,7 @@ class Routing:
             return "Block number not found"
 
 
+
 class Train:
     red_train_count = 0
     green_train_count = 0
@@ -2109,6 +2525,7 @@ class Train:
         trainNum = trainNum + 1
         self.routeQ = travel
         self.altRouteBool = False
+        train_routes[trainID] = self.routeQ
 
         self.sugg_speed = int(suggested_speed) if suggested_speed else 43.50
 
@@ -2183,27 +2600,34 @@ class Train:
                 else:
                     lineTrack = "red"
                 masterSignals.addTrain.emit(lineTrack, train.train_id)
-
                 next_stop = self.trainStops[0]
                 # Add the train's information to the dispatched trains table
                 row_position = self.main_window.dispatchTable.rowCount()
                 self.main_window.dispatchTable.insertRow(row_position)
-                self.main_window.dispatchTable.setItem(
-                    row_position, 0, QTableWidgetItem(train.train_id)
-                )
-                self.main_window.dispatchTable.setItem(
-                    row_position, 1, QTableWidgetItem("0")
-                )
-                self.main_window.dispatchTable.setItem(
-                    row_position, 2, QTableWidgetItem(next_stop)
-                )
-                self.main_window.dispatchTable.setItem(
-                    row_position, 3, QTableWidgetItem(str(train.sugg_speed))
-                )
-                self.main_window.dispatchTable.setItem(
-                    row_position, 4, QTableWidgetItem(str(train.authority))
-                )
-                Block.update_block_occupancy(0, 1, self.main_window, lineTrack)
+                self.main_window.sendTrain.setEnabled(False)
+                # Create a non-editable QTableWidgetItem for each piece of data
+                train_id_item = QTableWidgetItem(train.train_id)
+                location_item = QTableWidgetItem("0")  # Assuming "0" is the initial location
+                next_stop_item = QTableWidgetItem(next_stop)
+                suggested_speed_item = QTableWidgetItem(str(train.sugg_speed))
+                authority_item = QTableWidgetItem(str(train.authority))
+
+                # Set items as non-editable
+                train_id_item.setFlags(train_id_item.flags() & ~Qt.ItemIsEditable)
+                location_item.setFlags(location_item.flags() & ~Qt.ItemIsEditable)
+                next_stop_item.setFlags(next_stop_item.flags() & ~Qt.ItemIsEditable)
+                suggested_speed_item.setFlags(suggested_speed_item.flags() & ~Qt.ItemIsEditable)
+                authority_item.setFlags(authority_item.flags() & ~Qt.ItemIsEditable)
+
+                # Add items to the table
+                self.main_window.dispatchTable.setItem(row_position, 0, train_id_item)
+                self.main_window.dispatchTable.setItem(row_position, 1, location_item)
+                self.main_window.dispatchTable.setItem(row_position, 2, next_stop_item)
+                self.main_window.dispatchTable.setItem(row_position, 3, suggested_speed_item)
+                self.main_window.dispatchTable.setItem(row_position, 4, authority_item)
+
+            
+                #Block.update_block_occupancy(0, 1, self.main_window, lineTrack)
 
                 if train.trackLine == "Green Line":
                     trainLine = 1
@@ -2262,7 +2686,14 @@ class Block:
 
     @staticmethod
     def update_block_occupancy(block_num, occupancy, main_window, line):
+        print("UPDATING BLOCK OCCUPANCY")
+        print(f'{block_num},{occupancy}')
         global global_block_occupancy
+
+        if global_block_occupancy.get(block_num) == occupancy:
+            # The block occupancy status is unchanged, no need to update the table
+            return
+        
         global_block_occupancy[block_num] = occupancy
         
         Block.updateStatusLabel(main_window)
@@ -2272,21 +2703,42 @@ class Block:
         else:
             line = "Red"
 
+        # Check if block_num is within the valid range (1 to 150)
+        if line == "Green" and not (0 <= block_num <= 150):
+            return
+        elif line == "Red" and not (0 <= block_num <= 76):
+            return
+        
         # Update the occupancy_table
         if occupancy:  # If the block is now occupied
+            # Check if the block is already in the table with the same occupancy
+            for row in range(main_window.occupancy_table.rowCount()):
+                if main_window.occupancy_table.item(row, 0).text() == str(block_num):
+                    # Block already in the table with the same occupancy, do not add it again
+                    return
+                
             # Add the block and line to the table
             row_count = main_window.occupancy_table.rowCount()
             main_window.occupancy_table.insertRow(row_count)
-            main_window.occupancy_table.setItem(row_count, 0, QTableWidgetItem(str(block_num)))
-            main_window.occupancy_table.setItem(row_count, 1, QTableWidgetItem(line))
+
+            # Create non-editable QTableWidgetItem for block number and line
+            block_num_item = QTableWidgetItem(str(block_num))
+            line_item = QTableWidgetItem(line)
+
+            # Set items as non-editable
+            block_num_item.setFlags(block_num_item.flags() & ~Qt.ItemIsEditable)
+            line_item.setFlags(line_item.flags() & ~Qt.ItemIsEditable)
+
+            # Add items to the table
+            main_window.occupancy_table.setItem(row_count, 0, block_num_item)
+            main_window.occupancy_table.setItem(row_count, 1, line_item)
+
         else:  # If the block is no longer occupied
             # Remove the block from the table
             for row in range(main_window.occupancy_table.rowCount()):
                 if main_window.occupancy_table.item(row, 0).text() == str(block_num):
                     main_window.occupancy_table.removeRow(row)
                     break
-
-
 
     def setEnable(self, blockEnable):
         self.enable = blockEnable
@@ -2341,7 +2793,88 @@ class Block:
         status_text = f"<font color='{status_color}'>Status: {block_status}</font>"
         main_window.status_label.setText(status_text)
 
+    @staticmethod
+    def repairBlock(main_window):
+        blockNum = Block.setSelectedBlock(main_window)
+        global global_block_occupancy
 
+        # Check if the block number matches any entry in the first column of dispatchTable
+        for row in range(main_window.dispatchTable.rowCount()):
+            if main_window.dispatchTable.item(row, 1) and \
+               main_window.dispatchTable.item(row, 1).text() == str(blockNum):
+                QMessageBox.warning(main_window, "Error", "Cannot repair the block as it is currently occupied by a train.")
+                return
+    
+        # Check if the block is already unoccupied
+        if not global_block_occupancy.get(blockNum, False):
+            QMessageBox.warning(main_window, "Error", "Cannot repair the block as it is already unoccupied.")
+            return
+        
+        # Set the block as unoccupied or perform the repair action
+        global_block_occupancy[blockNum] = False
+        Block.updateStatusLabel(main_window)
+
+        # Remove the block from the table
+        for row in range(main_window.occupancy_table.rowCount()):
+            if main_window.occupancy_table.item(row, 0).text() == str(blockNum):
+                main_window.occupancy_table.removeRow(row)
+                break
+
+        QMessageBox.information(main_window, "Success", "Block repaired successfully.")
+
+    @staticmethod
+    def closeBlock(main_window):
+        blockNum = Block.setSelectedBlock(main_window)
+        global global_block_occupancy
+
+        if globalSelectLine == "Green Line":
+            line = "Green"
+        elif globalSelectLine == "Red Line":
+            line = "Red"
+
+        # Check if the block number matches any entry in the first column of dispatchTable
+        for row in range(main_window.dispatchTable.rowCount()):
+            if main_window.dispatchTable.item(row, 1) and \
+               main_window.dispatchTable.item(row, 1).text() == str(blockNum):
+                QMessageBox.warning(main_window, "Error", "Cannot close the block as it is currently occupied by a train.")
+                return
+    
+        # Check if the block is already occupied
+        if global_block_occupancy.get(blockNum, True):
+            QMessageBox.warning(main_window, "Error", "Cannot close the block as it is occupied.")
+            return
+        
+        # Set the block as unoccupied or perform the repair action
+        global_block_occupancy[blockNum] = True
+        Block.updateStatusLabel(main_window)
+
+        # Add the block from the table
+        # Check if the block is already in the table
+        for row in range(main_window.occupancy_table.rowCount()):
+            if main_window.occupancy_table.item(row, 0) and \
+               main_window.occupancy_table.item(row, 0).text() == str(blockNum):
+                # Block already in the table, no need to add it again
+                return
+
+        # Add the block to the table
+        row_count = main_window.occupancy_table.rowCount()
+        main_window.occupancy_table.insertRow(row_count)
+
+        # Create QTableWidgetItem for block number and line
+        block_num_item = QTableWidgetItem(str(blockNum))
+        line_item = QTableWidgetItem(line)
+
+        # Optionally, set items as non-editable if needed
+        block_num_item.setFlags(block_num_item.flags() & ~Qt.ItemIsEditable)
+        line_item.setFlags(line_item.flags() & ~Qt.ItemIsEditable)
+
+        # Add items to the table
+        main_window.occupancy_table.setItem(row_count, 0, block_num_item)
+        main_window.occupancy_table.setItem(row_count, 1, line_item)
+
+        QMessageBox.information(main_window, "Success", "Block closed successfully.")
+
+            
     @staticmethod
     def getBlockStatus(block):
         # Assuming occupancy is a boolean, you can adjust the return value based on your requirements
@@ -2350,6 +2883,10 @@ class Block:
     @staticmethod
     def setSelectedBlock(main_window):
         selected_block = main_window.blockDropDown.currentText()
-        return selected_block
 
-
+        # Check if the "Select a Block" placeholder is selected
+        if selected_block == "Select Block":
+            return None
+        else:
+            return int(selected_block) 
+        

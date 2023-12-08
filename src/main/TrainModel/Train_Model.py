@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QCheckBox,
 )
-from line_profiler import LineProfiler
+#from line_profiler import LineProfiler
 from numpy import block
 from qtwidgets import AnimatedToggle
 from TrainModel_Functions import *
