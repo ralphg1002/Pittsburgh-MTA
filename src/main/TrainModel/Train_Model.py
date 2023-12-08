@@ -345,7 +345,7 @@ class TrainModel(QMainWindow):
             self.functionsInstance.TrainModelCalculations(trainObject)
             self.functionsInstance.temperature(trainObject)
             self.functionsInstance.beacon(trainObject)
-            trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["speed_limit"])
+            trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], int(trainObject.vehicle_status["speed_limit"]))
             trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["current_speed"])
             trainModelToTrainController.sendCommandedSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["commanded_speed"])
             trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"], trainObject.navigation_status["authority"])

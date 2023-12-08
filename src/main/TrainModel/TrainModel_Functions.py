@@ -6,7 +6,7 @@ import re
 class TrainModelAttributes:
     def __init__(self, trainID):
         self.vehicle_status = {"speed_limit": 0,
-                               "current_speed": 0,
+                               "current_speed": 0.0,
                                "setpoint_speed": 0,
                                "commanded_speed": 0,
                                "acceleration": 0,
