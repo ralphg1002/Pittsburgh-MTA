@@ -1,143 +1,84 @@
 # Importing Libraries
+from decimal import DivisionByZero
 import sys
 import math
 import re
+
+from sklearn.model_selection import train_test_split
 
 
 class Calculations:
     def __init__(self):
         placeholder = True
 
-    # Sets the power of the train through the train controller
-    def power(self, trainObject):
-        # Ensure that power does not exceed 120
-        trainObject.vehicle_status["power"] /= 1000
-        currPower = min(trainObject.vehicle_status["power"], 120)
+    def TrainModelCalculations(self, trainObject):
+        self.updateMass(trainObject)
+        self.checkFailureModes(trainObject)
+        self.calculateAccelerationSum(trainObject)
+        self.calculateEngineForce(trainObject)
+        self.calculateSlopeForce(trainObject)
+        self.calculateFrictionForce(trainObject)
+        self.calculateNetForce(trainObject)
+        self.calculateAcceleration(trainObject)
+        self.calculateCurrentSpeed(trainObject)
+        self.updatePosition(trainObject)
 
-        # Update the "vehicle_status" of "Train 1" in self.trains
-        trainObject.vehicle_status["power"] = currPower
+    def updateMass(self, trainObject):
+        trainObject.calculations["mass"] = trainObject.calculations["empty_mass"] + (trainObject.passenger_status["passengers"] * 150)
+        if trainObject.calculations["mass"] >= trainObject.calculations["full_mass"]:
+            trainObject.calculations["mass"] = trainObject.calculations["full_mass"]
 
-        # Calculate current_speed using the updated power
-        self.current_speed(trainObject, currPower)
+    def checkFailureModes(self, trainObject):
+        if trainObject.failure_status["signal_pickup_failure"]:
+            trainObject.navigation_status["beacon"] = ""
 
-    def current_speed(self, trainObject, currPower):
-        # Retrieve necessary values from self.trains
-        lastVelocity = trainObject.calculations["lastVelocity"]
-        mass = trainObject.calculations["mass"]
+    def calculateAccelerationSum(self, trainObject):
+        trainObject.calculations["lastAcceleration"] = trainObject.calculations["currAcceleration"]
 
-        if lastVelocity == 0:
-            lastVelocity = 0.001
+    def calculateEngineForce(self, trainObject):
+        try:
+            trainObject.calculations["currEngineForce"] = abs(trainObject.vehicle_status["power"] / trainObject.vehicle_status["current_speed"])
+        except ZeroDivisionError:
+            if trainObject.vehicle_status["power"] > 0:
+                trainObject.vehicle_status["current_speed"] = 0.01
 
-        currForce = currPower / lastVelocity
+    def calculateSlopeForce(self, trainObject):
+        trainObject.calculations["currAngle"] = math.atan(trainObject.navigation_status["block_grade"] / 100)
+        trainObject.calculations["slopeForce"] = trainObject.calculations["mass"] * 0.98 * math.sin(trainObject.calculations["currAngle"])
 
-        # Set calculated force and apply force limit
-        trainObject.calculations["currForce"] = currForce
+    def calculateFrictionForce(self, trainObject):
+        trainObject.calculations["frictionForce"] = 1000
 
-        self.limit_force(trainObject)
+    def calculateNetForce(self, trainObject):
+        try:
+            trainObject.calculations["totalForce"] = trainObject.calculations["currEngineForce"] - trainObject.calculations["slopeForce"] - trainObject.calculations["brakeForce"] - trainObject.calculations["frictionForce"]
+            if trainObject.vehicle_status["current_speed"] != 0:
+                if trainObject.calculations["totalForce"] > (120 / 1000) / trainObject.vehicle_status["current_speed"]:
+                    trainObject.calculations["totalForce"] = (120 / 1000) / trainObject.vehicle_status["current_speed"]
+        except ZeroDivisionError:
+            # Handle division by zero here, if necessary
+            pass
 
-        # Calculate acceleration from force and set it, applying acceleration limit
-        trainObject.calculations["currAcceleration"] = (
-            trainObject.calculations["currForce"] / mass
-        )
-        self.limit_acceleration(trainObject)
+    def calculateAcceleration(self, trainObject):
+        trainObject.calculations["currAcceleration"] = trainObject.calculations["totalForce"] / trainObject.calculations["mass"]
 
-        # Calculate velocity using the velocity function and set it
-        self.velocity(trainObject)
+    def calculateCurrentSpeed(self, trainObject):
+        if trainObject.vehicle_status["power"] <= 120 / 1000:
+            trainObject.vehicle_status["current_speed"] = trainObject.vehicle_status["current_speed"] + (trainObject.calculations["timeInterval"] * 0.001 / 2) * (trainObject.calculations["currAcceleration"] + trainObject.calculations["lastAcceleration"])
 
-        # Calculate the distance traveled and set it
-        self.total_distance(trainObject)
+        if trainObject.vehicle_status["current_speed"] < 0:
+            trainObject.vehicle_status["current_speed"] = 0
 
-    def limit_force(self, trainObject):
-        # Retrieve necessary values from self.trains
-        emergency_brake = trainObject.failure_status["emergency_brake"]
-        mass = trainObject.calculations["mass"]
-        force = trainObject.calculations["currForce"]
-        power = trainObject.vehicle_status["power"]
-        lastVelocity = trainObject.calculations["lastVelocity"]
+        if trainObject.vehicle_status["current_speed"] > 43.49598:
+            trainObject.vehicle_status["current_speed"] = 43.49598
 
-        # Limit the force of the train
-        if force > (mass * 0.5):
-            force = mass * 0.5
-        elif (power == 0 and lastVelocity == 0) or emergency_brake:
-            force = 0
-        elif lastVelocity == 0:
-            force = mass * 0.5
+        if trainObject.vehicle_status["current_speed"] > trainObject.vehicle_status["speed_limit"]:
+            trainObject.vehicle_status["current_speed"] = trainObject.vehicle_status["speed_limit"]
 
-        # Set the limited force value
-        trainObject.calculations["currForce"] = force
-
-    def limit_acceleration(self, trainObject):
-        # Retrieve necessary values from self.trains
-        failure_1 = trainObject.failure_status["engine_failure"]
-        failure_2 = trainObject.failure_status["signal_pickup_failure"]
-        failure_3 = trainObject.failure_status["brake_failure"]
-        brakes = trainObject.vehicle_status["brakes"]
-        emergency_brake = trainObject.failure_status["emergency_brake"]
-        force = trainObject.calculations["currForce"]
-        mass = trainObject.calculations["mass"]
-        power = trainObject.vehicle_status["power"]
-        currVelocity = trainObject.calculations["currVelocity"]
-
-        # Limit the acceleration of the train based on various conditions
-        if (failure_1 or failure_2 or failure_3) and (brakes or emergency_brake):
-            acceleration = (force - (0.01 * mass * 9.8)) / mass
-        elif power == 0 and currVelocity > 0:
-            if emergency_brake:
-                acceleration = -2.73
-            else:
-                acceleration = -1.2
-        elif power != 0:
-            if force > 0.5:
-                acceleration = 0.5
-            else:
-                acceleration = force / mass
-        else:
-            acceleration = 0
-
-        # Set the limited acceleration value
-        trainObject.calculations["currAcceleration"] = acceleration
-
-    def velocity(self, trainObject):
-        # Retrieve necessary values from self.trains
-        brake = trainObject.vehicle_status["brakes"]
-        emergency_brake = trainObject.failure_status["emergency_brake"]
-        last_acceleration = trainObject.calculations["lastAcceleration"]
-        curr_acceleration = trainObject.calculations["currAcceleration"]
-        last_velocity = trainObject.calculations["lastVelocity"]
-
-        # Calculate the total acceleration and update velocity
-        total_acceleration = last_acceleration + curr_acceleration
-        velocity = (
-            last_velocity
-            + (trainObject.calculations["timeInterval"] / 2) * total_acceleration
-        )
-
-        # Limit velocity so that it doesn't go below 0
-        if velocity < 0:
-            velocity = 0
-
-        # If the train is stopped and brakes or emergency brake are applied, set velocity to 0
-        if last_velocity <= 0 and (brake or emergency_brake):
-            velocity = 0
-
-        # Set the calculated velocity value
-        trainObject.calculations["currVelocity"] = velocity
-
-    def total_distance(self, trainObject):
-        # Retrieve necessary values from self.trains
-        curr_velocity = trainObject.calculations["currVelocity"]
-        last_position = trainObject.calculations["lastPosition"]
-
-        # Update total_velocity using the current velocity (consider whether this is necessary)
-        total_velocity = curr_velocity
-
-        # Correct the distance calculation (multiply, not divide)
-        distance = (
-            last_position
-            + (trainObject.calculations["timeInterval"] * 2) * total_velocity
-        )
-
-        trainObject.calculations["distance"] = distance
+    def updatePosition(self, trainObject):
+        # self.distanceFromYard += self.currentSpeed * (trainObject.calculations["timeInterval"] * 0.001)
+        # self.distanceFromBlockStart += self.currentSpeed * (trainObject.calculations["timeInterval"] * 0.001)
+        trainObject.calculations["distance"] += trainObject.vehicle_status["current_speed"] * (trainObject.calculations["timeInterval"] * 0.001)
 
     def blockID(
         self,
