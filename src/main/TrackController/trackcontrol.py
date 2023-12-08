@@ -472,10 +472,13 @@ class Wayside:
                     entry = [entry]  # Convert single integer to a list
 
                 # print("Wayside Number: ", self.waysideNum)
+                #print(self.line, self.waysideNum, condition, entry, exitRange)
 
                 if entry != 0:
                     # check for validity of conditon 1
                     for block in entry:
+                        if (self.get_block(block) == None):
+                            print(block)
                         if self.get_block(block).get_occupancystate() == True:
                             condition1 = True
                             break
@@ -490,6 +493,8 @@ class Wayside:
                             condition2 = True
                             break
 
+                        if (self.get_block(block) == None):
+                            print(block)
                         elif self.get_block(block).get_occupancystate() == True:
                             condition2 = True
                             break
@@ -639,8 +644,8 @@ class Wayside:
                     notExist = False
                     break
                 elif pattern == "patternEntryReverseRangeAndExitReverseRange":
-                    entry = list(range(int(match.group(2)), int(match.group(1)) + 1))
-                    exit = list(range(int(match.group(4)), int(match.group(3)) + 1))
+                    entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
                     notExist = False
                     break
                 elif pattern == "patternEntryAndNotExitRange":
@@ -713,8 +718,6 @@ class Wayside:
 
     def get_occupied_blocks(self):
         occupiedBlocks = []
-        if self.waysideNum == 2:
-            print("Block State: ", self.get_block(0).get_occupancystate())
         for block in self.blocks:
             if block.get_occupancystate() == True:
                 occupiedBlocks.append(block)
@@ -753,7 +756,7 @@ class TrackControl(QMainWindow):
         switchDict = {"SW1": 13, "SW2": 29}
         self.wayside1G.switches_init(switchDict)
         self.wayside2G = Wayside(2, 1)
-        switchDict = {"SW3": 57, "SW4": 62, "SW5": 77, "SW6": 85}
+        switchDict = {"SW3": 57, "SW4": 63, "SW5": 77, "SW6": 85}
         self.wayside2G.switches_init(switchDict)
         self.greenLine.add_wayside(self.wayside1G)
         self.greenLine.add_wayside(self.wayside2G)
@@ -901,12 +904,14 @@ class TrackControl(QMainWindow):
         # Load the default plc programs for all wayside controllers
         self.wayside1G.run_plc("src/main/TrackController/plc_green.txt")
         self.wayside2G.run_plc("src/main/TrackController/plc_green.txt")
-        # self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
-        # self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
+        self.wayside1R.run_plc("src/main/TrackController/plc_red.txt")
+        self.wayside2R.run_plc("src/main/TrackController/plc_red.txt")
 
         """ REFRESH THE PLCS FOR EACH WAYSIDE ON THE TIME INTERVAL """
         self.ui.timer.timeout.connect(lambda: self.wayside1G.refresh_plc())
         self.ui.timer.timeout.connect(lambda: self.wayside2G.refresh_plc())
+        self.ui.timer.timeout.connect(lambda: self.wayside1R.refresh_plc())
+        self.ui.timer.timeout.connect(lambda: self.wayside2R.refresh_plc())
         
        
         """ Connect handlers for GUI actions """
@@ -1466,106 +1471,116 @@ class TrackControl(QMainWindow):
                 print("Enter a valid block number for the green line (0-150)")
                 print("You entered: ", blockNum)
                 return
-
             # call the block
             block = self.wayside1G.get_block(blockNum)
             waysideNum = 1
             if block == None:
                 block = self.wayside2G.get_block(blockNum)
                 waysideNum = 2
-
-            # set switch state
-            if action == 1:
-                if state == "true" or state == "True" or state == "1":
-                    finalState = True
-                elif state == "false" or state == "False" or state == "0":
-                    finalState = False
-                else:
-                    print("This is not a valid input for the state. (True/False)")
-                    return
-
-                try:
-                    block.set_switchstate(finalState)
-                except Exception as e:
-                    print(
-                        "This action cannot be performed on a block of type: ",
-                        block.get_type(),
-                    )
-                else:
-                    self.set_switchstate_handler(line, waysideNum, blockNum, finalState)
-
-            # Set Crossing State
-            elif action == 2:
-                pass
-            # Set Light State
-            elif action == 3:
-                pass
-            # Set Maintenance State
-            elif action == 4:
-                pass
-            # Set Occupancy State
-            elif action == 5:
-                if state == "true" or state == "True" or state == "1":
-                    finalState = True
-                elif state == "false" or state == "False" or state == "0":
-                    finalState = False
-                else:
-                    print("This is not a valid input for the state. (True/False)")
-                    return
-
-                try:
-                    block.set_occupancystate(finalState)
-                except Exception as e:
-                    print("This action cannot be performed on a block of type: ", None)
-                else:
-                    self.set_occupancystate_handler(
-                        line, waysideNum, blockNum, finalState
-                    )
-                    #trackModelToTrackController.occupancyState.emit(line, waysideNum, blockNum, state)
-
-            # Set Authority
-            elif action == 6:
-                if state == "true" or state == "True" or state == "1":
-                    finalState = 1
-                elif state == "false" or state == "False" or state == "0":
-                    finalState = 0
-                else:
-                    print(
-                        "This is not a valid input for the state. (True/False or 1/0)"
-                    )
-                    return
-
-                try:
-                    block.set_authority(finalState)
-                except Exception as e:
-                    print("This action cannot be performed on a block of type: ", None)
-                else:
-                    self.handle_authority(line, waysideNum, blockNum, finalState)
-
-            # Set Suggested Speed
-            elif action == 7:
-                finalState = float(state)
-                if finalState < 0 or finalState > block.get_speed():
-                    print(
-                        "This is not a valid input for the state. (Must range from 0 to block.get_speed)"
-                    )
-                    return
-
-                try:
-                    block.set_suggestedspeed(finalState)
-                except Exception as e:
-                    print("This action cannot be performed on a block of type: ", None)
-                else:
-                    self.handle_suggested_speed(line, waysideNum, blockNum, finalState)
-
-            # Set Direction
-            elif action == 8:
-                pass
-
+        
+        # red line selected
         elif line == 2:
-            if not (blockNum >= 0 and blockNum <= 75):
+            if not (int(blockNum) >= 0 and int(blockNum) <= 75):
                 print("Enter a valid block number for the red line (0-75)")
                 return
+            # call the block
+            block = self.wayside1R.get_block(blockNum)
+            waysideNum = 1
+            if block == None:
+                block = self.wayside2R.get_block(blockNum)
+                waysideNum = 2
+
+        
+
+        # set switch state
+        if action == 1:
+            if state == "true" or state == "True" or state == "1":
+                finalState = True
+            elif state == "false" or state == "False" or state == "0":
+                finalState = False
+            else:
+                print("This is not a valid input for the state. (True/False)")
+                return
+
+            try:
+                block.set_switchstate(finalState)
+            except Exception as e:
+                print(
+                    "This action cannot be performed on a block of type: ",
+                    block.get_type(),
+                )
+            else:
+                self.set_switchstate_handler(line, waysideNum, blockNum, finalState)
+
+        # Set Crossing State
+        elif action == 2:
+            pass
+        # Set Light State
+        elif action == 3:
+            pass
+        # Set Maintenance State
+        elif action == 4:
+            pass
+        # Set Occupancy State
+        elif action == 5:
+            if state == "true" or state == "True" or state == "1":
+                finalState = True
+            elif state == "false" or state == "False" or state == "0":
+                finalState = False
+            else:
+                print("This is not a valid input for the state. (True/False)")
+                return
+
+            try:
+                block.set_occupancystate(finalState)
+            except Exception as e:
+                print("This action cannot be performed on a block of type: ", None)
+            else:
+                self.set_occupancystate_handler(
+                    line, waysideNum, blockNum, finalState
+                )
+                #trackModelToTrackController.occupancyState.emit(line, waysideNum, blockNum, state)
+
+        # Set Authority
+        elif action == 6:
+            if state == "true" or state == "True" or state == "1":
+                finalState = 1
+            elif state == "false" or state == "False" or state == "0":
+                finalState = 0
+            else:
+                print(
+                    "This is not a valid input for the state. (True/False or 1/0)"
+                )
+                return
+
+            try:
+                block.set_authority(finalState)
+            except Exception as e:
+                print("This action cannot be performed on a block of type: ", None)
+            else:
+                self.handle_authority(line, waysideNum, blockNum, finalState)
+
+        # Set Suggested Speed
+        elif action == 7:
+            finalState = float(state)
+            if finalState < 0 or finalState > block.get_speed():
+                print(
+                    "This is not a valid input for the state. (Must range from 0 to block.get_speed)"
+                )
+                return
+
+            try:
+                block.set_suggestedspeed(finalState)
+            except Exception as e:
+                print("This action cannot be performed on a block of type: ", None)
+            else:
+                self.handle_suggested_speed(line, waysideNum, blockNum, finalState)
+
+        # Set Direction
+        elif action == 8:
+            pass
+
+        
 
 
 """

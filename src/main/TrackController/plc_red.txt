@@ -1,136 +1,117 @@
-CRX:
-IF
-    Condition: (14->24)
-    Operation: CROSS(1)
-    end
-IF
-    Condition: (14<-24)
-    Operation: CROSS(1)
-    end
-END
-
 SW1:
 IF
-    Condition: 0 AND NOT(1->9)
+    Condition: (16<-27)
+    Operation: SWITCH(0)
+    Operation: 0 R
+    Operation: 9 G
+    Operation: 1 G
+    Operation: 16 G
+    end
+IF
+    Condition: (1->9)
+    Operation: SWITCH(0)
+    Operation: 0 R
+    Operation: 9 G
+    Operation: 1 G
+    Operation: 16 G
+    end
+IF
+    Condition: 0
     Operation: SWITCH(1)
     Operation: 0 G
-    Operation: 9 R
-    Operation: 10 R
+    Operation: 9 G
+    Operation: 1 G
+    Operation: 16 G
+    Operation: 76 G
     end
 END
 
 SW2:
 IF
-    Condition: (27->16) AND NOT(9->1)
-    Operation: SWITCH(1)
-    Operation: 1 R
-    Operation: 15 R
-    Operation: 16 G
-    end
-IF  
-    Condition: (32->28) AND (9->1)
+    Condition: (1<-9) 
     Operation: SWITCH(1)
     Operation: 1 G
-    Operation: 15 R
-    Operation: 16 R
-    Operation: 28 R
+    Operation: 76 R
+    Operation: 16 G
     end
 END
 
 SW3:
 IF
-    Condition: (22->27) AND (33->28)
-    Operation: SWITCH(1)
-    Operation: 27 G
-    Operation: 28 R
-    Operation: 76 R
-    end
-IF
-    Condition: (33->28) AND (9->1)
-    Operation: SWITCH(1)
-    Operation: 27 G
-    Operation: 28 R
-    Operation: 76 R
-    end
-IF
-    Condition: (71->76) AND (9->1)
+    Condition: (16->27)
     Operation: SWITCH(0)
     Operation: 27 G
-    Operation: 28 R
     Operation: 76 R
     end
 IF
-    Condition: (71->76) AND NOT(16->27)
+    Condition: (1<-9)
+    Operation: SWITCH(0)
+    Operation: 27 G
+    Operation: 76 R
+    end
+IF
+    Condition: (72->76)
     Operation: SWITCH(1)
-    Operation: 27 R
-    Operation: 28 R
+    Operation: 0 R
     Operation: 76 G
     end
 END
 
 SW4:
 IF
-    Condition: (57->62)
-    Operation: SWITCH(0)
-    Operation: 62 G
-    Operation: 63 R
-    Operation: 0 R
-    end
-IF
-    Condition: 0 AND NOT(57->64)
+    Condition: (33<-38)
     Operation: SWITCH(1)
-    Operation: 62 R
-    Operation: 63 R
-    Operation: 0 G
+    Operation: 33 G
+    Operation: 32 R
     end
 IF
-    Condition: (57->64)
+    Condition: (28->32)
     Operation: SWITCH(0)
-    Operation: 62 G
-    Operation: 63 R
-    Operation: 0 R
+    Operation: 32 G
     end
 END
 
 SW5:
 IF
-    Condition: (71->76) AND NOT(77<-85)
+    Condition: (33->38)
     Operation: SWITCH(0)
-    Operation: 76 G
-    Operation: 77 R
-    Operation: 101 R
+    Operation: 38 G
+    Operation: 71 R
     end
 IF
-    Condition: (77<-85)
+    Condition: (67->71)
     Operation: SWITCH(1)
-    Operation: 76 R
-    Operation: 77 G
-    Operation: 101 R
+    Operation: 33 R
+    Operation: 71 G
     end
 END
 
 SW6:
 IF
-    Condition: (80->85)
-    Operation: SWITCH(0)
-    Operation: 85 G
-    Operation: 86 R
-    Operation: 100 R
-    end
-IF
-    Condition: (95->100) AND NOT(77->85)
+    Condition: (44<-52)
     Operation: SWITCH(1)
-    Operation: 85 R
-    Operation: 86 R
-    Operation: 100 G
+    Operation: 43 R
+    Operation: 44 G
     end
 IF
-    Condition: (95->100) AND (77->85)
+    Condition: (39->43)
     Operation: SWITCH(0)
-    Operation: 85 G
-    Operation: 86 R
-    Operation: 100 R
+    Operation: 43 G
+    Operation: 66 R
     end
 END
 
-
+SW7:
+IF
+    Condition: (44->52)
+    Operation: SWITCH(0)
+    Operation: 52 G
+    Operation: 66 R
+    end
+IF
+    Condition: (61->66)
+    Operation: SWITCH(1)
+    Operation: 43 R
+    Operation: 66 G
+    end
+END
