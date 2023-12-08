@@ -1130,10 +1130,10 @@ class Scheduler:
         print("SELECTED LINE IS")
         print(selected_line)
         print(globalSelectLine)
-        """self.routing = Routing(
+        self.routing = Routing(
                "src/main/CTC/GreenLine.csv", self.main_window
-        ) """ 
-        if globalSelectLine == "Green Line":
+        ) 
+        """if globalSelectLine == "Green Line":
             print("GREEN ROUTING")
             self.routing = Routing(
                 "src/main/CTC/GreenLine.csv", self.main_window
@@ -1142,7 +1142,7 @@ class Scheduler:
             print("RED ROUTING")
             self.routing = Routing(
                 "src/main/CTC/RedLine.csv", self.main_window
-            )
+            )"""
 
         self.trainID = None
 
@@ -1614,7 +1614,7 @@ class Routing:
         # self.scheduler_class = Scheduler(main_window)
         self.temp_routes = []  # temp dict
         trackControllerToCTC.occupancyState.connect(self.checkPosition)
-        trackControllerToCTC.occupancyState.connect(self.handleBlockOccupancy)
+        trackControllerToCTC.occupancyState.connect(lambda line, blockNum, state: self.handleBlockOccupancy(line,blockNum,state))
 
     def handleBlockOccupancy(self, line, blockNum, state):
         Block.update_block_occupancy(blockNum, state, self.main_window, line)
