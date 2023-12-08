@@ -25,11 +25,11 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QCheckBox,
 )
-from line_profiler import LineProfiler
+# from line_profiler import LineProfiler
 from numpy import block
 from qtwidgets import AnimatedToggle
-from TrainModel_Functions import *
-from TrainModel_Calculations import *
+from .TrainModel_Functions import *
+from .TrainModel_Calculations import *
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 main_path = os.path.join(current_path, "../../main")
@@ -309,7 +309,7 @@ class TrainModel(QMainWindow):
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
-        masterSignals.addTrain.emit("green", "train1")
+        # masterSignals.addTrain.emit("green", "train1")
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
         masterSignals.addTrain.connect(self.signal_addTrain)
