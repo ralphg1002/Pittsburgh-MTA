@@ -76,6 +76,9 @@ class TrainControllerUI(QMainWindow):
             "number": "",
             "trainList": [],
             "customAnnouncement": "",
+            "prevLine": "",
+            "redLine": [],
+            "greenLine": []
         }
 
         super().__init__()
@@ -405,6 +408,7 @@ class TrainControllerUI(QMainWindow):
         self.kpLabel.move(self.kpLabel.x(), self.kpLabel.y() + 10)
 
         self.kpEdit = QSpinBox(self)
+        self.kpEdit.setRange(0, 1000000)
         self.kpEdit.setValue(1)
         self.kpEdit.setFont(QFont(self.fontStyle, self.textFontSize))
         self.set_relative_right(self.kpEdit, self.kpLabel, 20)
@@ -415,6 +419,7 @@ class TrainControllerUI(QMainWindow):
         self.set_relative_below(self.kiLabel, self.kpLabel, 20)
 
         self.kiEdit = QSpinBox(self)
+        self.kiEdit.setRange(0, 1000000)
         self.kiEdit.setValue(1)
         self.kiEdit.setFont(QFont(self.fontStyle, self.textFontSize))
         self.set_relative_right(self.kiEdit, self.kiLabel, 20)
@@ -964,21 +969,36 @@ class TrainControllerUI(QMainWindow):
                 self.tcVariables["trainList"].append(train)
 
         blockDict = []
+        if self.trainLineCombo.currentText() != self.tcVariables["prevLine"]:
+            self.trainNumberCombo.clear()
+            self.tcVariables["redLine"].clear()
+            self.tcVariables["greenLine"].clear()
+
         if self.trainLineCombo.currentText() == "red":
             blockDict = self.tcFunctions.redBlockDict
-            self.trainNumberCombo.clear()
-
             for train in self.tcVariables["trainList"]:
                 if isinstance(train, dict) and "red" in train:
-                    self.trainNumberCombo.addItem(train["red"])
+                    nameChecker = True
+                    for name in self.tcVariables["redLine"]:
+                        if train["red"] == name:
+                            nameChecker = False
+                    if nameChecker:
+                        self.tcVariables["redLine"].append(train["red"])
+                        self.trainNumberCombo.addItem(train["red"])
 
         if self.trainLineCombo.currentText() == "green":
             blockDict = self.tcFunctions.greenBlockDict
-            self.trainNumberCombo.clear()
-
             for train in self.tcVariables["trainList"]:
                 if isinstance(train, dict) and "green" in train:
-                    self.trainNumberCombo.addItem(train["green"])
+                    nameChecker = True
+                    for name in self.tcVariables["greenLine"]:
+                        if train["green"] == name:
+                            nameChecker = False
+                    if nameChecker:
+                        self.tcVariables["greenLine"].append(train["green"])
+                        self.trainNumberCombo.addItem(train["green"])
+
+        self.tcVariables["prevLine"] = self.trainLineCombo.currentText()
 
         updatedTrainList = []
         for train in self.tcVariables["trainList"]:
@@ -1244,7 +1264,13 @@ class TrainControllerUI(QMainWindow):
                 self.authorityVal.setAlignment(Qt.AlignCenter)
 
                 # setpoint speed range
+                if train.get_speedLimit() > 70:
+                    train.speedLimit = 70
+                if train.get_speedLimit() < 0:
+                    train.speedLimit = 0
                 self.setpointSpeedValue.setRange(0, train.get_speedLimit())
+                if train.safetyLimit < 0:
+                    train.safetyLimit = 0
                 if train.safetyLimit < train.get_speedLimit():
                     self.setpointSpeedValue.setRange(0, train.safetyLimit)
 

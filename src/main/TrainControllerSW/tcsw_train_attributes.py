@@ -66,7 +66,6 @@ class Train:
         self.piVariables = {
             "powerLimit": 120000,
             "uk": 0,
-            "prevError": 0,
             "ek": 0,
             "samplePeriod": 1,
         }
