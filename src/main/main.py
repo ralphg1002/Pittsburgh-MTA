@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         self.trainControllerSW = TrainControllerUI()
         trackModel = TrackModel()
         ctc = CTCWindow()
-        trainModel = TrainModel()
+        #trainModel = TrainModel()
         
 
         # setting title
@@ -100,7 +100,7 @@ class MainWindow(QMainWindow):
         self.box2 = QPushButton("Train Model", self)
         self.box_button(self.box2, self.box1.width(), self.box1.height())
         self.set_relative_right(self.box2, self.box1, 20)
-        self.box2.clicked.connect(lambda: trainModel.show_gui())
+        #self.box2.clicked.connect(lambda: trainModel.show_gui())
 
         self.box3 = QPushButton("CTC", self)
         self.box_button(self.box3, self.box1.width(), self.box1.height())
