@@ -387,7 +387,7 @@ class TrainModel(QMainWindow):
 
     def signal_beacon(self, beaconDict):
         for trainObject in self.trainsList:
-            if trainObject.calulations["currStation"] == trainObject.navigation_status["next_station"]:
+            if trainObject.calculations["currStation"] == trainObject.navigation_status["next_station"]:
                 # The train is at a station, request passengers
                 trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.
                                                                   calculations["currStation"], trainObject.passenger_status["passengers"])
