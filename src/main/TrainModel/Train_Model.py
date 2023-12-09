@@ -362,29 +362,39 @@ class TrainModel(QMainWindow):
             trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
             trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
             trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])            
+            
             if trainObject.calculations["initialized"]:
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
                 trainObject.calculations["initialized"] = False
+            
             if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"]:
-                trainObject.calculations["back_length"] = trainObject.calculations["distance"] - trainObject.calculations["length"]
+                # trainObject.calculations["back_length"] = trainObject.calculations["distance"] - trainObject.calculations["length"]
                 trainObject.calculations["distance"] = 0
                 trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
-                if trainObject.calculations["back_length"] >= trainObject.navigation_status["block_length"]:
+            
+            if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"] - trainObject.calculations["length"]:
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], -1, trainObject.calculations["prevBlock"])
+                
+                # if trainObject.calculations["back_length"] >= trainObject.navigation_status["block_length"]:
                     # Reset distance for the back of the train
-                    trainObject.calculations["back_length"] = 0
-                    trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+                    # trainObject.calculations["back_length"] = 0
+                    # trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+            
             trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
             trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
 
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
-            trainObject.calculations["nextBlock"] = nextBlock
-            trainObject.navigation_status["block_length"] = blockLength
-            trainObject.navigation_status["block_grade"] = blockGrade
-            trainObject.vehicle_status["speed_limit"] = speedLimit
-            trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
-            trainObject.navigation_status["authority"] = authority
+            if trainObject.calculations["currBlock"] == nextBlock:
+                trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
+                trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]                
+                trainObject.calculations["nextBlock"] = nextBlock
+                trainObject.navigation_status["block_length"] = blockLength
+                trainObject.navigation_status["block_grade"] = blockGrade
+                trainObject.vehicle_status["speed_limit"] = speedLimit
+                trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
+                trainObject.navigation_status["authority"] = authority
         return
 
     def signal_beacon(self, beaconDict):
