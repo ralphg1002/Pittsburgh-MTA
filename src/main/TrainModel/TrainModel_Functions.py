@@ -53,7 +53,7 @@ class TrainModelAttributes:
                             "currAngle": 0,
                             "slopeForce": 0,
                             "frictionForce": 0,
-                            "brakeForce": 1.2,
+                            "brakeForce": 0,
                             "totalForce": 0,
                             "currBlock": 999,
                             "prevBlock": 999,
