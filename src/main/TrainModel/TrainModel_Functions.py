@@ -39,10 +39,10 @@ class TrainModelAttributes:
                                  "passenger_emergency_brake": False}
         
         self.calculations = {"cars": 5,
-                            "empty_mass": 81800,
-                            "full_mass": 113400,
+                            "empty_mass": 37103.86,
+                            "full_mass": 51437.37,
                             "mass": 0,
-                            "length": 5 * 105.6,
+                            "length": 32.2,
                             "back_length": 0,
                             "currVelocity": 0,
                             "currEngineForce": 0,
