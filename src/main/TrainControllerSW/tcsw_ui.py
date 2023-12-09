@@ -1342,6 +1342,12 @@ class TrainControllerUI(QMainWindow):
 
             # test emit
             trainControllerSWToTrainModel.sendPower.connect(self.test_display)
+            print(f'{"suggspd"},{train.commandedSpeed}')
+            print(f'{"power"},{train.powerCommand}')
+            print(f'{"speedlim"},{train.speedLimit}')
+            print(f'{"currSpeed"},{train.currentSpeed}')
+
+
 
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
