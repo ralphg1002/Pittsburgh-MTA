@@ -1104,8 +1104,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for passengers
         self.word_label_passengers = QLabel(
             "Passengers: {}".format(self.trainsList[0].passenger_status["passengers"]),
-            self.passenger_white_background_label
-            
+            self.passenger_white_background_label            
         )
         self.word_label_passengers.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1660,10 +1659,10 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_passengers.setText(
-                "Power Limit: {} kW".format(trainObject.vehicle_status["power_limit"])
+                "Passengers: {}".format(trainObject.passenger_status["passengers"])
             )
 
-            self.word_label_power_limit.setText(
+            self.word_label_passenger_limit.setText(
                 "Passenger Limit: {}".format(trainObject.passenger_status["passenger_limit"])
             )
 
