@@ -248,12 +248,12 @@ class TestbenchWindow:
         self.occupancyCurrentBlock.setGeometry(720, 100, 50, 30)
         self.occupancyCurrentBlock.setStyleSheet("background-color: white")
 
-        nextBlockLabel = QLabel("Next Block:", self.testbench)
-        nextBlockLabel.setGeometry(780, 100, 100, 30)
-        nextBlockLabel.setStyleSheet("font-weight: bold")
-        self.occupancyNextBlock = QLineEdit(self.testbench)
-        self.occupancyNextBlock.setGeometry(860, 100, 50, 30)
-        self.occupancyNextBlock.setStyleSheet("background-color: white")
+        prevBlockLabel = QLabel("Prev Block:", self.testbench)
+        prevBlockLabel.setGeometry(780, 100, 100, 30)
+        prevBlockLabel.setStyleSheet("font-weight: bold")
+        self.occupancyPrevBlock = QLineEdit(self.testbench)
+        self.occupancyPrevBlock.setGeometry(860, 100, 50, 30)
+        self.occupancyPrevBlock.setStyleSheet("background-color: white")
 
         # self.lineInput.addItem("Green")
         # self.lineInput.addItem("Red")
@@ -272,8 +272,8 @@ class TestbenchWindow:
             cur = int(self.occupancyCurrentBlock.text())
         else:
             cur = ""
-        next = int(self.occupancyNextBlock.text())
-        trainModelToTrackModel.sendPolarity.emit(line, next, cur)
+        prev = int(self.occupancyPrevBlock.text())
+        trainModelToTrackModel.sendPolarity.emit(line, cur, prev)
 
     def add_passenger_test(self):
         selectLineLabel = QLabel("Select Line:", self.testbench)
