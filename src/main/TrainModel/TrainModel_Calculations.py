@@ -15,6 +15,7 @@ class Calculations:
         self.updateMass(trainObject)
         self.checkFailureModes(trainObject)
         self.calculateAccelerationSum(trainObject)
+        self.calculateBrakes(trainObject)
         self.calculateEngineForce(trainObject)
         self.calculateSlopeForce(trainObject)
         self.calculateFrictionForce(trainObject)
@@ -24,7 +25,7 @@ class Calculations:
         self.updatePosition(trainObject)
 
     def updateMass(self, trainObject):
-        trainObject.calculations["mass"] = trainObject.calculations["empty_mass"] + (trainObject.passenger_status["passengers"] * 45)
+        trainObject.calculations["mass"] = trainObject.calculations["empty_mass"] + (trainObject.passenger_status["passengers"] * 68)
         if trainObject.calculations["mass"] >= trainObject.calculations["full_mass"]:
             trainObject.calculations["mass"] = trainObject.calculations["full_mass"]
 
@@ -40,7 +41,7 @@ class Calculations:
             trainObject.calculations["currEngineForce"] = abs(trainObject.vehicle_status["power"] / trainObject.vehicle_status["current_speed"])
         except ZeroDivisionError:
             if trainObject.vehicle_status["power"] > 0:
-                trainObject.vehicle_status["current_speed"] = 0.01
+                trainObject.calculations["currEngineForce"] = abs(trainObject.vehicle_status["power"] / sys.float_info.epsilon)
 
     def calculateSlopeForce(self, trainObject):
         trainObject.calculations["currAngle"] = math.atan(trainObject.navigation_status["block_grade"] / 100)
@@ -53,28 +54,25 @@ class Calculations:
         if (trainObject.vehicle_status["brakes"] and not trainObject.failure_status["emergency_brake"]):
             trainObject.calculations["brakeForce"] = 1.2
         
-        if (trainObject.failure_status["emergency_brake"] == True):
+        if (trainObject.failure_status["emergency_brake"] and not trainObject.vehicle_status["brakes"]):
             trainObject.calculations["brakeForce"] = 2.73
         
         if (not trainObject.vehicle_status["brakes"] and not trainObject.failure_status["emergency_brake"]):
             trainObject.calculations["brakeForce"] = 0
     
     def calculateNetForce(self, trainObject):
-        try:
-            trainObject.calculations["totalForce"] = trainObject.calculations["currEngineForce"] - trainObject.calculations["slopeForce"] - trainObject.calculations["brakeForce"] - trainObject.calculations["frictionForce"]
-            if trainObject.vehicle_status["current_speed"] != 0:
-                if trainObject.calculations["totalForce"] > 120 / trainObject.vehicle_status["current_speed"]:
-                    trainObject.calculations["totalForce"] = 120 / trainObject.vehicle_status["current_speed"]
-        except ZeroDivisionError:
-            # Handle division by zero here, if necessary
-            pass
+        trainObject.calculations["totalForce"] = trainObject.calculations["currEngineForce"] - trainObject.calculations["slopeForce"] - trainObject.calculations["brakeForce"] - trainObject.calculations["frictionForce"]
+        
+        if trainObject.vehicle_status["current_speed"] != 0:
+            force_limit = 120 / trainObject.vehicle_status["current_speed"]
+            trainObject.calculations["totalForce"] = min(trainObject.calculations["totalForce"], force_limit)
 
     def calculateAcceleration(self, trainObject):
         trainObject.calculations["currAcceleration"] = trainObject.calculations["totalForce"] / trainObject.calculations["mass"]
 
     def calculateCurrentSpeed(self, trainObject):
-        if trainObject.vehicle_status["power"] / 1000 <= 120:
-            trainObject.vehicle_status["current_speed"] = trainObject.vehicle_status["current_speed"] + (trainObject.calculations["timeInterval"] / 2) * (trainObject.calculations["currAcceleration"] + trainObject.calculations["lastAcceleration"])
+        if trainObject.vehicle_status["power"] <= 120:
+            trainObject.vehicle_status["current_speed"] = trainObject.vehicle_status["current_speed"] + (trainObject.calculations["timeInterval"] * 0.01 / 2) * (trainObject.calculations["currAcceleration"] + trainObject.calculations["lastAcceleration"])
 
         if trainObject.vehicle_status["current_speed"] < 0:
             trainObject.vehicle_status["current_speed"] = 0
@@ -88,7 +86,7 @@ class Calculations:
     def updatePosition(self, trainObject):
         # self.distanceFromYard += self.currentSpeed * (trainObject.calculations["timeInterval"] * 0.001)
         # self.distanceFromBlockStart += self.currentSpeed * (trainObject.calculations["timeInterval"] * 0.001)
-        trainObject.calculations["distance"] += trainObject.vehicle_status["current_speed"] * (trainObject.calculations["timeInterval"])
+        trainObject.calculations["distance"] += trainObject.vehicle_status["current_speed"] * (trainObject.calculations["timeInterval"] * 0.01)
 
     def blockID(
         self,
