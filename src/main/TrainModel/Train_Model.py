@@ -2,6 +2,7 @@ import cProfile
 from decimal import DivisionByZero
 from doctest import master
 from email import header
+from msilib.schema import Component
 from operator import length_hint
 import pstats
 from re import T
@@ -24,6 +25,8 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QComboBox,
     QCheckBox,
+    QSpacerItem,
+    QSizePolicy
 )
 # from line_profiler import LineProfiler
 from numpy import block
@@ -310,6 +313,8 @@ class TrainModel(QMainWindow):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         # masterSignals.addTrain.emit("green", "train1")
+        # trackModelToTrainModel.blockInfo.emit(1, 100, 10, 40, 20, 1)
+        # next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
         masterSignals.addTrain.connect(self.signal_addTrain)
@@ -360,29 +365,42 @@ class TrainModel(QMainWindow):
             trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
             trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
             trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])            
+            
             if trainObject.calculations["initialized"]:
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
                 trainObject.calculations["initialized"] = False
+            
             if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"]:
-                trainObject.calculations["back_length"] = trainObject.calculations["distance"] - trainObject.calculations["length"]
+                # trainObject.calculations["back_length"] = trainObject.calculations["distance"] - trainObject.calculations["length"]
                 trainObject.calculations["distance"] = 0
                 trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
-                if trainObject.calculations["back_length"] >= trainObject.navigation_status["block_length"]:
+            
+            if trainObject.calculations["distance"] == (trainObject.navigation_status["block_length"] - trainObject.calculations["length"]):
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], -1, trainObject.calculations["prevBlock"])
+                
+                # if trainObject.calculations["back_length"] >= trainObject.navigation_status["block_length"]:
                     # Reset distance for the back of the train
-                    trainObject.calculations["back_length"] = 0
-                    trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+                    # trainObject.calculations["back_length"] = 0
+                    # trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+            
             trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
-            trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
+            # trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
 
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
-            trainObject.calculations["nextBlock"] = nextBlock
-            trainObject.navigation_status["block_length"] = blockLength
-            trainObject.navigation_status["block_grade"] = blockGrade
-            trainObject.vehicle_status["speed_limit"] = speedLimit
-            trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
-            trainObject.navigation_status["authority"] = authority
+            if trainObject.calculations["currBlock"] == nextBlock:
+                if trainObject.navigation_status["authority"] == 0:
+                    trainObject.navigation_status["authority"] = 1
+                
+                trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
+                trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]                
+                trainObject.calculations["nextBlock"] = nextBlock
+                trainObject.navigation_status["block_length"] = blockLength
+                trainObject.navigation_status["block_grade"] = blockGrade
+                trainObject.vehicle_status["speed_limit"] = speedLimit
+                trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
+                trainObject.navigation_status["authority"] = authority
         return
 
     def signal_beacon(self, beaconDict):
@@ -411,7 +429,7 @@ class TrainModel(QMainWindow):
     def signal_power(self, id, power):
         for train in self.trainsList:
             if train.calculations["trainID"] == id:
-                train.vehicle_status["power"] = power
+                train.vehicle_status["power"] = power / 1000
 
     def signal_interior_lights(self, id, status):
         for train in self.trainsList:
@@ -895,48 +913,38 @@ class ResultsWindow(QMainWindow):
         self.failure_white_background_layout.setSpacing(10)
 
         # Create QLabel widgets for the list of words
-        failure_word_list = [
+        self.failure_word_list = [
             "Engine Failure: {}",
             "Signal Pickup Failure: {}",
             "Brake Failure: {}",
             "Emergency Brake: {}",
         ]
+        
+        self.checkboxes = []
+        
+        for status in self.failure_word_list[:3]:
+            layout = QHBoxLayout() 
+    
+            status_label = QLabel(status.format(""))
+            status_label.setStyleSheet("border: none;")
+            status_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            status_label.setContentsMargins(0, 0, 0, 0)
+            status_label.setFont(QFont("Arial", 9))
+            
+            self.cb = QCheckBox()
+            self.cb.setChecked(False)
+            self.cb.setStyleSheet("border: none;")
+            self.cb.toggled.connect(lambda checked, s=status: self.update_failure_status(s, checked))
+            
+            spacer = QSpacerItem(100, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            
+            layout.addWidget(status_label) 
+            layout.addItem(spacer)
+            layout.addWidget(self.cb)
+            
+            self.failure_white_background_layout.addLayout(layout)
 
-        # QLabel for engine failure
-        self.word_label_engine_failure = QLabel(
-            "Engine Failure: {}".format(self.trainsList[0].failure_status["engine_failure"]),
-            self.failure_white_background_label
-        )
-        self.word_label_engine_failure.setStyleSheet(
-            "color: #000000; background-color: transparent; border: none;"
-        )
-        self.word_label_engine_failure.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.word_label_engine_failure.setContentsMargins(0, 0, 0, 0)
-        self.word_label_engine_failure.setFont(QFont("Arial", 9))
-
-        # QLabel for signal pickup failure
-        self.word_label_signal_pickup_failure = QLabel(
-            "Signal Pickup Failure: {}".format(self.trainsList[0].failure_status["signal_pickup_failure"]),
-            self.failure_white_background_label
-        )
-        self.word_label_signal_pickup_failure.setStyleSheet(
-            "color: #000000; background-color: transparent; border: none;"
-        )
-        self.word_label_signal_pickup_failure.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.word_label_signal_pickup_failure.setContentsMargins(0, 0, 0, 0)
-        self.word_label_signal_pickup_failure.setFont(QFont("Arial", 9))
-
-        # QLabel for brake failure
-        self.word_label_brake_failure = QLabel(
-            "Brake Failure: {}".format(self.trainsList[0].failure_status["brake_failure"]),
-            self.failure_white_background_label
-        )
-        self.word_label_brake_failure.setStyleSheet(
-            "color: #000000; background-color: transparent; border: none;"
-        )
-        self.word_label_brake_failure.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.word_label_brake_failure.setContentsMargins(0, 0, 0, 0)
-        self.word_label_brake_failure.setFont(QFont("Arial", 9))
+            self.checkboxes.append(self.cb)
 
         # QLabel for emergency brake
         self.word_label_emergency_brake = QLabel(
@@ -949,21 +957,6 @@ class ResultsWindow(QMainWindow):
         self.word_label_emergency_brake.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.word_label_emergency_brake.setContentsMargins(0, 0, 0, 0)
         self.word_label_emergency_brake.setFont(QFont("Arial", 9))
-
-        # Add QLabel widgets to layout
-        self.failure_white_background_layout.addWidget(
-            self.word_label_engine_failure, alignment=Qt.AlignTop
-        )
-
-        # Add QLabel widgets to layout
-        self.failure_white_background_layout.addWidget(
-            self.word_label_signal_pickup_failure, alignment=Qt.AlignTop
-        )
-
-        # Add QLabel widgets to layout
-        self.failure_white_background_layout.addWidget(
-            self.word_label_brake_failure, alignment=Qt.AlignTop
-        )
 
         # Add QLabel widgets to layout
         self.failure_white_background_layout.addWidget(
@@ -1092,8 +1085,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for passengers
         self.word_label_passengers = QLabel(
             "Passengers: {}".format(self.trainsList[0].passenger_status["passengers"]),
-            self.passenger_white_background_label
-            
+            self.passenger_white_background_label            
         )
         self.word_label_passengers.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1541,9 +1533,9 @@ class ResultsWindow(QMainWindow):
             )
         )
 
-    def update_failure_status(self, train_name, key, state):
-        # Sets the value of the dictionary value for the failure variables
-        self.trains.set_value(train_name, "failure_status", key, state)
+    def update_failure_status(self, status, checked):
+        component = status.split(":")[0].lower().replace(" ", "_")
+        self.trainsList[0].failure_status[component] = checked
 
     def update_ui(self):
         word_value = {}
@@ -1596,7 +1588,13 @@ class ResultsWindow(QMainWindow):
         self.systemSpeedInput.setText(
             "x" + format(1 / (self.time_interval / 1000), ".3f")
         )
-
+        
+        # Update failure status
+        for checkbox, status in zip(self.checkboxes, self.failure_word_list[:3]):
+            component = status.split(":")[0].lower().replace(" ", "_")
+            checked = checkbox.isChecked()
+            self.trainsList[0].failure_status[component] = checked
+        
         for trainObject in self.trainsList:
             # Update QLabel widgets with new information
             self.word_label_speed_limit.setText(
@@ -1631,27 +1629,15 @@ class ResultsWindow(QMainWindow):
                 "Power Limit: {} kW".format(trainObject.vehicle_status["power_limit"])
             )
 
-            self.word_label_engine_failure.setText(
-                "Engine Failure: {}".format(self.trainsList[0].failure_status["engine_failure"])
-            )
-
-            self.word_label_signal_pickup_failure.setText(
-                "Signal Pickup Failure: {}".format(self.trainsList[0].failure_status["signal_pickup_failure"])
-            )
-
-            self.word_label_brake_failure.setText(
-                "Brake Failure: {}".format(self.trainsList[0].failure_status["brake_failure"])
-            )
-
             self.word_label_emergency_brake.setText(
                 "Emergency Brake: {}".format(self.trainsList[0].failure_status["emergency_brake"])
             )
 
             self.word_label_passengers.setText(
-                "Power Limit: {} kW".format(trainObject.vehicle_status["power_limit"])
+                "Passengers: {}".format(trainObject.passenger_status["passengers"])
             )
 
-            self.word_label_power_limit.setText(
+            self.word_label_passenger_limit.setText(
                 "Passenger Limit: {}".format(trainObject.passenger_status["passenger_limit"])
             )
 
