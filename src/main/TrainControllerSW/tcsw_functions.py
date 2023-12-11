@@ -237,14 +237,16 @@ class TCFunctions:
         ) / 2.237
 
         # calculate new uk
-        if newError == 0 and trainObject.piVariables["prevError"] == 0:
+        if newError == 0 and trainObject.piVariables["ek"] == 0:
             # trainObject.set_powerCommand(0)
             powerDict["powerValue"] = 0
+            powerDict["uk"] = 0
+            powerDict["ek"] = 0
             return
         elif (trainObject.get_powerCommand() < trainObject.piVariables["powerLimit"]) or (trainObject.get_powerCommand() > 0 and trainObject.get_setpointSpeed() < trainObject.get_currentSpeed()):
             newUk = trainObject.piVariables["uk"] + trainObject.piVariables[
                 "samplePeriod"
-            ] / 2 * (newError + trainObject.piVariables["prevError"])
+            ] / 2 * (newError + trainObject.piVariables["ek"])
 
             if newUk < 0:
                 newUk = 0
@@ -269,7 +271,7 @@ class TCFunctions:
         # trainObject.piVariables["uk"] = newUk
         # trainObject.piVariables["prevError"] = newError
         powerDict["uk"] = newUk
-        powerDict["prevError"] = newError
+        powerDict["ek"] = newError
 
     def pi_control(self, trainObject):
         self.pi_calculation(trainObject, self.power1)
@@ -279,39 +281,45 @@ class TCFunctions:
             if self.power1["powerValue"] <= self.power3["powerValue"]:
                 trainObject.set_powerCommand(self.power1["powerValue"])
                 trainObject.piVariables["uk"] = self.power1["uk"]
-                trainObject.piVariables["prevError"] = self.power1["prevError"]
+                trainObject.piVariables["ek"] = self.power1["ek"]
             else:
                 trainObject.set_powerCommand(self.power3["powerValue"])
                 trainObject.piVariables["uk"] = self.power3["uk"]
-                trainObject.piVariables["prevError"] = self.power3["prevError"]
+                trainObject.piVariables["ek"] = self.power3["ek"]
         elif self.power2["powerValue"] <= self.power3["powerValue"]:
             trainObject.set_powerCommand(self.power2["powerValue"])
             trainObject.piVariables["uk"] = self.power2["uk"]
-            trainObject.piVariables["prevError"] = self.power2["prevError"]
+            trainObject.piVariables["ek"] = self.power2["ek"]
         else:
             trainObject.set_powerCommand(self.power3["powerValue"])
             trainObject.piVariables["uk"] = self.power3["uk"]
-            trainObject.piVariables["prevError"] = self.power3["prevError"]
+            trainObject.piVariables["ek"] = self.power3["ek"]
 
         # print(f'Power: {trainObject.powerCommand}, Uk: {trainObject.piVariables["uk"]}, prevError: {trainObject.piVariables["prevError"]}')
 
     def failure_operations(self, trainObject):
         if trainObject.get_engineFailure():
             trainObject.set_driverEbrake(True)
-        elif trainObject.get_brakeFailure():
-            trainObject.set_driverEbrake(True)
-        elif trainObject.get_signalFailure():
-            trainObject.set_driverEbrake(True)
             trainObject.set_interiorLights(False)
             trainObject.set_headlights(False)
+        elif trainObject.get_brakeFailure():
+            trainObject.set_driverEbrake(True)
+            trainObject.set_driverSbrake(0)
+        elif trainObject.get_signalFailure():
+            trainObject.set_driverEbrake(True)
+
 
     def sbrake_operations(self, trainObject):
         if trainObject.get_driverSbrake():
             trainObject.set_powerCommand(0)
+            trainObject.piVariables["ek"] = 0
+            trainObject.piVariables["uk"] = 0
 
     def ebrake_operations(self, trainObject):
         if trainObject.get_driverEbrake():
             trainObject.set_powerCommand(0)
+            trainObject.piVariables["ek"] = 0
+            trainObject.piVariables["uk"] = 0
 
     def automatic_operations(self, trainObject):
         self.station_operations(trainObject)

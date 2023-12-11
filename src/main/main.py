@@ -11,7 +11,6 @@ from TrainControllerSW.tcsw_ui import *
 from TrackModel.TrackModel import TrackModel
 from CTC.CTC_UI import *
 from TrainModel.Train_Model import TrainModel
-# from TrainModel.Train_Model import TrainModel
 
 
 class MainWindow(QMainWindow):
