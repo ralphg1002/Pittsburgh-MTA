@@ -376,7 +376,7 @@ class TrainModel(QMainWindow):
                 trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
             
-            if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"] - trainObject.calculations["length"]:
+            if trainObject.calculations["distance"] == (trainObject.navigation_status["block_length"] - trainObject.calculations["length"]):
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], -1, trainObject.calculations["prevBlock"])
                 
                 # if trainObject.calculations["back_length"] >= trainObject.navigation_status["block_length"]:
@@ -385,11 +385,14 @@ class TrainModel(QMainWindow):
                     # trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
             
             trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
-            trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
+            # trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
 
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
             if trainObject.calculations["currBlock"] == nextBlock:
+                if trainObject.navigation_status["authority"] == 0:
+                    trainObject.navigation_status["authority"] = 1
+                
                 trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
                 trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]                
                 trainObject.calculations["nextBlock"] = nextBlock
