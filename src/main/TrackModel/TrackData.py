@@ -329,10 +329,14 @@ class TrackData:
             for block in self.greenTrackData:
                 if block["Block Number"] == blockNum:
                     block["Authority"] == authority
+                    if block["Occupancy"] == 1 and authority == 1:
+                        trackModelToTrainModel.authorityUpdate.emit("Green", blockNum)
         elif line == 2:
             for block in self.redTrackData:
                 if block["Block Number"] == blockNum:
                     block["Authority"] == authority
+                    if block["Occupancy"] == 1 and authority == 1:
+                        trackModelToTrainModel.authorityUpdate.emit("Red", blockNum)
 
     def set_maintenance(self, line, _, blockNum, maintenance):
         if line == 1:
