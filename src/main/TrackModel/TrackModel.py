@@ -333,8 +333,8 @@ class TrackModel:
                 f"background-color: {color}; color: white; border: 1px solid {color}; border-radius: 10px;"
             )
 
-    def update_occupancy(self, _, curBlock, prevBlock):
-        self.trackView.change_color(curBlock, prevBlock)
+    def update_occupancy(self, line, curBlock, prevBlock):
+        self.trackView.change_color(line, curBlock, prevBlock)
     
     def update_light_state(self, line, _, blockNum, state):
         lightBlocks = [0, 1, 62, 76, 100, 150]

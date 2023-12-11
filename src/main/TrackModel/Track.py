@@ -1693,8 +1693,8 @@ class TrackView(QGraphicsView):
 
     def createSwitch(self, path):
         switch = QGraphicsPathItem(path)
-        switchPen = QPen(QColor(0, 0, 255))
-        switchPen.setWidth(12)
+        switchPen = QPen(QColor(148, 71, 8))
+        switchPen.setWidth(5)
         switch.setPen(switchPen)
         return switch
     
@@ -1704,17 +1704,65 @@ class TrackView(QGraphicsView):
     def showRedLineLayout(self):
         self.setScene(self.redTrack)
 
-    def change_color(self, on, off):
-        print("works")
-        if on == 999:
-            on = 0
-        onBlock = self.blocks.get(on)
-        if onBlock:
-            onBlock.toggle_occupancy(True)
-        if off != 999:
-            offBlock = self.blocks.get(off)
-            if offBlock:
+    def change_color(self, line, curBlock, prevBlock):
+        if line == "Green":
+            #To turn off occupancy of previous block based on back of the train
+            if curBlock == -1:
+                offBlock = self.blocks.get(prevBlock)
                 offBlock.toggle_occupancy(False)
+            elif curBlock == 151:
+                offBlock = self.blocks.get(curBlock)
+                offBlock.toggle_occupancy(False)
+            #Turn on occupancy
+            elif curBlock != -1:
+                #First yard block
+                if curBlock == 999:
+                    onBlock = self.blocks.get(0)
+                    onBlock.toggle_occupancy(True)
+                #After first yard block
+                elif curBlock == 0:
+                    onBlock = self.blocks.get(63)
+                    onBlock.toggle_occupancy(True)
+                #Q -> N
+                elif curBlock == 100:
+                    onBlock = self.blocks.get(85)
+                    onBlock.toggle_occupancy(True)
+                #N -> R
+                elif curBlock == 77 and prevBlock == 78:
+                    onBlock = self.blocks.get(101)
+                    onBlock.toggle_occupancy(True)
+                #Z -> F
+                elif curBlock == 150:
+                    onBlock = self.blocks.get(28)
+                    onBlock.toggle_occupancy(True)
+                #A -> D
+                elif curBlock == 1:
+                    onBlock = self.blocks.get(13)
+                    onBlock.toggle_occupancy(True)
+                #For last yard block
+                elif curBlock == 57:
+                    onBlock = self.blocks.get(151)
+                    onBlock.toggle_occupancy(True)
+                elif curBlock > prevBlock:
+                    nextBlock = curBlock + 1
+                    onBlock = self.blocks.get(nextBlock)
+                    onBlock.toggle_occupancy(True)
+                elif curBlock < prevBlock:
+                    nextBlock = curBlock - 1
+                    onBlock = self.blocks.get(nextBlock)
+                    onBlock.toggle_occupancy(True)
+        elif line == "Red":
+            return
+        # print("works")
+        # if on == 999:
+        #     on = 0
+        # onBlock = self.blocks.get(on)
+        # if onBlock:
+        #     onBlock.toggle_occupancy(True)
+        # if off != 999:
+        #     offBlock = self.blocks.get(off)
+        #     if offBlock:
+        #         offBlock.toggle_occupancy(False)
 
     def change_switch(self, line, switchNum, state):
         switch = QPainterPath()
@@ -1804,7 +1852,7 @@ class TrackView(QGraphicsView):
                     switch85 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch85)
                 self.switches[switchNum] = switch85
-        print(self.switches)
+        # print(self.switches)
         
 
 class TrackBlock(QGraphicsPathItem):
