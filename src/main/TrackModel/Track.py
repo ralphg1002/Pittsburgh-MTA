@@ -1706,8 +1706,14 @@ class TrackView(QGraphicsView):
 
     def change_color(self, line, curBlock, prevBlock):
         if line == "Green":
+            if prevBlock == None:
+                onBlock = self.blocks.get(curBlock)
+                onBlock.toggle_occupancy(True)
+            elif curBlock == None:
+                offBlock = self.blocks.get(prevBlock)
+                offBlock.toggle_occupancy(False)
             #To turn off occupancy of previous block based on back of the train
-            if curBlock == -1:
+            elif curBlock == -1:
                 offBlock = self.blocks.get(prevBlock)
                 offBlock.toggle_occupancy(False)
             elif curBlock == 151:
@@ -1752,6 +1758,12 @@ class TrackView(QGraphicsView):
                     onBlock = self.blocks.get(nextBlock)
                     onBlock.toggle_occupancy(True)
         elif line == "Red":
+            if prevBlock == None:
+                onBlock = self.blocks.get(curBlock)
+                onBlock.toggle_occupancy(True)
+            elif curBlock == None:
+                offBlock = self.blocks.get(prevBlock)
+                offBlock.toggle_occupancy(False)
             return
         # print("works")
         # if on == 999:

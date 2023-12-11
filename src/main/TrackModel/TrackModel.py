@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from signals import masterSignals, trainModelToTrackModel, trackControllerToTrackModel
+from signals import masterSignals, trainModelToTrackModel, trackControllerToTrackModel, trackModelToTrackController
 
 MTA_STYLING = {
     # font variables
@@ -298,9 +298,9 @@ class TrackModel:
         self.redLineButton.setStyleSheet(buttonStyle)
         self.redLineButton.clicked.connect(self.toggle_red_data)
 
-        # Set Base Line to Red
+        # Set Base Line to Green
         self.change_button_color(MTA_STYLING["green"])
-        self.toggle_green_data()  ################
+        self.toggle_red_data()  ################
 
         # Connect button click events to change the background color when selected
         self.greenLineButton.clicked.connect(
@@ -343,7 +343,7 @@ class TrackModel:
                 if blockNum in lightBlocks:
                     self.trackView.greenTrack.removeItem(self.signals[blockNum])
                     del self.signals[blockNum]
-                    print(self.signals)
+                    # print(self.signals)
             elif state == "Red":
                 redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
                 redLight = redLight.scaledToWidth(35)
@@ -787,12 +787,16 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
+                    data["Occupancy"] = 1
+                    self.emit_occupancy(int(blockNumber), None)
                 else:
                     self.circuitSelection.hide()
                     self.failures.remove("Track Circuit Failure")
                     data[
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
+                    data["Occupancy"] = 0
+                    self.emit_occupancy(None, int(blockNumber))
         self.block.set_data(self.selectedLine, self.trackData)
 
     def set_power_failure(self, event):
@@ -807,12 +811,16 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
+                    data["Occupancy"] = 1
+                    self.emit_occupancy(int(blockNumber), None)
                 else:
                     self.powerSelection.hide()
                     self.failures.remove("Power Failure")
                     data[
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
+                    data["Occupancy"] = 0
+                    self.emit_occupancy(None, int(blockNumber))
         self.block.set_data(self.selectedLine, self.trackData)
 
     def set_broken_failure(self, event):
@@ -827,13 +835,48 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
+                    data["Occupancy"] = 1
+                    self.emit_occupancy(int(blockNumber), None)
                 else:
                     self.brokenSelection.hide()
                     self.failures.remove("Broken Rail")
                     data[
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
+                    data["Occupancy"] = 0
+                    self.emit_occupancy(None, int(blockNumber))
         self.block.set_data(self.selectedLine, self.trackData)
+    
+    def emit_occupancy(self, onBlockNum, offBlockNum):
+        line = self.selectedLine
+        if offBlockNum == None:
+            curBlock = int(onBlockNum)
+            self.update_occupancy(self.selectedLine, curBlock, None)
+            if line == "Green":
+                line = 1
+            elif line == "Red":
+                line = 2
+            wayside = self.get_wayside_num(curBlock, line)
+            trackModelToTrackController.occupancyState.emit(line, wayside, curBlock, True)  
+        elif onBlockNum == None:
+            curBlock = int(offBlockNum)
+            self.update_occupancy(self.selectedLine, None, curBlock)
+            if line == "Green":
+                line = 1
+            elif line == "Red":
+                line = 2
+            wayside = self.get_wayside_num(curBlock, line)
+            trackModelToTrackController.occupancyState.emit(line, wayside, curBlock, False) 
+
+    def get_wayside_num(self, blockNum, line):
+        if line == 1:
+            blockNum = int(blockNum)
+            if (blockNum >= 1 and blockNum <= 30) or (blockNum >= 102 and blockNum <= 150):
+                return 1
+            else:
+                return 2
+        elif line == 2:
+            return
 
     def update_switch_state(self, line, _, blockNum, state):
         self.trackView.change_switch(line, blockNum, state)
