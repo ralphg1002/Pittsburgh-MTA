@@ -300,7 +300,7 @@ class TrackModel:
 
         # Set Base Line to Green
         self.change_button_color(MTA_STYLING["green"])
-        self.toggle_red_data()  ################
+        self.toggle_red_data()  #################
 
         # Connect button click events to change the background color when selected
         self.greenLineButton.clicked.connect(
@@ -380,6 +380,24 @@ class TrackModel:
                 crossing2.setPos(-175, 12)
                 self.trackView.greenTrack.addItem(crossing)
                 self.trackView.greenTrack.addItem(crossing2)
+        if line == 2:
+            if state == 0:
+                self.trackView.redTrack.removeItem(self.signals[47.1])
+                self.trackView.redTrack.removeItem(self.signals[47.2])
+                del self.signals[47.1]
+                del self.signals[47.2]
+                print(self.signals)
+            elif state == 1:
+                redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
+                redLight = redLight.scaledToWidth(20)
+                crossing = QGraphicsPixmapItem(redLight)
+                crossing2 = QGraphicsPixmapItem(redLight)
+                self.signals[47.1] = crossing
+                self.signals[47.2] = crossing2
+                crossing.setPos(-104, 332)
+                crossing2.setPos(-85, 332)
+                self.trackView.redTrack.addItem(crossing)
+                self.trackView.redTrack.addItem(crossing2)
                 
     def add_import_button(self):
         importButton = QPushButton("Import Track Data", self.mainWindow)

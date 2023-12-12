@@ -1131,9 +1131,9 @@ class TrackView(QGraphicsView):
         #CROSSING
         crossing = QPixmap("src/main/TrackModel/pngs/crossing.png")
         crossing = crossing.scaledToWidth(70)
-        self.crossing = QGraphicsPixmapItem(crossing)
-        self.crossing.setPos(-210, -20)
-        self.greenTrack.addItem(self.crossing)
+        self.greenCrossing = QGraphicsPixmapItem(crossing)
+        self.greenCrossing.setPos(-210, -20)
+        self.greenTrack.addItem(self.greenCrossing)
 
         #TRAFFIC LIGHTS
         lightPole1 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
@@ -1759,9 +1759,9 @@ class TrackView(QGraphicsView):
         #CROSSING
         crossing = QPixmap("src/main/TrackModel/pngs/crossing.png")
         crossing = crossing.scaledToWidth(70)
-        self.crossing = QGraphicsPixmapItem(crossing)
-        self.crossing.setPos(-210, -20)
-        self.greenTrack.addItem(self.crossing)
+        self.redCrossing = QGraphicsPixmapItem(crossing)
+        self.redCrossing.setPos(-120, 300)
+        self.redTrack.addItem(self.redCrossing)
 
         #TRAFFIC LIGHTS
         lightPole1 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
