@@ -337,10 +337,11 @@ class TrackModel:
         self.trackView.change_color(line, curBlock, prevBlock)
     
     def update_light_state(self, line, _, blockNum, state):
-        lightBlocks = [0, 1, 62, 76, 100, 150]
+        greenLightBlocks = [0, 1, 76, 100, 150]
+        redLightBlocks = [0, 32, 43, 66, 71, 76]
         if line == 1:
             if state == "Green":
-                if blockNum in lightBlocks:
+                if blockNum in greenLightBlocks:
                     self.trackView.greenTrack.removeItem(self.signals[blockNum])
                     del self.signals[blockNum]
                     # print(self.signals)
@@ -360,6 +361,29 @@ class TrackModel:
                 if blockNum == 150:   
                     signal.setPos(-225, 161)              
                 self.trackView.greenTrack.addItem(signal)
+        if line == 2:
+            if state == "Green":
+                if blockNum in redLightBlocks:
+                    self.trackView.redTrack.removeItem(self.signals[blockNum])
+                    del self.signals[blockNum]
+            elif state == "Red":
+                redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
+                redLight = redLight.scaledToWidth(35)
+                signal = QGraphicsPixmapItem(redLight)
+                self.signals[blockNum] = signal
+                if blockNum == 0:
+                    signal.setPos(118, -44)
+                if blockNum == 32:
+                    signal.setPos(-94, 91)
+                if blockNum == 43:
+                    signal.setPos(-94, 212)
+                if blockNum == 66:
+                    signal.setPos(-230, 271)
+                if blockNum == 71:
+                    signal.setPos(-128, 150)  
+                if blockNum == 76:
+                    signal.setPos(-128, 29)          
+                self.trackView.redTrack.addItem(signal)
 
     def update_crossing_state(self, line, _, __, state):
         if line == 1:
