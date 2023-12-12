@@ -1,3 +1,4 @@
+from numpy import block
 from .TrackData import TrackData
 from .Station import Station
 from .Track import TrackView
@@ -914,10 +915,12 @@ class TrackModel:
             blockNum = int(blockNum)
             if (blockNum >= 1 and blockNum <= 30) or (blockNum >= 102 and blockNum <= 150):
                 return 1
-            else:
-                return 2
+            # return 2
         elif line == 2:
-            return
+            if (blockNum >= 0 and blockNum <= 27) or (blockNum >= 72 and blockNum <= 76):
+                return 1
+        return 2
+                
 
     def update_switch_state(self, line, _, blockNum, state):
         self.trackView.change_switch(line, blockNum, state)

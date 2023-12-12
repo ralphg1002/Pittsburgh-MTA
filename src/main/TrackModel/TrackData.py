@@ -540,9 +540,13 @@ class TrackData:
         elif line == "Red":
             return
 
-    def get_wayside_num(self, blockNum):
-        blockNum = int(blockNum)
-        if (blockNum >= 1 and blockNum <= 30) or (blockNum >= 102 and blockNum <= 150):
-            return 1
-        else:
-            return 2
+    def get_wayside_num(self, blockNum, line):
+        if line == 1:
+            blockNum = int(blockNum)
+            if (blockNum >= 1 and blockNum <= 30) or (blockNum >= 102 and blockNum <= 150):
+                return 1
+            # return 2
+        elif line == 2:
+            if (blockNum >= 0 and blockNum <= 27) or (blockNum >= 72 and blockNum <= 76):
+                return 1
+        return 2
