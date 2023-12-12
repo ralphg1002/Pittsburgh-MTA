@@ -12,10 +12,10 @@ class TestTrainModel(unittest.TestCase):
 
     def test_signal_interior_lights(self):
         #train_model_value = TrainModelAttributes("id")
-        # masterSign
+        masterSignal()
         trainControllerSWToTrainModel.sendInteriorLightState.emit("id", True)
 
-        # result1 = train_model_value.passenger_status["lights_status"]
+        result1 = train_model_value.passenger_status["lights_status"]
 
         self.assertEqual(result1, True)
 
