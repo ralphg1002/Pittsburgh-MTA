@@ -4,8 +4,6 @@ import sys
 import math
 import re
 
-from sklearn.model_selection import train_test_split
-
 
 class Calculations:
     def __init__(self):
