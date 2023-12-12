@@ -37,6 +37,7 @@ class TrackModelToTrainModel(QObject):
     )  # next block, length, grade, speed limit, suggested speed, authority
     beacon = pyqtSignal(dict)
     newCurrentPassengers = pyqtSignal(int)
+    authority_update = pyqtSignal(str, int) # line number, block number
 
 
 ##########################################################################################

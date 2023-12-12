@@ -343,6 +343,7 @@ class TrainModel(QMainWindow):
         trackModelToTrainModel.blockInfo.connect(self.signal_blockInfo)
         trackModelToTrainModel.beacon.connect(self.signal_beacon)
         trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers)
+        trackModelToTrainModel.authority_update.connect(self.signal_newAuthority)
 
         # Send train controller information
         for trainObject in self.trainsList:
@@ -387,12 +388,14 @@ class TrainModel(QMainWindow):
             trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
             # trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
 
+    def signal_newAuthority(self, line_num, block_num):
+        for trainObject in self.trainsList:
+            if trainObject.calculations["currBlock"] == block_num and trainObject.calculations["line"] == line_num:
+                trainObject.navigation_status["Authority"] = 1
+    
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
-            if trainObject.calculations["currBlock"] == nextBlock:
-                if trainObject.navigation_status["authority"] == 0:
-                    trainObject.navigation_status["authority"] = 1
-                
+            if trainObject.calculations["currBlock"] == nextBlock: 
                 trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
                 trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]                
                 trainObject.calculations["nextBlock"] = nextBlock
