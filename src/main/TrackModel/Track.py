@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, 
 
 class TrackView(QGraphicsView):
     blocks = {}
-    switches = {}
+    greenSwitches = {}
+    redSwitches = {}
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -1090,42 +1091,42 @@ class TrackView(QGraphicsView):
         switchPath13.cubicTo(-10, 0, 10, 1, 23, 2)
         switch13 = self.createSwitch(switchPath13)
         self.greenTrack.addItem(switch13)
-        self.switches[13] = switch13
+        self.greenSwitches[13] = switch13
 
         switchPath29 = QPainterPath()
         switchPath29.moveTo(-167, 193)
         switchPath29.lineTo(-167, 213)
         switch29 = self.createSwitch(switchPath29)
         self.greenTrack.addItem(switch29)
-        self.switches[29] = switch29
+        self.greenSwitches[29] = switch29
 
         switchPath57 = QPainterPath()
         switchPath57.moveTo(95, 278)
         switchPath57.quadTo(107, 278, 111, 279)
         switch57 = self.createSwitch(switchPath57)
         self.greenTrack.addItem(switch57)
-        self.switches[57] = switch57
+        self.greenSwitches[57] = switch57
 
         switchPath63 = QPainterPath()
         switchPath63.moveTo(163, 350)
         switchPath63.cubicTo(163, 340, 163, 330, 161, 322)
         switch63 = self.createSwitch(switchPath63)
         self.greenTrack.addItem(switch63)
-        self.switches[63] = switch63
+        self.greenSwitches[63] = switch63
 
         switchPath77 = QPainterPath()
         switchPath77.moveTo(12, 556)
         switchPath77.lineTo(50, 556)
         switch77 = self.createSwitch(switchPath77)
         self.greenTrack.addItem(switch77)
-        self.switches[77] = switch77
+        self.greenSwitches[77] = switch77
 
         switchpath85 = QPainterPath()
         switchpath85.moveTo(-124, 556)
         switchpath85.lineTo(-149, 556)
         switch85 = self.createSwitch(switchpath85)
         self.greenTrack.addItem(switch85)
-        self.switches[85] = switch85        
+        self.greenSwitches[85] = switch85        
 
         #CROSSING
         crossing = QPixmap("src/main/TrackModel/pngs/crossing.png")
@@ -1687,6 +1688,162 @@ class TrackView(QGraphicsView):
         block_76 = self.createTrackBlock(path_76, "Block 76")
         self.redTrack.addItem(block_76)
 
+        #SWITCHES -> 0 by default, means continuation of number
+        switchPath9 = QPainterPath()
+        switchPath9.moveTo(116, -59)
+        switchPath9.cubicTo(119, -52, 119, -42, 115, -29)
+        switch9 = self.createSwitch(switchPath9)
+        self.redTrack.addItem(switch9)
+        self.redSwitches[9] = switch9
+
+        switchPath15 = QPainterPath()
+        switchPath15.moveTo(0, 0)
+        switchPath15.lineTo(20, 0)
+        switch15 = self.createSwitch(switchPath15)
+        self.redTrack.addItem(switch15)
+        self.redSwitches[15] = switch15
+
+        switchPath27 = QPainterPath()
+        switchPath27.moveTo(-94, 71)
+        switchPath27.lineTo(-94, 83)
+        switch27 = self.createSwitch(switchPath27)
+        self.redTrack.addItem(switch27)
+        self.redSwitches[27] = switch27
+
+        switchPath33 = QPainterPath()
+        switchPath33.moveTo(-94, 138)
+        switchPath33.lineTo(-94, 126)
+        switch33 = self.createSwitch(switchPath33)
+        self.redTrack.addItem(switch33)
+        self.redSwitches[33] = switch33
+
+        switchPath38 = QPainterPath()
+        switchPath38.moveTo(-94, 192)
+        switchPath38.lineTo(-94, 204)
+        switch38 = self.createSwitch(switchPath38)
+        self.redTrack.addItem(switch38)
+        self.redSwitches[38] = switch38
+
+        switchPath44 = QPainterPath()
+        switchPath44.moveTo(-94, 259)
+        switchPath44.lineTo(-94, 247)
+        switch44 = self.createSwitch(switchPath44)
+        self.redTrack.addItem(switch44)
+        self.redSwitches[44] = switch44
+
+        path_52 = QPainterPath()
+        path_52.moveTo(-206, 327)
+        path_52.lineTo(-214, 327)
+        block_52 = self.createTrackBlock(path_52, "Block 52")
+        self.redTrack.addItem(block_52)
+
+        path_53 = QPainterPath()
+        path_53.moveTo(-224, 327)
+        path_53.lineTo(-232, 327)
+        block_53 = self.createTrackBlock(path_53, "Block 53")
+        self.redTrack.addItem(block_53)
+
+        path_66 = QPainterPath()
+        path_66.moveTo(-225, 314)
+        path_66.quadTo(-223, 318, -220, 322)
+        block_66 = self.createTrackBlock(path_66, "Block 66")
+        self.redTrack.addItem(block_66)
+
+        switchPath52 = QPainterPath()
+        switchPath52.moveTo(-206, 327)
+        switchPath52.lineTo(-232, 327)
+        switch52 = self.createSwitch(switchPath52)
+        self.redTrack.addItem(switch52)
+        self.redSwitches[52] = switch52
+
+        #CROSSING
+        crossing = QPixmap("src/main/TrackModel/pngs/crossing.png")
+        crossing = crossing.scaledToWidth(70)
+        self.crossing = QGraphicsPixmapItem(crossing)
+        self.crossing.setPos(-210, -20)
+        self.greenTrack.addItem(self.crossing)
+
+        #TRAFFIC LIGHTS
+        lightPole1 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole1 = lightPole1.scaledToWidth(15)
+        pole1 = QGraphicsPixmapItem(lightPole1)
+        pole1.setPos(-5, 35)
+        self.greenTrack.addItem(pole1)
+        lightCircle1 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle1 = lightCircle1.scaledToWidth(17)
+        circle1 = QGraphicsPixmapItem(lightCircle1)
+        circle1.setPos(-6, 20)
+        self.greenTrack.addItem(circle1)
+        light1 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light1 = light1.scaledToWidth(35)
+        self.signal1 = QGraphicsPixmapItem(light1)
+        self.signal1.setPos(-15, 16)
+        self.greenTrack.addItem(self.signal1)
+
+        lightPole150 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole150 = lightPole150.scaledToWidth(15)
+        pole150 = QGraphicsPixmapItem(lightPole150)
+        pole150.setPos(-215, 180)
+        self.greenTrack.addItem(pole150)
+        lightCircle150 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle150 = lightCircle1.scaledToWidth(17)
+        circle150 = QGraphicsPixmapItem(lightCircle150)
+        circle150.setPos(-216, 165)
+        self.greenTrack.addItem(circle150)
+        light150 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light150 = light1.scaledToWidth(35)
+        signal150 = QGraphicsPixmapItem(light150)
+        signal150.setPos(-225, 161)
+        self.greenTrack.addItem(signal150)
+
+        lightPole0 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole0 = lightPole0.scaledToWidth(15)
+        pole0 = QGraphicsPixmapItem(lightPole0)
+        pole0.setPos(175, 310)
+        self.greenTrack.addItem(pole0)
+        lightCircle0 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle0 = lightCircle1.scaledToWidth(17)
+        circle0 = QGraphicsPixmapItem(lightCircle0)
+        circle0.setPos(174, 295)
+        self.greenTrack.addItem(circle0)
+        light0 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light0 = light1.scaledToWidth(35)
+        signal0 = QGraphicsPixmapItem(light0)
+        signal0.setPos(165, 291)
+        self.greenTrack.addItem(signal0)
+
+        lightPole76 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole76 = lightPole76.scaledToWidth(15)
+        pole76 = QGraphicsPixmapItem(lightPole76)
+        pole76.setPos(30, 580)
+        self.greenTrack.addItem(pole76)
+        lightCircle76 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle76 = lightCircle1.scaledToWidth(17)
+        circle76 = QGraphicsPixmapItem(lightCircle76)
+        circle76.setPos(29, 565)
+        self.greenTrack.addItem(circle76)
+        light76 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light76 = light1.scaledToWidth(35)
+        signal76 = QGraphicsPixmapItem(light76)
+        signal76.setPos(20, 561)
+        self.greenTrack.addItem(signal76)
+
+        lightPole100 = QPixmap("src/main/TrackModel/pngs/light-pole.png")
+        lightPole100 = lightPole100.scaledToWidth(15)
+        pole100 = QGraphicsPixmapItem(lightPole100)
+        pole100.setPos(-142, 520)
+        self.greenTrack.addItem(pole100)
+        lightCircle100 = QPixmap("src/main/TrackModel/pngs/light-circle.png")
+        lightCircle100 = lightCircle1.scaledToWidth(17)
+        circle100 = QGraphicsPixmapItem(lightCircle100)
+        circle100.setPos(-143, 505)
+        self.greenTrack.addItem(circle100)
+        light100 = QPixmap("src/main/TrackModel/pngs/green-light.png")
+        light100 = light1.scaledToWidth(35)
+        signal100 = QGraphicsPixmapItem(light100)
+        signal100.setPos(-152, 501)
+        self.greenTrack.addItem(signal100)
+
     def createTrackBlock(self, path, number):
         track_block = TrackBlock(path, number)
         return track_block
@@ -1778,8 +1935,8 @@ class TrackView(QGraphicsView):
 
     def change_switch(self, line, switchNum, state):
         switch = QPainterPath()
-        self.greenTrack.removeItem(self.switches[switchNum])
         if line == 1:
+            self.greenTrack.removeItem(self.greenSwitches[switchNum])
             if switchNum == 13:
                 if state == 0:
                     # 13 -> 12
@@ -1793,7 +1950,7 @@ class TrackView(QGraphicsView):
                     switch.cubicTo(-10, 0, 0, 0, 10, 10)
                     switch13 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch13)
-                self.switches[switchNum] = switch13
+                self.greenSwitches[switchNum] = switch13
             elif switchNum == 29:
                 if state == 0:
                     # 29 -> 30
@@ -1807,7 +1964,7 @@ class TrackView(QGraphicsView):
                     switch.cubicTo(-167, 198, -177, 200, -204, 214)
                     switch29 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch29)
-                self.switches[switchNum] = switch29
+                self.greenSwitches[switchNum] = switch29
             elif switchNum == 57:
                 if state == 0:
                     # 57 -> 58
@@ -1821,7 +1978,7 @@ class TrackView(QGraphicsView):
                     switch.quadTo(97, 278, 112, 260)
                     switch57 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch57)
-                self.switches[switchNum] = switch57
+                self.greenSwitches[switchNum] = switch57
             elif switchNum == 63:
                 if state == 0:
                     # 63 -> 62
@@ -1835,7 +1992,7 @@ class TrackView(QGraphicsView):
                     switch.lineTo(163, 310)
                     switch63 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch63)
-                self.switches[switchNum] = switch63
+                self.greenSwitches[switchNum] = switch63
             elif switchNum == 77:
                 if state == 0:
                     # 77 -> 76
@@ -1849,7 +2006,7 @@ class TrackView(QGraphicsView):
                     switch.cubicTo(20, 556, 24, 546, 28, 540)
                     switch77 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch77)
-                self.switches[switchNum] = switch77
+                self.greenSwitches[switchNum] = switch77
             elif switchNum == 85:
                 if state == 0:
                     # 85 -> 86
@@ -1863,8 +2020,107 @@ class TrackView(QGraphicsView):
                     switch.cubicTo(-132, 556, -142, 551, -148, 546)
                     switch85 = self.createSwitch(switch)
                     self.greenTrack.addItem(switch85)
-                self.switches[switchNum] = switch85
-        # print(self.switches)
+                self.greenSwitches[switchNum] = switch85
+        elif line == 2:
+            self.redTrack.removeItem(self.redSwitches[switchNum])
+            if switchNum == 9:
+                if state == 0:
+                    # 9 -> 10
+                    switch.moveTo(116, -59)
+                    switch.cubicTo(119, -52, 119, -42, 115, -29)
+                    switch9 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch9)
+                elif state == 1:
+                    # 9 -> 0
+                    switch.moveTo(116, -59)
+                    switch.cubicTo(119, -52, 119, -42, 115, -10)
+                    switch9 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch9)
+                self.redSwitches[switchNum] = switch9
+            elif switchNum == 15:
+                if state == 0:
+                    # 16 -> 15
+                    switch.moveTo(0, 0)
+                    switch.lineTo(20, 0)
+                    switch15 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch15)
+                elif state == 1:
+                    # 16 -> 1
+                    switch.moveTo(0, 0)
+                    switch.cubicTo(-1, 0, 7, -4, 22, -14)
+                    switch15 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch15)
+                self.redSwitches[switchNum] = switch15
+            elif switchNum == 27:
+                if state == 0:
+                    # 27 -> 28
+                    switch.moveTo(-94, 71)
+                    switch.lineTo(-94, 83)
+                    switch27 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch27)
+                elif state == 1:
+                    # 27 -> 76
+                    switch.moveTo(-94, 71)
+                    switch.cubicTo(-94, 77, -105, 77, -110, 78)
+                    switch27 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch27)
+                self.redSwitches[switchNum] = switch27
+            elif switchNum == 33:
+                if state == 0:
+                    # 33 -> 32
+                    switch.moveTo(-94, 138)
+                    switch.lineTo(-94, 126)
+                    switch33 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch33)
+                elif state == 1:
+                    # 33 -> 72
+                    switch.moveTo(-94, 138)
+                    switch.cubicTo(-94, 132, -105, 132, -110, 131)
+                    switch33 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch33)
+                self.redSwitches[switchNum] = switch33
+            elif switchNum == 38:
+                if state == 0:
+                    # 38 -> 39
+                    switch.moveTo(-94, 192)
+                    switch.lineTo(-94, 204)
+                    switch38 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch38)
+                elif state == 1:
+                    # 38 -> 71
+                    switch.moveTo(-94, 192)
+                    switch.cubicTo(-94, 198, -105, 198, -110, 199)
+                    switch38 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch38)
+                self.redSwitches[switchNum] = switch38
+            elif switchNum == 44:
+                if state == 0:
+                    # 44 -> 43
+                    switch.moveTo(-94, 259)
+                    switch.lineTo(-94, 247)
+                    switch44 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch44)
+                elif state == 1:
+                    # 44 -> 67
+                    switch.moveTo(-94, 259)
+                    switch.cubicTo(-94, 253, -105, 253, -110, 252)
+                    switch44 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch44)
+                self.redSwitches[switchNum] = switch44
+            elif switchNum == 52:
+                if state == 0:
+                    # 52 -> 53
+                    switch.moveTo(-206, 327)
+                    switch.lineTo(-232, 327)
+                    switch52 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch52)
+                elif state == 1:
+                    # 52 -> 66
+                    switch.moveTo(-206, 327)
+                    switch.cubicTo(-214, 327, -220, 322, -225, 314)
+                    switch52 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch52)
+                self.redSwitches[switchNum] = switch52
         
 
 class TrackBlock(QGraphicsPathItem):
