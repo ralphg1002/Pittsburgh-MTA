@@ -12,7 +12,7 @@ class TrainModelAttributes:
                                "acceleration": 0,
                                "brakes": 0,
                                "power": 0,
-                               "power_limit": 0}
+                               "power_limit": 120}
 
         self.failure_status = {"engine_failure": False,
                                "signal_pickup_failure": False,
@@ -53,7 +53,7 @@ class TrainModelAttributes:
                             "currAngle": 0,
                             "slopeForce": 0,
                             "frictionForce": 0,
-                            "brakeForce": 1.2,
+                            "brakeForce": 0,
                             "totalForce": 0,
                             "currBlock": 999,
                             "prevBlock": 999,

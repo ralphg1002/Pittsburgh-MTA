@@ -123,13 +123,13 @@ class Calculations:
                 trainObject.passenger_status["temperature"] = curr_temp
                 # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
-        elif set_temp < curr_temp:
-            while set_temp < curr_temp:
+        elif set_temp > curr_temp:
+            while curr_temp > set_temp:
                 curr_temp -= 1
                 trainObject.passenger_status["temperature"] = curr_temp
                 # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
-        else:
+        elif set_temp == curr_temp:
             trainObject.passenger_status["temperature"] = curr_temp
             # trainModelToTrainController.sendTemperature.emit(train, curr_temp)
 
