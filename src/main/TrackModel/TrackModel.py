@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from signals import masterSignals, trainModelToTrackModel, trackControllerToTrackModel
+from signals import masterSignals, trainModelToTrackModel, trackControllerToTrackModel, trackModelToTrackController
 
 MTA_STYLING = {
     # font variables
@@ -298,9 +298,9 @@ class TrackModel:
         self.redLineButton.setStyleSheet(buttonStyle)
         self.redLineButton.clicked.connect(self.toggle_red_data)
 
-        # Set Base Line to Red
+        # Set Base Line to Green
         self.change_button_color(MTA_STYLING["green"])
-        self.toggle_green_data()  ################
+        self.toggle_green_data()  #################
 
         # Connect button click events to change the background color when selected
         self.greenLineButton.clicked.connect(
@@ -337,13 +337,14 @@ class TrackModel:
         self.trackView.change_color(line, curBlock, prevBlock)
     
     def update_light_state(self, line, _, blockNum, state):
-        lightBlocks = [0, 1, 62, 76, 100, 150]
+        greenLightBlocks = [0, 1, 76, 100, 150]
+        redLightBlocks = [0, 32, 43, 66, 71, 76]
         if line == 1:
             if state == "Green":
-                if blockNum in lightBlocks:
+                if blockNum in greenLightBlocks:
                     self.trackView.greenTrack.removeItem(self.signals[blockNum])
                     del self.signals[blockNum]
-                    print(self.signals)
+                    # print(self.signals)
             elif state == "Red":
                 redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
                 redLight = redLight.scaledToWidth(35)
@@ -360,6 +361,29 @@ class TrackModel:
                 if blockNum == 150:   
                     signal.setPos(-225, 161)              
                 self.trackView.greenTrack.addItem(signal)
+        if line == 2:
+            if state == "Green":
+                if blockNum in redLightBlocks:
+                    self.trackView.redTrack.removeItem(self.signals[blockNum])
+                    del self.signals[blockNum]
+            elif state == "Red":
+                redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
+                redLight = redLight.scaledToWidth(35)
+                signal = QGraphicsPixmapItem(redLight)
+                self.signals[blockNum] = signal
+                if blockNum == 0:
+                    signal.setPos(118, -44)
+                if blockNum == 32:
+                    signal.setPos(-94, 91)
+                if blockNum == 43:
+                    signal.setPos(-94, 212)
+                if blockNum == 66:
+                    signal.setPos(-230, 271)
+                if blockNum == 71:
+                    signal.setPos(-128, 150)  
+                if blockNum == 76:
+                    signal.setPos(-128, 29)          
+                self.trackView.redTrack.addItem(signal)
 
     def update_crossing_state(self, line, _, __, state):
         if line == 1:
@@ -380,6 +404,24 @@ class TrackModel:
                 crossing2.setPos(-175, 12)
                 self.trackView.greenTrack.addItem(crossing)
                 self.trackView.greenTrack.addItem(crossing2)
+        if line == 2:
+            if state == 0:
+                self.trackView.redTrack.removeItem(self.signals[47.1])
+                self.trackView.redTrack.removeItem(self.signals[47.2])
+                del self.signals[47.1]
+                del self.signals[47.2]
+                print(self.signals)
+            elif state == 1:
+                redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
+                redLight = redLight.scaledToWidth(20)
+                crossing = QGraphicsPixmapItem(redLight)
+                crossing2 = QGraphicsPixmapItem(redLight)
+                self.signals[47.1] = crossing
+                self.signals[47.2] = crossing2
+                crossing.setPos(-104, 332)
+                crossing2.setPos(-85, 332)
+                self.trackView.redTrack.addItem(crossing)
+                self.trackView.redTrack.addItem(crossing2)
                 
     def add_import_button(self):
         importButton = QPushButton("Import Track Data", self.mainWindow)
@@ -593,7 +635,7 @@ class TrackModel:
             self.errorLabel.setText("Please enter a block number")
         elif self.entryField.text().isnumeric() == False:
             self.errorLabel.setText("Please enter a valid block number")
-        elif ((int(self.entryField.text()) > 150 or int(self.entryField.text()) < 1) and self.selectedLine == "Green") or (int(self.entryField.text()) > 75 and self.selectedLine == "Red"):
+        elif ((int(self.entryField.text()) > 151 or int(self.entryField.text()) < 0) and self.selectedLine == "Green") or ((int(self.entryField.text()) > 76 or int(self.entryField.text()) < 0) and self.selectedLine == "Red"):
             self.errorLabel.setText("Block Number does not exist")
         else:
             self.errorLabel.setText("") #Clear error message
@@ -787,12 +829,16 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
+                    data["Occupancy"] = 1
+                    self.emit_occupancy(int(blockNumber), None)
                 else:
                     self.circuitSelection.hide()
                     self.failures.remove("Track Circuit Failure")
                     data[
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
+                    data["Occupancy"] = 0
+                    self.emit_occupancy(None, int(blockNumber))
         self.block.set_data(self.selectedLine, self.trackData)
 
     def set_power_failure(self, event):
@@ -807,12 +853,16 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
+                    data["Occupancy"] = 1
+                    self.emit_occupancy(int(blockNumber), None)
                 else:
                     self.powerSelection.hide()
                     self.failures.remove("Power Failure")
                     data[
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
+                    data["Occupancy"] = 0
+                    self.emit_occupancy(None, int(blockNumber))
         self.block.set_data(self.selectedLine, self.trackData)
 
     def set_broken_failure(self, event):
@@ -827,13 +877,48 @@ class TrackModel:
                     data[
                         "Failures"
                     ] = self.failures  # Should append failure to this block
+                    data["Occupancy"] = 1
+                    self.emit_occupancy(int(blockNumber), None)
                 else:
                     self.brokenSelection.hide()
                     self.failures.remove("Broken Rail")
                     data[
                         "Failures"
                     ] = self.failures  # Should remove failure to this block
+                    data["Occupancy"] = 0
+                    self.emit_occupancy(None, int(blockNumber))
         self.block.set_data(self.selectedLine, self.trackData)
+    
+    def emit_occupancy(self, onBlockNum, offBlockNum):
+        line = self.selectedLine
+        if offBlockNum == None:
+            curBlock = int(onBlockNum)
+            self.update_occupancy(self.selectedLine, curBlock, None)
+            if line == "Green":
+                line = 1
+            elif line == "Red":
+                line = 2
+            wayside = self.get_wayside_num(curBlock, line)
+            trackModelToTrackController.occupancyState.emit(line, wayside, curBlock, True)  
+        elif onBlockNum == None:
+            curBlock = int(offBlockNum)
+            self.update_occupancy(self.selectedLine, None, curBlock)
+            if line == "Green":
+                line = 1
+            elif line == "Red":
+                line = 2
+            wayside = self.get_wayside_num(curBlock, line)
+            trackModelToTrackController.occupancyState.emit(line, wayside, curBlock, False) 
+
+    def get_wayside_num(self, blockNum, line):
+        if line == 1:
+            blockNum = int(blockNum)
+            if (blockNum >= 1 and blockNum <= 30) or (blockNum >= 102 and blockNum <= 150):
+                return 1
+            else:
+                return 2
+        elif line == 2:
+            return
 
     def update_switch_state(self, line, _, blockNum, state):
         self.trackView.change_switch(line, blockNum, state)
