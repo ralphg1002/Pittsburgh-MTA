@@ -1,4 +1,3 @@
-from numpy import block
 from .TrackData import TrackData
 from .Station import Station
 from .Track import TrackView

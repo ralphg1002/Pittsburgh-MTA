@@ -281,7 +281,10 @@ class TrackData:
                         ticketSales = (
                             station.get_ticket_sales()
                         )  # random number generated
-                        block["Ticket Sales"] += ticketSales
+                        tempTicketSales = block["Ticket Sales"]
+                        tempTicketSales += ticketSales
+                        block["Ticket Sales"] = tempTicketSales
+                        print(block["Ticket Sales"])
 
                         waiting = block["Passengers Waiting"] + ticketSales
                         (
@@ -293,14 +296,16 @@ class TrackData:
                         block["Passengers Disembarking"] = disembarkingPassengers
                         block["Passengers Boarding"] = newPassengers
                         block["Passengers Waiting"] = passengersWaiting
+                        print(
+                            ticketSales,
+                            passengersWaiting,
+                            disembarkingPassengers,
+                            newPassengers,
+                        )
 
                         trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
-
-                        # blockNumber = block["Block Number"]
-                        # for block in self.
-                        # if stationName in block["Infrastructure"] and blockNumber != block["Block Number"]:
-                        #     print(f"Another Block Found: {block['Block Number']}")
-                        # return
+                        
+                        # No duplicate station blocks
         elif line == "Green":
             for block in self.greenTrackData:
                 # print(block["Block Number"])
