@@ -66,6 +66,7 @@ class TrackData:
                     block["Switch State"] = 0
                 if "RAILWAY CROSSING" in block["Infrastructure"]:
                     block["Crossing State"] = 0
+            #Beacon Data
             if lineName == "Green Line":
                 if block["Block Number"] == 2:  # Section A, Pioneer
                     block["Beacon"] = {
@@ -191,6 +192,63 @@ class TrackData:
                         "Next Station1": "WHITED",
                         "Next Station2": "",
                         "Current Station": "CENTRAL",
+                        "Door Side": block["Station Side"],
+                    }
+            elif lineName == "Red Line":
+                if block["Block Number"] == 7:  # Section C, Shadyside
+                    block["Beacon"] = {
+                        "Next Station1": "HERRON AVE",
+                        "Next Station2": "",
+                        "Current Station": "SHADYSIDE",
+                        "Door Side": block["Station Side"],
+                    }
+                elif block["Block Number"] == 16:  # Section F, Herron Ave
+                    block["Beacon"] = {
+                        "Next Station1": "SHADYSIDE",
+                        "Next Station2": "SWISSVILLE",
+                        "Current Station": "HERRON AVE",
+                        "Door Side": block["Station Side"],
+                    }
+                elif block["Block Number"] == 21:  # Section G, Swissville
+                    block["Beacon"] = {
+                        "Next Station1": "HERRON AVE",
+                        "Next Station2": "PENN STATION",
+                        "Current Station": "SWISSVILLE",
+                        "Door Side": block["Station Side"],
+                    }
+                elif block["Block Number"] == 25: #Section H, Penn Station
+                    block["Beacon"] = {
+                        "Next Station1": "SWISSVILLE",
+                        "Next Station2": "STEEL PLAZA",
+                        "Current Station": "PENN STATION",
+                        "Door Side": block["Station Side"],
+                    }
+                elif block["Block Number"] == 35: #Section H, Steel Plaza
+                    block["Beacon"] = {
+                        "Next Station1": "PENN STATION",
+                        "Next Station2": "FIRST AVE",
+                        "Current Station": "STEEL PLAZA",
+                        "Door Side": block["Station Side"],
+                    }
+                elif block["Block Number"] == 45: #Section H, First Ave
+                    block["Beacon"] = {
+                        "Next Station1": "STEEL PLAZA",
+                        "Next Station2": "STATION SQUARE",
+                        "Current Station": "FIRST AVE",
+                        "Door Side": block["Station Side"],
+                    }
+                elif block["Block Number"] == 48: #Section I, Station Square
+                    block["Beacon"] = {
+                        "Next Station1": "FIRST AVE",
+                        "Next Station2": "SOUTH HILLS JUNCTION",
+                        "Current Station": "STATION SQUARE",
+                        "Door Side": block["Station Side"],
+                    }
+                elif block["Block Number"] == 60: #Section L, South Hills Junction
+                    block["Beacon"] = {
+                        "Next Station1": "STATION SQUARE",
+                        "Next Station2": "",
+                        "Current Station": "SOUTH HILLS JUNCTION",
                         "Door Side": block["Station Side"],
                     }
 
