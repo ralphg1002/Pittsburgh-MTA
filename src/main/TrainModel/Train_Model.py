@@ -352,19 +352,21 @@ class TrainModel(QMainWindow):
             self.functionsInstance.temperature(trainObject)
             self.functionsInstance.beacon(trainObject)
             trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], int(trainObject.vehicle_status["speed_limit"]))
-            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["current_speed"])
-            trainModelToTrainController.sendCommandedSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["commanded_speed"])
             trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"], trainObject.navigation_status["authority"])
-            trainModelToTrainController.sendEngineFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["engine_failure"])
-            trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["signal_pickup_failure"])
-            trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
-            trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"], trainObject.navigation_status["passenger_emergency_brake"])
-            trainModelToTrainController.sendTemperature.emit(trainObject.calculations["trainID"], trainObject.passenger_status["temperature"])
+            trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
+            trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
             trainModelToTrainController.sendNextStation1.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation1"])
             trainModelToTrainController.sendNextStation2.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation2"])
             trainModelToTrainController.sendCurrStation.emit(trainObject.calculations["trainID"], trainObject.calculations["currStation"])
-            trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
-            trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
+            trainModelToTrainController.sendCommandedSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["commanded_speed"])
+            trainModelToTrainController.sendBlockLength.emit(trainObject.calculations["trainID"], trainObject.navigation_status["block_length"])
+            trainModelToTrainController.sendCurrentSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["current_speed"])
+            trainModelToTrainController.sendTemperature.emit(trainObject.calculations["trainID"], trainObject.passenger_status["temperature"])
+            trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"], trainObject.navigation_status["passenger_emergency_brake"])
+            trainModelToTrainController.sendEngineFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["engine_failure"])
+            trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["signal_pickup_failure"])
+            trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
+            trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
             trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])            
             
             if trainObject.calculations["initialized"]:
@@ -385,7 +387,7 @@ class TrainModel(QMainWindow):
                     # trainObject.calculations["back_length"] = 0
                     # trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
             
-            trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
+            
             # trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
 
     def signal_newAuthority(self, line_num, block_num):
@@ -396,8 +398,9 @@ class TrainModel(QMainWindow):
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
             if trainObject.calculations["currBlock"] == nextBlock: 
-                trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
-                trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]                
+                tempBlock = trainObject.calculations["currBlock"]
+                trainObject.calculations["prevBlock"] = tempBlock
+                trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
                 trainObject.calculations["nextBlock"] = nextBlock
                 trainObject.navigation_status["block_length"] = blockLength
                 trainObject.navigation_status["block_grade"] = blockGrade
