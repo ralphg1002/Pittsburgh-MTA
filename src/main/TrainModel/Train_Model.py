@@ -343,7 +343,7 @@ class TrainModel(QMainWindow):
         trackModelToTrainModel.blockInfo.connect(self.signal_blockInfo)
         trackModelToTrainModel.beacon.connect(self.signal_beacon)
         trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers)
-        trackModelToTrainModel.authority_update.connect(self.signal_newAuthority)
+        trackModelToTrainModel.authorityUpdate.connect(self.signal_newAuthority)
 
         # Send train controller information
         for trainObject in self.trainsList:
