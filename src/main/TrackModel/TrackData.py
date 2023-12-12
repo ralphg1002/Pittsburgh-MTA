@@ -41,7 +41,7 @@ class TrackData:
     def read_track_data(self, filePath, lineName):
         excelData = pd.read_excel(filePath, sheet_name=lineName)
         if lineName == "Red Line":
-            data = excelData.head(78).to_dict(orient="records")
+            data = excelData.head(77).to_dict(orient="records")
         elif lineName == "Green Line":
             data = excelData.head(152).to_dict(orient="records")
         self.initialize_data(data, lineName)

@@ -300,7 +300,7 @@ class TrackModel:
 
         # Set Base Line to Green
         self.change_button_color(MTA_STYLING["green"])
-        self.toggle_red_data()  #################
+        self.toggle_green_data()  #################
 
         # Connect button click events to change the background color when selected
         self.greenLineButton.clicked.connect(
@@ -635,7 +635,7 @@ class TrackModel:
             self.errorLabel.setText("Please enter a block number")
         elif self.entryField.text().isnumeric() == False:
             self.errorLabel.setText("Please enter a valid block number")
-        elif ((int(self.entryField.text()) > 150 or int(self.entryField.text()) < 1) and self.selectedLine == "Green") or (int(self.entryField.text()) > 75 and self.selectedLine == "Red"):
+        elif ((int(self.entryField.text()) > 151 or int(self.entryField.text()) < 0) and self.selectedLine == "Green") or ((int(self.entryField.text()) > 76 or int(self.entryField.text()) < 0) and self.selectedLine == "Red"):
             self.errorLabel.setText("Block Number does not exist")
         else:
             self.errorLabel.setText("") #Clear error message
