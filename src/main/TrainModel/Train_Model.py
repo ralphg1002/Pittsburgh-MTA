@@ -255,7 +255,7 @@ class TrainModel(QMainWindow):
 
     def open_results_window(self, event):
         # This function is called when the search icon is clicked
-        selected_item = self.comboBox.currentText()
+        selected_item = self.comboBox.currentIndex()
         self.results_window = ResultsWindow(
             selected_item, self.trainsList
         )
@@ -313,7 +313,7 @@ class TrainModel(QMainWindow):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.addTrain.emit("green", "train1")
-        trackModelToTrainModel.blockInfo.emit(1, 100, 10, 40, 20, 1)
+        trackModelToTrainModel.blockInfo.emit(1, 1, 100, 10, 40, 20, 1)
         # next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
@@ -351,6 +351,7 @@ class TrainModel(QMainWindow):
             self.functionsInstance.TrainModelCalculations(trainObject)
             self.functionsInstance.temperature(trainObject)
             self.functionsInstance.beacon(trainObject)
+            
             trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], int(trainObject.vehicle_status["speed_limit"]))
             trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"], trainObject.navigation_status["authority"])
             trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
@@ -395,11 +396,10 @@ class TrainModel(QMainWindow):
             if trainObject.calculations["currBlock"] == block_num and trainObject.calculations["line"] == line_num:
                 trainObject.navigation_status["Authority"] = 1
     
-    def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
+    def signal_blockInfo(self, currBlock, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
-            if trainObject.calculations["currBlock"] == nextBlock: 
-                tempBlock = trainObject.calculations["currBlock"]
-                trainObject.calculations["prevBlock"] = tempBlock
+            if trainObject.calculations["currBlock"] == currBlock:
+                trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
                 trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
                 trainObject.calculations["nextBlock"] = nextBlock
                 trainObject.navigation_status["block_length"] = blockLength
@@ -415,6 +415,7 @@ class TrainModel(QMainWindow):
                 # The train is at a station, request passengers
                 trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.
                                                                   calculations["currStation"], trainObject.passenger_status["passengers"])
+                # trackModelToTrainModel.newCurrentPassengers.connect(self.signal_new_passengers(trainObject))
                             
             trainObject.calculations["nextStation1"] = beaconDict["Next Station1"]
             trainObject.calculations["nextStation2"] = beaconDict["Next Station2"]
@@ -428,9 +429,10 @@ class TrainModel(QMainWindow):
             
         return
 
-    def signal_new_passengers(self, passengers):
+    def signal_new_passengers(self, passengers, station_name):
         for trainObject in self.trainsList:
-            trainObject.passenger_status["passengers"] = passengers
+           if trainObject.currentstation == station_name:
+                trainObject.passenger_status["passengers"] = passengers
 
     def signal_power(self, id, power):
         for train in self.trainsList:
