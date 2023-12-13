@@ -1308,6 +1308,8 @@ class TrainControllerUI(QMainWindow):
                 elif train.get_advertisement() == 3:
                     self.png_label(self.adDisplay, self.pixmapAd3)
 
+            self.tcFunctions.regular_operations(blockDict, train)
+
             # SIGNAL INTEGRATION: TCSW -> TM
             trainControllerSWToTrainModel.sendPower.emit(
                 train.get_trainID(), train.get_powerCommand()
@@ -1342,6 +1344,10 @@ class TrainControllerUI(QMainWindow):
 
             # test emit
             trainControllerSWToTrainModel.sendPower.connect(self.test_display)
+            #print(f'{"setpspd"},{train.setpointSpeed}')
+            #print(f'{"power"},{train.powerCommand}')
+
+
 
         # system time
         # self.sysTime = self.sysTime.addSecs(1)

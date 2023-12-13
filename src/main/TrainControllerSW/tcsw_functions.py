@@ -328,6 +328,7 @@ class TCFunctions:
         trainObject.set_setpointTemp(70)
 
     def regular_operations(self, blockDict, trainObject):
+        trainObject.safetyLimit = trainObject.speedLimit
         self.update_block_info(blockDict, trainObject)
         self.failure_operations(trainObject)
         self.stopping_operations(trainObject)
