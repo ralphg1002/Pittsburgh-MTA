@@ -1776,12 +1776,12 @@ class TrackView(QGraphicsView):
         self.redTrack.addItem(switch9)
         self.redSwitches[9] = switch9
 
-        switchPath15 = QPainterPath()
-        switchPath15.moveTo(0, 0)
-        switchPath15.lineTo(20, 0)
-        switch15 = self.createSwitch(switchPath15)
-        self.redTrack.addItem(switch15)
-        self.redSwitches[15] = switch15
+        switchPath16 = QPainterPath()
+        switchPath16.moveTo(0, 0)
+        switchPath16.lineTo(20, 0)
+        switch16 = self.createSwitch(switchPath16)
+        self.redTrack.addItem(switch16)
+        self.redSwitches[16] = switch16
 
         switchPath27 = QPainterPath()
         switchPath27.moveTo(-94, 71)
@@ -1999,7 +1999,71 @@ class TrackView(QGraphicsView):
             elif curBlock == None:
                 offBlock = self.redBlocks.get(prevBlock)
                 offBlock.toggle_occupancy(False)
-            return
+            #To turn off occupancy of previous block based on back of the train
+            elif curBlock == -1:
+                offBlock = self.redBlocks.get(prevBlock)
+                offBlock.toggle_occupancy(False)
+            elif curBlock == 0 and prevBlock == 9:
+                offBlock = self.redBlocks.get(prevBlock)
+                offBlock.toggle_occupancy(False)
+            #Turn on occupancy
+            elif curBlock != -1:
+                #Yard block
+                if curBlock == 999:
+                    onBlock = self.redBlocks.get(0)
+                    onBlock.toggle_occupancy(True)
+                #Yard -> C
+                elif curBlock == 0 and prevBlock == 999:
+                    onBlock = self.redBlocks.get(9)
+                    onBlock.toggle_occupancy(True)
+                #C -> Yard
+                elif curBlock == 9 and prevBlock == 8:
+                    onBlock = self.redBlocks.get(0)
+                    onBlock.toggle_occupancy(True)
+                #9 -> 8
+                elif curBlock == 9 and prevBlock == 0:
+                    onBlock = self.redBlocks.get(8)
+                    onBlock.toggle_occupancy(True)
+                                #1 -> 2
+                elif curBlock == 1 and prevBlock == 16:
+                    onBlock = self.redBlocks.get(2)
+                    onBlock.toggle_occupancy(True)
+                #A -> F
+                elif curBlock == 1:
+                    onBlock = self.redBlocks.get(16)
+                    onBlock.toggle_occupancy(True)
+                #F -> A
+                elif curBlock == 16 and prevBlock == 17:
+                    onBlock = self.redBlocks.get(1)
+                    onBlock.toggle_occupancy(True)
+                #N -> J
+                elif curBlock == 66:
+                    onBlock = self.redBlocks.get(52)
+                    onBlock.toggle_occupancy(True)
+                #H -> O
+                elif curBlock == 44 and prevBlock == 45:
+                    onBlock = self.redBlocks.get(67)
+                    onBlock.toggle_occupancy(True)
+                #Q -> H
+                elif curBlock == 71:
+                    onBlock = self.redBlocks.get(38)
+                    onBlock.toggle_occupancy(True)
+                #H -> R
+                elif curBlock == 33 and prevBlock == 34:
+                    onBlock = self.redBlocks.get(72)
+                    onBlock.toggle_occupancy(True)
+                #T -> H
+                elif curBlock == 76:
+                    onBlock = self.redBlocks.get(27)
+                    onBlock.toggle_occupancy(True)
+                elif curBlock > prevBlock:
+                    nextBlock = curBlock + 1
+                    onBlock = self.redBlocks.get(nextBlock)
+                    onBlock.toggle_occupancy(True)
+                elif curBlock < prevBlock:
+                    nextBlock = curBlock - 1
+                    onBlock = self.redBlocks.get(nextBlock)
+                    onBlock.toggle_occupancy(True)
         
     def change_switch(self, line, switchNum, state):
         switch = QPainterPath()
@@ -2105,20 +2169,20 @@ class TrackView(QGraphicsView):
                     switch9 = self.createSwitch(switch)
                     self.redTrack.addItem(switch9)
                 self.redSwitches[switchNum] = switch9
-            elif switchNum == 15:
+            elif switchNum == 16:
                 if state == 0:
                     # 16 -> 15
                     switch.moveTo(0, 0)
                     switch.lineTo(20, 0)
-                    switch15 = self.createSwitch(switch)
-                    self.redTrack.addItem(switch15)
+                    switch16 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch16)
                 elif state == 1:
                     # 16 -> 1
                     switch.moveTo(0, 0)
                     switch.cubicTo(-1, 0, 7, -4, 22, -14)
-                    switch15 = self.createSwitch(switch)
-                    self.redTrack.addItem(switch15)
-                self.redSwitches[switchNum] = switch15
+                    switch16 = self.createSwitch(switch)
+                    self.redTrack.addItem(switch16)
+                self.redSwitches[switchNum] = switch16
             elif switchNum == 27:
                 if state == 0:
                     # 27 -> 28
