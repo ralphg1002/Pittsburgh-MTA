@@ -313,8 +313,8 @@ class TrainModel(QMainWindow):
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
-        # masterSignals.addTrain.emit("green", "train1")
-        # trackModelToTrainModel.blockInfo.emit(999, 1, 100, 5, 40, 20, 1)
+        masterSignals.addTrain.emit("green", "train1")
+        trackModelToTrainModel.blockInfo.emit(999, 1, 100, 5, 40, 20, 1)
         # current block, next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
@@ -432,7 +432,7 @@ class TrainModel(QMainWindow):
 
     def signal_new_passengers(self, passengers, station_name):
         for trainObject in self.trainsList:
-           if trainObject.currentstation == station_name:
+           if trainObject.calculations["currStation"] == station_name:
                 trainObject.passenger_status["passengers"] = passengers
 
     def signal_power(self, id, power):
