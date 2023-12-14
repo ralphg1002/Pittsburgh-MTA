@@ -97,11 +97,10 @@ class Block:
         self.maintenanceState = maintenanceState
         self.direction = direction
         self.number = number
+        
 
         # initialize authority variables
-        self.ctcAuthority = None
-        self.nextRedAuthority = None
-        self.nextOccupiedBlockAuthority = None
+        self.nextBlock = None 
 
     def get_number(self):
         return self.number
@@ -123,6 +122,8 @@ class Block:
 
     def set_occupancystate(self, newOccupancyState):
         self.occupancyState = newOccupancyState
+        if(newOccupancyState == 0):
+            self.nextBlock = None
 
     def get_failurestate(self):
         return self.failureState
@@ -147,6 +148,12 @@ class Block:
 
     def set_suggestedspeed(self, newSpeed):
         self.suggestedSpeed = newSpeed
+
+    def set_nextblock(self, next):
+        self.nextBlock = next
+
+    def get_nextblock(self):
+        return self.nextBlock
 
     def get_type(self):
         return "plain"
@@ -455,18 +462,24 @@ class Wayside:
         if not self.plcState:
             return
 
+        print("LOGIC FOR LINE ", self.line)
+        print("**********************************************")
+        print(self.plcData)
         for item in self.plcData:
             # Initialize a flag to track if any condition is satisfied
             any_condition_satisfied = False
-
+            
             for ifBlock in range(0, len(item)):
+                print("ENTERING LOGIC FOR WAYSIDE ", self.waysideNum)
                 switchString = item[ifBlock]["Section"].rstrip(":")
                 correctWayside = False
+                print(switchString)
                 if switchString in self.switches:
                     # Determine what is the switch block
                     switchBlock = self.get_block(self.switches[switchString])
                     correctWayside = True
                 else:
+                    print()
                     continue
 
                 # Parse the conditions
@@ -517,10 +530,10 @@ class Wayside:
                 elif condition2 == False and notExist:
                     condition2 = True
 
-                """print(switchString)
+                print(switchString)
                 print(entry, exitRange)
                 print("Condition 1: ", condition1)
-                print("Condition 2: ", condition2)"""
+                print("Condition 2: ", condition2)
 
 
                 # If both condition 1 and 2 are valid, set the flag and break the loop
@@ -641,6 +654,8 @@ class Wayside:
         entry = []
         exit = []
         notExist = False
+        direction_entry = None
+        direction_exit = None
 
         patterns = {
             "patternEntry": r"^(\d+)$",
@@ -675,30 +690,35 @@ class Wayside:
                     entry = list(range(start, end + 1))
                     exit = None
                     notExist = False
+                    direction_entry = 1
                     break
                 elif pattern == "patternEntryReverseRange":
                     end, start = map(int, match.groups())
                     entry = list(range(start, end - 1, -1))
                     exit = None
                     notExist = False
+                    direction_entry = -1
                     break
                 elif pattern == "patternEntryAndExitRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(2)),
                                 int(match.group(3)) + 1))
                     notExist = False
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryAndExitReverseRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(3)),
                                 int(match.group(2)) + 1))
                     notExist = False
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryRangeAndExit":
                     entry = list(range(int(match.group(1)),
                                  int(match.group(2)) + 1))
                     exit = [int(match.group(3))]
                     notExist = False
+                    direction_entry = 1
                     break
                 elif pattern == "patternEntryRangeAndExitRange":
                     entry = list(range(int(match.group(1)),
@@ -706,6 +726,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = 1
+                    diretion_exit = 1
                     break
                 elif pattern == "patternEntryReverseRangeAndExitRange":
                     entry = list(range(int(match.group(2)),
@@ -713,6 +735,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = -1
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryRangeAndExitReverseRange":
                     entry = list(range(int(match.group(1)),
@@ -720,29 +744,36 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = 1
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryReverseRangeAndExitReverseRange":
                     entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = -1
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryAndNotExitRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(2)),
                                 int(match.group(3)) + 1))
                     notExist = True
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryAndNotExitReverseRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(3)),
                                 int(match.group(2)) + 1))
                     notExist = True
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryRangeAndNotExit":
                     entry = list(range(int(match.group(1)),
                                  int(match.group(2)) + 1))
                     exit = [int(match.group(3))]
                     notExist = True
+                    direction_entry = 1
                     break
                 elif pattern == "patternEntryRangeAndNotExitRange":
                     entry = list(range(int(match.group(1)),
@@ -750,6 +781,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = True
+                    direction_entry = 1
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryReverseRangeAndNotExitRange":
                     entry = list(range(int(match.group(2)),
@@ -757,6 +790,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = True
+                    direction_entry = -1
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryRangeAndNotExitReverseRange":
                     entry = list(range(int(match.group(1)),
@@ -764,6 +799,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = True
+                    direction_entry = 1
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryReverseRangeAndNotExitReverseRange":
                     entry = list(range(int(match.group(1)),
@@ -771,6 +808,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = True
+                    direction_entry = -1
+                    direction_exit = -1
                     break
 
         # print("Entry: ", entry)

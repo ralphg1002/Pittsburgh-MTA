@@ -1,16 +1,3 @@
-CRX:
-IF
-    Condition: (14->24)
-    Operation: CROSS(0)
-    Operation: 19 R
-    end
-IF
-    Condition: (14<-24)
-    Operation: CROSS(0)
-    Operation: 19 R
-    end
-END
-
 SW1:
 IF
     Condition: (13<-17)
@@ -64,16 +51,10 @@ IF
     Operation: 0 R
     end
 IF
-    Condition: 0 AND NOT(57->64)
+    Condition: 0
     Operation: SWITCH(1)
     Operation: 63 R
     Operation: 0 G
-    end
-IF
-    Condition: (57->64)
-    Operation: SWITCH(0)
-    Operation: 63 R
-    Operation: 0 R
     end
 END
 
@@ -113,4 +94,15 @@ IF
     end
 END
 
-
+CRX:
+IF
+    Condition: (14->24)
+    Operation: CROSS(0)
+    Operation: 19 R
+    end
+IF
+    Condition: (14<-24)
+    Operation: CROSS(0)
+    Operation: 19 R
+    end
+END
