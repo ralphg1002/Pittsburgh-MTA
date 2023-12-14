@@ -272,35 +272,35 @@ class TrainModel(QMainWindow):
 
     def signal_period(self, period):
         self.time_interval = period
-    
+
     def signal_addTrain(self, line, id):
         # Combine line and id to create the trainID
         name = line + "_" + id
         train = TrainModelAttributes(name)
-        
+
         # Check if trainID already exists in the list
         idCheck = False
         for train in self.trainsList:
-            if train.calculations["trainID"]== name:
+            if train.calculations["trainID"] == name:
                 idCheck = True
                 break
-        
+
         # If trainID already exists, do nothing
         if idCheck:
             return
-        
+
         # Otherwise, add the new train to the list
         self.trainsList.append(train)
-        
+
     def update_drop_down(self):
         existing_items = [self.comboBox.itemText(i) for i in range(self.comboBox.count())]
-        
+
         all_trainIDs = []
         for trains in self.trainsList:
             all_trainIDs.append(trains.calculations["trainID"])
 
         missing_trainIDs = set(all_trainIDs) - set(existing_items)
-        
+
         for trainID in missing_trainIDs:
             self.comboBox.addItem(trainID)
 
@@ -312,8 +312,8 @@ class TrainModel(QMainWindow):
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
-        masterSignals.addTrain.emit("green", "train1")
-        trackModelToTrainModel.blockInfo.emit(1, 100, 10, 40, 20, 1)
+        # masterSignals.addTrain.emit("green", "train1")
+        # trackModelToTrainModel.blockInfo.emit(1, 100, 10, 40, 20, 1)
         # next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
@@ -351,55 +351,76 @@ class TrainModel(QMainWindow):
             self.functionsInstance.TrainModelCalculations(trainObject)
             self.functionsInstance.temperature(trainObject)
             self.functionsInstance.beacon(trainObject)
-            trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], int(trainObject.vehicle_status["speed_limit"]))
-            trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"], trainObject.navigation_status["authority"])
-            trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
-            trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["right_door"])
-            trainModelToTrainController.sendNextStation1.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation1"])
-            trainModelToTrainController.sendNextStation2.emit(trainObject.calculations["trainID"], trainObject.calculations["nextStation2"])
-            trainModelToTrainController.sendCurrStation.emit(trainObject.calculations["trainID"], trainObject.calculations["currStation"])
-            trainModelToTrainController.sendCommandedSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["commanded_speed"])
-            trainModelToTrainController.sendBlockLength.emit(trainObject.calculations["trainID"], trainObject.navigation_status["block_length"])
-            trainModelToTrainController.sendCurrentSpeed.emit(trainObject.calculations["trainID"], trainObject.vehicle_status["current_speed"])
-            trainModelToTrainController.sendTemperature.emit(trainObject.calculations["trainID"], trainObject.passenger_status["temperature"])
-            trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"], trainObject.navigation_status["passenger_emergency_brake"])
-            trainModelToTrainController.sendEngineFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["engine_failure"])
-            trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["signal_pickup_failure"])
-            trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
-            trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
-            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])            
-            
+            trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"],
+                                                            int(trainObject.vehicle_status["speed_limit"]))
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"],
+                                                             trainObject.vehicle_status["current_speed"])
+            trainModelToTrainController.sendCommandedSpeed.emit(trainObject.calculations["trainID"],
+                                                                trainObject.vehicle_status["commanded_speed"])
+            trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"],
+                                                           trainObject.navigation_status["authority"])
+            trainModelToTrainController.sendEngineFailure.emit(trainObject.calculations["trainID"],
+                                                               trainObject.failure_status["engine_failure"])
+            trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"],
+                                                                     trainObject.failure_status[
+                                                                         "signal_pickup_failure"])
+            trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"],
+                                                              trainObject.failure_status["brake_failure"])
+            trainModelToTrainController.sendPassengerEmergencyBrake.emit(trainObject.calculations["trainID"],
+                                                                         trainObject.navigation_status[
+                                                                             "passenger_emergency_brake"])
+            trainModelToTrainController.sendTemperature.emit(trainObject.calculations["trainID"],
+                                                             trainObject.passenger_status["temperature"])
+            trainModelToTrainController.sendNextStation1.emit(trainObject.calculations["trainID"],
+                                                              trainObject.calculations["nextStation1"])
+            trainModelToTrainController.sendNextStation2.emit(trainObject.calculations["trainID"],
+                                                              trainObject.calculations["nextStation2"])
+            trainModelToTrainController.sendCurrStation.emit(trainObject.calculations["trainID"],
+                                                             trainObject.calculations["currStation"])
+            trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"],
+                                                          trainObject.passenger_status["left_door"])
+            trainModelToTrainController.sendRightDoor.emit(trainObject.calculations["trainID"],
+                                                           trainObject.passenger_status["right_door"])
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"],
+                                                             trainObject.calculations["currBlock"])
+
             if trainObject.calculations["initialized"]:
-                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"],
+                                                         trainObject.calculations["currBlock"],
+                                                         trainObject.calculations["prevBlock"])
                 trainObject.calculations["initialized"] = False
-            
+
             if trainObject.calculations["distance"] == trainObject.navigation_status["block_length"]:
                 # trainObject.calculations["back_length"] = trainObject.calculations["distance"] - trainObject.calculations["length"]
                 trainObject.calculations["distance"] = 0
                 trainObject.calculations["polarity"] = not trainObject.calculations["polarity"]
-                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
-            
-            if trainObject.calculations["distance"] == (trainObject.navigation_status["block_length"] - trainObject.calculations["length"]):
-                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], -1, trainObject.calculations["prevBlock"])
-                
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"],
+                                                         trainObject.calculations["currBlock"],
+                                                         trainObject.calculations["prevBlock"])
+
+            if trainObject.calculations["distance"] == (
+                    trainObject.navigation_status["block_length"] - trainObject.calculations["length"]):
+                trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], -1,
+                                                         trainObject.calculations["prevBlock"])
+
                 # if trainObject.calculations["back_length"] >= trainObject.navigation_status["block_length"]:
-                    # Reset distance for the back of the train
-                    # trainObject.calculations["back_length"] = 0
-                    # trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
-            
-            
+                # Reset distance for the back of the train
+                # trainObject.calculations["back_length"] = 0
+                # trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
+
+            trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"],
+                                                          trainObject.calculations["polarity"])
             # trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
 
     def signal_newAuthority(self, line_num, block_num):
         for trainObject in self.trainsList:
             if trainObject.calculations["currBlock"] == block_num and trainObject.calculations["line"] == line_num:
                 trainObject.navigation_status["Authority"] = 1
-    
+
     def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
-            if trainObject.calculations["currBlock"] == nextBlock: 
-                tempBlock = trainObject.calculations["currBlock"]
-                trainObject.calculations["prevBlock"] = tempBlock
+            if trainObject.calculations["currBlock"] == nextBlock:
+                trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
                 trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
                 trainObject.calculations["nextBlock"] = nextBlock
                 trainObject.navigation_status["block_length"] = blockLength
@@ -414,8 +435,9 @@ class TrainModel(QMainWindow):
             if trainObject.calculations["currStation"] == trainObject.navigation_status["next_station"]:
                 # The train is at a station, request passengers
                 trainModelToTrackModel.sendCurrentPassengers.emit(trainObject.calculations["line"], trainObject.
-                                                                  calculations["currStation"], trainObject.passenger_status["passengers"])
-                            
+                                                                  calculations["currStation"],
+                                                                  trainObject.passenger_status["passengers"])
+
             trainObject.calculations["nextStation1"] = beaconDict["Next Station1"]
             trainObject.calculations["nextStation2"] = beaconDict["Next Station2"]
             trainObject.calculations["currStation"] = beaconDict["Current Station"]
@@ -423,9 +445,9 @@ class TrainModel(QMainWindow):
 
             if trainObject.calculations["nextStation1"] == trainObject.navigation_status["prev_station"]:
                 trainObject.navigation_status["next_station"] = trainObject.calculations["nextStation2"]
-            else: 
+            else:
                 trainObject.navigation_status["next_station"] = trainObject.calculations["nextStation1"]
-            
+
         return
 
     def signal_new_passengers(self, passengers):
@@ -471,7 +493,6 @@ class TrainModel(QMainWindow):
         for train in self.trainsList:
             if train.calculations["trainID"] == id:
                 train.vehicle_status["brakes"] = eff
-                train.vehicle_status["brakes"] = bool(train.vehicle_status["brakes"])
 
     def signal_emergency_brake(self, id, status):
         for train in self.trainsList:
@@ -482,6 +503,7 @@ class TrainModel(QMainWindow):
         for train in self.trainsList:
             if train.calculations["trainID"] == id:
                 train.passenger_status["announcements"] = ann
+
 
 class ResultsWindow(QMainWindow):
     # Font variables
@@ -821,7 +843,7 @@ class ResultsWindow(QMainWindow):
 
         # Add stretch
         self.vehicle_white_background_layout.addStretch(1)
-        
+
         # self.vehicle_status = {}
         # self.vehicle_labels = []
 
@@ -926,29 +948,29 @@ class ResultsWindow(QMainWindow):
             "Brake Failure: {}",
             "Emergency Brake: {}",
         ]
-        
+
         self.checkboxes = []
-        
+
         for status in self.failure_word_list[:3]:
-            layout = QHBoxLayout() 
-    
+            layout = QHBoxLayout()
+
             status_label = QLabel(status.format(""))
             status_label.setStyleSheet("border: none;")
             status_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             status_label.setContentsMargins(0, 0, 0, 0)
             status_label.setFont(QFont("Arial", 9))
-            
+
             self.cb = QCheckBox()
             self.cb.setChecked(False)
             self.cb.setStyleSheet("border: none;")
             self.cb.toggled.connect(lambda checked, s=status: self.update_failure_status(s, checked))
-            
+
             spacer = QSpacerItem(100, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
-            
-            layout.addWidget(status_label) 
+
+            layout.addWidget(status_label)
             layout.addItem(spacer)
             layout.addWidget(self.cb)
-            
+
             self.failure_white_background_layout.addLayout(layout)
 
             self.checkboxes.append(self.cb)
@@ -969,7 +991,7 @@ class ResultsWindow(QMainWindow):
         self.failure_white_background_layout.addWidget(
             self.word_label_emergency_brake, alignment=Qt.AlignTop
         )
-        
+
         # failure_status = {}
 
         # # Check if the selected train exists in the trains dictionary
@@ -1092,7 +1114,7 @@ class ResultsWindow(QMainWindow):
         # QLabel for passengers
         self.word_label_passengers = QLabel(
             "Passengers: {}".format(self.trainsList[0].passenger_status["passengers"]),
-            self.passenger_white_background_label            
+            self.passenger_white_background_label
         )
         self.word_label_passengers.setStyleSheet(
             "color: #000000; background-color: transparent; border: none;"
@@ -1236,7 +1258,7 @@ class ResultsWindow(QMainWindow):
 
         # Add stretch
         self.passenger_white_background_layout.addStretch(1)
-        
+
         # self.passenger_status = {}
         # self.passenger_labels = []
 
@@ -1476,7 +1498,7 @@ class ResultsWindow(QMainWindow):
 
         # Add stretch
         self.navigation_white_background_layout.addStretch(1)
-        
+
         # self.navigation_status = {}
         # self.navigation_labels = []
 
@@ -1595,13 +1617,13 @@ class ResultsWindow(QMainWindow):
         self.systemSpeedInput.setText(
             "x" + format(1 / (self.time_interval / 1000), ".3f")
         )
-        
+
         # Update failure status
         for checkbox, status in zip(self.checkboxes, self.failure_word_list[:3]):
             component = status.split(":")[0].lower().replace(" ", "_")
             checked = checkbox.isChecked()
             self.trainsList[0].failure_status[component] = checked
-        
+
         for trainObject in self.trainsList:
             # Update QLabel widgets with new information
             self.word_label_speed_limit.setText(
@@ -1619,7 +1641,7 @@ class ResultsWindow(QMainWindow):
             self.word_label_commanded_speed.setText(
                 "Commanded Speed: {} mph".format(trainObject.vehicle_status["commanded_speed"])
             )
-            
+
             self.word_label_acceleration.setText(
                 "Acceleration: {} ft/s".format(trainObject.vehicle_status["acceleration"])
             )
@@ -1627,7 +1649,7 @@ class ResultsWindow(QMainWindow):
             self.word_label_brakes.setText(
                 "Brakes: {}".format(trainObject.vehicle_status["brakes"])
             )
-            
+
             self.word_label_power.setText(
                 "Power: {} kW".format(trainObject.vehicle_status["power"])
             )
@@ -1709,9 +1731,6 @@ class ResultsWindow(QMainWindow):
             )
 
 
-
-
-
 class TrainTest(QMainWindow):
     # Font variables
     textFontSize = 10
@@ -1733,11 +1752,11 @@ class TrainTest(QMainWindow):
     w = 960
     h = 960
     moduleName = "Train Test"
-    
+
     def __init__(self):
         super().__init__()
         self.test_train = TrainModelAttributes(trainID="Test_Train")
-        
+
         self.time_interval = 1
         self.timer = QTimer(self)
         self.timer.timeout.connect(
@@ -1984,7 +2003,7 @@ class TrainTest(QMainWindow):
         self.show_track_model_test(selected_train_attributes)
         self.show_train_controller_test(selected_train_attributes)
         self.show_murphy_test(selected_train_attributes)
-    
+
     def show_track_model_test(self, train_attributes):
         self.track_model_test = TrackModelTestWindow(train_attributes=train_attributes)
         self.track_model_test.show()
@@ -2025,7 +2044,7 @@ class TrackModelTestWindow(QMainWindow):
         self.trainsList = []
         self.functionsInstance = Calculations()
         self.test_train = TrainModelAttributes(train_attributes)
-        
+
         self.time_interval = 1
         self.timer = QTimer(self)
         self.timer.timeout.connect(
@@ -2197,7 +2216,7 @@ class TrackModelTestWindow(QMainWindow):
         self.track_input_line_edits = [
             QLineEdit("", self) for _ in range(len(self.track_model_word_list))
         ]
-        
+
         # Create a list to store the horizontal layouts
         self.input_layouts = []
 
@@ -2289,7 +2308,7 @@ class TrackModelTestWindow(QMainWindow):
 
         # Create a dictionary to store QLineEdit widgets for track model inputs
         self.track_input_line_edits = {}
-        
+
         # Create QLabel widgets for the list of words
         self.train_model_word_list = [
             "Speed Limit: {}",
@@ -2318,8 +2337,7 @@ class TrackModelTestWindow(QMainWindow):
 
             # Add QLineEdit widgets to the dictionary with the corresponding word as the key
             self.track_input_line_edits[word] = line_edit
-        
-        
+
         # QLabel for speed limit
         self.train_model_label_speed_limit = QLabel(
             "Speed Limit: {}".format(self.test_train.vehicle_status["speed_limit"]),
@@ -2498,10 +2516,6 @@ class TrackModelTestWindow(QMainWindow):
         self.apply_button.setAutoRepeatInterval(105)
         self.apply_button.clicked.connect(self.apply_changes)
 
-        
-
-
-
     def map_word_to_attribute(self, word):
         # Implement a mapping function based on your naming convention
         # This is a simplified example; adjust it to your specific case
@@ -2531,7 +2545,6 @@ class TrackModelTestWindow(QMainWindow):
         # Update the UI to reflect the changes
         self.update_train_model_ui()
 
-
     def update_train_model_ui(self):
         # Update QLabel widgets with the values from the dictionary
         for label, word in zip(self.train_model_labels, self.train_model_word_list):
@@ -2548,9 +2561,7 @@ class TrackModelTestWindow(QMainWindow):
             self.test_train[attribute] = value
         else:
             print(f"Error: '{attribute}' is not a valid calculation attribute.")
-            
 
-        
     # def apply_values(self):
     #     values_wordlist_1 = {}
 
@@ -2950,7 +2961,7 @@ class TrainControllerTestWindow(QMainWindow):
         }
 
         for i, (word_placeholder, value) in enumerate(
-            zip(self.word_list_2, default_values_wordlist_2.values())
+                zip(self.word_list_2, default_values_wordlist_2.values())
         ):
             label_text = f"{word_placeholder} {value}" if word_placeholder else value
             self.word_labels[i].setText(label_text)
@@ -3120,7 +3131,7 @@ class MurphyTestWindow(QMainWindow):
 
             # Check if the word_placeholder is in the values_2 dictionary and is a boolean value
             if word_placeholder.lower().replace(":", "").replace(
-                " ", "_"
+                    " ", "_"
             ) in values_1 and isinstance(
                 values_1[word_placeholder.lower().replace(":", "").replace(" ", "_")],
                 bool,
@@ -3354,7 +3365,7 @@ class MurphyTestWindow(QMainWindow):
         }
 
         for i, (word_placeholder, value) in enumerate(
-            zip(self.word_list_2, default_values_wordlist_2.values())
+                zip(self.word_list_2, default_values_wordlist_2.values())
         ):
             label_text = f"{word_placeholder} {value}" if word_placeholder else value
             self.word_labels[i].setText(label_text)
@@ -3390,7 +3401,6 @@ class MurphyTestWindow(QMainWindow):
     def update_clock_label(self):
         time_text = self.clock.elapsed_time.toString("HH:mm:ss")
         self.clock_label.setText(time_text)
-
 
 # def main():
 #     app = QApplication(sys.argv)
