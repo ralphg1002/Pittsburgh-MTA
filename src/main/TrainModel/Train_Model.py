@@ -312,8 +312,8 @@ class TrainModel(QMainWindow):
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
-        # masterSignals.addTrain.emit("green", "train1")
-        # trackModelToTrainModel.blockInfo.emit(1, 1, 100, 10, 40, 20, 1)
+        masterSignals.addTrain.emit("green", "train1")
+        trackModelToTrainModel.blockInfo.emit(1, 1, 100, 10, 40, 20, 1)
         # next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
