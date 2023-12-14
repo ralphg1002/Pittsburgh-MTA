@@ -535,9 +535,9 @@ class TrackModel:
         elevationLabel.setGeometry(600, 435, 140, 25)
         elevationLabel.setStyleSheet(style)
 
-        cumElevationLabel = QLabel("Cum. Elevation:", self.mainWindow)
+        cumElevationLabel = QLabel("Cumul. Elevation:", self.mainWindow)
         cumElevationLabel.setFont(font)
-        cumElevationLabel.setGeometry(600, 470, 140, 25)
+        cumElevationLabel.setGeometry(600, 470, 160, 25)
         cumElevationLabel.setStyleSheet(style)
 
         trackHeaterLabel = QLabel("Track Heater:", self.mainWindow)
@@ -549,32 +549,32 @@ class TrackModel:
         self.blockLengthLabel = QLabel(self.mainWindow)
         self.blockLengthLabel.setFont(font)
         self.blockLengthLabel.setStyleSheet(style)
-        self.blockLengthLabel.setGeometry(750, 330, 110, 25)
+        self.blockLengthLabel.setGeometry(800, 330, 110, 25)
 
         self.speedLimitLabel = QLabel(self.mainWindow)
         self.speedLimitLabel.setFont(font)
         self.speedLimitLabel.setStyleSheet(style)
-        self.speedLimitLabel.setGeometry(750, 365, 110, 25)
+        self.speedLimitLabel.setGeometry(800, 365, 110, 25)
 
         self.gradeLabel = QLabel(self.mainWindow)
         self.gradeLabel.setFont(font)
         self.gradeLabel.setStyleSheet(style)
-        self.gradeLabel.setGeometry(750, 400, 110, 25)
+        self.gradeLabel.setGeometry(800, 400, 110, 25)
 
         self.elevationLabel = QLabel(self.mainWindow)
         self.elevationLabel.setFont(font)
         self.elevationLabel.setStyleSheet(style)
-        self.elevationLabel.setGeometry(750, 435, 110, 25)
+        self.elevationLabel.setGeometry(800, 435, 110, 25)
 
         self.cumElevationLabel = QLabel(self.mainWindow)
         self.cumElevationLabel.setFont(font)
         self.cumElevationLabel.setStyleSheet(style)
-        self.cumElevationLabel.setGeometry(750, 470, 110, 25)
+        self.cumElevationLabel.setGeometry(800, 470, 110, 25)
 
         self.trackHeaterLabel = QLabel(self.mainWindow)
         self.trackHeaterLabel.setFont(font)
         self.trackHeaterLabel.setStyleSheet(style)
-        self.trackHeaterLabel.setGeometry(750, 505, 110, 25)
+        self.trackHeaterLabel.setGeometry(800, 505, 110, 25)
 
         # Station Labels:
         self.stationNameLabel = QLabel(self.mainWindow)
