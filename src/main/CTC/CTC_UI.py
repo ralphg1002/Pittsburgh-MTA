@@ -2546,6 +2546,8 @@ class Routing:
                 print("ROUTE Q")
                 print(routeQ)
                 
+                rowNumber = dispatchTrainsList.index(train)
+                
                 ########## SWITCH CHECK ##################
                 # Check if switch is in next 5 and get its index within the route queue. 
                 for i in range(0, 5):
@@ -2585,69 +2587,87 @@ class Routing:
 
                 ############## OCCUPANCY CHECK ############
                 # determine the index of the occupied block within the routeQ
-                for i in range(0, 5):
+                print("entering occupancy check...")
+                for i in range(1, 6):
                     if i < len(routeQ) and routeQ[i] in global_block_occupancy:
-                        occupied_index = i
-                        occupied_block = routeQ[i]
-                        break
+                        print("checking: if block " + str(routeQ[i]) + "is occupied: " + str(global_block_occupancy.get(routeQ[i])))
+                        if(global_block_occupancy.get(routeQ[i]) == 1):
+                            occupied_index = i
+                            occupied_block = routeQ[i]
+                            print("Here is the occupied block", occupied_block)
+                            print("Here is the occupied index", occupied_index)
+                            break
+                        occupied_index = None
+                        print("its not...")
                     else:
                         occupied_index = None
+                        print("No occupied block discovered...")
                 # If there is an occupied block within the next 6...
                 if occupied_index != None:
                     if(len(routeQ) >= 5 and occupied_block == routeQ[4]):
+                        print("slowing down 1")
                         suggestedSpeed = (
                         int(0.75 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
                         )
                         suggestedSpeed = round(suggestedSpeed, 2)
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
                         )
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
                         )
+                        return
                     elif(len(routeQ) >= 4 and occupied_block == routeQ[3]):
+                        print("slowing down 2")
                         suggestedSpeed = (
                         int(0.5 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
                         )
                         suggestedSpeed = round(suggestedSpeed, 2)
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
                         )
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
                         )
+                        return
                     elif(len(routeQ) >= 3 and occupied_block == routeQ[2]):
+                        print("slowing down 3")
                         suggestedSpeed = (
                         int(0.25 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
                         )
                         suggestedSpeed = round(suggestedSpeed, 2)
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
                         )
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
                         )
+                        return
                     elif(len(routeQ) >= 2 and occupied_block == routeQ[1]):
+                        print("slowing down 4")
                         suggestedSpeed = 0
                         authority = 0
 
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 4, QTableWidgetItem(str(authority))
                         )
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
@@ -2658,13 +2678,13 @@ class Routing:
                         ctcToTrackController.sendAuthority.emit(
                         line, wayside, routeQ[0], authority
                         )
+                        return
 
 
                 # LIGHT CHECK 
                 # STILL NEED TO DO THE CODE FOR THIS PART
 
                 #STATION CHECK
-                rowNumber = dispatchTrainsList.index(train)
                 if len(routeQ) >= 4 and stations_to_stop[0] == routeQ[3]:
                     suggestedSpeed = (
                         int(0.75 * block_info_list[routeQ[0]].speedLimit)

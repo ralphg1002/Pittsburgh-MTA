@@ -1580,6 +1580,7 @@ class TrackControl(QMainWindow):
                     tempBlock.get_number(),
                     tempBlock.get_lightstate(),
                 ))
+                
 
             elif blockType == "station":
                 # blockStatus.shift_middle()
