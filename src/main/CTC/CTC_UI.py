@@ -2490,6 +2490,8 @@ class Routing:
             routeQ = train.travelPath
             stations_to_stop = train.ordered_stations
             block_info_list = train.blockList
+            print("STATIONS TO STOP")
+            print(stations_to_stop)
 
             try:
                 routeQ[0]
