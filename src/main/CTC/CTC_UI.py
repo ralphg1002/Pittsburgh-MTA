@@ -1361,7 +1361,7 @@ class Scheduler:
                     print("Path: ", self.path)
                     self.travel = routing.find_travel_path(self.path)
                     print("Travel: ", self.travel)
-                    self.correctStops = routing.reorderStops(self.path)
+                    self.correctStops, self.correctBlocks = routing.reorderStops(self.path)
                 
                 suggested_speed = 43.50
                 travelTime = routing.computeTravelTime(
@@ -1380,7 +1380,7 @@ class Scheduler:
                     train_id,
                     suggested_speed,
                     self.travel,
-                    self.correctStops,
+                    self.correctBlocks,
                     self.blockInfo
                 )              
                 self.trainList.append(train)
@@ -1492,7 +1492,7 @@ class Scheduler:
                 print("Path: ", self.path)
                 self.travel = routing.find_travel_path(self.path)
                 print("Travel: ", self.travel)
-                self.correctStops = routing.reorderStops(self.path)
+                self.correctStops, self.correctBlocks = routing.reorderStops(self.path)
 
             # case if no arrival time is input, needs to be calculated
             if arrival_time == "":
@@ -1539,7 +1539,7 @@ class Scheduler:
                 train_id,
                 suggested_speed,
                 self.travel,
-                self.correctStops,
+                self.correctBlocks,
                 self.blockInfo
             )
 
@@ -1968,7 +1968,7 @@ class Routing:
         third_stations = []
 
         ordered_stations = []
-
+        ordered_blocks = []
         for block, station in block_stations[0:]:  
             if 62 < block < max_block:
                 first_stations.append(block)
@@ -1989,8 +1989,9 @@ class Routing:
         for block in self.stations_to_stop:
             station_name = self.find_station_name_by_block(block)
             ordered_stations.append(station_name)
+            ordered_blocks.append(block)
 
-        return ordered_stations
+        return ordered_stations, ordered_blocks
     
     def find_travel_path(self, path):
         max_block = 0
@@ -2740,8 +2741,12 @@ class Routing:
                     target_time_obj = current_time_obj.addSecs(60) 
                     #ctcToTrackController.signalTrainDwelling.emit(target_time_obj)
                     #print("Target Time:", target_time_obj.toString("HH:mm:ss"))
+                    print(stations_to_stop)
+                    print(block_info_list)
+                    print(routeQ)
+                    print(rowNumber)
                     
-                    QTimer.singleShot(15000,self.leaveStop)
+                    QTimer.singleShot(15000,lambda : self.leaveStop(stations_to_stop, block_info_list, routeQ, rowNumber))
                     #emite when dwelling, then check itll get, once then emit another signal
 
                 else:
@@ -2766,38 +2771,38 @@ class Routing:
                         rowNumber, 1, QTableWidgetItem(str(blockNum))
                     )
 
-    def leaveStop(self):
+    def leaveStop(self, stations_to_stop, block_info_list, routeQ, rowNumber):
         print("In leaveStop function")
-        print("Current stations to stop:", self.stations_to_stop)
+        print("Current stations to stop:", stations_to_stop)
+        print(block_info_list)
+        if stations_to_stop:
+            stations_to_stop.pop(0)
+            print("After pop(0), stations to stop:", stations_to_stop)
 
-        if self.stations_to_stop:
-            self.stations_to_stop.pop(0)
-            print("After pop(0), stations to stop:", self.stations_to_stop)
-
-            if not self.stations_to_stop:
-                self.stations_to_stop.append(0)
+            if not stations_to_stop:
+                stations_to_stop.append(0)
                 nextStop = "Returning to Yard"
                 print("List is empty, added 0, nextStop set to 'Returning to Yard'")
             else:
-                nextStop = self.find_station_name_by_block(self.stations_to_stop[0])
+                nextStop = self.find_station_name_by_block(stations_to_stop[0])
                 print("Next stop:", nextStop)
         else:
             nextStop = "Returning to Yard"
             print("List was initially empty, nextStop set to 'Returning to Yard'")
 
-        suggestedSpeed = round((self.block_info_list[self.routeQ[0]].speedLimit) * 0.621371, 2)
-        wayside = self.find_wayside(self.routeQ[0])
+        suggestedSpeed = round((block_info_list[routeQ[0]].speedLimit) * 0.621371, 2)
+        wayside = self.find_wayside(routeQ[0])
 
         print("Sending suggested speed and updating dispatch table")
         ctcToTrackController.sendSuggestedSpeed.emit(
-            1, wayside, self.routeQ[0], suggestedSpeed
+            1, wayside, routeQ[0], suggestedSpeed
         )
         self.main_window.dispatchTable.setItem(
-            0, 3, QTableWidgetItem(str(suggestedSpeed))
+            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
         )
-        self.main_window.dispatchTable.setItem(0, 1, QTableWidgetItem(self.routeQ[0]))
-        self.main_window.dispatchTable.setItem(0, 2, QTableWidgetItem(str(nextStop)))
-        self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("1"))
+        self.main_window.dispatchTable.setItem(rowNumber, 1, QTableWidgetItem(routeQ[0]))
+        self.main_window.dispatchTable.setItem(rowNumber, 2, QTableWidgetItem(str(nextStop)))
+        self.main_window.dispatchTable.setItem(rowNumber, 4, QTableWidgetItem("1"))
 
     def calculateDepartureTime(self, arrival_time, travelTime):
         arrivalTime = QTime.fromString(arrival_time, "HHmm")
