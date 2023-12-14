@@ -315,6 +315,15 @@ class TrainModel(QMainWindow):
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.addTrain.emit("green", "train1")
         trackModelToTrainModel.blockInfo.emit(999, 1, 100, 5, 40, 20, 1)
+        
+        self.dict = {
+            "Next Station1": "FIRST AVE",
+            "Next Station2": "SOUTH HILLS JUNCTION",
+            "Current Station": "STATION SQUARE",
+            "Door Side": "Left",
+            }       
+        
+        trackModelToTrainModel.beacon.emit(self.dict)
         # current block, next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
@@ -406,7 +415,7 @@ class TrainModel(QMainWindow):
                 trainObject.navigation_status["block_length"] = blockLength
                 trainObject.navigation_status["block_grade"] = blockGrade
                 trainObject.vehicle_status["speed_limit"] = speedLimit
-                # trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
+                trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
                 trainObject.vehicle_status["commanded_speed"] = 30
                 trainObject.navigation_status["authority"] = authority
         
