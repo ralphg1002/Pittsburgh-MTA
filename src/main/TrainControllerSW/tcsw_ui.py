@@ -1377,12 +1377,14 @@ class TrainControllerUI(QMainWindow):
         return
 
     def signal_speedLimit(self, name, speedLimit):
+        # km/hr -> mph
         for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_speedLimit(int(speedLimit * 2.237))
         return
 
     def signal_authority(self, name, authority):
+        # bool
         for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_authority(authority)
@@ -1419,16 +1421,18 @@ class TrainControllerUI(QMainWindow):
         return
 
     def signal_commandedSpeed(self, name, commandedSpeed):
+        # mph
         for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.set_commandedSpeed(commandedSpeed)
         return
 
     def signal_currSpeed(self, name, currSpeed):
+        # mph
         for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.prevSpeed = train.currentSpeed
-                train.set_currentSpeed(currSpeed)
+                train.set_currentSpeed(int(currSpeed * 2.237))
         return
 
     def signal_currTemp(self, name, currTemp):

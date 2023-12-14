@@ -141,6 +141,8 @@ class Train:
         return self.auto
 
     def set_setpointSpeed(self, setpointSpeed):
+        if setpointSpeed > self.speedLimit:
+            return
         self.setpointSpeed = setpointSpeed
 
     def get_setpointSpeed(self):
