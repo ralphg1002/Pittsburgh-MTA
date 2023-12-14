@@ -1,0 +1,1060 @@
+* e03d4f6 (origin/signal-train-model) Copied code to make sure everything is up to date
+| *   3c0e926 (origin/master, origin/HEAD) Merge pull request #120 from ralphg1002/signal-train-model
+| |\  
+| |/  
+|/|   
+* | 538e6ef Small uncomment
+* | 1aebc1a (origin/calculations-train-model) Added a station to show failures
+| *   d4640a8 Merge pull request #119 from ralphg1002/calculations-train-model
+| |\  
+| |/  
+|/|   
+* | 119105d Refixed by temperature
+| *   3fb3d67 Merge pull request #115 from ralphg1002/solo_track_control
+| |\  
+| | *   573bc60 (HEAD -> solo_track_control, origin/solo_track_control) Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+| | |\  
+| | |/  
+| |/|   
+| * |   fe76bed Merge pull request #118 from ralphg1002/traincontroller
+| |\ \  
+| | * \   ff007bd (origin/traincontroller) Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| | |\ \  
+| | |/ /  
+| |/| |   
+| * | |   b1ebd99 Merge pull request #117 from ralphg1002/final_tm_touchups
+| |\ \ \  
+| | * \ \   3306b08 (origin/final_tm_touchups) Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into final_tm_touchups
+| | |\ \ \  
+| | |/ / /  
+| |/| | |   
+| * | | |   d155908 Merge pull request #116 from ralphg1002/calculations-train-model
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | | 80d321b It is what it is
+| | * | | eba066e added direction to block data
+| | * | | b0c9f4a added map legend
+| | * | | ba231f9 adjusted block info labels
+| | * | | d7e475c added viewable beacon data
+| | * | | 66a0fcf added beacons and stations to map
+| | * | | 6301e2b failure selection disabled if no valid block number given
+| | * | | f33e0f1 Added block number hover display
+| |/ / /  
+| | * / dbc4198 tested train model signals
+| |/ /  
+| | * d32640a fixing automatic errors and voting
+| | *   537a7f6 Merge branch 'solo_track_control' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+| | |\  
+| | | * df73929 fixed arrival tiem
+| | | * 1634eaa fixed 2 trains dispatching
+| | * | 1437e5e voting logic
+| | * | f540d77 Merge branch 'solo_track_control' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+| | |\| 
+| | | * 12367d6 fixed import schedule and auto
+| | * | 2c36320 stopping and starting at lights
+| | |/  
+| | * ab989bf  fixed UI updating and manual mode
+| | *   adb7867 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+| | |\  
+| | |/  
+| |/|   
+| * |   96ca857 Merge pull request #114 from ralphg1002/calculations-train-model
+| |\ \  
+| |/ /  
+|/| |   
+* | | 0d2c547 Testing some stuff
+* | | 27d35b7 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into calculations-train-model
+|\| | 
+* | | a392f57 N
+* | | 5fc8912 I have no idea anymore
+| | * baf51fc slowing down to avoid collision with next occupied block
+| | * 086ea4a idk
+| | *   029cf46 Merge branch 'solo_track_control' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+| | |\  
+| | | * cb57672 comments
+| | |/  
+| |/|   
+| * |   9ab0b3b Merge pull request #113 from ralphg1002/solo_track_control
+| |\ \  
+| | * | 1ac7f61 hell yes
+| * | |   465c0a0 Merge pull request #112 from ralphg1002/traincontroller
+| |\ \ \  
+| | * \ \   47f7606 revert
+| | |\ \ \  
+| | |/ / /  
+| |/| | |   
+| | * | | d13fd9d updated unit tests
+| | | | * 8a1e28a test
+| | | |/  
+| | | *   393a572 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+| | | |\  
+| | |_|/  
+| |/| |   
+| * | | a324145 Merge pull request #111 from ralphg1002/solo_track_controller
+|/| | | 
+| * | | c093885 (origin/solo_track_controller) boopity boppity
+* | | |   ba33998 Merge pull request #110 from ralphg1002/calculations-train-model
+|\ \ \ \  
+| * \ \ \   3f2cd11 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into calculations-train-model
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   63da74b Merge pull request #109 from ralphg1002/track-train-integration-change
+|\ \ \ \ \  
+| * | | | | 361e78c added additional info for train model integration
+|/ / / / /  
+* | | | |   78d9819 Merge pull request #108 from ralphg1002/calculations-train-model
+|\ \ \ \ \  
+| |_|/ / /  
+|/| | | |   
+* | | | |   20e0f63 Merge pull request #107 from ralphg1002/updatesCTC
+|\ \ \ \ \  
+| * | | | | 81fd193 (origin/updatesCTC) added directionality signal
+| * | | | | 417488f idk
+| | | * | | 3eeca4b Small change
+| | |/ / /  
+| | * | | 7ebcb94 Train moves but i dont think its perfect
+| | * | | 276686e Made some changes to the signals
+| | * | | 4289d32 Same
+| | * | | 416c46e Updated block and passenger signals
+| | | | * bd4887e changes
+| | | | * 17dc591 fixed crossing logic
+| | | | * 9c9d2c6 integration with track model for lights and crossing
+| |_|_|/  
+|/| | |   
+* | | |   b08e8c9 (master) Merge pull request #106 from ralphg1002/tm_redline_work
+|\ \ \ \  
+| |_|_|/  
+|/| | |   
+| * | |   95a48cb Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into tm_redline_work
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   d41ffe4 Merge pull request #105 from ralphg1002/calculations-train-model
+|\ \ \ \  
+| | |_|/  
+| |/| |   
+| * | | 1e8353e small change to signals
+| * | | 0e2c72a Fixed some signals that were somehow not implemented
+| * | | 8d541c7 Test
+| * | |   529aede Trying to merge
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   37145bd Merge pull request #104 from ralphg1002/traincontroller
+|\ \ \ \  
+| * \ \ \   3eca806 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+| * | | | 908c6b5 updated ui
+| * | | |   c5a9a4d Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \ \  
+| * | | | | e4c769e  investigating power/currspd
+| | |_|_|/  
+| |/| | |   
+| | | * | 900a008 Same as before
+| | | * | 7f1a174 Some changes made to calculations
+| |_|/ /  
+|/| | |   
+| | | * b2dce8e red line occupancy logic added
+| | | * 2f898b7 ticket exchange works and so does throughput for red line
+| | | * e095ae2 added redline wayside
+| | | * 3e26b24 red stations show up on gui
+| | | * d98e019 Added breacon data for red line
+| |_|/  
+|/| |   
+* | |   e58b519 Merge pull request #103 from ralphg1002/red_line_map
+|\ \ \  
+| * | | d5c52d7 modified train model to utilize correct authority signal
+| * | |   bae1181 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into red_line_map
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   3a113c7 Merge pull request #102 from ralphg1002/main-train-model
+|\ \ \ \  
+| * | | | 171a56f Added the new authority but who knows if itll work
+| | * | | 32b9044 modified red line data reading from data sheet
+| | * | | 0cb92de modified track data to include red yard block
+| | * | | 38e9231 fixed small bugs with track map gui and prepared code for occupancy
+| | * | | f4b1b71 added red line signals
+| | * | | c9633b9 fix track data
+| | * | | 2763b4f added railway crossing
+| | * | | d29d509 added switches for red track
+| | * | | 10c0e33 train now receives command to start moving with authority update
+| | * | | 29b03e8 Need to load all blocks
+| | * | | 0849fe8 Failures result in occupancy emission
+| | * | |   e108c2e Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into red_line_map
+| | |\ \ \  
+| |_|/ / /  
+|/| | | |   
+* | | | |   4da490d Merge pull request #101 from ralphg1002/refactor_occupancy
+|\ \ \ \ \  
+| * \ \ \ \   9e940d7 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into refactor_occupancy
+| |\ \ \ \ \  
+| |/ / / / /  
+|/| | | | |   
+| * | | | | 8d25489 update frontend occupancy logic to match backend
+| * | | | | 32d27ff modify testbench to match actual occupancy signal
+| * | | | | 6d0c3b4 Revamped occupancy logic in backend to new model
+| | |_|_|/  
+| |/| | |   
+| | | * |   740825f Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into red_line_map
+| | | |\ \  
+| |_|_|/ /  
+|/| | | |   
+* | | | |   24e098f Merge pull request #100 from ralphg1002/main-train-model
+|\ \ \ \ \  
+| |/ / / /  
+|/| / / /   
+| |/ / /    
+| * | | f9e1fa7 (origin/main-train-model) push
+| * | | 028aa23 Integration with track model may work now but not tested yet
+| * | | 7d1a043 Fixed my failures so they actually work and have checkboxes
+| * | | b35d71c Fixed UI
+| * | | 471fa9f Some changes made to my main file
+| * | | 546761d (origin/calculations-trainmodel) doesnt work
+* | | | 7db8ab2 Merge pull request #98 from ralphg1002/calculations-trainmodel
+|\| | | 
+| |_|/  
+|/| |   
+| * | bc4fff9 made some calculation changes
+|/ /  
+* |   4efa60f Merge pull request #97 from ralphg1002/fixedCTCStuff
+|\ \  
+| * | fbc6d77 Fixed train model line and few lines of CTC
+* | |   e53871b Merge pull request #96 from ralphg1002/main-fix
+|\ \ \  
+| * | | c63521d fixed main
+|/ / /  
+* | |   ff1c8b0 Merge pull request #95 from ralphg1002/temp-train-model
+|\ \ \  
+| |/ /  
+|/| |   
+| * | 641604c temperature works
+* | |   9a0cad2 Merge pull request #94 from ralphg1002/moreUpdates
+|\ \ \  
+| |/ /  
+|/| |   
+| * |   6ef124b Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into moreUpdates
+| |\ \  
+| |/ /  
+|/| |   
+* | |   185e699 Merge pull request #93 from ralphg1002/traincontroller
+|\ \ \  
+| * \ \   22e57b7 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \  
+| |/ / /  
+|/| | |   
+| * | |   0a3d5df Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \  
+| * | | | d5758ec investigating announcement
+| * | | | ae1102a fixed train drop down
+| * | | | bfbcb97 fixed train drop down
+| * | | |   b6bde3a Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \ \  
+| * | | | | ef2df57 added unit tests
+| | | | * | 2ceb376 updates idk
+| | | |/ /  
+| | |/| |   
+| | | | * 2ce8b90 Add all blocks for red line
+| |_|_|/  
+|/| | |   
+* | | |   e201536 Merge pull request #92 from ralphg1002/track_control_switches
+|\ \ \ \  
+| * \ \ \   10d6eea (origin/track_control_switches, track_control_switches) Merge branch 'master' into track_control_switches
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   5cf3e45 Merge pull request #91 from ralphg1002/smallfix-train-model
+|\ \ \ \ \  
+| * | | | | 29a014a Small changes
+|/ / / / /  
+* | | | |   110bdfa Merge pull request #90 from ralphg1002/nomain-train-model
+|\ \ \ \ \  
+| * | | | | bd238a9 Commented out my main
+|/ / / / /  
+* | | | |   2939597 Merge pull request #89 from ralphg1002/manychanges-train-model
+|\ \ \ \ \  
+| |_|_|_|/  
+|/| | | |   
+| * | | | 0c38d35 Made many changes so hopefully some work
+* | | | |   d7457d5 Merge pull request #88 from ralphg1002/update_tm_functionality
+|\ \ \ \ \  
+| |_|_|_|/  
+|/| | | |   
+| * | | | 404af5c base logic for block 151
+| * | | | 3def1d0 add all switch functionality for green line
+| * | | | acd9407 fixed throughput integration with CTC
+| * | | |   122125b Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into update_tm_functionality
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   9cb1aa8 Merge pull request #87 from ralphg1002/fixed-train-model
+|\ \ \ \ \  
+| | |/ / /  
+| |/| | |   
+| * | | | d25f584 Fixed the lag problem
+|/ / / /  
+| * | | 2b8c67b switch functionality works for test switch
+| * | | f4c5ff5 stations that are on multiple blocks now carry the same data
+| * | | fb5e9aa restructured code
+| * | | ba6e373 commented out train dispatch occupancy from track controller
+| * | |   9a869df Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into update_tm_functionality
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   7ed0624 Merge pull request #86 from ralphg1002/ctc_updates
+|\ \ \ \  
+| * \ \ \   dd7f2eb Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into ctc_updates
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+| * | | |   04c9393 Merge branch 'ctc_updates' of https://github.com/ralphg1002/ECE-1140 into ctc_updates
+| |\ \ \ \  
+| | * | | | 08de81d small track model changes so it works for green line
+| | * | | | 5ee0864 fixed PLC logic for red line and updated wayside jurisdiction in excel
+| * | | | | 46b10d5 red line is ready and blocks update with occupancy
+| | | * | | 8f3334c railway crossing functionality added
+| | | * | | 1bde4a4 modified scene logic, added signal functionality for green line
+| | | * | |   ebf876d Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into update_tm_functionality
+| | | |\ \ \  
+| |_|_|/ / /  
+|/| | | | |   
+* | | | | |   2f54849 Merge pull request #85 from ralphg1002/TrackControl_Tweaks
+|\ \ \ \ \ \  
+| * | | | | | b27333d (TrackControl_Tweaks) testing stuff
+| * | | | | |   08d90ca Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into TrackControl_Tweaks
+| |\ \ \ \ \ \  
+| |/ / / / / /  
+|/| | | | | |   
+| * | | | | | c94c883 I don't remmeber my changes
+| | | | * | | 5aece9d fixed excel data sheet, added error checks, added signals to map
+| | | | * | |   61d6cc6 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into update_tm_functionality
+| | | | |\ \ \  
+| |_|_|_|/ / /  
+|/| | | | | |   
+| | | | * | | 28daeeb modified yard block occupancy and track data
+| | |_|/ / /  
+| |/| | | |   
+| | | | * | 6d02851 fixed switches
+| | | |/ /  
+| | | * / 8cb5783 (ctc_updates) minor changes
+| | |/ /  
+| | * |   a0c30a7 Merge branch 'ctc_updates' of https://github.com/ralphg1002/ECE-1140 into ctc_updates
+| | |\ \  
+| | * | | a5f6ff9 changes
+| | | | | * 6f436ff (refs/stash) WIP on ctc_updates: 977b359 rerouting logic
+| | | | |/| 
+| | | |/| | 
+| | | | | * a23e9a7 index on ctc_updates: 977b359 rerouting logic
+| | | | |/  
+| | | |/|   
+| | | * | 977b359 rerouting logic
+| | |/ /  
+| | * | d444b30 idk
+| | * | d0caa9d i dont remember
+| | * | d07eb8b added test file
+| |/ /  
+|/| |   
+* | |   0f9c5dc Merge pull request #84 from ralphg1002/test-train-model
+|\ \ \  
+| |/ /  
+|/| |   
+| * | f08fca5 Added test case for train model
+|/ /  
+* |   d8f14ad Merge pull request #83 from ralphg1002/TrackControl_Tweaks
+|\ \  
+| * | d42d25b edit occupancy
+| * | 5f31e02 fixed station labels
+| * | f221ac8 temp
+| * |   9e7bedd Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into TrackControl_Tweaks
+| |\ \  
+| |/ /  
+|/| |   
+* | |   210ce32 Merge pull request #82 from ralphg1002/Update_HWTC_Functionality
+|\ \ \  
+| * | | 79e37cd Merge branch 'Update_HWTC_Functionality' of https://github.com/ralphg1002/ECE-1140 into Update_HWTC_Functionality
+|/| | | 
+| * | | f1cbce5 Minor updates to power and speed control
+| * | | 0255621 Updating power calculation, braking functions
+* | | |   64066d4 Merge pull request #81 from ralphg1002/traincontroller
+|\ \ \ \  
+| | |_|/  
+| |/| |   
+| * | | f9c0d0b commented out print statement
+| * | | c0e3aee commented out test signal
+| * | |   9e99177 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \  
+| |/ / /  
+|/| | |   
+| * | | 80b0f48 fixed power calculation
+| | | * 615153f manual mode stuff
+| | | * db97ab1 changed switch from yard to block 53 instead of block 52
+| | | *   e0c3487 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into TrackControl_Tweaks
+| | | |\  
+| |_|_|/  
+|/| | |   
+* | | |   4f4d9b5 Merge pull request #80 from ralphg1002/TrackControl_Tweaks
+|\ \ \ \  
+| | | | * fc7614a Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into TrackControl_Tweaks
+| | |_|/| 
+| |/| |/  
+| |_|/|   
+|/| | |   
+* | | |   7cdaede Merge pull request #79 from ralphg1002/fixTrackSignals-train-model
+|\ \ \ \  
+| |_|_|/  
+|/| | |   
+| * | | b5fd471 Made a couple small changes
+| * | | dd40536 Making fixes to the track model signals
+| * | |   61ac4b2 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into fixTrackSignals-train-model
+| |\ \ \  
+| |/ / /  
+|/| | |   
+| * | |   b0f13c2 Making fixes to the track model signals
+| |\ \ \  
+| | | |/  
+| | |/|   
+| * | | e9bc884 Making fixes to the track model signals
+| | | *   fd80d92 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into TrackControl_Tweaks
+| | | |\  
+| |_|_|/  
+|/| | |   
+* | | |   26a184e Merge pull request #78 from ralphg1002/modify_occupancy_logic
+|\ \ \ \  
+| |_|/ /  
+|/| | |   
+| * | |   78d11a6 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into modify_occupancy_logic
+| |\ \ \  
+| |/ / /  
+|/| | |   
+| * | | 6d1a470 update occupancy logic for train
+| | | * 1caae19 uncommented stuff
+| | | * fa6c215 fixed the arrival toyard
+| | | * 6e20f25 meh
+| | | * 285b0f9 further testing with ctc
+| | | *   567bf37 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into TrackControl_Tweaks
+| | | |\  
+| |_|_|/  
+|/| | |   
+* | | |   11f5f44 Merge pull request #77 from ralphg1002/updateCTC
+|\ \ \ \  
+| * \ \ \   2c46052 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into updateCTC
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   a8e5a33 Merge pull request #76 from ralphg1002/traincontroller
+|\ \ \ \ \  
+| |_|_|/ /  
+|/| | | |   
+| * | | | 09014f5 adjusted power and stopping calculations to incorporate steel friction coeff
+| * | | |   3adcbf8 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+| * | | | f23f433 tested power and authority, correct some minor conditional errors
+| * | | |   c2dc5c2 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \ \  
+| * | | | | 0c4933c updating authority counter
+| | | * | | fbcf777 updated stuff in ctc
+| |_|/ / /  
+|/| | | |   
+* | | | |   7ba7f82 Merge pull request #75 from ralphg1002/tempvalue-train-model
+|\ \ \ \ \  
+| |_|_|/ /  
+|/| | | |   
+| * | | | 609cd55 fixed some ui colons
+|/ / / /  
+| | | * c2a2b28 fixing ui outputs
+| | | * 011be90 formatting handlers and sending signals
+| |_|/  
+|/| |   
+* | |   a7d50cb Merge pull request #74 from ralphg1002/testbench_functionality
+|\ \ \  
+| |_|/  
+|/| |   
+| * |   270b3fa Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into testbench_functionality
+| |\ \  
+| |/ /  
+|/| |   
+* | |   4256729 Merge pull request #72 from ralphg1002/temporary_changes
+|\ \ \  
+| * \ \   81bfdda Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into temporary_changes
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   f4c796d Merge pull request #73 from ralphg1002/tempvalue-train-model
+|\ \ \ \  
+| |_|_|/  
+|/| | |   
+| * | |   45cec43 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into tempvalue-train-model
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   419e8d5 Merge pull request #71 from ralphg1002/train-model
+|\ \ \ \  
+* \ \ \ \   581f4f0 Merge pull request #70 from ralphg1002/oldCodeRemove-train-model
+|\ \ \ \ \  
+* \ \ \ \ \   dbe6edc Merge pull request #69 from ralphg1002/updateUi-train-model
+|\ \ \ \ \ \  
+| | | | * | | 917bd0e added placeholders for my failures
+| | | |/ / /  
+| | | * / / a1933dd Minor fixes
+| | |/ / /  
+| | * / / 1728e31 Remove some old code
+| |/ / /  
+| * / / cf37800 updated ui functionality
+|/ / /  
+* | |   22cc0bb Merge pull request #68 from ralphg1002/trainmodelupdates
+|\ \ \  
+| * | | b856d53 linked signals
+|/ / /  
+| * | 7b11216 commenting out prints
+| * |   8b7af04 Merge branch 'temporary_changes' of https://github.com/ralphg1002/ECE-1140 into temporary_changes
+| |\ \  
+| | * | 172964f I don't even know whats happening at this point
+| * | | eafb930 fixing merge stuff
+| |/ /  
+| * |   0938413 Merge branch 'master' into your-branch-name
+| |\ \  
+| * \ \   3c48eb0 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+| |\ \ \  
+| * | | | d48dbff added handlers for ctc signals
+| | | | * ff740dd temporarily remove black
+| | | | * 03f69af added station data to gui and testbench
+| | | | *   4e02b70 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into testbench_functionality
+| | | | |\  
+| |_|_|_|/  
+|/| | | |   
+* | | | |   b206294 Merge pull request #67 from ralphg1002/ui-update-train-model
+|\ \ \ \ \  
+| * | | | | 22772d2 Changed brakes to 0
+| * | | | |   b8ed3b9 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into ui-update-train-model
+| |\ \ \ \ \  
+| |/ / / / /  
+|/| | | | |   
+* | | | | |   c9dbd08 Merge pull request #66 from ralphg1002/trainmodelupdates
+|\ \ \ \ \ \  
+| * \ \ \ \ \   4f85ff2 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into trainmodelupdates
+| |\ \ \ \ \ \  
+| |/ / / / / /  
+|/| | | | | |   
+| * | | | | | 8e9a76f Created new files and removed one line in signals file
+| * | | | | | f3a9a67 small changes
+| | * | | | | 06b6125 Made UI changes for the new dictionary
+| |/ / / / /  
+|/| | | | |   
+* | | | | | cb60bb5 Merge pull request #65 from ralphg1002/trainmodelupdates
+|\| | | | | 
+| * | | | | 010f345 fixed grammar
+| * | | | |   2df9ab3 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into trainmodelupdates
+| |\ \ \ \ \  
+| |/ / / / /  
+|/| | | | |   
+| * | | | | 92219bd made some changes to train model classes
+| * | | | |   0cf3659 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+| |\ \ \ \ \  
+| * | | | | | b707d49 updated test bench
+| | | | | | * e9347cb added occupancy logic from trckctrl for frontend. also added yard blocks to map
+| | | | | | * 81943b3 occupancy fully functional!
+| |_|_|_|_|/  
+|/| | | | |   
+* | | | | |   be008d8 Merge pull request #64 from ralphg1002/ctc_trackControl_integration
+|\ \ \ \ \ \  
+| |_|/ / / /  
+|/| | | | |   
+| * | | | |   f27a20f Merge branch 'ctc_trackControl_integration' of https://github.com/ralphg1002/ECE-1140 into ctc_trackControl_integration
+| |\ \ \ \ \  
+| | * | | | | d8b4fcc CTC is functional
+| * | | | | | 246c69f fixing ui bugs
+| |/ / / / /  
+| * | | | | 0bad4b5 further integration and int to string conversion
+| * | | | | 6b57695 more testing
+| * | | | | 2080894 running tests
+* | | | | |   6bb1107 Merge pull request #62 from ralphg1002/train-model-inte
+|\ \ \ \ \ \  
+| |_|/ / / /  
+|/| | | | |   
+| * | | | | 6533f03 minor tweaks
+|/ / / / /  
+* | | | |   7379e2d Merge pull request #61 from ralphg1002/traincontroller
+|\ \ \ \ \  
+| * | | | | 427014c Delete src/main/test.py
+| * | | | | ffa6795 Update signals.py
+| * | | | | 747b4cf Update TrackData.py
+| * | | | | 73fe900 Update TrackData.py
+| * | | | | fa793ae Update signals.py
+| * | | | | 7c54f05 Update TrackData.py
+| * | | | | ce602a4 Update TrackData.py
+| * | | | | b6c421d Update TrackData.py
+| * | | | | 43e3164 Update trackcontrolui.py
+| * | | | | f4878e1 Update trackcontrol.py
+| * | | | | 65d1aba Update CTC_UI.py
+| * | | | | 6cca0c5 made minor edit to change train functionality
+| * | | | | 5da3d8c added signal
+| * | | | | 51803ee added missing dictionary information
+| * | | | | 36531f4 ran scripts
+| * | | | |   488ff79 ???
+| |\ \ \ \ \  
+| |/ / / / /  
+|/| | | | |   
+* | | | | |   ac6842b Merge pull request #60 from ralphg1002/ctc_trackControl_integration
+|\ \ \ \ \ \  
+| | |/ / / /  
+| |/| | | |   
+| * | | | |   01e989b merge
+| |\ \ \ \ \  
+| | * \ \ \ \   5685c40 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into ctc_trackControl_integration
+| | |\ \ \ \ \  
+| |_|/ / / / /  
+|/| | | | | |   
+* | | | | | |   1d6c86b Merge pull request #58 from ralphg1002/train-model-delete
+|\ \ \ \ \ \ \  
+| * \ \ \ \ \ \   1e51f9d Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into train-model-delete
+| |\ \ \ \ \ \ \  
+| |/ / / / / / /  
+|/| | | | | | |   
+* | | | | | | |   ceb3fae Merge pull request #57 from ralphg1002/occupancy_on_gui
+|\ \ \ \ \ \ \ \  
+| * \ \ \ \ \ \ \   3078591 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into occupancy_on_gui
+| |\ \ \ \ \ \ \ \  
+| |/ / / / / / / /  
+|/| | | | | | | |   
+| * | | | | | | | c480eb3 modified track controller integration
+| * | | | | | | | 1b6d7b9 occupancy is updated in the backend for each block
+| | |_|_|_|_|_|/  
+| |/| | | | | |   
+| | * | | | | | 0cd2bd2 Deleted some useless classes
+| |/ / / / / /  
+|/| | | | | |   
+* | | | | | |   3eed621 Merge pull request #56 from ralphg1002/train-model-minor
+|\ \ \ \ \ \ \  
+| |/ / / / / /  
+|/| | | | | |   
+| * | | | | | 69b57a5 Changed a couple functions so they should work better and fixed minor emits
+* | | | | | |   3eabfd6 Merge pull request #55 from ralphg1002/ctc_trackControl_integration
+|\ \ \ \ \ \ \  
+| |_|_|_|_|_|/  
+|/| | | | | |   
+| | | * | | | 4692086 working on testbench
+| | | |/ / /  
+| | | * | | 1900413 something
+| | | * | | 08a35c3 i dont even know what im adding here
+| | | * | | 6cbbc71 fixed the crashing bug
+| | | * | | 6a48732 my system keeps crashing when I speed the clock up
+| | | * | | a092fca this isnt hard
+| | | * | | 0ce3615 Added some stuff
+| | | * | | ddb2ee4 connect signals
+| | | * | | a6f3cbe more signal changes and plc update
+| | |/ / /  
+| |/| | |   
+| * | | |   6a22b44 Merge branch 'master' into ctc_trackControl_integration
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   c12ac7b Merge pull request #54 from ralphg1002/ctcupdate
+|\ \ \ \ \  
+| * | | | | fced971 fixed some ctc stuff
+| | |_|_|/  
+| |/| | |   
+* | | | |   6592bde Merge pull request #53 from ralphg1002/integration_work
+|\ \ \ \ \  
+| |_|_|/ /  
+|/| | | |   
+| * | | |   a508d6a Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into integration_work
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   da82ebb Merge pull request #52 from ralphg1002/emit-function-train-model
+|\ \ \ \ \  
+| |_|/ / /  
+|/| | | |   
+| * | | |   0f82e4d Merge branch 'master' into emit-function-train-model
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+| * | | | 69a3a0d Added a couple emit signals and finished some of my functions
+| * | | | dd1c7ef Added a couple emit signals and finished some of my functions
+| | * | | 1dfb705 add base maintenance integration from track controller
+| | * | | e73df22 emiting occupancy updates to track controller
+| | * | | bc27f5c added beacon emissions to train model
+| |/ / /  
+|/| | |   
+| | * | 7b1db04 testing signals
+| | * | db580cf fixing test bench signal names
+| | * | ab6cc6a fixed ui window naming
+| | * | 40df785 working on test bench handlers
+| | * | f73b60a allowed track controller to be launched from main
+| | * | e341e1c added set occupancy
+| | * | 142e826 added handers
+| | | * 2eef13f added a signal
+| | | * 8df2e8c revised authority calculations
+| | | * dffd048 changed variable names
+| | | *   004280f Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| | | |\  
+| |_|_|/  
+|/| | |   
+* | | |   d2e13d5 Merge pull request #51 from ralphg1002/trackControllerIntegration
+|\ \ \ \  
+| |_|/ /  
+|/| | |   
+| * | |   d9490ac Merge branch 'master' into trackControllerIntegration
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   09e8bfb Merge pull request #50 from ralphg1002/add_integration_features
+|\ \ \ \  
+| * | | | d1752e5 added occupancy logic and signals for infrastructure
+| * | | |   32cd214 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into add_integration_features
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   311bb05 Merge pull request #49 from ralphg1002/anotherCTCfix
+|\ \ \ \ \  
+| * | | | | 69f311d accidentially messed something up so fixing it rq
+|/ / / / /  
+* | | | |   0ae8896 Merge pull request #48 from ralphg1002/signal/function-train-model
+|\ \ \ \ \  
+| * \ \ \ \   8986913 Merge branch 'master' into signal/function-train-model
+| |\ \ \ \ \  
+| | |_|_|/ /  
+| |/| | | |   
+| * | | | | 31e7745 Edited some small parts of functions
+| * | | | | bd65a26 made changes to some of my functions, added more signals, and changed my dictionary around
+* | | | | |   cc6ab06 Merge pull request #47 from ralphg1002/CTC_quickFix
+|\ \ \ \ \ \  
+| |_|/ / / /  
+|/| | | | |   
+| * | | | | ef9a6c6 CTC fixed tables and emit more signals
+|/ / / / /  
+| | * | | ff53a00 passenger integration complete
+| | * | | b8355a9 add suggested speed and authority from track controller
+| | * | | 730f53a added master clock and speed
+| |/ / /  
+|/| | |   
+| | * | 4f50df4 changed plc
+| | | * b63d972 revised pngs, reworking distance calculations
+| | | *   1da65f2 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| | | |\  
+| |_|_|/  
+|/| | |   
+* | | |   85593b9 Merge pull request #46 from ralphg1002/update_trackmodel_functionality
+|\ \ \ \  
+| |/ / /  
+|/| | |   
+| * | | 40d3638 prepare for master push
+| * | | 387d3bd Disabled testbench
+| * | | 22e0587 Added beacon data to green line
+| * | | c5de797 modified and cleaned track data
+| * | | d98b584 added track model signals for integration
+| * | |   051c359 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into update_trackmodel_functionality
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   d527be8 Merge pull request #45 from ralphg1002/CTC_addedSignals
+|\ \ \ \  
+| * | | | 8c94935 added CTC signals
+| | * | |   9b6d2f4 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into update_trackmodel_functionality
+| | |\ \ \  
+| |_|/ / /  
+|/| | | |   
+* | | | |   099cadf Merge pull request #44 from ralphg1002/traincontroller
+|\ \ \ \ \  
+| | | * | | 4b5cec6 added track map for green line
+| | | | | * e363bcf revised block dictionary and implementation
+| | | | | * 5748912 revised block dictionary and implementation
+| | |_|_|/  
+| |/| | |   
+| * | | | 498ac85 made minor changes to announcement functionality
+| * | | | 5431e36 implemented signal when train is dispatched
+| * | | | e30bb10 ran scripts
+| * | | |   9de375d Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   e5f18fe Merge pull request #43 from ralphg1002/AddHWTrainControllerCode
+|\ \ \ \ \  
+| * | | | | 1253c22 Added HW Train Controller main file
+|/ / / / /  
+| * / / / a15111e implemented train search by line
+|/ / / /  
+* | | |   4a27356 Merge pull request #42 from ralphg1002/signal-train-model
+|\ \ \ \  
+| * | | | e839c95 added signals and a refresh rate method to my classes
+| |/ / /  
+* | | |   f8c3d83 Merge pull request #41 from ralphg1002/trackControllerIntegration
+|\ \ \ \  
+| |/ / /  
+|/| | /   
+| | |/    
+| |/|     
+| * | 2b46702 fixed plc parsing logic and wayside mapping in the excel
+* | |   7dc5066 Merge pull request #40 from ralphg1002/traincontroller
+|\ \ \  
+| * \ \   6bbe684 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   1f3bdbf Merge pull request #39 from ralphg1002/functions-train-model
+|\ \ \ \  
+| * | | | 5fbcfe7 Added function for train model simulation and reading information from track model
+* | | | |   772ae8a Merge pull request #38 from ralphg1002/traincontroller
+|\ \ \ \ \  
+| | | * | | 67e7cee ran scripts
+| | | * | | deb7375 synchronized time
+| | | * | | 2fa167f minor adjustment to functionality when train reaches a station
+| | |/ / /  
+| |/| | |   
+| * | | |   ed4b0e4 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   7b87c89 Merge pull request #37 from ralphg1002/traincontroller
+|\ \ \ \ \  
+| |_|/ / /  
+|/| | | |   
+| | * | | 7315fc5 ran scripts
+| | * | | 4552c30 Updated signals file and made minor adjustments to functionality
+| |/ / /  
+| * | | 6c1ab2a ran scripts
+| * | |   78309fb Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   6762714 Merge pull request #36 from ralphg1002/update-failures
+|\ \ \ \  
+| * | | | 8063d45 Commented entire explanation.py file in TrackController bc file caused black issue
+| * | | |   89b5f1d Merge branch 'master' into update-failures
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   7c01d92 Merge pull request #35 from ralphg1002/trackControllerIntegration
+|\ \ \ \ \  
+| | |_|/ /  
+| |/| | |   
+| * | | | 741271e clean up folder
+|/ / / /  
+* | | |   aa9b0f6 Merge pull request #34 from ralphg1002/CTC_update
+|\ \ \ \  
+| * | | | 75c191e updated CTC
+| * | | | b27b9cc CTC updated gui
+| * | | |   6ad42e9 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+| |\ \ \ \  
+| |/ / / /  
+|/| | | |   
+* | | | |   e046201 Merge pull request #33 from ralphg1002/traincontroller
+|\ \ \ \ \  
+| |_|_|_|/  
+|/| | | |   
+| | * | |   9c6bd5f Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+| | |\ \ \  
+| |_|/ / /  
+|/| | | |   
+| | * | | 84320d0 CTC window updated
+| | * | |   62d8c56 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+| | |\ \ \  
+| | * \ \ \   dfa35c2 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+| | |\ \ \ \  
+| | | | | * | 6bcfb2e Added checkboxes to failures with some functionality
+| | | | | * | d0a8cfa working on failures
+| |_|_|_|/ /  
+|/| | | | |   
+* | | | | |   a6cddc6 Merge pull request #32 from ralphg1002/update-main-train-model
+|\ \ \ \ \ \  
+| |_|_|_|/ /  
+|/| | | | |   
+| * | | | | 260ac5a Updated main to call Train Model
+|/ / / / /  
+* | | | |   26a33eb Merge pull request #31 from ralphg1002/CTC_mainGUI_ready
+|\ \ \ \ \  
+| * | | | | 4c6076d CTC_GUI!
+| * | | | | 119ac86 CTC merge
+| * | | | |   196f15c Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into CTC_mainGUI_ready
+| |\ \ \ \ \  
+| |/ / / / /  
+|/| | | | |   
+* | | | | |   d3f5029 Merge pull request #30 from ralphg1002/create_new_trackmodel_gui
+|\ \ \ \ \ \  
+| * | | | | | 3cc4dca added track model to main application
+| * | | | | | f1e9608 reworked data and station classes
+|/ / / / / /  
+| * | / / / d952bb6 CTC starting ui
+| | |/ / /  
+| |/| | |   
+| * | | | 2d21ad3 CTC ready for group gui
+| | | | * 8bfcb45 Updated train controller sw functionality, adjusted ui components
+| | | |/  
+| | |/|   
+| | * | 86d359b updated signals file to include train controller sw outputs
+| |/ /  
+|/| |   
+* | |   4e36a3f Merge pull request #29 from ralphg1002/traincontroller
+|\ \ \  
+| * | | af79c8a ran scripts on updated train controller functions
+| * | | 8b202e6 updated main.py and implement time
+| * | | ed1add8 updated main.py and linked train controller ui
+| * | | 6042428 updated main.py
+|/ / /  
+* | |   d637157 Merge pull request #28 from ralphg1002/tweakingTrackControlUIandMain
+|\ \ \  
+| * \ \   ea649ec Merge branch 'master' into tweakingTrackControlUIandMain
+| |\ \ \  
+| |/ / /  
+|/| | |   
+* | | |   145dc6f Merge pull request #27 from ralphg1002/update-train-model
+|\ \ \ \  
+| * | | | 797c04c Updated methods to classes
+|/ / / /  
+* | | |   97cbb02 Merge pull request #25 from ralphg1002/traincontroller
+|\ \ \ \  
+| |_|_|/  
+|/| | |   
+| * | | fbd42ee train controller ui + functions
+|/ / /  
+| * / bc523f8 fixed some UI and test bench bugs, made signal naming consistent
+|/ /  
+* |   8c659e8 Merge pull request #24 from ralphg1002/initialTrackControllerGUI
+|\ \  
+| |/  
+|/|   
+| * 0188c47 Added main signals file and main ui
+|/  
+*   d184553 Merge pull request #23 from ralphg1002/initial-train-model
+|\  
+| * e8a350c Adding my Train Model UI
+|/  
+*   aa9827e Merge pull request #22 from ralphg1002/CTC_initial
+|\  
+| * 760c191 This is the CTC's initial push!
+|/  
+*   5cdd91d Merge pull request #21 from ralphg1002/initialTrackControllerGUI
+|\  
+| * 54a2fc7 Add all track controller code
+|/  
+*   e3a6ae1 Merge pull request #20 from ralphg1002/remove_linter
+|\  
+| * e344034 temporarily disable linter
+| * c6e1156 reset
+| * 6e0371e temporarily disable pylint
+|/  
+*   c628243 Merge pull request #19 from ralphg1002/add_pymon
+|\  
+| * d78fc5d add pymon
+|/  
+*   81b69f5 Merge pull request #18 from ralphg1002/create_track_model_ui
+|\  
+| * c2a0d7c ran pylint and black
+| *   125d24b Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into create_track_model_ui
+| |\  
+| |/  
+|/|   
+* |   13af14c Merge pull request #17 from ralphg1002/create_gitignore
+|\ \  
+| * | 053d130 added gitignore
+|/ /  
+* |   9f5e34d Merge pull request #16 from ralphg1002/edit_linter
+|\ \  
+| * | dd7d17a removed docstring requirements from linter
+|/ /  
+* |   9141d80 Merge pull request #15 from ralphg1002/modify_clarification
+|\ \  
+| * | 26fe9d7 added clarity to the documentation
+|/ /  
+| * 950e4c4 modified png paths to work
+| * 50ad9ec moved files into track model folder
+| * 0c3668b testbench output dispalys
+| * 81b2e1f Created empty testbench window
+| * 8451b21 Added station data
+| * 11ed4a7 Fixed possible failures from failure configuration window
+| * 83df5ba Added full functionality to failure configuration, works as intended
+| * 583d392 Selectable block info from main window is now displayed for all blocks
+| * 27434ed Added icons next to selectables and import button
+| * ab45d48 simple fix to temperature input
+| * be0ff51 Add temperature control
+| * f900793 Added line selection buttons
+| * bd62317 Disabled change failrues button prior to import & refactored code
+| * 29e7d25 Read in excel data for blue line, gui updates upon import
+| * b25523f Added track data import
+| * 8f4461d added pngs, map can zoom in and zoom out
+| * a9b6501 Added simulation clock and speed
+| * f14a27e Disabled button if dropdown menu option not selected
+| * 3652ffe Added selections to failure popup window
+| * 16c0cfa Added button functionality to close popup window
+| * f14eb4b Add popup window for failures
+| * ac19f2f Add all selectable options for track/block info
+| * 299bc24 created basic gui
+|/  
+* 1414daa correct argument naming style
+*   0fd1063 Merge pull request #13 from ralphg1002/more_documentation
+|\  
+| * 0bbfd09 I added more documentation
+|/  
+*   f7fcb42 Merge pull request #12 from ralphg1002/add_documentation
+|\  
+| * 81790f0 added documentation for git, github, and poetry
+|/  
+* dad488e added custom rules to linter
+* 4669e4d add config file for linter, now enforces custom naming rules
+* adb7d68 remove score from linter output
+* 704223c fix linting error
+* 3d1f791 add temp files
+*   fb59475 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+|\  
+| * 3f039d6 add linter to workflow
+| * 3da5790 run black only on src files
+* | 6466b1b default linter should pass
+|/  
+* 8b3d806 modify repo structure
+* f0c424d test black
+* 0ad3bd9 attempt 2 of trying to fix run black command
+* 4e0fd05 attempt 1 of trying to fix run black command
+* fed796c configure python build error
+* 4c05039 create yaml file for build workflow
+*   1854512 Merge branch 'master' of https://github.com/ralphg1002/ECE-1140
+|\  
+| *   4482662 Merge pull request #11 from ralphg1002/testing_webhook
+| |\  
+| | * 7f5248b fixed issue
+| | * 59e53be testing issue
+| |/  
+| *   1a17cfe Merge pull request #10 from ralphg1002/testing_webhook
+| |\  
+| | * 3807e91 Removed class and group #
+| * | f9129dc Merge pull request #9 from ralphg1002/testing_webhook
+| |\| 
+| | * 3c2102a Added class and group #
+| |/  
+| *   923995c Merge pull request #8 from ralphg1002/ReedYulis-patch-1
+| |\  
+| | * 2bac848 Added Name
+| |/  
+* / 2ef1ca1 poetry test
+|/  
+*   ea5200a Merge pull request #7 from ralphg1002/add_name_Aidan
+|\  
+| * d0b4da3 I added my name
+|/  
+*   3291a6c Merge pull request #5 from ralphg1002/add_name_Asher
+|\  
+| * 8afa06c added name
+|/  
+*   77ca435 Merge pull request #4 from ralphg1002/add_name_Julia
+|\  
+| * 129288a adding name
+|/  
+*   2e5c86e Merge pull request #3 from ralphg1002/test
+|\  
+| * 4ca3aa9 test
+|/  
+* fbe5484 fix
+*   750d1ef Merge pull request #2 from ralphg1002/add_name_beryl
+|\  
+| * 1a61f07 Beryl Sin is now a contributor to the project
+|/  
+*   d541ddb Merge pull request #1 from ralphg1002/add_name_ralph
+|\  
+| * c319a59 ralph is added as a contributor to this project
+|/  
+* d91fe5e Add README.md
