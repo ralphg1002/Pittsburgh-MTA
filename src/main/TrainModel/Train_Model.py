@@ -313,8 +313,8 @@ class TrainModel(QMainWindow):
     def update(self):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
-        # masterSignals.addTrain.emit("green", "train1")
-        # trackModelToTrainModel.blockInfo.emit(999, 1, 100, 5, 40, 20, 1)
+        masterSignals.addTrain.emit("green", "train1")
+        trackModelToTrainModel.blockInfo.emit(999, 1, 100, 5, 40, 20, 1)
         # current block, next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
@@ -1095,7 +1095,7 @@ class ResultsWindow(QMainWindow):
             "Air Conditioning: {}",
             "Advertisements: {}",
         ]
-
+        
         # QLabel for passengers
         self.word_label_passengers = QLabel(
             "Passengers: {}".format(self.selected_train.passenger_status["passengers"]),
@@ -1352,6 +1352,32 @@ class ResultsWindow(QMainWindow):
             "Passenger Emergency Brake: {}",
         ]
 
+        self.checkbox_nav = []
+        status2 = self.navigation_word_list[-1]
+        layout2 = QHBoxLayout()
+
+        status_label2 = QLabel(status2.format(""))
+        status_label2.setStyleSheet("border: none;")
+        status_label2.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        status_label2.setContentsMargins(0, 0, 0, 0)
+        status_label2.setFont(QFont("Arial", 9))
+
+        self.cb2 = QCheckBox()
+        self.cb2.setChecked(False)
+        self.cb2.setStyleSheet("border: none;")
+        self.cb2.toggled.connect(lambda checked, s=status: self.update_passenger_emer_brake(s, checked))
+
+        spacer2 = QSpacerItem(100, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        
+        layout2.addWidget(status_label2)
+        layout2.addItem(spacer2)
+        layout2.addWidget(self.cb2)
+        
+        self.navigation_white_background_layout.addLayout(layout2)
+
+        self.checkbox_nav.append(self.cb2)
+        
+        
         # QLabel for authority
         self.word_label_authority = QLabel(
             "Authority: {}".format(self.selected_train.navigation_status["authority"]),
@@ -1436,17 +1462,17 @@ class ResultsWindow(QMainWindow):
         self.word_label_headlights.setContentsMargins(5, 5, 5, 5)
         self.word_label_headlights.setFont(QFont("Arial", 9))
 
-        # QLabel for passenger emergency brake
-        self.word_label_pass_emergency_brake = QLabel(
-            "Passenger Emergency Brake: {}".format(self.selected_train.navigation_status["passenger_emergency_brake"]),
-            self.navigation_white_background_label
-        )
-        self.word_label_pass_emergency_brake.setStyleSheet(
-            "color: #000000; background-color: transparent; border: none;"
-        )
-        self.word_label_pass_emergency_brake.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.word_label_pass_emergency_brake.setContentsMargins(5, 5, 5, 5)
-        self.word_label_pass_emergency_brake.setFont(QFont("Arial", 9))
+        # # QLabel for passenger emergency brake
+        # self.word_label_pass_emergency_brake = QLabel(
+        #     "Passenger Emergency Brake: {}".format(self.selected_train.navigation_status["passenger_emergency_brake"]),
+        #     self.navigation_white_background_label
+        # )
+        # self.word_label_pass_emergency_brake.setStyleSheet(
+        #     "color: #000000; background-color: transparent; border: none;"
+        # )
+        # self.word_label_pass_emergency_brake.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        # self.word_label_pass_emergency_brake.setContentsMargins(5, 5, 5, 5)
+        # self.word_label_pass_emergency_brake.setFont(QFont("Arial", 9))
 
         # Add QLabel widgets to layout
         self.navigation_white_background_layout.addWidget(
@@ -1477,9 +1503,9 @@ class ResultsWindow(QMainWindow):
             self.word_label_headlights, alignment=Qt.AlignTop
         )
 
-        self.navigation_white_background_layout.addWidget(
-            self.word_label_pass_emergency_brake, alignment=Qt.AlignTop
-        )
+        # self.navigation_white_background_layout.addWidget(
+        #     self.word_label_pass_emergency_brake, alignment=Qt.AlignTop
+        # )
 
         # Add stretch
         self.navigation_white_background_layout.addStretch(1)
@@ -1551,6 +1577,10 @@ class ResultsWindow(QMainWindow):
         component = status.split(":")[0].lower().replace(" ", "_")
         self.selected_train.failure_status[component] = checked
 
+    def update_passenger_emer_brake(self, status, checked):
+        component = status.split(":")[0].lower().replace(" ", "_")
+        self.selected_train.navigation_status[component] = checked
+
     def update_ui(self):
         word_value = {}
         if self.vehicle_word_list:
@@ -1608,6 +1638,13 @@ class ResultsWindow(QMainWindow):
             component = status.split(":")[0].lower().replace(" ", "_")
             checked = checkbox.isChecked()
             self.selected_train.failure_status[component] = checked
+
+        checkbox2 = self.checkbox_nav[-1]
+        status2 = self.navigation_word_list[-1]
+
+        component2 = status2.split(":")[0].lower().replace(" ", "_")
+        checked2 = checkbox2.isChecked()
+        self.selected_train.navigation_status[component2] = checked2
         
         for trainObject in self.trainsList:
             # Update QLabel widgets with new information
@@ -1711,9 +1748,9 @@ class ResultsWindow(QMainWindow):
                 "Headlights: {}".format(trainObject.navigation_status["headlights"])
             )
 
-            self.word_label_pass_emergency_brake.setText(
-                "Passenger Emergency Brake: {}".format(trainObject.navigation_status["passenger_emergency_brake"])
-            )
+            # self.word_label_pass_emergency_brake.setText(
+            #     "Passenger Emergency Brake: {}".format(trainObject.navigation_status["passenger_emergency_brake"])
+            # )
 
 
 
