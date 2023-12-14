@@ -692,38 +692,37 @@ class TrackModel:
     def show_station_data(self):
         blockNumber = self.entryField.text()
 
-        if self.selectedLine == "Green":
-            for data in self.trackData:
-                if data["Block Number"] == int(blockNumber):
-                    if type(data["Infrastructure"]) == str and "STATION" in data["Infrastructure"]:
-                        stationName = str(data["Infrastructure"])
-                        stationName = stationName.split(";")[0]
-                        print(stationName)
-                        # if stationName in data["Infrastructure"]:
-                        #     print(data["Infrasctructure"])#Left off here
-                        self.stationNameLabel.setText(f"{stationName}")
-                        self.ticketSalesLabel.show()
-                        self.waitingLabel.show()
-                        self.boardingLabel.show()
-                        self.leavingLabel.show()
-                        self.ticketSalesOutput.setText(f"{data['Ticket Sales']}")
-                        self.ticketSalesOutput.show()
-                        self.waitingOutput.setText(f"{data['Passengers Waiting']}")
-                        self.waitingOutput.show()
-                        self.boardingOutput.setText(f"{data['Passengers Boarding']}")
-                        self.boardingOutput.show()
-                        self.leavingOutput.setText(f"{data['Passengers Disembarking']}")
-                        self.leavingOutput.show()
-                    else:
-                        self.stationNameLabel.setText(f"")
-                        self.ticketSalesOutput.hide()
-                        self.waitingOutput.hide()
-                        self.boardingOutput.hide()
-                        self.leavingOutput.hide()
-                        self.ticketSalesLabel.hide()
-                        self.waitingLabel.hide()
-                        self.boardingLabel.hide()
-                        self.leavingLabel.hide()
+        for data in self.trackData:
+            if data["Block Number"] == int(blockNumber):
+                if type(data["Infrastructure"]) == str and "STATION" in data["Infrastructure"]:
+                    stationName = str(data["Infrastructure"])
+                    stationName = stationName.split(";")[0]
+                    print(stationName)
+                    # if stationName in data["Infrastructure"]:
+                    #     print(data["Infrasctructure"])#Left off here
+                    self.stationNameLabel.setText(f"{stationName}")
+                    self.ticketSalesLabel.show()
+                    self.waitingLabel.show()
+                    self.boardingLabel.show()
+                    self.leavingLabel.show()
+                    self.ticketSalesOutput.setText(f"{data['Ticket Sales']}")
+                    self.ticketSalesOutput.show()
+                    self.waitingOutput.setText(f"{data['Passengers Waiting']}")
+                    self.waitingOutput.show()
+                    self.boardingOutput.setText(f"{data['Passengers Boarding']}")
+                    self.boardingOutput.show()
+                    self.leavingOutput.setText(f"{data['Passengers Disembarking']}")
+                    self.leavingOutput.show()
+                else:
+                    self.stationNameLabel.setText(f"")
+                    self.ticketSalesOutput.hide()
+                    self.waitingOutput.hide()
+                    self.boardingOutput.hide()
+                    self.leavingOutput.hide()
+                    self.ticketSalesLabel.hide()
+                    self.waitingLabel.hide()
+                    self.boardingLabel.hide()
+                    self.leavingLabel.hide()
 
     def check_failures(self):
         if "Track Circuit Failure" in self.failures:
@@ -915,10 +914,12 @@ class TrackModel:
             blockNum = int(blockNum)
             if (blockNum >= 1 and blockNum <= 30) or (blockNum >= 102 and blockNum <= 150):
                 return 1
-            else:
-                return 2
+            # return 2
         elif line == 2:
-            return
+            if (blockNum >= 0 and blockNum <= 27) or (blockNum >= 72 and blockNum <= 76):
+                return 1
+        return 2
+                
 
     def update_switch_state(self, line, _, blockNum, state):
         self.trackView.change_switch(line, blockNum, state)
