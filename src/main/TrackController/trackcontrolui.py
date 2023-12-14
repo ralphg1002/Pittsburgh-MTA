@@ -288,10 +288,10 @@ class MapWindow(QMainWindow):
     def set_map(self, line):
         if line == 1:
             self.mapLabel.setPixmap(self.scaledPixmapGreenLine)
-            print("greenline")
+            #print("greenline")
         else:
             self.mapLabel.setPixmap(self.scaledPixmapRedLine)
-            print("Red line: ", line)
+            #print("Red line: ", line)
 
 
 class DeviceBox(QWidget):
@@ -888,12 +888,12 @@ class TestWindow(QMainWindow, UiMainWindow):
         )
 
     def handle_input_action_select(self, index):
-        print("THIS IS THE ACTION SELECT INDEX: ", index)
+        #print("THIS IS THE ACTION SELECT INDEX: ", index)
         self.inputAction = index
 
     def handle_input_line_select(self, index):
         self.inputLine = index
-        print("THIS IS THE LINE: ", index)
+        #print("THIS IS THE LINE: ", index)
         if index == 0:
             # reset the next selections
             pass
@@ -905,12 +905,12 @@ class TestWindow(QMainWindow, UiMainWindow):
             pass
 
     def handle_input_block_select(self, blockNum):
-        print("THIS IS THE BLOCK NUMBER: ", blockNum)
+        #print("THIS IS THE BLOCK NUMBER: ", blockNum)
         self.inputBlockNum = blockNum
         # print("Here is it converted to an int: ", int(self.inputBlockNum))
 
     def handle_input_state_select(self, state):
-        print("THIS IS THE STATE: ", state)
+        #print("THIS IS THE STATE: ", state)
         self.inputStateText = state
 
         """
@@ -1481,7 +1481,7 @@ class MainUI(QMainWindow):
         self.systemSpeedInput.setText(
             "x" + format(1 / (self.time_interval / 1000), ".3f")
         )
-
+    
     # This is a method to make all of the device widgets hidden
     def hide_devices(self):
         self.lightState.hide()
