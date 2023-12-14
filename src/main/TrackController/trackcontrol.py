@@ -503,13 +503,14 @@ class Wayside:
                         if (
                             self.get_block(block).get_occupancystate() == True
                         ):
-                            # if it is the last in the list, just assume its true
-                            if(current_index + 1 >= len(entry)):
-                                condition1 = True
-                            # if it is not in the last of the list ensure it is traveling in the proper direction
-                            elif(self.get_block(entry[current_index + 1]).get_occupancystate() == True):
-                                condition1 = True
-                            break
+                            condition1 = True
+                            # # if it is the last in the list, just assume its true
+                            # if(current_index + 1 >= len(entry)):
+                            #     condition1 = True
+                            # # if it is not in the last of the list ensure it is traveling in the proper direction
+                            # elif(self.get_block(entry[current_index + 1]).get_number() == self.get_block(block).get_nextblock()):
+                            #     condition1 = True
+                            # break
                         
                 else:
                     if self.get_block(0).get_occupancystate() == True:
@@ -521,13 +522,14 @@ class Wayside:
                         current_index = exitRange.index(block)
                         # Check if the current block is occupied and the next block exists and is occupied
                         if (self.get_block(block).get_occupancystate() == True):
+                            condition2 = True
                             # if it is the last in the list, just assume its true
-                            if(current_index + 1 >= len(exitRange)):
-                                condition2 = True
-                            # if it is not in the last of the list ensure it is traveling in the proper direction
-                            elif(self.get_block(exitRange[current_index + 1]).get_occupancystate() == True):
-                                condition2 = True
-                            break
+                            # if(current_index + 1 >= len(exitRange)):
+                            #     condition2 = True
+                            # # if it is not in the last of the list ensure it is traveling in the proper direction
+                            # elif(self.get_block(exitRange[current_index + 1]).get_occupancystate() == True):
+                            #     condition2 = True
+                            # break
                 else:
                     condition2 = True
                     # print("Here I set the condition2 to true")
