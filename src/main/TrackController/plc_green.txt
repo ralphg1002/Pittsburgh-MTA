@@ -75,22 +75,16 @@ END
 
 SW6:
 IF
-    Condition: (80->85)
+    Condition: (77->86)
     Operation: SWITCH(0)
     Operation: 85 G
     Operation: 100 R
     end
 IF
-    Condition: (95->100) AND NOT(77->85)
+    Condition: (95->100)
     Operation: SWITCH(1)
     Operation: 85 R
     Operation: 100 G
-    end
-IF
-    Condition: (95->100) AND (77->85)
-    Operation: SWITCH(0)
-    Operation: 85 G
-    Operation: 100 R
     end
 END
 

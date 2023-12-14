@@ -499,12 +499,20 @@ class Wayside:
                 if entry != 0:
                     # check for validity of conditon 1
                     for block in entry:
-                        #print(self.line, self.waysideNum, block)
-                        if (self.get_block(block) == None):
-                            print(block)
-                        if self.get_block(block).get_occupancystate() == True:
-                            condition1 = True
+                        # Find the index of the current block in the entry list
+                        current_index = entry.index(block)
+                        # Check if the current block is occupied and the next block exists and is occupied
+                        if (
+                            self.get_block(block).get_occupancystate() == True
+                        ):
+                            # if it is the last in the list, just assume its true
+                            if(current_index + 1 >= len(entry)):
+                                condition1 = True
+                            # if it is not in the last of the list ensure it is traveling in the proper direction
+                            elif(self.get_block(entry[current_index + 1]).get_occupancystate() == True):
+                                condition1 = True
                             break
+                        
                 else:
                     if self.get_block(0).get_occupancystate() == True:
                         condition1 = True
@@ -512,14 +520,15 @@ class Wayside:
                 # check for validity of condition 2
                 if exitRange != None:
                     for block in exitRange:
-                        if exitRange == None:
-                            condition2 = True
-                            break
-
-                        if (self.get_block(block) == None):
-                            print(block)
-                        elif self.get_block(block).get_occupancystate() == True:
-                            condition2 = True
+                        current_index = exitRange.index(block)
+                        # Check if the current block is occupied and the next block exists and is occupied
+                        if (self.get_block(block).get_occupancystate() == True):
+                            # if it is the last in the list, just assume its true
+                            if(current_index + 1 >= len(exitRange)):
+                                condition2 = True
+                            # if it is not in the last of the list ensure it is traveling in the proper direction
+                            elif(self.get_block(exitRange[current_index + 1]).get_occupancystate() == True):
+                                condition2 = True
                             break
                 else:
                     condition2 = True
@@ -796,8 +805,7 @@ class Wayside:
                 elif pattern == "patternEntryRangeAndNotExitReverseRange":
                     entry = list(range(int(match.group(1)),
                                  int(match.group(2)) + 1))
-                    exit = list(range(int(match.group(3)),
-                                int(match.group(4)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))[::-1]
                     notExist = True
                     direction_entry = 1
                     direction_exit = -1
