@@ -40,8 +40,12 @@ class RunPLC:
                 for line in file:
                     line = line.strip()
 
-                    if line.startswith("SW") or line.startswith("CRX"):
+                    if line.startswith("SW"):
                         currentSection = line
+                        sections = []
+                        ifBlock = 0
+                    elif line.startswith("CRX"):
+                        currentSection = "CRX"
                         sections = []
                         ifBlock = 0
                     elif line == "IF":
@@ -69,6 +73,7 @@ class RunPLC:
             print(f"An error occurred while parsing the file: {e}")
             # You can choose to continue or raise an exception here if needed
 
+        #print(data)
         return data
 
 
@@ -456,9 +461,11 @@ class Wayside:
 
             for ifBlock in range(0, len(item)):
                 switchString = item[ifBlock]["Section"].rstrip(":")
+                correctWayside = False
                 if switchString in self.switches:
                     # Determine what is the switch block
                     switchBlock = self.get_block(self.switches[switchString])
+                    correctWayside = True
                 else:
                     continue
 
@@ -479,6 +486,7 @@ class Wayside:
                 if entry != 0:
                     # check for validity of conditon 1
                     for block in entry:
+                        #print(self.line, self.waysideNum, block)
                         if (self.get_block(block) == None):
                             print(block)
                         if self.get_block(block).get_occupancystate() == True:
@@ -509,31 +517,75 @@ class Wayside:
                 elif condition2 == False and notExist:
                     condition2 = True
 
+                """print(switchString)
+                print(entry, exitRange)
+                print("Condition 1: ", condition1)
+                print("Condition 2: ", condition2)"""
+
+
                 # If both condition 1 and 2 are valid, set the flag and break the loop
                 if condition1 and condition2:
                     any_condition_satisfied = True
                     break
 
+            #exception for crossing logic to set to true if nothing is satisfied
+            if switchString == "CRX" and ifBlock == len(item)-1 and not any_condition_satisfied:
+                if(self.line == 1 and self.waysideNum == 1):
+                    crossNumber = 19
+                elif(self.line == 2 and self.waysideNum == 2):
+                    crossNumber = 47
+                else:
+                    break
+
+                if self.get_block(crossNumber).get_crossingstate() == 0:
+                    print("prior state: ", self.get_block(crossNumber).get_crossingstate())
+                    self.get_block(
+                        crossNumber).set_crossingstate(1)
+                    self.get_block(
+                        crossNumber).set_lightstate("green")
+                    print("after state: ", self.get_block(crossNumber).get_crossingstate())
+
+                    # called again after the handler
+                    trackControllerToTrackModel.crossingState.emit(
+                        self.line,
+                        self.waysideNum,
+                        crossNumber,
+                        1,
+                    )
+                    """trackControllerToTrackModel.lightState.emit(
+                        self.line,
+                        self.waysideNum,
+                        crossNumber,
+                        "green",
+                    )"""
+                    trackControllerToCTC.lightState.emit(
+                        self.line,
+                        crossNumber,
+                        "green",
+                    )
+
             # If any condition is satisfied, execute the operations
             if any_condition_satisfied:
                 for operation in item[ifBlock]["Operations"]:
                     parsedOperation = self.parse_operation(operation)
+                    #print(parsedOperation["Type"])
                     # set the switch value
                     if parsedOperation["Type"] == "SWITCH":
                         switchValue = int(parsedOperation["Value"])
 
-                        switchBlock.set_switchstate(switchValue)
+                        if(switchValue != switchBlock.get_switchstate()):
+                            switchBlock.set_switchstate(switchValue)
 
-                        # emit that a switch value has been changed to the Track Model
-                        trackControllerToTrackModel.switchState.emit(
-                            self.line,
-                            self.waysideNum,
-                            self.switches[switchString],
-                            switchValue,
-                        )
-                        # emit that the switch value has bene changed to the CTC
-                        trackControllerToCTC.switchState.emit(
-                            self.line, self.switches[switchString], switchValue)
+                            # emit that a switch value has been changed to the Track Model
+                            trackControllerToTrackModel.switchState.emit(
+                                self.line,
+                                self.waysideNum,
+                                self.switches[switchString],
+                                switchValue,
+                            )
+                            # emit that the switch value has bene changed to the CTC
+                            trackControllerToCTC.switchState.emit(
+                                self.line, self.switches[switchString], switchValue)
 
                     # set the light value
                     elif parsedOperation["Type"] == "SIGNAL":
@@ -546,31 +598,43 @@ class Wayside:
                         elif signalState == "R":
                             signalState = "red"
 
-                        self.get_block(int(signalNumber)
-                                       ).set_lightstate(signalState)
-                        # print(self.line, self.waysideNum, signalNumber, signalState)
-                        # emit that a light value has been changed
-                        trackControllerToTrackModel.lightState.emit(
-                            self.line, self.waysideNum, int(
-                                signalNumber), signalState
-                        )
+                        lightBlock = self.get_block(int(signalNumber))
+                        
+
+                        if(lightBlock.get_lightstate() != signalState):
+                            lightBlock.set_lightstate(signalState)
+                            # print(self.line, self.waysideNum, signalNumber, signalState)
+                            # emit that a light value has been changed
+                            print("Emitting to Track Model: ")
+                            print("Block: " + str(signalNumber) + " State: " + str(signalState))
+                            trackControllerToTrackModel.lightState.emit(
+                                self.line, self.waysideNum, int(
+                                    signalNumber), signalState
+                            )
+                            trackControllerToCTC.lightState.emit(self.line, int(signalNumber), signalState)
 
                     # Set the crossing value
                     elif parsedOperation["Type"] == "CROSS":
                         crossValue = int(parsedOperation["Value"])
-                        crossNumber = parsedOperation["Number"]
+                        if(self.line == 1 and self.waysideNum == 1):
+                            crossNumber = 19
+                        elif(self.line == 2 and self.waysideNum == 2):
+                            crossNumber = 47
+                        #print("CROSSING")
+                        #print(crossNumber)
 
-                        self.get_block(
-                            crossNumber).set_crosssingstate(crossValue)
+                        if self.get_block(crossNumber).get_crossingstate() != crossValue:
+                            self.get_block(
+                                crossNumber).set_crossingstate(crossValue)
 
-                        # called again after the handler
-                        # emit that a switch value has been changed
-                        trackControllerToTrackModel.crossingState.emit(
-                            self.line,
-                            self.waysideNum,
-                            crossNumber,
-                            switchValue,
-                        )
+                            # called again after the handler
+                            # emit that a switch value has been changed
+                            trackControllerToTrackModel.crossingState.emit(
+                                self.line,
+                                self.waysideNum,
+                                crossNumber,
+                                crossValue,
+                            )
 
     # This is the method that parses the condition of a section within a PLC file
     def parse_condition(self, condition):
@@ -719,6 +783,10 @@ class Wayside:
             switchValue = operationLine.split("(")[1].strip(")")
             if switchValue in ["0", "1"]:
                 return {"Type": "SWITCH", "Value": int(switchValue)}
+        elif operationLine.startswith("CROSS"):
+            crossValue = operationLine.split("(")[1].strip(")")
+            if crossValue in ["0", "1"]:
+                return {"Type": "CROSS", "Value": int(crossValue)}
         elif operationLine.endswith(" G"):
             return {"Type": "SIGNAL", "Number": operationLine.split()[0], "State": "G"}
         elif operationLine.endswith(" R"):
@@ -778,7 +846,7 @@ class TrackControl(QMainWindow):
         # Instantiate the track information for the Green Line
         self.greenLine = Line(1)
         self.wayside1G = Wayside(1, 1)
-        switchDict = {"SW1": 13, "SW2": 29}
+        switchDict = {"SW1": 13, "SW2": 29, "CRX": 19}
         self.wayside1G.switches_init(switchDict)
         self.wayside2G = Wayside(2, 1)
         switchDict = {"SW3": 57, "SW4": 63, "SW5": 77, "SW6": 85}
@@ -928,6 +996,9 @@ class TrackControl(QMainWindow):
 
                 wayside.add_block(block)
 
+        trackControllerToTrackModel.crossingState.emit(1,1,1,0)
+        print("After")
+
         # Load the default plc programs for all wayside controllers
         self.wayside1G.run_plc("src/main/TrackController/plc_green.txt")
         self.wayside2G.run_plc("src/main/TrackController/plc_green.txt")
@@ -964,7 +1035,7 @@ class TrackControl(QMainWindow):
             lambda: self.handle_mode(
                 self.lines[self.ui.lineSelect - 1]
                 .get_wayside(self.ui.waysideSelect)
-                .get_plc_state()
+                .R()
             )
         )
 
@@ -981,6 +1052,7 @@ class TrackControl(QMainWindow):
         ctcToTrackController.sendSuggestedSpeed.connect(
             self.handle_suggested_speed)
         ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
+        ctcToTrackController.sendMaintenance.connect(self.handle_maintenance)
 
         """ This section of code is for the connections from track model to the track controller handler"""
         trackModelToTrackController.occupancyState.connect(
@@ -1055,7 +1127,7 @@ class TrackControl(QMainWindow):
 
         # send maintenance state signal to the track model
         trackControllerToTrackModel.maintenance.emit(line, wayside, num, state)
-        self.ui.testBenchWindow.refreshed.emit(True)
+        #self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_failure(self, line, wayside, num, state):
         self.lines[line -
@@ -1110,7 +1182,7 @@ class TrackControl(QMainWindow):
     """ Handler methods for the  Track Model input signals (and internally change gui) """
 
     def set_occupancystate_handler(self, line, wayside, num, state):
-        print(line, wayside, num, state)
+        #print(line, wayside, num, state)
         self.lines[line -
                    1].get_wayside(wayside).get_block(num).set_occupancystate(state)
         # print("Sending occupancy to CTC...")
