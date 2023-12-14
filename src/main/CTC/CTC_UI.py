@@ -717,7 +717,9 @@ class CTCWindow(QMainWindow):
 
     def clearSchedule(self):
         self.schedule_table.clearContents()
-        self.schedule_table.setRowCount(0)        
+        self.schedule_table.setRowCount(0)   
+        self.scheduler.trainList.clear() 
+
     def handleSwitch(self):
         print("IN HANDLE SWITCH")
         selected_block = self.blockDropDown.currentText()
@@ -1549,9 +1551,13 @@ class Scheduler:
                 travelTime = routing.computeTravelTime(
                     self.travel, suggested_speed
                 )
-                arrivalTimeBefore = routing.calculateArrivalTime(
+                """arrivalTimeBefore = routing.calculateArrivalTime(
                     travelTime, current_time_qtime
-                )
+                )"""
+                arrivalTimeBefore = current_time_qtime.addSecs(27 * 60)
+                current_time_str = self.main_window.systemTimeInput.text()[:8]
+                current_time_obj = QTime.fromString(current_time_str, "HH:mm:ss")
+                arrivalTimeBefore = current_time_obj.addSecs(27 * 60)
 
                 arrival_hours = arrivalTimeBefore.hour()
                 arrival_minutes = arrivalTimeBefore.minute()
@@ -1573,9 +1579,27 @@ class Scheduler:
                     self.travel, suggested_speed
                 )
                 arrivalTime = arrival_time
-                departureTime = routing.calculateDepartureTime(
+                print("ARRIVAL TIME IS")
+
+                print("ARRIVAL TIME IS")
+                print(arrivalTime)
+
+                # Convert arrival time to QTime object
+                arrival_time_qtime = QTime.fromString(arrivalTime, "HHmm")
+
+                # Subtract 27 minutes from the arrival time to get the departure time
+                departure_time_qtime = arrival_time_qtime.addSecs(-27 * 60)
+
+                departure_hours = departure_time_qtime.hour()
+                departure_minutes = departure_time_qtime.minute()
+
+                # Format as "HHmm"
+                departureTime = f"{departure_hours:02d}{departure_minutes:02d}"
+                """departureTime = routing.calculateDepartureTime(
                     arrivalTime, travelTime
-                )
+                )"""
+                print("DEPARTURE TIME IS")
+                print(departureTime)
                 self.blockInfo = routing.makeBlockInfo(self.travel, suggested_speed)
 
             train = Train(
@@ -1771,7 +1795,6 @@ class Scheduler:
                     print("Suggested Speed:", train.sugg_speed)
                     print("-----------")  # Add a separator between trains
                 self.numTrains += 1
-
 
     def getSelectedLine(self):
         selected_line = self.main_window.selectLine.currentText()
