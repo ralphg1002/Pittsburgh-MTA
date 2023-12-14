@@ -956,7 +956,8 @@ class TrainControllerUI(QMainWindow):
         # masterSignals.addTrain.emit("green", "train")
         # Update Train ID list
         # from CTC
-        # masterSignals.addTrain.emit("green", "test")
+        #masterSignals.addTrain.emit("green", "test")
+
         masterSignals.addTrain.connect(self.signal_addTrain)
 
         # testing train model signals
@@ -1254,6 +1255,12 @@ class TrainControllerUI(QMainWindow):
 
                 # regardless of automatic
                 self.tcFunctions.regular_operations(blockDict, train)
+                if train.get_engineFailure():
+                    self.emergencyBrakeButton.setChecked(True)
+                elif train.get_brakeFailure():
+                    self.emergencyBrakeButton.setChecked(True)
+                elif train.get_signalFailure():
+                    self.emergencyBrakeButton.setChecked(True)
 
                 if self.emergencyBrakeButton.isChecked():
                     train.set_driverEbrake(True)
@@ -1328,7 +1335,11 @@ class TrainControllerUI(QMainWindow):
                 elif train.get_advertisement() == 3:
                     self.png_label(self.adDisplay, self.pixmapAd3)
 
+                if train.get_driverEbrake():
+                    self.emergencyBrakeButton.setChecked(True)
+
             self.tcFunctions.regular_operations(blockDict, train)
+
 
             # SIGNAL INTEGRATION: TCSW -> TM
             trainControllerSWToTrainModel.sendPower.emit(
