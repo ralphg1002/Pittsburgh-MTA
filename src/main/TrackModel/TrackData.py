@@ -549,7 +549,7 @@ class TrackData:
                 for block in self.redTrackData:
                     if block["Block Number"] == prevBlock:
                         block["Occupancy"] = 0
-                        # trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(prevBlock, 2), prevBlock, False)
+                        trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(prevBlock, 2), prevBlock, False)
                 return
             elif curBlock == 0 and prevBlock == 9:
                 for block in self.greenTrackData:

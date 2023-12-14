@@ -115,3 +115,16 @@ IF
     Operation: 66 G
     end
 END
+
+CRX:
+IF
+    Condition: (44->52)
+    Operation: CROSS(0)
+    Operation: 47 R
+    end
+IF
+    Condition: (44<-52)
+    Operation: CROSS(0)
+    Operation: 47 R
+    end
+END

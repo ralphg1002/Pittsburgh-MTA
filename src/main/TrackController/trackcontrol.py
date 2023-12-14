@@ -464,7 +464,7 @@ class Wayside:
 
         print("LOGIC FOR LINE ", self.line)
         print("**********************************************")
-        print(self.plcData)
+        #print(self.plcData)
         for item in self.plcData:
             # Initialize a flag to track if any condition is satisfied
             any_condition_satisfied = False
@@ -473,13 +473,11 @@ class Wayside:
                 print("ENTERING LOGIC FOR WAYSIDE ", self.waysideNum)
                 switchString = item[ifBlock]["Section"].rstrip(":")
                 correctWayside = False
-                print(switchString)
                 if switchString in self.switches:
                     # Determine what is the switch block
                     switchBlock = self.get_block(self.switches[switchString])
                     correctWayside = True
                 else:
-                    print()
                     continue
 
                 # Parse the conditions
@@ -907,7 +905,7 @@ class TrackControl(QMainWindow):
         switchDict = {"SW1": 9, "SW2": 16, "SW3": 27}
         self.wayside1R.switches_init(switchDict)
         self.wayside2R = Wayside(2, 2)
-        switchDict = {"SW4": 33, "SW5": 38, "SW6": 44, "SW7": 52}
+        switchDict = {"SW4": 33, "SW5": 38, "SW6": 44, "SW7": 52, "CRX": 47}
         self.wayside2R.switches_init(switchDict)
         self.redLine.add_wayside(self.wayside1R)
         self.redLine.add_wayside(self.wayside2R)
@@ -1044,7 +1042,7 @@ class TrackControl(QMainWindow):
                 wayside.add_block(block)
 
         trackControllerToTrackModel.crossingState.emit(1,1,1,0)
-        print("After")
+        trackControllerToTrackModel.crossingState.emit(2,2,1,0)
 
         # Load the default plc programs for all wayside controllers
         self.wayside1G.run_plc("src/main/TrackController/plc_green.txt")
