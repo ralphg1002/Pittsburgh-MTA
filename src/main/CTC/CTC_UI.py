@@ -187,21 +187,11 @@ switches = {
 }
 
 lights_greenLine = {
-    0: [0, 63],
-    1: [0, 13],
-    12: [0, 11],
-    13: [1, 12],
-    29: [1, 30],
-    30: [0, 31],
-    57: [1, 0],
-    58: [0, 59],
-    62: [0, 63],
-    63: [0, 64],
-    76: [0, 77],
-    77: [1, 101],
-    85: [1, 86],
-    86: [0, 87],
-    100: [0, 85]
+    0: [1, 63],
+    1: [1, 13],
+    76: [1, 77],
+    100: [1, 85],
+    150: [1, 29]
     }
 
 lights_redLine = {
@@ -219,6 +209,14 @@ global_block_occupancy = {}
 
 train_routes = {}  # Class attribute for train routes
 
+switchStates = {
+    13: 0,
+    29: 0,
+    57: 0,
+    63: 0,
+    77: 0,
+    85: 0
+}
 
 class CTCWindow(QMainWindow):
     # font variables
@@ -699,6 +697,66 @@ class CTCWindow(QMainWindow):
         self.autoSchedule.setFont(QFont(self.fontStyle, self.textFontSize))
         self.autoSchedule.setGeometry(50, 560, 100, 50)
         self.autoSchedule.setStyleSheet("background-color: white; color: " + self.colorDarkBlue + "; border: 1px solid black")"""
+        self.stateLabel = QLabel("Switch: ", self)
+
+        self.stateLabel.setGeometry(35, 615, 100, 50)
+        self.stateLabel.setFont(QFont(self.fontStyle, self.textFontSize))
+
+        self.blockDropDown.currentIndexChanged.connect(self.checkSwitchPosition)
+        trackControllerToCTC.switchState.connect(self.getSwitchPosition)
+        self.switchButton = QPushButton("Flip Switch", self)
+        self.switchButton.setFont(QFont(self.fontStyle, self.textFontSize))
+        self.switchButton.setGeometry(35, 655, 100,50)
+        self.switchButton.clicked.connect(self.handleSwitch)
+        self.selectLine.currentIndexChanged.connect(self.scheduler.setGreenSchedule)
+
+        self.clearTable = QPushButton("Clear Schedule", self)
+        self.clearTable.setGeometry(515, 725, 120, 20)
+        self.clearTable.setFont(QFont(self.fontStyle, self.textFontSize))
+        self.clearTable.clicked.connect(self.clearSchedule)
+
+    def clearSchedule(self):
+        self.schedule_table.clearContents()
+        self.schedule_table.setRowCount(0)   
+        self.scheduler.trainList.clear() 
+
+    def handleSwitch(self):
+        print("IN HANDLE SWITCH")
+        selected_block = self.blockDropDown.currentText()
+        if selected_block == "Select Block":
+            return None
+        else:
+            blockNum = int(selected_block) 
+        
+        state = switchStates.get(blockNum)
+        if state == 0:
+            newState = 1
+        elif state == 1:
+            newState = 0
+        else:
+            newState = switchStates.get(blockNum)
+        
+        switchStates[blockNum] = newState
+
+        self.stateLabel.setText(f"Switch: {newState}")
+        
+    def checkSwitchPosition(self):
+        selected_block = self.blockDropDown.currentText()
+
+        # Check if the "Select a Block" placeholder is selected
+        if selected_block == "Select Block":
+            return None
+        else:
+            blockNum = int(selected_block) 
+        
+        # Use blockNum to get the switch state from the switchStates dictionary
+        state = switchStates.get(blockNum)
+
+        # Update the stateLabel to display the switch state
+        self.stateLabel.setText(f"Switch: {state}")
+    
+    def getSwitchPosition(self, line, blockNum, state):
+        switchStates[blockNum] = state
 
     def openTestBench(self):
         self.testBenchWindow = TestBench()
@@ -1134,9 +1192,9 @@ class Scheduler:
         selected_line = globalSelectLine
         #selected_line = self.main_window.selectLine.currentText()
         #selected_line = self.getSelectedLine()
-        print("SELECTED LINE IS")
-        print(selected_line)
-        print(globalSelectLine)
+        # print("SELECTED LINE IS")
+        # print(selected_line)
+        # print(globalSelectLine)
         self.routing = Routing(
                "src/main/CTC/GreenLine.csv", self.main_window
         ) 
@@ -1154,6 +1212,7 @@ class Scheduler:
         self.trainID = None
 
     def load_file(self):
+
         selected_line = self.getSelectedLine()
         # self.main_window.selectLine.currentText()
         if selected_line == "Select a Line":
@@ -1210,7 +1269,7 @@ class Scheduler:
                 if item:
                     item.setFlags(item.flags() & ~Qt.ItemIsEditable)
 
-    def load_file(self, filePath):
+    def load_autoFile(self, filePath):
         selected_line = self.getSelectedLine()
         # self.main_window.selectLine.currentText()
         if selected_line == "Select a Line":
@@ -1224,16 +1283,9 @@ class Scheduler:
 
         self.main_window.error_label.clear()
 
-        options = QFileDialog.Options()
-        filePath, _ = QFileDialog.getOpenFileName(
-            self.main_window,
-            "Open CSV File",
-            "",
-            "CSV Files (*.csv);;All Files (*)",
-            options=options,
-        )
-
         if filePath:
+            self.main_window.schedule_table.clearContents()
+            self.main_window.schedule_table.setRowCount(0)
             with open(filePath, "r") as file:
                 csv_content = file.read()
 
@@ -1361,7 +1413,7 @@ class Scheduler:
                     print("Path: ", self.path)
                     self.travel = routing.find_travel_path(self.path)
                     print("Travel: ", self.travel)
-                    self.correctStops = routing.reorderStops(self.path)
+                    self.correctStops, self.correctBlocks = routing.reorderStops(self.path)
                 
                 suggested_speed = 43.50
                 travelTime = routing.computeTravelTime(
@@ -1380,7 +1432,7 @@ class Scheduler:
                     train_id,
                     suggested_speed,
                     self.travel,
-                    self.correctStops,
+                    self.correctBlocks,
                     self.blockInfo
                 )              
                 self.trainList.append(train)
@@ -1492,16 +1544,20 @@ class Scheduler:
                 print("Path: ", self.path)
                 self.travel = routing.find_travel_path(self.path)
                 print("Travel: ", self.travel)
-                self.correctStops = routing.reorderStops(self.path)
+                self.correctStops, self.correctBlocks = routing.reorderStops(self.path)
 
             # case if no arrival time is input, needs to be calculated
             if arrival_time == "":
                 travelTime = routing.computeTravelTime(
                     self.travel, suggested_speed
                 )
-                arrivalTimeBefore = routing.calculateArrivalTime(
+                """arrivalTimeBefore = routing.calculateArrivalTime(
                     travelTime, current_time_qtime
-                )
+                )"""
+                arrivalTimeBefore = current_time_qtime.addSecs(27 * 60)
+                current_time_str = self.main_window.systemTimeInput.text()[:8]
+                current_time_obj = QTime.fromString(current_time_str, "HH:mm:ss")
+                arrivalTimeBefore = current_time_obj.addSecs(27 * 60)
 
                 arrival_hours = arrivalTimeBefore.hour()
                 arrival_minutes = arrivalTimeBefore.minute()
@@ -1523,9 +1579,27 @@ class Scheduler:
                     self.travel, suggested_speed
                 )
                 arrivalTime = arrival_time
-                departureTime = routing.calculateDepartureTime(
+                print("ARRIVAL TIME IS")
+
+                print("ARRIVAL TIME IS")
+                print(arrivalTime)
+
+                # Convert arrival time to QTime object
+                arrival_time_qtime = QTime.fromString(arrivalTime, "HHmm")
+
+                # Subtract 27 minutes from the arrival time to get the departure time
+                departure_time_qtime = arrival_time_qtime.addSecs(-27 * 60)
+
+                departure_hours = departure_time_qtime.hour()
+                departure_minutes = departure_time_qtime.minute()
+
+                # Format as "HHmm"
+                departureTime = f"{departure_hours:02d}{departure_minutes:02d}"
+                """departureTime = routing.calculateDepartureTime(
                     arrivalTime, travelTime
-                )
+                )"""
+                print("DEPARTURE TIME IS")
+                print(departureTime)
                 self.blockInfo = routing.makeBlockInfo(self.travel, suggested_speed)
 
             train = Train(
@@ -1539,7 +1613,7 @@ class Scheduler:
                 train_id,
                 suggested_speed,
                 self.travel,
-                self.correctStops,
+                self.correctBlocks,
                 self.blockInfo
             )
 
@@ -1629,8 +1703,8 @@ class Scheduler:
         self.main_window.schedule_table.setRowCount(0)
 
         selected_line = self.main_window.selectLine.currentText()
-        filePath = "src/main/CTC/green_auto_for_code"
-        self.load_file(filePath)
+        filePath = "src/main/CTC/green_auto_for_code.csv"
+        self.load_autoFile(filePath)
         if selected_line == "Green Line":
             # Iterate through rows in the schedule table
             for row in range(self.main_window.schedule_table.rowCount()):
@@ -1692,6 +1766,8 @@ class Scheduler:
                 travelTime = routing.computeTravelTime(
                     self.travel, suggested_speed
                 )
+                self.correctStops, self.correctBlocks = routing.reorderStops(self.path)
+                self.blockInfo = routing.makeBlockInfo(self.travel, suggested_speed)
 
                 train = Train(
                     self,
@@ -1703,7 +1779,9 @@ class Scheduler:
                     self.correctStops,
                     train_id,
                     suggested_speed,
-                    self.travel
+                    self.travel,
+                    self.correctBlocks,
+                    self.blockInfo
                 )              
                 
                 self.trainList.append(train)
@@ -1717,7 +1795,6 @@ class Scheduler:
                     print("Suggested Speed:", train.sugg_speed)
                     print("-----------")  # Add a separator between trains
                 self.numTrains += 1
-
 
     def getSelectedLine(self):
         selected_line = self.main_window.selectLine.currentText()
@@ -1836,9 +1913,46 @@ class Routing:
         trackControllerToCTC.occupancyState.connect(self.checkPosition)
         trackControllerToCTC.occupancyState.connect(lambda line, blockNum, state: self.handleBlockOccupancy(line,blockNum,state))
         ctcToTrackController.signalTrainDwelling.connect(self.leaveStation)
+        trackControllerToCTC.lightState.connect(self.handle_light_change)
 
     def handleBlockOccupancy(self, line, blockNum, state):
         Block.update_block_occupancy(blockNum, state, self.main_window, line)
+
+    def handle_light_change(self, line, blockNum, state):
+        if state == "green":
+            state = 1
+        else:
+            state = 0
+
+        if blockNum in WAYSIDE_1G_BLOCKS:
+            wayside = 1
+        elif blockNum in WAYSIDE_2G_BLOCKS:
+            wayside = 2
+        
+        if line == 1:
+            print("entered green line light handler")
+            try:
+                # print("Block: ", blockNum)
+                # print("before:",lights_greenLine[blockNum][0])
+                lights_greenLine[blockNum][0] = int(state)
+                # print("after:",lights_greenLine[blockNum][0])
+            except Exception as e:
+                return
+            if(int(state) == 1):
+                ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 1)
+                ctcToTrackController.sendSuggestedSpeed.emit(line, wayside, blockNum, 20)
+                # print("checking for row table for block: ", blockNum)
+                for row in range(self.main_window.dispatchTable.rowCount()):
+                    # print(row)
+                    # print(self.main_window.dispatchTable.item(row,1).text())
+                    if self.main_window.dispatchTable.item(row,1).text() == str(blockNum):
+                        print("found match for blockNum at row ", row)
+                        self.main_window.dispatchTable.setItem(row, 3, QTableWidgetItem(str(20)))
+                        self.main_window.dispatchTable.setItem(row, 4, QTableWidgetItem(str(1)))
+                        
+                
+                
+            # send update signal
 
     def load_data(self):
         data = []
@@ -1968,7 +2082,7 @@ class Routing:
         third_stations = []
 
         ordered_stations = []
-
+        ordered_blocks = []
         for block, station in block_stations[0:]:  
             if 62 < block < max_block:
                 first_stations.append(block)
@@ -1989,8 +2103,9 @@ class Routing:
         for block in self.stations_to_stop:
             station_name = self.find_station_name_by_block(block)
             ordered_stations.append(station_name)
+            ordered_blocks.append(block)
 
-        return ordered_stations
+        return ordered_stations, ordered_blocks
     
     def find_travel_path(self, path):
         max_block = 0
@@ -2036,6 +2151,7 @@ class Routing:
         self.stations_to_stop.append(0)
         print("BLOCKS TO STOP AT")
         print(self.stations_to_stop)
+
         self.routeQ = []
 
         trainLine = globalSelectLine
@@ -2113,12 +2229,18 @@ class Routing:
         if globalSelectLine == "Green Line":
             waysideNum = self.find_wayside(blockNumber)
             ctcToTrackController.sendMaintenance.emit(1, waysideNum, blockNumber, 1)
+        else:
+            waysideNum = self.find_wayside(blockNumber)
+            ctcToTrackController.sendMaintenance.emit(2, waysideNum, blockNumber, 1)
 
     def openBlock(self, blockNumber):
         self.blockList[blockNumber].setEnable(1)
         if globalSelectLine == "Green Line":
             waysideNum = self.find_wayside(blockNumber)
             ctcToTrackController.sendMaintenance.emit(1, waysideNum, blockNumber, 0)
+        else:
+            waysideNum = self.find_wayside(blockNumber)
+            ctcToTrackController.sendMaintenance.emit(2, waysideNum, blockNumber, 1)
 
     def computeTravelTime(self, travel_path, suggested_speed):
         total_time = 0  # Initialize total time to zero
@@ -2226,270 +2348,13 @@ class Routing:
         # print(total_time)
         return self.block_info_list
 
-    """def checkPosition(self, line, blockNum, occupancy):
-        for train_id, routeQ in train_routes.items():
-            try:
-                routeQ[0]
-            except Exception as e:
-                return
-            try:
-                print(
-                    "comparing current block of "
-                    + str(blockNum)
-                    + " with destination at "
-                    + str(routeQ[1])
-                )
-            except Exception as e:
-                pass
-
-            if line == 1:
-                track = "Green"
-            else:
-                track = "Red"
-
-            trainLine = globalSelectLine
-            print("GLOBAL SELECT LINE IS")
-            print(globalSelectLine)
-            #trainLine = self.main_window.selectLine.currentText()
-            # for train_id, routeQ in self.train_routes.items():
-            print(f"{trainLine}, {track}")
-            if trainLine == "Green Line":
-                trainTrack = "Green"
-            else:
-                trainTrack = "Red"
-
-            if occupancy == True and blockNum == routeQ[1] and trainTrack == track:
-                print("inside check position")
-                self.routeQ.pop(0)
-                train_routes[train_id] = routeQ
-
-                if(len(routeQ) == 1):
-                    self.main_window.dispatchTable.removeRow(0)
-                    print("removing row...")
-                    return
-                # nextBlock = self.routeQ[1]
-                wayside = self.find_wayside(routeQ[0])
-                print("STATIONS TO STOP:")
-                print(self.stations_to_stop[0])
-                print("ROUTE Q")
-                print(routeQ)
-                
-                ########## SWITCH CHECK ##################
-                # Check if switch is in next 5 and get its index within the route queue. 
-                for i in range(0, 5):
-                    if i < len(self.routeQ) and routeQ[i] in switches:
-                        switch_index = i
-                        switch = switches[i]
-                        break
-                    else:
-                        switch_index = None
-                # if the switch is in the next 5 
-                if switch_index != None:
-                    # Check if the train is traveling in the right direction
-                    correct_direction = False
-                    for i in range (0,5):
-                        if i < len(routeQ) and routeQ[i] == switch[0][0]:
-                            correct_direction = True
-                            break
-                    # if the train is  traveling in the right direction then proceed.
-                    if(correct_direction):
-                        # check if switch is activated
-                        if switch[2] == 1:
-                            if self.altRouteBool == False:
-                                self.altRouteBool = True
-                                # remove the normal route from the routeQ
-                                routeQ.remove(switch_index+1, switch_index+1+len(switch[0]))
-                                # replace it with the alternative route
-                                routeQ.insert(switch_index+1, switch[1])
-                        # if switch is not activated
-                        else:
-                            if self.altRouteBool == True:
-                                self.altRouteBool = False
-                                # remove the alternative route from the routeQ
-                                routeQ.remove(switch_index+1, switch_index+1+len(switch[1]))
-                                # replace it with the normal route
-                                routeQ.insert(switch_index+1, switch[0])
-
-
-                ############## OCCUPANCY CHECK ############
-                # determine the index of the occupied block within the routeQ
-                for i in range(0, 5):
-                    if i < len(self.routeQ) and routeQ[i] in global_block_occupancy:
-                        occupied_index = i
-                        occupied_block = self.routeQ[i]
-                        break
-                    else:
-                        occupied_index = None
-                # If there is an occupied block within the next 6...
-                if occupied_index != None:
-                    if(len(routeQ) >= 5 and occupied_block == routeQ[4]):
-                        suggestedSpeed = (
-                        int(0.75 * self.block_info_list[routeQ[0]].speedLimit)
-                        * 0.621371
-                        )
-                        suggestedSpeed = round(suggestedSpeed, 2)
-                        self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
-                        )
-                        self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
-                        )
-                        ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                        )
-                    elif(len(routeQ) >= 4 and occupied_block == routeQ[3]):
-                        suggestedSpeed = (
-                        int(0.5 * self.block_info_list[routeQ[0]].speedLimit)
-                        * 0.621371
-                        )
-                        suggestedSpeed = round(suggestedSpeed, 2)
-                        self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
-                        )
-                        self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
-                        )
-                        ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                        )
-                    elif(len(routeQ) >= 3 and occupied_block == routeQ[2]):
-                        suggestedSpeed = (
-                        int(0.25 * self.block_info_list[self.routeQ[0]].speedLimit)
-                        * 0.621371
-                        )
-                        suggestedSpeed = round(suggestedSpeed, 2)
-                        self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
-                        )
-                        self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
-                        )
-                        ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                        )
-                    elif(len(routeQ) >= 2 and occupied_block == routeQ[1]):
-                        suggestedSpeed = 0
-                        authority = 0
-
-                        self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
-                        )
-                        self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
-                        )
-                        ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                        )
-                        ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                        )
-                        ctcToTrackController.sendAuthority.emit(
-                        line, wayside, routeQ[0], authority
-                        )
-
-
-                ############ LIGHT CHECK ##########
-                # STILL NEED TO DO THE CODE FOR THIS PART
-
-                ######### STATION CHECK ############
-                if len(routeQ) >= 4 and self.stations_to_stop[0] == routeQ[3]:
-                    suggestedSpeed = (
-                        int(0.75 * self.block_info_list[self.routeQ[0]].speedLimit)
-                        * 0.621371
-                    )
-                    suggestedSpeed = round(suggestedSpeed, 2)
-                    self.main_window.dispatchTable.setItem(
-                        0, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        0, 1, QTableWidgetItem(str(blockNum))
-                    )
-                    #Block.update_block_occupancy(blockNum, 1, self.main_window)
-
-                    ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                    )
-                elif len(routeQ) >= 3 and self.stations_to_stop[0] == routeQ[2]:
-                    suggestedSpeed = (
-                        int(0.50 * self.block_info_list[routeQ[0]].speedLimit)
-                        * 0.621371
-                    )
-                    suggestedSpeed = round(suggestedSpeed, 2)
-                    self.main_window.dispatchTable.setItem(
-                        0, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        0, 1, QTableWidgetItem(str(blockNum))
-                    )
-                    ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                    )
-                elif len(routeQ) >= 2 and self.stations_to_stop[0] == routeQ[1]:
-                    suggestedSpeed = (
-                        int(0.25 * self.block_info_list[routeQ[0]].speedLimit)
-                        * 0.621371
-                    )
-                    suggestedSpeed = round(suggestedSpeed, 2)
-
-                    self.main_window.dispatchTable.setItem(
-                        0, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        0, 1, QTableWidgetItem(str(blockNum))
-                    )
-                    ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                    )
-                elif len(routeQ) >= 1 and self.stations_to_stop[0] == routeQ[0]:
-                    suggestedSpeed = 0
-                    station_name = self.find_station_name_by_block(self.stations_to_stop[0])
-
-                    self.main_window.dispatchTable.setItem(
-                        0, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("0"))
-                    ctcToTrackController.sendSuggestedSpeed.emit(
-                        line, wayside, routeQ[0], suggestedSpeed
-                    )
-                    ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 0)
-                    self.main_window.dispatchTable.setItem(
-                        0, 1, QTableWidgetItem(str(station_name))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        0, 2, QTableWidgetItem("Dwelling")
-                    )
-                    QTimer.singleShot(15000, self.leaveStop)
-                
-
-                else:
-                    print(
-                        "Top of route queue: ",
-                        self.block_info_list[int(routeQ[0])].speedLimit,
-                    )
-                    print(
-                        "Suggested Speed Before: ",
-                        (self.block_info_list[int(routeQ[0])].speedLimit) * 0.621371,
-                    )
-                    #print("Block 65: ", self.block_info_list[65].speedLimit)
-                    #print("Block 65: ", self.block_info_list[66].speedLimit)
-
-                    suggestedSpeed = (
-                        self.block_info_list[int(routeQ[0])].speedLimit
-                    ) * 0.621371
-                    suggestedSpeed = round(suggestedSpeed, 2)
-
-                    self.main_window.dispatchTable.setItem(
-                        0, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        0, 1, QTableWidgetItem(str(blockNum))
-                    )"""
-
     def checkPosition(self, line, blockNum, occupancy):
         for train in dispatchTrainsList:
             routeQ = train.travelPath
             stations_to_stop = train.ordered_stations
             block_info_list = train.blockList
+            print("STATIONS TO STOP")
+            print(stations_to_stop)
 
             try:
                 routeQ[0]
@@ -2520,15 +2385,23 @@ class Routing:
             else:
                 trainTrack = "Red"
 
+
+            """ ENTERING CONDITION THAT TRAIN HAS MOVED A BLOCK IN ITS ROUTE """
             if occupancy == True and blockNum == routeQ[1] and trainTrack == track:
                 print("inside check position")
-                previous_block = routeQ[0]
                 routeQ.pop(0)
                 if globalSelectLine == "Green Line":
                     lineNum = 1
                 waysideNum = self.find_wayside(blockNum)
 
                 ctcToTrackController.nextBlock.emit(lineNum, waysideNum, routeQ[0], routeQ[1])
+
+
+                red_light_check = False
+                occupied_check = False
+                station_check = False
+                authority = 1
+                suggestedSpeed = 20
 
                 #train_routes[train_id] = self.routeQ
 
@@ -2543,9 +2416,104 @@ class Routing:
                 print("ROUTE Q")
                 print(routeQ)
                 
+                rowNumber = dispatchTrainsList.index(train)
+                
+                ############## STATION CHECK ############
+                
+                station_check_authority = 1
+                if len(routeQ) >= 4 and stations_to_stop[0] == routeQ[3]:
+                    suggestedSpeed = (
+                        int(0.75 * block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    #Block.update_block_occupancy(blockNum, 1, self.main_window)
+
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                    station_check = True
+                elif len(routeQ) >= 3 and stations_to_stop[0] == routeQ[2]:
+                    suggestedSpeed = (
+                        int(0.50 * block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                    station_check = True
+                elif len(routeQ) >= 2 and stations_to_stop[0] == routeQ[1]:
+                    suggestedSpeed = (
+                        int(0.25 * block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                    )
+                    suggestedSpeed = round(suggestedSpeed, 2)
+
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 1, QTableWidgetItem(str(blockNum))
+                    )
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                    station_check = True
+                elif len(routeQ) >= 1 and stations_to_stop[0] == routeQ[0]:
+                    suggestedSpeed = 0
+                    station_name = self.find_station_name_by_block(stations_to_stop[0])
+
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                    )
+                    self.main_window.dispatchTable.setItem(rowNumber, 4, QTableWidgetItem("0"))
+                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                    )
+                    ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 0)
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 1, QTableWidgetItem(str(station_name))
+                    )
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 2, QTableWidgetItem("Dwelling")
+                    )
+
+                    #current_time = self.main_window.systemTimeInput.text()
+                    #current_time_str = current_time.replace(":", "")[:4]
+
+                    current_time_str = self.main_window.systemTimeInput.text()[:8]
+                    current_time_obj = QTime.fromString(current_time_str, "HH:mm:ss")
+
+                    target_time_obj = current_time_obj.addSecs(60) 
+                    #ctcToTrackController.signalTrainDwelling.emit(target_time_obj)
+                    #print("Target Time:", target_time_obj.toString("HH:mm:ss"))
+                    print(stations_to_stop)
+                    print(block_info_list)
+                    print(routeQ)
+                    print(rowNumber)
+                    
+                    QTimer.singleShot(15000,lambda : self.leaveStop(stations_to_stop, block_info_list, routeQ, rowNumber))
+                    #emite when dwelling, then check itll get, once then emit another signal
+                    station_check = True
+                station_check_suggestedSpeed = suggestedSpeed
+
+
                 ########## SWITCH CHECK ##################
                 # Check if switch is in next 5 and get its index within the route queue. 
-                for i in range(0, 5):
+                """for i in range(0, 5):
                     if i < len(routeQ) and routeQ[i] in switches:
                         switch_index = i
                         switch = switches[i]
@@ -2577,74 +2545,95 @@ class Routing:
                                 # remove the alternative route from the routeQ
                                 routeQ.remove(switch_index+1, switch_index+1+len(switch[1]))
                                 # replace it with the normal route
-                                routeQ.insert(switch_index+1, switch[0])
-
+                                routeQ.insert(switch_index+1, switch[0])"""
 
                 ############## OCCUPANCY CHECK ############
                 # determine the index of the occupied block within the routeQ
-                for i in range(0, 5):
+                # print("entering occupancy check...")
+                for i in range(1, 6):
                     if i < len(routeQ) and routeQ[i] in global_block_occupancy:
-                        occupied_index = i
-                        occupied_block = routeQ[i]
-                        break
+                        # print("checking: if block " + str(routeQ[i]) + "is occupied: " + str(global_block_occupancy.get(routeQ[i])))
+                        if(global_block_occupancy.get(routeQ[i]) == 1):
+                            occupied_index = i
+                            occupied_block = routeQ[i]
+                            # print("Here is the occupied block", occupied_block)
+                            # print("Here is the occupied index", occupied_index)
+                            break
+                        occupied_index = None
+                        # print("its not...")
                     else:
                         occupied_index = None
+                        # print("No occupied block discovered...")
                 # If there is an occupied block within the next 6...
                 if occupied_index != None:
+                    occupied_check_authority = 1
+                    occupied_check = False
                     if(len(routeQ) >= 5 and occupied_block == routeQ[4]):
+                        print("slowing down 1")
                         suggestedSpeed = (
                         int(0.75 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
                         )
                         suggestedSpeed = round(suggestedSpeed, 2)
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
                         )
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
                         )
-                    elif(len(routeQ) >= 4 and occupied_block == routeQ[3]):
+                        occupied_check = True
+                    if(len(routeQ) >= 4 and occupied_block == routeQ[3]):
+                        print("slowing down 2")
                         suggestedSpeed = (
                         int(0.5 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
                         )
                         suggestedSpeed = round(suggestedSpeed, 2)
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
                         )
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
                         )
-                    elif(len(routeQ) >= 3 and occupied_block == routeQ[2]):
+                        occupied_check = True
+                    if(len(routeQ) >= 3 and occupied_block == routeQ[2]):
+                        print("slowing down 3")
                         suggestedSpeed = (
                         int(0.25 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
                         )
+                        
                         suggestedSpeed = round(suggestedSpeed, 2)
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
                         )
+                        occupied_check = True
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
                         )
-                    elif(len(routeQ) >= 2 and occupied_block == routeQ[1]):
+                    if(len(routeQ) >= 2 and occupied_block == routeQ[1]):
+                        print("slowing down 4")
                         suggestedSpeed = 0
                         authority = 0
+                        occupied_check_authority = 0
 
                         self.main_window.dispatchTable.setItem(
-                            0, 3, QTableWidgetItem(str(suggestedSpeed))
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
                         )
                         self.main_window.dispatchTable.setItem(
-                            0, 1, QTableWidgetItem(str(blockNum))
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 4, QTableWidgetItem(str(authority))
                         )
                         ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
@@ -2655,147 +2644,201 @@ class Routing:
                         ctcToTrackController.sendAuthority.emit(
                         line, wayside, routeQ[0], authority
                         )
+                        occupied_check = True
 
+                    occupied_check_suggestedSpeed = suggestedSpeed
 
-                # LIGHT CHECK 
-                # STILL NEED TO DO THE CODE FOR THIS PART
-
-                #STATION CHECK
-                rowNumber = dispatchTrainsList.index(train)
-                if len(routeQ) >= 4 and stations_to_stop[0] == routeQ[3]:
-                    suggestedSpeed = (
+                ############## LIGHT CHECK ############
+                print("entering red light check...")
+                for i in range(0, 6):
+                    if i < len(routeQ) and routeQ[i] in lights_greenLine and routeQ[i+1] == lights_greenLine.get(routeQ[i])[1]:
+                        # print("checking: if block " + str(routeQ[i]) + "is red(0): " + str(lights_greenLine.get(routeQ[i])[0]))
+                        if(lights_greenLine.get(routeQ[i])[0] == 0):
+                            red_light_index = i
+                            red_light_block = routeQ[i]
+                            # print("Here is the red light block", red_light_block)
+                            # print("Here is the red light index", red_light_index)
+                            break
+                        red_light_index = None
+                        # print("its not...")
+                    else:
+                        red_light_index = None
+                        # print("No red lights discovered...")
+                # If there is a red light block within the next 4...
+                if red_light_index != None:
+                    red_light_check_authority = 1
+                    red_light_check = False
+                    if(len(routeQ) >= 4 and red_light_block == routeQ[3]):
+                        print("slowing down 1")
+                        suggestedSpeed = (
                         int(0.75 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
-                    )
-                    suggestedSpeed = round(suggestedSpeed, 2)
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 1, QTableWidgetItem(str(blockNum))
-                    )
-                    #Block.update_block_occupancy(blockNum, 1, self.main_window)
-
-                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
-                    )
-                elif len(routeQ) >= 3 and stations_to_stop[0] == routeQ[2]:
-                    suggestedSpeed = (
-                        int(0.50 * block_info_list[routeQ[0]].speedLimit)
+                        )
+                        red_light_check = True
+                    if(len(routeQ) >= 3 and red_light_block == routeQ[2]):
+                        print("slowing down 2")
+                        suggestedSpeed = (
+                        int(0.5 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
-                    )
-                    suggestedSpeed = round(suggestedSpeed, 2)
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 1, QTableWidgetItem(str(blockNum))
-                    )
-                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
-                    )
-                elif len(routeQ) >= 2 and stations_to_stop[0] == routeQ[1]:
-                    suggestedSpeed = (
+                        )
+                        red_light_check = True
+                    if(len(routeQ) >= 2 and red_light_block == routeQ[1]):
+                        print("slowing down 3")
+                        suggestedSpeed = (
                         int(0.25 * block_info_list[routeQ[0]].speedLimit)
                         * 0.621371
-                    )
-                    suggestedSpeed = round(suggestedSpeed, 2)
-
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 1, QTableWidgetItem(str(blockNum))
-                    )
-                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
-                    )
-                elif len(routeQ) >= 1 and stations_to_stop[0] == routeQ[0]:
-                    suggestedSpeed = 0
-                    station_name = self.find_station_name_by_block(stations_to_stop[0])
+                        )
+                        red_light_check = True
+                    if(len(routeQ) >= 1 and red_light_block == routeQ[0]):
+                        print("slowing down 4")
+                        suggestedSpeed = 0
+                        authority = 0
+                        red_light_check_authority = 0
 
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(rowNumber, 4, QTableWidgetItem("0"))
-                    ctcToTrackController.sendSuggestedSpeed.emit(
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 4, QTableWidgetItem(str(authority))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
-                    )
-                    ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 0)
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 1, QTableWidgetItem(str(station_name))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 2, QTableWidgetItem("Dwelling")
-                    )
+                        )
+                        ctcToTrackController.sendAuthority.emit(
+                        line, wayside, routeQ[0], authority
+                        )
+                        red_light_check = True
 
-                    #current_time = self.main_window.systemTimeInput.text()
-                    #current_time_str = current_time.replace(":", "")[:4]
+                    red_light_check_suggestedSpeed = suggestedSpeed
 
-                    current_time_str = self.main_window.systemTimeInput.text()[:8]
-                    current_time_obj = QTime.fromString(current_time_str, "HH:mm:ss")
-
-                    target_time_obj = current_time_obj.addSecs(60) 
-                    #ctcToTrackController.signalTrainDwelling.emit(target_time_obj)
-                    #print("Target Time:", target_time_obj.toString("HH:mm:ss"))
-                    
-                    QTimer.singleShot(15000,self.leaveStop)
-                    #emite when dwelling, then check itll get, once then emit another signal
-
-                else:
-                    print(
-                        "Top of route queue: ",
-                        block_info_list[int(routeQ[0])].speedLimit,
-                    )
-                    print(
-                        "Suggested Speed Before: ",
-                        (block_info_list[int(routeQ[0])].speedLimit) * 0.621371,
-                    )
-
+                
+                if not station_check:
+                    print("there is no station coming up")
                     suggestedSpeed = (
                         block_info_list[int(routeQ[0])].speedLimit
                     ) * 0.621371
                     suggestedSpeed = round(suggestedSpeed, 2)
+                    authority = 1
 
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
-                    )
-                    self.main_window.dispatchTable.setItem(
-                        rowNumber, 1, QTableWidgetItem(str(blockNum))
-                    )
 
-    def leaveStop(self):
+                #compare which value is lower for the light check and the occupancy check
+                if(red_light_check and occupied_check):
+                    print("both true")
+                    if(red_light_check_authority * occupied_check_authority == 0):
+                        authority = 0
+                    else:
+                        before_authority = 1
+                    if(red_light_check_suggestedSpeed <= occupied_check_suggestedSpeed):
+                        before_suggestedSpeed = red_light_check_suggestedSpeed
+                    else:
+                        before_suggestedSpeed = occupied_check_suggestedSpeed
+
+                elif(red_light_check):
+                    print("red true")
+                    authority = red_light_check_authority
+                    before_suggestedSpeed = red_light_check_suggestedSpeed
+
+                elif(occupied_check):
+                    print("occ true")
+                    authority = occupied_check_authority
+                    before_suggestedSpeed = occupied_check_suggestedSpeed
+
+                # compare values for station check suggested speed with the above
+                if station_check:
+                    try:
+                        if (before_suggestedSpeed <= station_check_suggestedSpeed):
+                            suggestedSpeed = before_suggestedSpeed
+                        else:
+                            suggestedSpeed = station_check_suggestedSpeed
+                    except Exception as e:
+                        suggestedSpeed = station_check_suggestedSpeed
+
+                self.main_window.dispatchTable.setItem(
+                    rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                )
+                self.main_window.dispatchTable.setItem(
+                    rowNumber, 1, QTableWidgetItem(str(blockNum))
+                )
+                self.main_window.dispatchTable.setItem(
+                    rowNumber, 4, QTableWidgetItem(str(authority))
+                )
+                ctcToTrackController.sendSuggestedSpeed.emit(
+                line, wayside, routeQ[0], suggestedSpeed
+                )
+                ctcToTrackController.sendAuthority.emit(
+                line, wayside, routeQ[0], authority
+                )
+
+
+                
+                    
+
+
+    def leaveStop(self, stations_to_stop, block_info_list, routeQ, rowNumber):
         print("In leaveStop function")
-        print("Current stations to stop:", self.stations_to_stop)
+        print("Current stations to stop:", stations_to_stop)
+        print(block_info_list)
+        if stations_to_stop:
+            stations_to_stop.pop(0)
+            print("After pop(0), stations to stop:", stations_to_stop)
 
-        if self.stations_to_stop:
-            self.stations_to_stop.pop(0)
-            print("After pop(0), stations to stop:", self.stations_to_stop)
-
-            if not self.stations_to_stop:
-                self.stations_to_stop.append(0)
+            if not stations_to_stop:
+                stations_to_stop.append(0)
                 nextStop = "Returning to Yard"
                 print("List is empty, added 0, nextStop set to 'Returning to Yard'")
             else:
-                nextStop = self.find_station_name_by_block(self.stations_to_stop[0])
+                nextStop = self.find_station_name_by_block(stations_to_stop[0])
                 print("Next stop:", nextStop)
         else:
             nextStop = "Returning to Yard"
             print("List was initially empty, nextStop set to 'Returning to Yard'")
 
-        suggestedSpeed = round((self.block_info_list[self.routeQ[0]].speedLimit) * 0.621371, 2)
-        wayside = self.find_wayside(self.routeQ[0])
+        suggestedSpeed = round((block_info_list[routeQ[0]].speedLimit) * 0.621371, 2)
+        wayside = self.find_wayside(routeQ[0])
 
         print("Sending suggested speed and updating dispatch table")
         ctcToTrackController.sendSuggestedSpeed.emit(
-            1, wayside, self.routeQ[0], suggestedSpeed
+            1, wayside, routeQ[0], suggestedSpeed
         )
         self.main_window.dispatchTable.setItem(
-            0, 3, QTableWidgetItem(str(suggestedSpeed))
+            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
         )
-        self.main_window.dispatchTable.setItem(0, 1, QTableWidgetItem(self.routeQ[0]))
-        self.main_window.dispatchTable.setItem(0, 2, QTableWidgetItem(str(nextStop)))
-        self.main_window.dispatchTable.setItem(0, 4, QTableWidgetItem("1"))
+        self.main_window.dispatchTable.setItem(rowNumber, 1, QTableWidgetItem(routeQ[0]))
+        self.main_window.dispatchTable.setItem(rowNumber, 2, QTableWidgetItem(str(nextStop)))
+        self.main_window.dispatchTable.setItem(rowNumber, 4, QTableWidgetItem("1"))
 
     def calculateDepartureTime(self, arrival_time, travelTime):
         arrivalTime = QTime.fromString(arrival_time, "HHmm")
@@ -2932,7 +2975,7 @@ class Train:
     def checkDepartureTime(self):
         current_time = self.main_window.systemTimeInput.text()
         current_time_str = current_time.replace(":", "")[:4]
-        print(current_time_str)
+        #print(current_time_str)
         # Iterate through your list of trains and check their departure times
         for train in self.scheduler.trainList:
             departureTime = train.trainDeparture
@@ -3234,4 +3277,24 @@ class Block:
             return None
         else:
             return int(selected_block) 
-        
+
+class Switch:
+    def __init__(
+        self,
+        routing,
+        blockNumber,
+        trackSection,
+        blockLength,
+        speedLimit,
+        stationName,
+        seconds_to_traverse_block,
+    ):
+        self.routing = routing
+        self.blockNumber = blockNumber
+        self.section = trackSection
+        self.length = blockLength
+        self.speedLimit = speedLimit
+        self.station = stationName
+        self.seconds_to_traverse_block = seconds_to_traverse_block
+        self.occupancy = 0
+        self.enable = 1   
