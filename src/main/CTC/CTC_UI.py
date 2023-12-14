@@ -187,21 +187,11 @@ switches = {
 }
 
 lights_greenLine = {
-    0: [0, 63],
-    1: [0, 13],
-    12: [0, 11],
-    13: [1, 12],
-    29: [1, 30],
-    30: [0, 31],
-    57: [1, 0],
-    58: [0, 59],
-    62: [0, 63],
-    63: [0, 64],
-    76: [0, 77],
-    77: [1, 101],
-    85: [1, 86],
-    86: [0, 87],
-    100: [0, 85]
+    0: [1, 63],
+    1: [1, 13],
+    76: [1, 77],
+    100: [1, 85],
+    150: [1, 29]
     }
 
 lights_redLine = {
@@ -1836,9 +1826,46 @@ class Routing:
         trackControllerToCTC.occupancyState.connect(self.checkPosition)
         trackControllerToCTC.occupancyState.connect(lambda line, blockNum, state: self.handleBlockOccupancy(line,blockNum,state))
         ctcToTrackController.signalTrainDwelling.connect(self.leaveStation)
+        trackControllerToCTC.lightState.connect(self.handle_light_change)
 
     def handleBlockOccupancy(self, line, blockNum, state):
         Block.update_block_occupancy(blockNum, state, self.main_window, line)
+
+    def handle_light_change(self, line, blockNum, state):
+        if state == "green":
+            state = 1
+        else:
+            state = 0
+
+        if blockNum in WAYSIDE_1G_BLOCKS:
+            wayside = 1
+        elif blockNum in WAYSIDE_2G_BLOCKS:
+            wayside = 2
+        
+        if line == 1:
+            print("entered green line light handler")
+            try:
+                print("Block: ", blockNum)
+                print("before:",lights_greenLine[blockNum][0])
+                lights_greenLine[blockNum][0] = int(state)
+                print("after:",lights_greenLine[blockNum][0])
+            except Exception as e:
+                return
+            if(int(state) == 1):
+                ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 1)
+                ctcToTrackController.sendSuggestedSpeed.emit(line, wayside, blockNum, 20)
+                print("checking for row table for blocl: ", blockNum)
+                for row in range(self.main_window.dispatchTable.rowCount()):
+                    print(row)
+                    print(self.main_window.dispatchTable.item(row,1).text())
+                    if self.main_window.dispatchTable.item(row,1).text() == str(blockNum):
+                        print("found match for blockNum at row ", row)
+                        self.main_window.dispatchTable.setItem(row, 3, QTableWidgetItem(str(20)))
+                        self.main_window.dispatchTable.setItem(row, 4, QTableWidgetItem(str(1)))
+                        
+                
+                
+            # send update signal
 
     def load_data(self):
         data = []
@@ -2523,9 +2550,10 @@ class Routing:
             else:
                 trainTrack = "Red"
 
+
+            """ ENTERING CONDITION THAT TRAIN HAS MOVED A BLOCK IN ITS ROUTE """
             if occupancy == True and blockNum == routeQ[1] and trainTrack == track:
                 print("inside check position")
-                previous_block = routeQ[0]
                 routeQ.pop(0)
                 if globalSelectLine == "Green Line":
                     lineNum = 1
@@ -2550,7 +2578,7 @@ class Routing:
                 
                 ########## SWITCH CHECK ##################
                 # Check if switch is in next 5 and get its index within the route queue. 
-                for i in range(0, 5):
+                """for i in range(0, 5):
                     if i < len(routeQ) and routeQ[i] in switches:
                         switch_index = i
                         switch = switches[i]
@@ -2582,7 +2610,7 @@ class Routing:
                                 # remove the alternative route from the routeQ
                                 routeQ.remove(switch_index+1, switch_index+1+len(switch[1]))
                                 # replace it with the normal route
-                                routeQ.insert(switch_index+1, switch[0])
+                                routeQ.insert(switch_index+1, switch[0])"""
 
 
                 ############## OCCUPANCY CHECK ############
@@ -2680,11 +2708,101 @@ class Routing:
                         )
                         return
 
+                ############## LIGHT CHECK ############
+                print("entering red light check...")
+                for i in range(0, 6):
+                    if i < len(routeQ) and routeQ[i] in lights_greenLine and routeQ[i+1] == lights_greenLine.get(routeQ[i])[1]:
+                        print("checking: if block " + str(routeQ[i]) + "is red(0): " + str(lights_greenLine.get(routeQ[i])[0]))
+                        if(lights_greenLine.get(routeQ[i])[0] == 0):
+                            red_light_index = i
+                            red_light_block = routeQ[i]
+                            print("Here is the red light block", red_light_block)
+                            print("Here is the red light index", red_light_index)
+                            break
+                        red_light_index = None
+                        print("its not...")
+                    else:
+                        red_light_index = None
+                        print("No red lights discovered...")
+                # If there is a red light block within the next 4...
+                if red_light_index != None:
+                    if(len(routeQ) >= 4 and red_light_block == routeQ[3]):
+                        print("slowing down 1")
+                        suggestedSpeed = (
+                        int(0.75 * block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                        return
+                    elif(len(routeQ) >= 3 and red_light_block == routeQ[2]):
+                        print("slowing down 2")
+                        suggestedSpeed = (
+                        int(0.5 * block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                        return
+                    elif(len(routeQ) >= 2 and red_light_block == routeQ[1]):
+                        print("slowing down 3")
+                        suggestedSpeed = (
+                        int(0.25 * block_info_list[routeQ[0]].speedLimit)
+                        * 0.621371
+                        )
+                        suggestedSpeed = round(suggestedSpeed, 2)
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                        return
+                    elif(len(routeQ) >= 1 and red_light_block == routeQ[0]):
+                        print("slowing down 4")
+                        suggestedSpeed = 0
+                        authority = 0
 
-                # LIGHT CHECK 
-                # STILL NEED TO DO THE CODE FOR THIS PART
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 1, QTableWidgetItem(str(blockNum))
+                        )
+                        self.main_window.dispatchTable.setItem(
+                            rowNumber, 4, QTableWidgetItem(str(authority))
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                        ctcToTrackController.sendSuggestedSpeed.emit(
+                        line, wayside, routeQ[0], suggestedSpeed
+                        )
+                        ctcToTrackController.sendAuthority.emit(
+                        line, wayside, routeQ[0], authority
+                        )
+                        return
 
-                #STATION CHECK
+                ############## STATION CHECK ############
                 if len(routeQ) >= 4 and stations_to_stop[0] == routeQ[3]:
                     suggestedSpeed = (
                         int(0.75 * block_info_list[routeQ[0]].speedLimit)
@@ -2790,6 +2908,12 @@ class Routing:
                     self.main_window.dispatchTable.setItem(
                         rowNumber, 1, QTableWidgetItem(str(blockNum))
                     )
+                    self.main_window.dispatchTable.setItem(
+                        rowNumber, 4, QTableWidgetItem(str(1))
+                    )
+
+                    # otherwise, set authority to 1
+                    ctcToTrackController.sendAuthority.emit(line, wayside, blockNum, 1)
 
     def leaveStop(self, stations_to_stop, block_info_list, routeQ, rowNumber):
         print("In leaveStop function")
