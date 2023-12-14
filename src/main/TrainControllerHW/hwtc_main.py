@@ -1,15 +1,9 @@
-import numpy as np
-import pyfirmata
 import serial
 import time
 
 
-# board = pyfirmata.Arduino() TODO: Implement Arduino Communication
-# arduino = serial.Serial(port='COM4', baudrate=11520, timeout=.1)
-
-
 class HWTrainController:
-    def __init__(self, _id="", auth=1, speed=10):
+    def __init__(self, _id="", line=0, auth=1, speed=10):
         # Control variables
         self._authority = auth  # 1 means go
         self._commandedSpeed = speed
@@ -22,9 +16,12 @@ class HWTrainController:
         # Location Variables
         self._currentBlock = 0
         self._currentPolarity = 0
-        self._stationList = np.zeros(20)  # TODO: Once track model is finalized, hard code this
-                                          #       array with all stations' block numbers
-        self._stationList[0] = 9
+        self._whichLine = line # 0 for red, 1 for green
+        self._redStations = [7, 16, 21, 25, 35, 45, 48, 60]
+        self._redSensList = [7, 9, 15, 16, 21, 25, 27, 32, 35, 38, 43, 45, 48, 52, 60]
+        self._greenStations = [2, 9, 16, 22, 31, 38, 47, 56, 65, 73, 77, 88, 96, 105, 114, 122, 131, 141]
+        self._greenSensList = [2, 9, 12, 16, 19, 22, 29, 31, 38, 47, 56, 58, 62, 65, 73, 76, 77, 85, 88, 96, 105, 114,
+                               122, 131, 141]
 
         # Train State Variables
         self._leftDoor = 0  # 0 for closed or Off
@@ -40,55 +37,18 @@ class HWTrainController:
         self._nextDoors = '00'
         self._announcement = "test"
 
-        # Power Variables
-        self._K_p = 10000  # TODO: Figure out what values these take based on the train
-        self._K_i = 900
-        self._powerToSend = 5
-        self._powerLimit = 1000000000
-        self._SerialData = ""
-        self._lastError = 0
-        self._thisError = 0
-        self._uk = 0
-        self._samplePd = 1
+        # Arduino variables
+        self._powerToSend = 0
+        self._arduino = serial.Serial(port='COM4', baudrate=115200, timeout=.1)
 
         # Failure Variables
         self._isFailed = False
 
-    def setAuthority(self, auth):
-        self._authority = auth
-
-    def setCommandedSpeed(self, newSpeed):
-        self._commandedSpeed = newSpeed
+    def enable(self):
+        self._arduino.write(bytes("33333333", 'utf-8'))  # starts the arduino's loop
 
     def sendPower(self):
         return self._powerToSend
-
-    def getCurrentSpeed(self):
-        return self._currentSpeed
-
-    def getCurrentBlock(self):
-        return self._currentBlock
-
-    def getLeftDoor(self):
-        return self._leftDoor
-
-    def getRightDoor(self):
-        return self._rightDoor
-
-    def getInLights(self):
-        return self._inLights
-
-    def getHeadLights(self):
-        return self._headlights
-
-    def getAnnouncement(self):
-        return self._announcement
-
-    def getTrainID(self):
-        return self._trainID
-
-    def getCurrentTemp(self):
-        return self._currentTemp
 
     # function to send beacon data
     def SetBeaconData(self, neighbor1, thisSt, neighbor2, doors):  # stations will be sent in order of increasing
@@ -118,45 +78,67 @@ class HWTrainController:
 
     def atStation(self, currentBlock):
         result = False
-        for i in self._stationList:
-            if currentBlock == i:
-                result = True
+        if self._whichLine:
+            for i in self._greenStations:
+                if currentBlock == i:
+                    result = True
+        else:
+            for i in self._redStations:
+                if currentBlock == i:
+                    result = True
         return result
 
-    def nearStation(self, currentBlock):
+    def nearStop(self, currentBlock):
         result = False
-        for i in self._stationList:
-            if abs(currentBlock - i) < 3:
-                result = True
+        if self._whichLine:
+            for i in self._greenSensList:
+                if abs(currentBlock - i) < 4:
+                    result = True
+        else:
+            for i in self._redSensList:
+                if abs(currentBlock - i) < 4:
+                    result = True
         return result
 
     def station_operations(self):
         self._inLights = True
-        self._leftDoor = bool(self._nextDoors[0])
-        self._rightDoor = bool(self._nextDoors[1])
+        self._leftDoor = int(self._nextDoors[0])
+        self._rightDoor = int(self._nextDoors[1])
         self._announcement = "This is " + self._thisStation + "."
 
+    def SendData(self, auth, cmdSpd, curSpd):
+        authStr = str(auth)
+        if curSpd < 10:
+            curSpdStr = "0" + str(curSpd)
+        else:
+            curSpdStr = str(curSpd)
+        if cmdSpd < 10:
+            cmdSpdStr = "0" + str(curSpd)
+        else:
+            cmdSpdStr = str(cmdSpd)
+        data = "1" + curSpdStr + cmdSpdStr + "00" + authStr
+        self._arduino.write(bytes(data, 'utf-8'))
+
+    def ReceiveData(self):
+        data = self._arduino.readline()
+        decoded_data = int(data)
+        if not self._mode:
+            self._headlights = decoded_data - decoded_data % 100000000000
+            self._EBrake = decoded_data - decoded_data % 10000000000
+            self._SBrake = decoded_data - decoded_data % 1000000000
+            self._mode = decoded_data - decoded_data % 100000000
+            self._leftDoor = decoded_data - decoded_data % 10000000
+            self._rightDoor = decoded_data - decoded_data % 1000000
+            self._inLights = decoded_data - decoded_data % 100000
+        self._powerToSend = (decoded_data % 10000)/100
+
     def StoppedHandler(self):
+        print("Train is Stopped")
         self._EBrakeLock = False
         if self.atStation(self._currentBlock):
             self.station_operations()
 
-    def PowerHandler(self):
-        newError = (self._setpointSpeed - self._currentSpeed) / 2.237
-        if newError == 0 and self._lastError == 0:
-            self._powerToSend = 0
-            return
-        else:
-            newUk = self._uk + self._samplePd / 2 * (newError + self._lastError)
-
-        power1 = self._K_p * newError + self._K_i * newUk  # TODO: insert power calculation here
-        power2 = self._K_p * newError + self._K_i * newUk
-        power3 = self._K_p * newError + self._K_i * newUk
-        self._powerToSend = (power1 + power2 + power3) / 3  # TODO: change this from an average to a voting algorithm
-        self._uk = newUk
-        self._lastError = newError
-
-    def FailureHandler(self, failures=[0, 0, 0]):  # Power Failure at index 2
+    def FailureHandler(self, failures):  # Power Failure at index 2
         for i in range(3):
             if failures[i]:
                 self.setEBrake(1)
@@ -165,31 +147,36 @@ class HWTrainController:
             self._inLights = 0
             self._headlights = 0
 
-    # def UpdateUI(self):  # TODO: implement arduino firmata communication for sending and receiving booleans from UI
-    #     return board
+    def UpdateUI(self):
+        toSend = "0" + (str(self._headlights) + str(self._EBrake) + str(self._SBrake)
+                        + str(self._leftDoor) + str(self._rightDoor) + str(self._inLights))
+        self._arduino.write(bytes(toSend, 'utf-8'))
 
-    def AutoUpdate(self):
-        if self.nearStation(self._currentBlock):
-            self._setpointSpeed = self._commandedSpeed / 2
+    def UpdateBoard(self):
+        if self.nearStop(self._currentBlock):
+            self._setpointSpeed = 20
         else:
             self._setpointSpeed = self._commandedSpeed
         if self._currentSpeed == 0 and not self._authority:
             self.StoppedHandler()
         else:
-            self.PowerHandler()
-            # self.UpdateUI()
+            self.SendData(self._authority, self._setpointSpeed, self._currentSpeed)
+            time.sleep(5)
+            self.ReceiveData()
 
-    def UpdateController(self, newAuth, newSpdCmd, currentSpeed, blockPolarity, failures=[0, 0, 0]):
+    def UpdateController(self, newAuth, newSpdCmd, currentSpeed, blockPolarity, failures):
         self._authority = newAuth
         self._commandedSpeed = newSpdCmd
-        self._currentSpeed = currentSpeed
+        self._currentSpeed = int(currentSpeed)
+        if self._commandedSpeed < self._currentSpeed:
+            self._SBrake = 1
         self.FailureHandler(failures)
         if not self._isFailed:
             if self._currentPolarity != blockPolarity:
                 self._currentBlock += 1
                 self._currentPolarity = blockPolarity
-            if self._mode:
-                self.AutoUpdate()
+            self.UpdateBoard()
+        self.UpdateUI()
 
     def BrakeStates(self):
         return [self._EBrake, self._SBrake]
