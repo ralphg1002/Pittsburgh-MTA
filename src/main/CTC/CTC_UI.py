@@ -1780,7 +1780,7 @@ class Scheduler:
                     train_id,
                     suggested_speed,
                     self.travel,
-                    self.correctStops,
+                    self.correctBlocks,
                     self.blockInfo
                 )              
                 
@@ -2151,6 +2151,7 @@ class Routing:
         self.stations_to_stop.append(0)
         print("BLOCKS TO STOP AT")
         print(self.stations_to_stop)
+
         self.routeQ = []
 
         trainLine = globalSelectLine
@@ -2398,6 +2399,9 @@ class Routing:
 
                 red_light_check = False
                 occupied_check = False
+                station_check = False
+                authority = 1
+                suggestedSpeed = 20
 
                 #train_routes[train_id] = self.routeQ
 
@@ -2415,7 +2419,8 @@ class Routing:
                 rowNumber = dispatchTrainsList.index(train)
                 
                 ############## STATION CHECK ############
-                station_check = False
+                
+                station_check_authority = 1
                 if len(routeQ) >= 4 and stations_to_stop[0] == routeQ[3]:
                     suggestedSpeed = (
                         int(0.75 * block_info_list[routeQ[0]].speedLimit)
@@ -2466,6 +2471,7 @@ class Routing:
                     ctcToTrackController.sendSuggestedSpeed.emit(
                         line, wayside, routeQ[0], suggestedSpeed
                     )
+                    station_check = True
                 elif len(routeQ) >= 1 and stations_to_stop[0] == routeQ[0]:
                     suggestedSpeed = 0
                     station_name = self.find_station_name_by_block(stations_to_stop[0])
@@ -2502,7 +2508,8 @@ class Routing:
                     QTimer.singleShot(15000,lambda : self.leaveStop(stations_to_stop, block_info_list, routeQ, rowNumber))
                     #emite when dwelling, then check itll get, once then emit another signal
                     station_check = True
-            
+                station_check_suggestedSpeed = suggestedSpeed
+
 
                 ########## SWITCH CHECK ##################
                 # Check if switch is in next 5 and get its index within the route queue. 
@@ -2753,22 +2760,31 @@ class Routing:
                     if(red_light_check_authority * occupied_check_authority == 0):
                         authority = 0
                     else:
-                        authority = 1
+                        before_authority = 1
                     if(red_light_check_suggestedSpeed <= occupied_check_suggestedSpeed):
-                        suggestedSpeed = red_light_check_suggestedSpeed
+                        before_suggestedSpeed = red_light_check_suggestedSpeed
                     else:
-                        suggestedSpeed = occupied_check_suggestedSpeed
+                        before_suggestedSpeed = occupied_check_suggestedSpeed
 
                 elif(red_light_check):
                     print("red true")
                     authority = red_light_check_authority
-                    suggestedSpeed = red_light_check_suggestedSpeed
+                    before_suggestedSpeed = red_light_check_suggestedSpeed
 
                 elif(occupied_check):
                     print("occ true")
                     authority = occupied_check_authority
-                    suggestedSpeed = occupied_check_suggestedSpeed
+                    before_suggestedSpeed = occupied_check_suggestedSpeed
 
+                # compare values for station check suggested speed with the above
+                if station_check:
+                    try:
+                        if (before_suggestedSpeed <= station_check_suggestedSpeed):
+                            suggestedSpeed = before_suggestedSpeed
+                        else:
+                            suggestedSpeed = station_check_suggestedSpeed
+                    except Exception as e:
+                        suggestedSpeed = station_check_suggestedSpeed
 
                 self.main_window.dispatchTable.setItem(
                     rowNumber, 3, QTableWidgetItem(str(suggestedSpeed))
