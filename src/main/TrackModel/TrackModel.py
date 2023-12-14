@@ -533,6 +533,11 @@ class TrackModel:
         trackHeaterLabel.setGeometry(600, 505, 140, 25)
         trackHeaterLabel.setStyleSheet(style)
 
+        directionLabel = QLabel("Direction:", self.mainWindow)
+        directionLabel.setFont(font)
+        directionLabel.setGeometry(600, 540, 140, 25)
+        directionLabel.setStyleSheet(style)
+
     def add_blockinfo(self, style, font):
         self.blockLengthLabel = QLabel(self.mainWindow)
         self.blockLengthLabel.setFont(font)
@@ -563,6 +568,20 @@ class TrackModel:
         self.trackHeaterLabel.setFont(font)
         self.trackHeaterLabel.setStyleSheet(style)
         self.trackHeaterLabel.setGeometry(800, 505, 110, 25)
+
+        biArrowPNG = QPixmap("src/main/TrackModel/pngs/bidirectional-arrow.png")
+        biArrowPNG = biArrowPNG.scaledToWidth(30)
+        self.biArrow = QLabel(self.mainWindow)
+        self.biArrow.setPixmap(biArrowPNG)
+        self.biArrow.setGeometry(800, 540, biArrowPNG.width(), biArrowPNG.height())
+        self.biArrow.hide()
+
+        uniArrowPNG = QPixmap("src/main/TrackModel/pngs/unidirectional-arrow.png")
+        uniArrowPNG = uniArrowPNG.scaledToWidth(40)
+        self.uniArrow = QLabel(self.mainWindow)
+        self.uniArrow.setPixmap(uniArrowPNG)
+        self.uniArrow.setGeometry(795, 535, uniArrowPNG.width(), uniArrowPNG.height())
+        self.uniArrow.hide()
 
         # Station Labels:
         self.stationNameLabel = QLabel(self.mainWindow)
@@ -704,6 +723,7 @@ class TrackModel:
     def parse_block_info(self):
         # Obtain block number provided
         blockNumber = self.entryField.text()
+
         # Update the block info based on the block selected
         for data in self.trackData:
             if data["Block Number"] == int(blockNumber):
@@ -713,6 +733,18 @@ class TrackModel:
                 self.blockElevation = str(data["ELEVATION (M)"])
                 self.blockCumElevation = str(data["CUMALTIVE ELEVATION (M)"])
 
+                #For directional of block
+                if self.selectedLine == "Green":
+                    if (int(blockNumber) >= 13 and int(blockNumber) <= 28) or (int(blockNumber) >= 77 and int(blockNumber) <= 88):
+                        self.uniArrow.hide()
+                        self.biArrow.show()
+                    else:
+                        self.biArrow.hide()
+                        self.uniArrow.show()
+                elif self.selectedLine == "Red":
+                    self.uniArrow.hide()
+                    self.biArrow.show()
+                
                 self.failures = data[
                     "Failures"
                 ]  # Store new blocks data in self.failures
@@ -792,7 +824,7 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["headerFontSize"]
         )
         failuresLabel.setFont(failuresLabelFont)
-        failuresLabel.setGeometry(670, 560, 150, 30)
+        failuresLabel.setGeometry(670, 580, 150, 30)
         failuresLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         circuitFailureLabel = QLabel("Circuit", self.mainWindow)
@@ -800,7 +832,7 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]
         )
         circuitFailureLabel.setFont(circuitFailureLabelFont)
-        circuitFailureLabel.setGeometry(615, 595, 50, 30)
+        circuitFailureLabel.setGeometry(615, 615, 50, 30)
         circuitFailureLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         powerFailureLabel = QLabel("Power", self.mainWindow)
@@ -808,7 +840,7 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]
         )
         powerFailureLabel.setFont(powerFailureLabelFont)
-        powerFailureLabel.setGeometry(715, 595, 50, 30)
+        powerFailureLabel.setGeometry(715, 615, 50, 30)
         powerFailureLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         brokenFailureLabel = QLabel("Broken", self.mainWindow)
@@ -816,32 +848,32 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]
         )
         brokenFailureLabel.setFont(brokenFailureLabelFont)
-        brokenFailureLabel.setGeometry(815, 595, 50, 30)
+        brokenFailureLabel.setGeometry(815, 615, 50, 30)
         brokenFailureLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         circuitFailureSelector = QLabel(self.mainWindow)
-        circuitFailureSelector.setGeometry(630, 625, 20, 20)
+        circuitFailureSelector.setGeometry(630, 645, 20, 20)
         circuitFailureSelector.setPixmap(
             QPixmap("src/main/TrackModel/pngs/circle_outline.png").scaled(20, 20)
         )
         circuitFailureSelector.mousePressEvent = self.set_circuit_failure
 
         powerFailureSelector = QLabel(self.mainWindow)
-        powerFailureSelector.setGeometry(730, 625, 20, 20)
+        powerFailureSelector.setGeometry(730, 645, 20, 20)
         powerFailureSelector.setPixmap(
             QPixmap("src/main/TrackModel/pngs/circle_outline.png").scaled(20, 20)
         )
         powerFailureSelector.mousePressEvent = self.set_power_failure
 
         brokenFailureSelector = QLabel(self.mainWindow)
-        brokenFailureSelector.setGeometry(830, 625, 20, 20)
+        brokenFailureSelector.setGeometry(830, 645, 20, 20)
         brokenFailureSelector.setPixmap(
             QPixmap("src/main/TrackModel/pngs/circle_outline.png").scaled(20, 20)
         )
         brokenFailureSelector.mousePressEvent = self.set_broken_failure
 
         self.circuitSelection = QLabel(self.mainWindow)
-        self.circuitSelection.setGeometry(630, 625, 20, 20)
+        self.circuitSelection.setGeometry(630, 645, 20, 20)
         self.circuitSelection.setPixmap(
             QPixmap("src/main/TrackModel/pngs/red_circle.png").scaled(20, 20)
         )
@@ -849,7 +881,7 @@ class TrackModel:
         self.circuitSelection.mousePressEvent = self.set_circuit_failure
 
         self.powerSelection = QLabel(self.mainWindow)
-        self.powerSelection.setGeometry(730, 625, 20, 20)
+        self.powerSelection.setGeometry(730, 645, 20, 20)
         self.powerSelection.setPixmap(
             QPixmap("src/main/TrackModel/pngs/red_circle.png").scaled(20, 20)
         )
@@ -857,7 +889,7 @@ class TrackModel:
         self.powerSelection.mousePressEvent = self.set_power_failure
 
         self.brokenSelection = QLabel(self.mainWindow)
-        self.brokenSelection.setGeometry(830, 625, 20, 20)
+        self.brokenSelection.setGeometry(830, 645, 20, 20)
         self.brokenSelection.setPixmap(
             QPixmap("src/main/TrackModel/pngs/red_circle.png").scaled(20, 20)
         )
