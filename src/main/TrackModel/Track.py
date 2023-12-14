@@ -1339,7 +1339,7 @@ class TrackView(QGraphicsView):
         self.greenTrack.addItem(castleshannonBeacon)
         
         #Box where block numbers are displayed
-        box = QGraphicsRectItem(-75, 150, 60, 20)
+        box = QGraphicsRectItem(-75, 150, 70, 20)
         box.setPen(QPen(QColor(0, 0, 0), 3))
         box.setBrush(QBrush(QColor(0, 255, 0, 20)))
         self.greenTrack.addItem(box)
@@ -2111,7 +2111,7 @@ class TrackView(QGraphicsView):
         self.redTrack.addItem(southhillsBeacon)
         
         #Box where block numbers are displayed
-        box = QGraphicsRectItem(-225, 0, 60, 20)
+        box = QGraphicsRectItem(-225, 0, 70, 20)
         box.setPen(QPen(QColor(0, 0, 0), 3))
         box.setBrush(QBrush(QColor(255, 0, 0, 20)))
         self.redTrack.addItem(box)
