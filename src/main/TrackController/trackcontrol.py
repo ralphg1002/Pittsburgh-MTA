@@ -462,15 +462,15 @@ class Wayside:
         if not self.plcState:
             return
 
-        print("LOGIC FOR LINE ", self.line)
-        print("**********************************************")
+        #print("LOGIC FOR LINE ", self.line)
+        #print("**********************************************")
         #print(self.plcData)
         for item in self.plcData:
             # Initialize a flag to track if any condition is satisfied
             any_condition_satisfied = False
             
             for ifBlock in range(0, len(item)):
-                print("ENTERING LOGIC FOR WAYSIDE ", self.waysideNum)
+                #print("ENTERING LOGIC FOR WAYSIDE ", self.waysideNum)
                 switchString = item[ifBlock]["Section"].rstrip(":")
                 correctWayside = False
                 if switchString in self.switches:
@@ -537,10 +537,10 @@ class Wayside:
                 elif condition2 == False and notExist:
                     condition2 = True
 
-                print(switchString)
+                """print(switchString)
                 print(entry, exitRange)
                 print("Condition 1: ", condition1)
-                print("Condition 2: ", condition2)
+                print("Condition 2: ", condition2)"""
 
 
                 # If both condition 1 and 2 are valid, set the flag and break the loop
