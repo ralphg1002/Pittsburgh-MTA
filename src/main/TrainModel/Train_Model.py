@@ -415,7 +415,7 @@ class TrainModel(QMainWindow):
                 trainObject.navigation_status["block_length"] = blockLength
                 trainObject.navigation_status["block_grade"] = blockGrade
                 trainObject.vehicle_status["speed_limit"] = speedLimit
-                # trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
+                trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
                 trainObject.vehicle_status["commanded_speed"] = 30
                 trainObject.navigation_status["authority"] = authority
         
