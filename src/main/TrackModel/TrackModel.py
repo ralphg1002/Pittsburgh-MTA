@@ -340,12 +340,12 @@ class TrackModel:
         greenLightBlocks = [0, 1, 76, 100, 150]
         redLightBlocks = [0, 32, 43, 66, 71, 76]
         if line == 1:
-            if state == "Green":
+            if state == "green":
                 if blockNum in greenLightBlocks:
                     self.trackView.greenTrack.removeItem(self.signals[blockNum])
                     del self.signals[blockNum]
                     # print(self.signals)
-            elif state == "Red":
+            elif state == "red" and (blockNum in greenLightBlocks):
                 redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
                 redLight = redLight.scaledToWidth(35)
                 signal = QGraphicsPixmapItem(redLight)
@@ -387,13 +387,13 @@ class TrackModel:
 
     def update_crossing_state(self, line, _, __, state):
         if line == 1:
-            if state == 0:
+            if state == 1:
                 self.trackView.greenTrack.removeItem(self.signals[19.1])
                 self.trackView.greenTrack.removeItem(self.signals[19.2])
                 del self.signals[19.1]
                 del self.signals[19.2]
                 print(self.signals)
-            elif state == 1:
+            elif state == 0:
                 redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
                 redLight = redLight.scaledToWidth(20)
                 crossing = QGraphicsPixmapItem(redLight)
@@ -405,13 +405,13 @@ class TrackModel:
                 self.trackView.greenTrack.addItem(crossing)
                 self.trackView.greenTrack.addItem(crossing2)
         if line == 2:
-            if state == 0:
+            if state == 1:
                 self.trackView.redTrack.removeItem(self.signals[47.1])
                 self.trackView.redTrack.removeItem(self.signals[47.2])
                 del self.signals[47.1]
                 del self.signals[47.2]
                 print(self.signals)
-            elif state == 1:
+            elif state == 0:
                 redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
                 redLight = redLight.scaledToWidth(20)
                 crossing = QGraphicsPixmapItem(redLight)

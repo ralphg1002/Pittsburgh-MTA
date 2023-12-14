@@ -40,8 +40,12 @@ class RunPLC:
                 for line in file:
                     line = line.strip()
 
-                    if line.startswith("SW") or line.startswith("CRX"):
+                    if line.startswith("SW"):
                         currentSection = line
+                        sections = []
+                        ifBlock = 0
+                    elif line.startswith("CRX"):
+                        currentSection = "CRX"
                         sections = []
                         ifBlock = 0
                     elif line == "IF":
@@ -69,6 +73,7 @@ class RunPLC:
             print(f"An error occurred while parsing the file: {e}")
             # You can choose to continue or raise an exception here if needed
 
+        #print(data)
         return data
 
 
@@ -92,11 +97,10 @@ class Block:
         self.maintenanceState = maintenanceState
         self.direction = direction
         self.number = number
+        
 
         # initialize authority variables
-        self.ctcAuthority = None
-        self.nextRedAuthority = None
-        self.nextOccupiedBlockAuthority = None
+        self.nextBlock = None 
 
     def get_number(self):
         return self.number
@@ -118,6 +122,8 @@ class Block:
 
     def set_occupancystate(self, newOccupancyState):
         self.occupancyState = newOccupancyState
+        if(newOccupancyState == 0):
+            self.nextBlock = None
 
     def get_failurestate(self):
         return self.failureState
@@ -142,6 +148,12 @@ class Block:
 
     def set_suggestedspeed(self, newSpeed):
         self.suggestedSpeed = newSpeed
+
+    def set_nextblock(self, next):
+        self.nextBlock = next
+
+    def get_nextblock(self):
+        return self.nextBlock
 
     def get_type(self):
         return "plain"
@@ -450,15 +462,21 @@ class Wayside:
         if not self.plcState:
             return
 
+        print("LOGIC FOR LINE ", self.line)
+        print("**********************************************")
+        #print(self.plcData)
         for item in self.plcData:
             # Initialize a flag to track if any condition is satisfied
             any_condition_satisfied = False
-
+            
             for ifBlock in range(0, len(item)):
+                print("ENTERING LOGIC FOR WAYSIDE ", self.waysideNum)
                 switchString = item[ifBlock]["Section"].rstrip(":")
+                correctWayside = False
                 if switchString in self.switches:
                     # Determine what is the switch block
                     switchBlock = self.get_block(self.switches[switchString])
+                    correctWayside = True
                 else:
                     continue
 
@@ -479,11 +497,20 @@ class Wayside:
                 if entry != 0:
                     # check for validity of conditon 1
                     for block in entry:
-                        if (self.get_block(block) == None):
-                            print(block)
-                        if self.get_block(block).get_occupancystate() == True:
-                            condition1 = True
+                        # Find the index of the current block in the entry list
+                        current_index = entry.index(block)
+                        # Check if the current block is occupied and the next block exists and is occupied
+                        if (
+                            self.get_block(block).get_occupancystate() == True
+                        ):
+                            # if it is the last in the list, just assume its true
+                            if(current_index + 1 >= len(entry)):
+                                condition1 = True
+                            # if it is not in the last of the list ensure it is traveling in the proper direction
+                            elif(self.get_block(entry[current_index + 1]).get_occupancystate() == True):
+                                condition1 = True
                             break
+                        
                 else:
                     if self.get_block(0).get_occupancystate() == True:
                         condition1 = True
@@ -491,14 +518,15 @@ class Wayside:
                 # check for validity of condition 2
                 if exitRange != None:
                     for block in exitRange:
-                        if exitRange == None:
-                            condition2 = True
-                            break
-
-                        if (self.get_block(block) == None):
-                            print(block)
-                        elif self.get_block(block).get_occupancystate() == True:
-                            condition2 = True
+                        current_index = exitRange.index(block)
+                        # Check if the current block is occupied and the next block exists and is occupied
+                        if (self.get_block(block).get_occupancystate() == True):
+                            # if it is the last in the list, just assume its true
+                            if(current_index + 1 >= len(exitRange)):
+                                condition2 = True
+                            # if it is not in the last of the list ensure it is traveling in the proper direction
+                            elif(self.get_block(exitRange[current_index + 1]).get_occupancystate() == True):
+                                condition2 = True
                             break
                 else:
                     condition2 = True
@@ -509,31 +537,75 @@ class Wayside:
                 elif condition2 == False and notExist:
                     condition2 = True
 
+                print(switchString)
+                print(entry, exitRange)
+                print("Condition 1: ", condition1)
+                print("Condition 2: ", condition2)
+
+
                 # If both condition 1 and 2 are valid, set the flag and break the loop
                 if condition1 and condition2:
                     any_condition_satisfied = True
                     break
 
+            #exception for crossing logic to set to true if nothing is satisfied
+            if switchString == "CRX" and ifBlock == len(item)-1 and not any_condition_satisfied:
+                if(self.line == 1 and self.waysideNum == 1):
+                    crossNumber = 19
+                elif(self.line == 2 and self.waysideNum == 2):
+                    crossNumber = 47
+                else:
+                    break
+
+                if self.get_block(crossNumber).get_crossingstate() == 0:
+                    print("prior state: ", self.get_block(crossNumber).get_crossingstate())
+                    self.get_block(
+                        crossNumber).set_crossingstate(1)
+                    self.get_block(
+                        crossNumber).set_lightstate("green")
+                    print("after state: ", self.get_block(crossNumber).get_crossingstate())
+
+                    # called again after the handler
+                    trackControllerToTrackModel.crossingState.emit(
+                        self.line,
+                        self.waysideNum,
+                        crossNumber,
+                        1,
+                    )
+                    """trackControllerToTrackModel.lightState.emit(
+                        self.line,
+                        self.waysideNum,
+                        crossNumber,
+                        "green",
+                    )"""
+                    trackControllerToCTC.lightState.emit(
+                        self.line,
+                        crossNumber,
+                        "green",
+                    )
+
             # If any condition is satisfied, execute the operations
             if any_condition_satisfied:
                 for operation in item[ifBlock]["Operations"]:
                     parsedOperation = self.parse_operation(operation)
+                    #print(parsedOperation["Type"])
                     # set the switch value
                     if parsedOperation["Type"] == "SWITCH":
                         switchValue = int(parsedOperation["Value"])
 
-                        switchBlock.set_switchstate(switchValue)
+                        if(switchValue != switchBlock.get_switchstate()):
+                            switchBlock.set_switchstate(switchValue)
 
-                        # emit that a switch value has been changed to the Track Model
-                        trackControllerToTrackModel.switchState.emit(
-                            self.line,
-                            self.waysideNum,
-                            self.switches[switchString],
-                            switchValue,
-                        )
-                        # emit that the switch value has bene changed to the CTC
-                        trackControllerToCTC.switchState.emit(
-                            self.line, self.switches[switchString], switchValue)
+                            # emit that a switch value has been changed to the Track Model
+                            trackControllerToTrackModel.switchState.emit(
+                                self.line,
+                                self.waysideNum,
+                                self.switches[switchString],
+                                switchValue,
+                            )
+                            # emit that the switch value has bene changed to the CTC
+                            trackControllerToCTC.switchState.emit(
+                                self.line, self.switches[switchString], switchValue)
 
                     # set the light value
                     elif parsedOperation["Type"] == "SIGNAL":
@@ -546,37 +618,51 @@ class Wayside:
                         elif signalState == "R":
                             signalState = "red"
 
-                        self.get_block(int(signalNumber)
-                                       ).set_lightstate(signalState)
-                        # print(self.line, self.waysideNum, signalNumber, signalState)
-                        # emit that a light value has been changed
-                        trackControllerToTrackModel.lightState.emit(
-                            self.line, self.waysideNum, int(
-                                signalNumber), signalState
-                        )
+                        lightBlock = self.get_block(int(signalNumber))
+                        
+
+                        if(lightBlock.get_lightstate() != signalState):
+                            lightBlock.set_lightstate(signalState)
+                            # print(self.line, self.waysideNum, signalNumber, signalState)
+                            # emit that a light value has been changed
+                            print("Emitting to Track Model: ")
+                            print("Block: " + str(signalNumber) + " State: " + str(signalState))
+                            trackControllerToTrackModel.lightState.emit(
+                                self.line, self.waysideNum, int(
+                                    signalNumber), signalState
+                            )
+                            trackControllerToCTC.lightState.emit(self.line, int(signalNumber), signalState)
 
                     # Set the crossing value
                     elif parsedOperation["Type"] == "CROSS":
                         crossValue = int(parsedOperation["Value"])
-                        crossNumber = parsedOperation["Number"]
+                        if(self.line == 1 and self.waysideNum == 1):
+                            crossNumber = 19
+                        elif(self.line == 2 and self.waysideNum == 2):
+                            crossNumber = 47
+                        #print("CROSSING")
+                        #print(crossNumber)
 
-                        self.get_block(
-                            crossNumber).set_crosssingstate(crossValue)
+                        if self.get_block(crossNumber).get_crossingstate() != crossValue:
+                            self.get_block(
+                                crossNumber).set_crossingstate(crossValue)
 
-                        # called again after the handler
-                        # emit that a switch value has been changed
-                        trackControllerToTrackModel.crossingState.emit(
-                            self.line,
-                            self.waysideNum,
-                            crossNumber,
-                            switchValue,
-                        )
+                            # called again after the handler
+                            # emit that a switch value has been changed
+                            trackControllerToTrackModel.crossingState.emit(
+                                self.line,
+                                self.waysideNum,
+                                crossNumber,
+                                crossValue,
+                            )
 
     # This is the method that parses the condition of a section within a PLC file
     def parse_condition(self, condition):
         entry = []
         exit = []
         notExist = False
+        direction_entry = None
+        direction_exit = None
 
         patterns = {
             "patternEntry": r"^(\d+)$",
@@ -611,30 +697,35 @@ class Wayside:
                     entry = list(range(start, end + 1))
                     exit = None
                     notExist = False
+                    direction_entry = 1
                     break
                 elif pattern == "patternEntryReverseRange":
                     end, start = map(int, match.groups())
                     entry = list(range(start, end - 1, -1))
                     exit = None
                     notExist = False
+                    direction_entry = -1
                     break
                 elif pattern == "patternEntryAndExitRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(2)),
                                 int(match.group(3)) + 1))
                     notExist = False
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryAndExitReverseRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(3)),
                                 int(match.group(2)) + 1))
                     notExist = False
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryRangeAndExit":
                     entry = list(range(int(match.group(1)),
                                  int(match.group(2)) + 1))
                     exit = [int(match.group(3))]
                     notExist = False
+                    direction_entry = 1
                     break
                 elif pattern == "patternEntryRangeAndExitRange":
                     entry = list(range(int(match.group(1)),
@@ -642,6 +733,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = 1
+                    diretion_exit = 1
                     break
                 elif pattern == "patternEntryReverseRangeAndExitRange":
                     entry = list(range(int(match.group(2)),
@@ -649,6 +742,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = -1
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryRangeAndExitReverseRange":
                     entry = list(range(int(match.group(1)),
@@ -656,29 +751,36 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = 1
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryReverseRangeAndExitReverseRange":
                     entry = list(range(int(match.group(1)), int(match.group(2)) + 1))
                     exit = list(range(int(match.group(3)), int(match.group(4)) + 1))
                     notExist = False
+                    direction_entry = -1
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryAndNotExitRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(2)),
                                 int(match.group(3)) + 1))
                     notExist = True
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryAndNotExitReverseRange":
                     entry = [int(match.group(1))]
                     exit = list(range(int(match.group(3)),
                                 int(match.group(2)) + 1))
                     notExist = True
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryRangeAndNotExit":
                     entry = list(range(int(match.group(1)),
                                  int(match.group(2)) + 1))
                     exit = [int(match.group(3))]
                     notExist = True
+                    direction_entry = 1
                     break
                 elif pattern == "patternEntryRangeAndNotExitRange":
                     entry = list(range(int(match.group(1)),
@@ -686,6 +788,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = True
+                    direction_entry = 1
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryReverseRangeAndNotExitRange":
                     entry = list(range(int(match.group(2)),
@@ -693,13 +797,16 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = True
+                    direction_entry = -1
+                    direction_exit = 1
                     break
                 elif pattern == "patternEntryRangeAndNotExitReverseRange":
                     entry = list(range(int(match.group(1)),
                                  int(match.group(2)) + 1))
-                    exit = list(range(int(match.group(3)),
-                                int(match.group(4)) + 1))
+                    exit = list(range(int(match.group(3)), int(match.group(4)) + 1))[::-1]
                     notExist = True
+                    direction_entry = 1
+                    direction_exit = -1
                     break
                 elif pattern == "patternEntryReverseRangeAndNotExitReverseRange":
                     entry = list(range(int(match.group(1)),
@@ -707,6 +814,8 @@ class Wayside:
                     exit = list(range(int(match.group(3)),
                                 int(match.group(4)) + 1))
                     notExist = True
+                    direction_entry = -1
+                    direction_exit = -1
                     break
 
         # print("Entry: ", entry)
@@ -719,6 +828,10 @@ class Wayside:
             switchValue = operationLine.split("(")[1].strip(")")
             if switchValue in ["0", "1"]:
                 return {"Type": "SWITCH", "Value": int(switchValue)}
+        elif operationLine.startswith("CROSS"):
+            crossValue = operationLine.split("(")[1].strip(")")
+            if crossValue in ["0", "1"]:
+                return {"Type": "CROSS", "Value": int(crossValue)}
         elif operationLine.endswith(" G"):
             return {"Type": "SIGNAL", "Number": operationLine.split()[0], "State": "G"}
         elif operationLine.endswith(" R"):
@@ -778,7 +891,7 @@ class TrackControl(QMainWindow):
         # Instantiate the track information for the Green Line
         self.greenLine = Line(1)
         self.wayside1G = Wayside(1, 1)
-        switchDict = {"SW1": 13, "SW2": 29}
+        switchDict = {"SW1": 13, "SW2": 29, "CRX": 19}
         self.wayside1G.switches_init(switchDict)
         self.wayside2G = Wayside(2, 1)
         switchDict = {"SW3": 57, "SW4": 63, "SW5": 77, "SW6": 85}
@@ -792,7 +905,7 @@ class TrackControl(QMainWindow):
         switchDict = {"SW1": 9, "SW2": 16, "SW3": 27}
         self.wayside1R.switches_init(switchDict)
         self.wayside2R = Wayside(2, 2)
-        switchDict = {"SW4": 33, "SW5": 38, "SW6": 44, "SW7": 52}
+        switchDict = {"SW4": 33, "SW5": 38, "SW6": 44, "SW7": 52, "CRX": 47}
         self.wayside2R.switches_init(switchDict)
         self.redLine.add_wayside(self.wayside1R)
         self.redLine.add_wayside(self.wayside2R)
@@ -928,6 +1041,9 @@ class TrackControl(QMainWindow):
 
                 wayside.add_block(block)
 
+        trackControllerToTrackModel.crossingState.emit(1,1,1,0)
+        trackControllerToTrackModel.crossingState.emit(2,2,1,0)
+
         # Load the default plc programs for all wayside controllers
         self.wayside1G.run_plc("src/main/TrackController/plc_green.txt")
         self.wayside2G.run_plc("src/main/TrackController/plc_green.txt")
@@ -964,7 +1080,7 @@ class TrackControl(QMainWindow):
             lambda: self.handle_mode(
                 self.lines[self.ui.lineSelect - 1]
                 .get_wayside(self.ui.waysideSelect)
-                .get_plc_state()
+                .R()
             )
         )
 
@@ -981,6 +1097,7 @@ class TrackControl(QMainWindow):
         ctcToTrackController.sendSuggestedSpeed.connect(
             self.handle_suggested_speed)
         ctcToTrackController.sendTrainDispatched.connect(self.handle_dispatch)
+        ctcToTrackController.sendMaintenance.connect(self.handle_maintenance)
 
         """ This section of code is for the connections from track model to the track controller handler"""
         trackModelToTrackController.occupancyState.connect(
@@ -1055,7 +1172,7 @@ class TrackControl(QMainWindow):
 
         # send maintenance state signal to the track model
         trackControllerToTrackModel.maintenance.emit(line, wayside, num, state)
-        self.ui.testBenchWindow.refreshed.emit(True)
+        #self.ui.testBenchWindow.refreshed.emit(True)
 
     def handle_failure(self, line, wayside, num, state):
         self.lines[line -
@@ -1110,7 +1227,7 @@ class TrackControl(QMainWindow):
     """ Handler methods for the  Track Model input signals (and internally change gui) """
 
     def set_occupancystate_handler(self, line, wayside, num, state):
-        print(line, wayside, num, state)
+        #print(line, wayside, num, state)
         self.lines[line -
                    1].get_wayside(wayside).get_block(num).set_occupancystate(state)
         # print("Sending occupancy to CTC...")

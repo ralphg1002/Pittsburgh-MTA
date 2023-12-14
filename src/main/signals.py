@@ -7,6 +7,7 @@ class TrackControllerToCTC(QObject):
     failureState = pyqtSignal(int, int, bool)  # line, block number, state
     switchState = pyqtSignal(int, int, bool)  # line, block number, state
     requestSpeed = pyqtSignal(int, int)  # line, block number
+    lightState = pyqtSignal(int, int, str)  # line, block number, state
 
 
 class TrackControllerToTrackModel(QObject):
