@@ -1,0 +1,203 @@
+* [33me03d4f6[m[33m ([m[1;31morigin/signal-train-model[m[33m)[m Copied code to make sure everything is up to date
+[31m|[m *   [33m3c0e926[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #120 from ralphg1002/signal-train-model
+[31m|[m [32m|[m[31m\[m  
+[31m|[m [32m|[m[31m/[m  
+[31m|[m[31m/[m[32m|[m   
+* [32m|[m [33m538e6ef[m Small uncomment
+* [32m|[m [33m1aebc1a[m[33m ([m[1;31morigin/calculations-train-model[m[33m)[m Added a station to show failures
+[33m|[m *   [33md4640a8[m Merge pull request #119 from ralphg1002/calculations-train-model
+[33m|[m [34m|[m[33m\[m  
+[33m|[m [34m|[m[33m/[m  
+[33m|[m[33m/[m[34m|[m   
+* [34m|[m [33m119105d[m Refixed by temperature
+[35m|[m *   [33m3fb3d67[m Merge pull request #115 from ralphg1002/solo_track_control
+[35m|[m [36m|[m[1;31m\[m  
+[35m|[m [36m|[m *   [33m573bc60[m[33m ([m[1;36mHEAD -> [m[1;32msolo_track_control[m[33m, [m[1;31morigin/solo_track_control[m[33m)[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+[35m|[m [36m|[m [1;32m|[m[36m\[m  
+[35m|[m [36m|[m [1;32m|[m[36m/[m  
+[35m|[m [36m|[m[36m/[m[1;32m|[m   
+[35m|[m * [1;32m|[m   [33mfe76bed[m Merge pull request #118 from ralphg1002/traincontroller
+[35m|[m [1;34m|[m[1;35m\[m [1;32m\[m  
+[35m|[m [1;34m|[m * [1;32m\[m   [33mff007bd[m[33m ([m[1;31morigin/traincontroller[m[33m)[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+[35m|[m [1;34m|[m [1;36m|[m[1;34m\[m [1;32m\[m  
+[35m|[m [1;34m|[m [1;36m|[m[1;34m/[m [1;32m/[m  
+[35m|[m [1;34m|[m[1;34m/[m[1;36m|[m [1;32m|[m   
+[35m|[m * [1;36m|[m [1;32m|[m   [33mb1ebd99[m Merge pull request #117 from ralphg1002/final_tm_touchups
+[35m|[m [32m|[m[33m\[m [1;36m\[m [1;32m\[m  
+[35m|[m [32m|[m * [1;36m\[m [1;32m\[m   [33m3306b08[m[33m ([m[1;31morigin/final_tm_touchups[m[33m)[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into final_tm_touchups
+[35m|[m [32m|[m [34m|[m[32m\[m [1;36m\[m [1;32m\[m  
+[35m|[m [32m|[m [34m|[m[32m/[m [1;36m/[m [1;32m/[m  
+[35m|[m [32m|[m[32m/[m[34m|[m [1;36m|[m [1;32m|[m   
+[35m|[m * [34m|[m [1;36m|[m [1;32m|[m   [33md155908[m Merge pull request #116 from ralphg1002/calculations-train-model
+[35m|[m [36m|[m[35m\[m [34m\[m [1;36m\[m [1;32m\[m  
+[35m|[m [36m|[m[35m/[m [34m/[m [1;36m/[m [1;32m/[m  
+[35m|[m[35m/[m[36m|[m [34m|[m [1;36m|[m [1;32m|[m   
+* [36m|[m [34m|[m [1;36m|[m [1;32m|[m [33m80d321b[m It is what it is
+[1;31m|[m [36m|[m * [1;36m|[m [1;32m|[m [33meba066e[m added direction to block data
+[1;31m|[m [36m|[m * [1;36m|[m [1;32m|[m [33mb0c9f4a[m added map legend
+[1;31m|[m [36m|[m * [1;36m|[m [1;32m|[m [33mba231f9[m adjusted block info labels
+[1;31m|[m [36m|[m * [1;36m|[m [1;32m|[m [33md7e475c[m added viewable beacon data
+[1;31m|[m [36m|[m * [1;36m|[m [1;32m|[m [33m66a0fcf[m added beacons and stations to map
+[1;31m|[m [36m|[m * [1;36m|[m [1;32m|[m [33m6301e2b[m failure selection disabled if no valid block number given
+[1;31m|[m [36m|[m * [1;36m|[m [1;32m|[m [33mf33e0f1[m Added block number hover display
+[1;31m|[m [36m|[m[36m/[m [1;36m/[m [1;32m/[m  
+[1;31m|[m [36m|[m * [1;32m/[m [33mdbc4198[m tested train model signals
+[1;31m|[m [36m|[m[36m/[m [1;32m/[m  
+[1;31m|[m [36m|[m * [33md32640a[m fixing automatic errors and voting
+[1;31m|[m [36m|[m *   [33m537a7f6[m Merge branch 'solo_track_control' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+[1;31m|[m [36m|[m [1;32m|[m[1;33m\[m  
+[1;31m|[m [36m|[m [1;32m|[m * [33mdf73929[m fixed arrival tiem
+[1;31m|[m [36m|[m [1;32m|[m * [33m1634eaa[m fixed 2 trains dispatching
+[1;31m|[m [36m|[m * [1;33m|[m [33m1437e5e[m voting logic
+[1;31m|[m [36m|[m * [1;33m|[m [33mf540d77[m Merge branch 'solo_track_control' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+[1;31m|[m [36m|[m [1;34m|[m[1;33m\[m[1;33m|[m 
+[1;31m|[m [36m|[m [1;34m|[m * [33m12367d6[m fixed import schedule and auto
+[1;31m|[m [36m|[m * [1;35m|[m [33m2c36320[m stopping and starting at lights
+[1;31m|[m [36m|[m [1;35m|[m[1;35m/[m  
+[1;31m|[m [36m|[m * [33mab989bf[m  fixed UI updating and manual mode
+[1;31m|[m [36m|[m *   [33madb7867[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+[1;31m|[m [36m|[m [1;36m|[m[36m\[m  
+[1;31m|[m [36m|[m [1;36m|[m[36m/[m  
+[1;31m|[m [36m|[m[36m/[m[1;36m|[m   
+[1;31m|[m * [1;36m|[m   [33m96ca857[m Merge pull request #114 from ralphg1002/calculations-train-model
+[1;31m|[m [32m|[m[1;31m\[m [1;36m\[m  
+[1;31m|[m [32m|[m[1;31m/[m [1;36m/[m  
+[1;31m|[m[1;31m/[m[32m|[m [1;36m|[m   
+* [32m|[m [1;36m|[m [33m0d2c547[m Testing some stuff
+* [32m|[m [1;36m|[m [33m27d35b7[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into calculations-train-model
+[34m|[m[32m\[m[32m|[m [1;36m|[m 
+* [32m|[m [1;36m|[m [33ma392f57[m N
+* [32m|[m [1;36m|[m [33m5fc8912[m I have no idea anymore
+[35m|[m [32m|[m * [33mbaf51fc[m slowing down to avoid collision with next occupied block
+[35m|[m [32m|[m * [33m086ea4a[m idk
+[35m|[m [32m|[m *   [33m029cf46[m Merge branch 'solo_track_control' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+[35m|[m [32m|[m [36m|[m[1;31m\[m  
+[35m|[m [32m|[m [36m|[m * [33mcb57672[m comments
+[35m|[m [32m|[m [36m|[m[32m/[m  
+[35m|[m [32m|[m[32m/[m[36m|[m   
+[35m|[m * [36m|[m   [33m9ab0b3b[m Merge pull request #113 from ralphg1002/solo_track_control
+[35m|[m [1;32m|[m[1;33m\[m [36m\[m  
+[35m|[m [1;32m|[m * [36m|[m [33m1ac7f61[m hell yes
+[35m|[m * [1;33m|[m [36m|[m   [33m465c0a0[m Merge pull request #112 from ralphg1002/traincontroller
+[35m|[m [1;34m|[m[1;35m\[m [1;33m\[m [36m\[m  
+[35m|[m [1;34m|[m * [1;33m\[m [36m\[m   [33m47f7606[m revert
+[35m|[m [1;34m|[m [1;36m|[m[1;34m\[m [1;33m\[m [36m\[m  
+[35m|[m [1;34m|[m [1;36m|[m[1;34m/[m [1;33m/[m [36m/[m  
+[35m|[m [1;34m|[m[1;34m/[m[1;36m|[m [1;33m|[m [36m|[m   
+[35m|[m [1;34m|[m * [1;33m|[m [36m|[m [33md13fd9d[m updated unit tests
+[35m|[m [1;34m|[m [31m|[m [1;33m|[m * [33m8a1e28a[m test
+[35m|[m [1;34m|[m [31m|[m [1;33m|[m[1;33m/[m  
+[35m|[m [1;34m|[m [31m|[m *   [33m393a572[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into solo_track_control
+[35m|[m [1;34m|[m [31m|[m [32m|[m[1;34m\[m  
+[35m|[m [1;34m|[m [31m|[m[1;34m_[m[32m|[m[1;34m/[m  
+[35m|[m [1;34m|[m[1;34m/[m[31m|[m [32m|[m   
+[35m|[m * [31m|[m [32m|[m [33ma324145[m Merge pull request #111 from ralphg1002/solo_track_controller
+[35m|[m[35m/[m[35m|[m [31m|[m [32m|[m 
+[35m|[m * [31m|[m [32m|[m [33mc093885[m[33m ([m[1;31morigin/solo_track_controller[m[33m)[m boopity boppity
+* [35m|[m [31m|[m [32m|[m   [33mba33998[m Merge pull request #110 from ralphg1002/calculations-train-model
+[36m|[m[1;31m\[m [35m\[m [31m\[m [32m\[m  
+[36m|[m * [35m\[m [31m\[m [32m\[m   [33m3f2cd11[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into calculations-train-model
+[36m|[m [1;32m|[m[36m\[m [35m\[m [31m\[m [32m\[m  
+[36m|[m [1;32m|[m[36m/[m [35m/[m [31m/[m [32m/[m  
+[36m|[m[36m/[m[1;32m|[m [35m|[m [31m|[m [32m|[m   
+* [1;32m|[m [35m|[m [31m|[m [32m|[m   [33m63da74b[m Merge pull request #109 from ralphg1002/track-train-integration-change
+[1;34m|[m[1;35m\[m [1;32m\[m [35m\[m [31m\[m [32m\[m  
+[1;34m|[m * [1;32m|[m [35m|[m [31m|[m [32m|[m [33m361e78c[m added additional info for train model integration
+[1;34m|[m[1;34m/[m [1;32m/[m [35m/[m [31m/[m [32m/[m  
+* [1;32m|[m [35m|[m [31m|[m [32m|[m   [33m78d9819[m Merge pull request #108 from ralphg1002/calculations-train-model
+[35m|[m[31m\[m [1;32m\[m [35m\[m [31m\[m [32m\[m  
+[35m|[m [31m|[m[35m_[m[1;32m|[m[35m/[m [31m/[m [32m/[m  
+[35m|[m[35m/[m[31m|[m [1;32m|[m [31m|[m [32m|[m   
+* [31m|[m [1;32m|[m [31m|[m [32m|[m   [33m20e0f63[m Merge pull request #107 from ralphg1002/updatesCTC
+[32m|[m[33m\[m [31m\[m [1;32m\[m [31m\[m [32m\[m  
+[32m|[m * [31m|[m [1;32m|[m [31m|[m [32m|[m [33m81fd193[m[33m ([m[1;31morigin/updatesCTC[m[33m)[m added directionality signal
+[32m|[m * [31m|[m [1;32m|[m [31m|[m [32m|[m [33m417488f[m idk
+[32m|[m [33m|[m [31m|[m * [31m|[m [32m|[m [33m3eeca4b[m Small change
+[32m|[m [33m|[m [31m|[m[31m/[m [31m/[m [32m/[m  
+[32m|[m [33m|[m * [31m|[m [32m|[m [33m7ebcb94[m Train moves but i dont think its perfect
+[32m|[m [33m|[m * [31m|[m [32m|[m [33m276686e[m Made some changes to the signals
+[32m|[m [33m|[m * [31m|[m [32m|[m [33m4289d32[m Same
+[32m|[m [33m|[m * [31m|[m [32m|[m [33m416c46e[m Updated block and passenger signals
+[32m|[m [33m|[m [33m|[m [31m|[m * [33mbd4887e[m changes
+[32m|[m [33m|[m [33m|[m [31m|[m * [33m17dc591[m fixed crossing logic
+[32m|[m [33m|[m [33m|[m [31m|[m * [33m9c9d2c6[m integration with track model for lights and crossing
+[32m|[m [33m|[m[32m_[m[33m|[m[32m_[m[31m|[m[32m/[m  
+[32m|[m[32m/[m[33m|[m [33m|[m [31m|[m   
+* [33m|[m [33m|[m [31m|[m   [33mb08e8c9[m[33m ([m[1;32mmaster[m[33m)[m Merge pull request #106 from ralphg1002/tm_redline_work
+[31m|[m[35m\[m [33m\[m [33m\[m [31m\[m  
+[31m|[m [35m|[m[31m_[m[33m|[m[31m_[m[33m|[m[31m/[m  
+[31m|[m[31m/[m[35m|[m [33m|[m [33m|[m   
+[31m|[m * [33m|[m [33m|[m   [33m95a48cb[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into tm_redline_work
+[31m|[m [36m|[m[31m\[m [33m\[m [33m\[m  
+[31m|[m [36m|[m[31m/[m [33m/[m [33m/[m  
+[31m|[m[31m/[m[36m|[m [33m|[m [33m|[m   
+* [36m|[m [33m|[m [33m|[m   [33md41ffe4[m Merge pull request #105 from ralphg1002/calculations-train-model
+[1;32m|[m[33m\[m [36m\[m [33m\[m [33m\[m  
+[1;32m|[m [33m|[m [36m|[m[33m_[m[33m|[m[33m/[m  
+[1;32m|[m [33m|[m[33m/[m[36m|[m [33m|[m   
+[1;32m|[m * [36m|[m [33m|[m [33m1e8353e[m small change to signals
+[1;32m|[m * [36m|[m [33m|[m [33m0e2c72a[m Fixed some signals that were somehow not implemented
+[1;32m|[m * [36m|[m [33m|[m [33m8d541c7[m Test
+[1;32m|[m * [36m|[m [33m|[m   [33m529aede[m Trying to merge
+[1;32m|[m [1;34m|[m[1;32m\[m [36m\[m [33m\[m  
+[1;32m|[m [1;34m|[m[1;32m/[m [36m/[m [33m/[m  
+[1;32m|[m[1;32m/[m[1;34m|[m [36m|[m [33m|[m   
+* [1;34m|[m [36m|[m [33m|[m   [33m37145bd[m Merge pull request #104 from ralphg1002/traincontroller
+[1;36m|[m[31m\[m [1;34m\[m [36m\[m [33m\[m  
+[1;36m|[m * [1;34m\[m [36m\[m [33m\[m   [33m3eca806[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+[1;36m|[m [32m|[m[1;36m\[m [1;34m\[m [36m\[m [33m\[m  
+[1;36m|[m [32m|[m[1;36m/[m [1;34m/[m [36m/[m [33m/[m  
+[1;36m|[m[1;36m/[m[32m|[m [1;34m|[m [36m|[m [33m|[m   
+[1;36m|[m * [1;34m|[m [36m|[m [33m|[m [33m908c6b5[m updated ui
+[1;36m|[m * [1;34m|[m [36m|[m [33m|[m   [33mc5a9a4d[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into traincontroller
+[1;36m|[m [34m|[m[35m\[m [1;34m\[m [36m\[m [33m\[m  
+[1;36m|[m * [35m|[m [1;34m|[m [36m|[m [33m|[m [33me4c769e[m  investigating power/currspd
+[1;36m|[m [33m|[m [35m|[m[33m_[m[1;34m|[m[33m_[m[36m|[m[33m/[m  
+[1;36m|[m [33m|[m[33m/[m[35m|[m [1;34m|[m [36m|[m   
+[1;36m|[m [33m|[m [35m|[m * [36m|[m [33m900a008[m Same as before
+[1;36m|[m [33m|[m [35m|[m * [36m|[m [33m7f1a174[m Some changes made to calculations
+[1;36m|[m [33m|[m[1;36m_[m[35m|[m[1;36m/[m [36m/[m  
+[1;36m|[m[1;36m/[m[33m|[m [35m|[m [36m|[m   
+[1;36m|[m [33m|[m [35m|[m * [33mb2dce8e[m red line occupancy logic added
+[1;36m|[m [33m|[m [35m|[m * [33m2f898b7[m ticket exchange works and so does throughput for red line
+[1;36m|[m [33m|[m [35m|[m * [33me095ae2[m added redline wayside
+[1;36m|[m [33m|[m [35m|[m * [33m3e26b24[m red stations show up on gui
+[1;36m|[m [33m|[m [35m|[m * [33md98e019[m Added breacon data for red line
+[1;36m|[m [33m|[m[1;36m_[m[35m|[m[1;36m/[m  
+[1;36m|[m[1;36m/[m[33m|[m [35m|[m   
+* [33m|[m [35m|[m   [33me58b519[m Merge pull request #103 from ralphg1002/red_line_map
+[36m|[m[1;31m\[m [33m\[m [35m\[m  
+[36m|[m * [33m|[m [35m|[m [33md5c52d7[m modified train model to utilize correct authority signal
+[36m|[m * [33m|[m [35m|[m   [33mbae1181[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into red_line_map
+[36m|[m [1;32m|[m[36m\[m [33m\[m [35m\[m  
+[36m|[m [1;32m|[m[36m/[m [33m/[m [35m/[m  
+[36m|[m[36m/[m[1;32m|[m [33m|[m [35m|[m   
+* [1;32m|[m [33m|[m [35m|[m   [33m3a113c7[m Merge pull request #102 from ralphg1002/main-train-model
+[1;34m|[m[1;35m\[m [1;32m\[m [33m\[m [35m\[m  
+[1;34m|[m * [1;32m|[m [33m|[m [35m|[m [33m171a56f[m Added the new authority but who knows if itll work
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33m32b9044[m modified red line data reading from data sheet
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33m0cb92de[m modified track data to include red yard block
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33m38e9231[m fixed small bugs with track map gui and prepared code for occupancy
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33mf4b1b71[m added red line signals
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33mc9633b9[m fix track data
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33m2763b4f[m added railway crossing
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33md29d509[m added switches for red track
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33m10c0e33[m train now receives command to start moving with authority update
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33m29b03e8[m Need to load all blocks
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m [33m0849fe8[m Failures result in occupancy emission
+[1;34m|[m [1;35m|[m * [33m|[m [35m|[m   [33me108c2e[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into red_line_map
+[1;34m|[m [1;35m|[m [1;36m|[m[1;34m\[m [33m\[m [35m\[m  
+[1;34m|[m [1;35m|[m[1;34m_[m[1;36m|[m[1;34m/[m [33m/[m [35m/[m  
+[1;34m|[m[1;34m/[m[1;35m|[m [1;36m|[m [33m|[m [35m|[m   
+* [1;35m|[m [1;36m|[m [33m|[m [35m|[m   [33m4da490d[m Merge pull request #101 from ralphg1002/refactor_occupancy
+[32m|[m[33m\[m [1;35m\[m [1;36m\[m [33m\[m [35m\[m  
+[32m|[m * [1;35m\[m [1;36m\[m [33m\[m [35m\[m   [33m9e940d7[m Merge branch 'master' of https://github.com/ralphg1002/ECE-1140 into refactor_occupancy
+[32m|[m [34m|[m[32m\[m [1;35m\[m [1;36m\[m [33m\[m [35m\[m  
+[32m|[m [34m|[m[32m/[m [1;35m/[m [1;36m/[m [33m/[m [35m/[m  
+[32m|[m[32m/[m[34m|[m [1;35m|[m [1;36m|[m [33m|[m [35m|[m   
+[32m|[m * [1;35m|[m [1;36m|[m [33m|[m [35m|[m [33m8d25489[m update frontend occupancy logic to match backend
+[32m|[m * [1;35m|[m [1;36m|[m [33m|[m [35m|[m [33m32d27ff[m modify testbench to match actual occupancy signal
+[32m|[m * [1;35m|[m [1;36m|[m [33m|[m [35m|[m [33m6d0c3b4[m Revamped occupancy logic in backend to new model
+[32m|[m [35m|[m [1;35m|[m[35m_[m[1;36m|[m[35m_[m[33m|[m[35m/[m  
+[32m|[m [35m|[m[35m/[m[1;35m|[m [1;36m|[m [33m|[m   
+[32m|[m [35m|[m [1;35m|[m * [33m|[m   [33m740825f[m Merge branch 'master' of https://g

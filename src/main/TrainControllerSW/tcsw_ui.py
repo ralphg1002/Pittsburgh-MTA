@@ -1065,8 +1065,8 @@ class TrainControllerUI(QMainWindow):
         trainModelToTrainController.sendBlockNumber.connect(self.signal_blockNumber)
 
         for train in self.tcFunctions.trainList:
-            print("speed: ", train.currentSpeed, ", power: ", train.powerCommand, ", nextStation: ", train.nextStop)
-            print("distance traveled: ", train.blockTravelled, "total distance of block: ", train.block["blockLength"]) # in m
+            #print("speed: ", train.currentSpeed, ", power: ", train.powerCommand, ", nextStation: ", train.nextStop)
+            #print("distance traveled: ", train.blockTravelled, "total distance of block: ", train.block["blockLength"]) # in m
             self.tcFunctions.set_samplePeriod(train, self.tcVariables["samplePeriod"])
 
             if train.get_auto():
