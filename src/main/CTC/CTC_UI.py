@@ -2524,6 +2524,7 @@ class Routing:
 
             if occupancy == True and blockNum == routeQ[1] and trainTrack == track:
                 print("inside check position")
+                previous_block = routeQ[0]
                 routeQ.pop(0)
                 if globalSelectLine == "Green Line":
                     lineNum = 1

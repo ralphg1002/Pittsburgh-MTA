@@ -405,13 +405,13 @@ class TrackModel:
                 self.trackView.greenTrack.addItem(crossing)
                 self.trackView.greenTrack.addItem(crossing2)
         if line == 2:
-            if state == 0:
+            if state == 1:
                 self.trackView.redTrack.removeItem(self.signals[47.1])
                 self.trackView.redTrack.removeItem(self.signals[47.2])
                 del self.signals[47.1]
                 del self.signals[47.2]
                 print(self.signals)
-            elif state == 1:
+            elif state == 0:
                 redLight = QPixmap("src/main/TrackModel/pngs/red-light.png")
                 redLight = redLight.scaledToWidth(20)
                 crossing = QGraphicsPixmapItem(redLight)
