@@ -819,74 +819,77 @@ class TrackModel:
     def set_circuit_failure(self, event):
         # Obtain block number provided
         blockNumber = self.entryField.text()
-        # Update the block info based on the block selected
-        for data in self.trackData:
-            if data["Block Number"] == int(blockNumber):
-                if self.circuitSelection.isHidden():
-                    self.circuitSelection.show()
-                    self.failures.append("Track Circuit Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should append failure to this block
-                    data["Occupancy"] = 1
-                    self.emit_occupancy(int(blockNumber), None)
-                else:
-                    self.circuitSelection.hide()
-                    self.failures.remove("Track Circuit Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should remove failure to this block
-                    data["Occupancy"] = 0
-                    self.emit_occupancy(None, int(blockNumber))
-        self.block.set_data(self.selectedLine, self.trackData)
+        if blockNumber != "" and blockNumber.isnumeric():
+            # Update the block info based on the block selected
+            for data in self.trackData:
+                if data["Block Number"] == int(blockNumber):
+                    if self.circuitSelection.isHidden():
+                        self.circuitSelection.show()
+                        self.failures.append("Track Circuit Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should append failure to this block
+                        data["Occupancy"] = 1
+                        self.emit_occupancy(int(blockNumber), None)
+                    else:
+                        self.circuitSelection.hide()
+                        self.failures.remove("Track Circuit Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should remove failure to this block
+                        data["Occupancy"] = 0
+                        self.emit_occupancy(None, int(blockNumber))
+            self.block.set_data(self.selectedLine, self.trackData)
 
     def set_power_failure(self, event):
         # Obtain block number provided
         blockNumber = self.entryField.text()
-        # Update the block info based on the block selected
-        for data in self.trackData:
-            if data["Block Number"] == int(blockNumber):
-                if self.powerSelection.isHidden():
-                    self.powerSelection.show()
-                    self.failures.append("Power Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should append failure to this block
-                    data["Occupancy"] = 1
-                    self.emit_occupancy(int(blockNumber), None)
-                else:
-                    self.powerSelection.hide()
-                    self.failures.remove("Power Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should remove failure to this block
-                    data["Occupancy"] = 0
-                    self.emit_occupancy(None, int(blockNumber))
-        self.block.set_data(self.selectedLine, self.trackData)
+        if blockNumber != "" and blockNumber.isnumeric():
+            # Update the block info based on the block selected
+            for data in self.trackData:
+                if data["Block Number"] == int(blockNumber):
+                    if self.powerSelection.isHidden():
+                        self.powerSelection.show()
+                        self.failures.append("Power Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should append failure to this block
+                        data["Occupancy"] = 1
+                        self.emit_occupancy(int(blockNumber), None)
+                    else:
+                        self.powerSelection.hide()
+                        self.failures.remove("Power Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should remove failure to this block
+                        data["Occupancy"] = 0
+                        self.emit_occupancy(None, int(blockNumber))
+            self.block.set_data(self.selectedLine, self.trackData)
 
     def set_broken_failure(self, event):
         # Obtain block number provided
         blockNumber = self.entryField.text()
-        # Update the block info based on the block selected
-        for data in self.trackData:
-            if data["Block Number"] == int(blockNumber):
-                if self.brokenSelection.isHidden():
-                    self.brokenSelection.show()
-                    self.failures.append("Broken Rail")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should append failure to this block
-                    data["Occupancy"] = 1
-                    self.emit_occupancy(int(blockNumber), None)
-                else:
-                    self.brokenSelection.hide()
-                    self.failures.remove("Broken Rail")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should remove failure to this block
-                    data["Occupancy"] = 0
-                    self.emit_occupancy(None, int(blockNumber))
-        self.block.set_data(self.selectedLine, self.trackData)
+        if blockNumber != "" and blockNumber.isnumeric():
+            # Update the block info based on the block selected
+            for data in self.trackData:
+                if data["Block Number"] == int(blockNumber):
+                    if self.brokenSelection.isHidden():
+                        self.brokenSelection.show()
+                        self.failures.append("Broken Rail")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should append failure to this block
+                        data["Occupancy"] = 1
+                        self.emit_occupancy(int(blockNumber), None)
+                    else:
+                        self.brokenSelection.hide()
+                        self.failures.remove("Broken Rail")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should remove failure to this block
+                        data["Occupancy"] = 0
+                        self.emit_occupancy(None, int(blockNumber))
+            self.block.set_data(self.selectedLine, self.trackData)
     
     def emit_occupancy(self, onBlockNum, offBlockNum):
         line = self.selectedLine
