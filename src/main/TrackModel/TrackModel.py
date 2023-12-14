@@ -101,6 +101,7 @@ class TrackModel:
         # NEW
         self.setup_content_widget()
         self.map_toggle()
+        self.add_legend()
 
         # Hide by default
         # self.mainWindow.show()
@@ -433,19 +434,6 @@ class TrackModel:
         )
         # Need to call lambda as parent_window is not accessible otherwise
         importButton.clicked.connect(lambda: self.import_track_data())
-
-    # def update_gui(self, filePath):
-        # self.update_file_path(filePath)
-        # self.select_line("Blue Line")  # Sets label to blue as that is the only line
-        # self.trackMap.show()
-        # self.zoomInButton.show()
-        # self.zoomOutButton.show()
-        # self.zoomInButton.setDisabled(True)
-        # self.zoomOutButton.setDisabled(True)
-        # self.changeFailuresButton.setEnabled(True)
-        # self.goButton.setEnabled(True)
-        # for checkbox in self.trackInfoCheckboxes.values():
-        #     checkbox.setDisabled(False)
 
     def import_track_data(self):
         options = QFileDialog.Options() | QFileDialog.ReadOnly
@@ -951,6 +939,62 @@ class TrackModel:
                         self.emit_occupancy(None, int(blockNumber))
             self.block.set_data(self.selectedLine, self.trackData)
     
+    def add_legend(self):
+        stationPNG = QPixmap("src/main/TrackModel/pngs/station.png")
+        stationPNG = stationPNG.scaledToWidth(25)
+        station = QLabel(self.mainWindow)
+        station.setPixmap(stationPNG)
+        station.setGeometry(50, 950, stationPNG.width(), stationPNG.height())
+
+        stationLabel = QLabel("- Station", self.mainWindow)
+        stationLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        stationLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        stationLabel.setGeometry(80, 950, 50, 25)
+
+        beaconPNG = QPixmap("src/main/TrackModel/pngs/beacon.png")
+        beaconPNG = beaconPNG.scaledToWidth(20)
+        beacon = QLabel(self.mainWindow)
+        beacon.setPixmap(beaconPNG)
+        beacon.setGeometry(50, 992, beaconPNG.width(), beaconPNG.height())
+
+        stationLabel = QLabel("- Beacon", self.mainWindow)
+        stationLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        stationLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        stationLabel.setGeometry(80, 990, 50, 25)
+
+        switchPNG = QPixmap("src/main/TrackModel/pngs/legend-switch.png")
+        switchPNG = switchPNG.scaledToWidth(25)
+        switch = QLabel(self.mainWindow)
+        switch.setPixmap(switchPNG)
+        switch.setGeometry(200, 960, switchPNG.width(), switchPNG.height())
+
+        switchLabel = QLabel("- Switch", self.mainWindow)
+        switchLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        switchLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        switchLabel.setGeometry(230, 950, 50, 25)
+
+        lightPNG = QPixmap("src/main/TrackModel/pngs/legend-light.png")
+        lightPNG = lightPNG.scaledToWidth(15)
+        light = QLabel(self.mainWindow)
+        light.setPixmap(lightPNG)
+        light.setGeometry(200, 990, lightPNG.width(), lightPNG.height())
+
+        lightLabel = QLabel("- Light", self.mainWindow)
+        lightLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        lightLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        lightLabel.setGeometry(230, 990, 50, 25)
+
+        crossingPNG = QPixmap("src/main/TrackModel/pngs/crossing.png")
+        crossingPNG = crossingPNG.scaledToWidth(35)
+        crossing = QLabel(self.mainWindow)
+        crossing.setPixmap(crossingPNG)
+        crossing.setGeometry(350, 950, crossingPNG.width(), crossingPNG.height())
+
+        crossingLabel = QLabel("- Crossing", self.mainWindow)
+        crossingLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        crossingLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        crossingLabel.setGeometry(380, 950, 60, 25)
+
     def emit_occupancy(self, onBlockNum, offBlockNum):
         line = self.selectedLine
         if offBlockNum == None:
