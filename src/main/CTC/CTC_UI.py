@@ -727,7 +727,8 @@ class CTCWindow(QMainWindow):
 
     def clearSchedule(self):
         self.schedule_table.clearContents()
-        self.schedule_table.setRowCount(0)        
+        self.schedule_table.setRowCount(0)   
+        self.scheduler.trainList.clear()     
     def handleSwitch(self):
         print("IN HANDLE SWITCH")
         selected_block = self.blockDropDown.currentText()
