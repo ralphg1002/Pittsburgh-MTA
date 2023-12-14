@@ -173,24 +173,27 @@ class TCFunctions:
             trainObject.set_announcement("")
 
     def update_block_info(self, blockDict, trainObject):
-        trainObject.authorityVal = (
-            trainObject.block["blockLength"] - trainObject.blockTravelled
-        )
-        if trainObject.blockTravelled >= trainObject.block["blockLength"]:
-            trainObject.authorityVal = 0
-        if trainObject.block["blockLength"] == 0:
-            trainObject.distanceRatio = 0
-            trainObject.blockTravelled = 0
-        elif trainObject.blockTravelled >= trainObject.block["blockLength"]:
-            trainObject.distanceRatio = 1
-            trainObject.blockTravelled = trainObject.blockTravelled - trainObject.block["blockLength"]
-        else:
-            trainObject.distanceRatio = (
-                trainObject.blockTravelled / trainObject.block["blockLength"]
-            )
         trainObject.blockTravelled += trainObject.prevSpeed
         trainObject.prevSpeed = trainObject.currentSpeed
 
+        if not trainObject.get_authority() and trainObject.authorityVal == 0:
+            return
+        else:
+            if trainObject.block["blockLength"] == 0:
+                trainObject.distanceRatio = 0
+                trainObject.blockTravelled = 0
+                trainObject.authorityVal = 0
+            elif trainObject.blockTravelled >= trainObject.block["blockLength"]:
+                trainObject.distanceRatio = 1
+                trainObject.authorityVal = 0
+                trainObject.blockTravelled = trainObject.blockTravelled - trainObject.block["blockLength"]
+            else:
+                trainObject.distanceRatio = (
+                    trainObject.blockTravelled / trainObject.block["blockLength"]
+                )
+                trainObject.authorityVal = (
+                        trainObject.block["blockLength"] - trainObject.blockTravelled
+                )
 
         for block in blockDict:
             if block["Number"] == trainObject.block["blockNumber"]:
