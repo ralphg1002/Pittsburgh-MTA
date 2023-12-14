@@ -33,7 +33,7 @@ class TrackModelToCTC(QObject):
 
 class TrackModelToTrainModel(QObject):
     blockInfo = pyqtSignal(
-        float, float, float, float, float, int, int
+        int, int, float, float, int, int, int
     )  # current block, next block, length, grade, speed limit, suggested speed, authority
     beacon = pyqtSignal(dict)
     newCurrentPassengers = pyqtSignal(int, str) # passengers, station name
@@ -85,19 +85,12 @@ class TrainControllerSWToTrainModel(QObject):
 
 #########################################################################################
 class CTCTrackController(QObject):
-    sendAuthority = pyqtSignal(
-        int, int, int, int
-    )  # line (1 for green, 2 for red), wayside, block number, authority
-    sendSuggestedSpeed = pyqtSignal(
-        int, int, int, int
-    )  # line, wayside, block number, suggested speed
-    sendMaintenance = pyqtSignal(
-        int, int, int, bool
-    )  # line, wayside, block number, 1 if disabled, 0 if enabled
-    sendTrainDispatched = pyqtSignal(
-        int, int, str, bool
-    )  # line, wayside #, trainID, authority
-
+    sendAuthority = pyqtSignal(int, int, int, int)  # line (1 for green, 2 for red), wayside, block number, authority
+    sendSuggestedSpeed = pyqtSignal(int, int, int, int)  # line, wayside, block number, suggested speed
+    sendMaintenance = pyqtSignal(int, int, int, bool)  # line, wayside, block number, 1 if disabled, 0 if enabled
+    sendTrainDispatched = pyqtSignal(int, int, str, bool)  # line, wayside #, trainID, authority
+    signalTrainDwelling = pyqtSignal(QTime) # target time -- only for CTC
+    nextBlock = pyqtSignal(int, int, int, int) # line, wayside, currentBlock, nextBlock
 
 class CTCToTrackModel(QObject):
     requestThroughput = pyqtSignal(str)  # requests hourly
