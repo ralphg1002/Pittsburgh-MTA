@@ -256,8 +256,9 @@ class TrainModel(QMainWindow):
     def open_results_window(self, event):
         # This function is called when the search icon is clicked
         selected_item = self.comboBox.currentText()
+        selected_index = self.comboBox.currentIndex()
         self.results_window = ResultsWindow(
-            selected_item, self.trainsList
+            selected_item, self.trainsList, selected_index
         )
         self.results_window.show()
 
@@ -313,8 +314,8 @@ class TrainModel(QMainWindow):
         # system time
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.addTrain.emit("green", "train1")
-        trackModelToTrainModel.blockInfo.emit(1, 100, 10, 40, 20, 1)
-        # next block, length, grade, speed limit, suggested speed, authority
+        trackModelToTrainModel.blockInfo.emit(999, 1, 100, 5, 40, 20, 1)
+        # current block, next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
         masterSignals.addTrain.connect(self.signal_addTrain)
@@ -351,6 +352,7 @@ class TrainModel(QMainWindow):
             self.functionsInstance.TrainModelCalculations(trainObject)
             self.functionsInstance.temperature(trainObject)
             self.functionsInstance.beacon(trainObject)
+            
             trainModelToTrainController.sendSpeedLimit.emit(trainObject.calculations["trainID"], int(trainObject.vehicle_status["speed_limit"]))
             trainModelToTrainController.sendAuthority.emit(trainObject.calculations["trainID"], trainObject.navigation_status["authority"])
             trainModelToTrainController.sendLeftDoor.emit(trainObject.calculations["trainID"], trainObject.passenger_status["left_door"])
@@ -367,8 +369,8 @@ class TrainModel(QMainWindow):
             trainModelToTrainController.sendSignalPickupFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["signal_pickup_failure"])
             trainModelToTrainController.sendBrakeFailure.emit(trainObject.calculations["trainID"], trainObject.failure_status["brake_failure"])
             trainModelToTrainController.sendPolarity.emit(trainObject.calculations["trainID"], trainObject.calculations["polarity"])
-            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])            
-            
+            trainModelToTrainController.sendBlockNumber.emit(trainObject.calculations["trainID"], trainObject.calculations["currBlock"])
+
             if trainObject.calculations["initialized"]:
                 trainModelToTrackModel.sendPolarity.emit(trainObject.calculations["line"], trainObject.calculations["currBlock"], trainObject.calculations["prevBlock"])
                 trainObject.calculations["initialized"] = False
@@ -395,18 +397,18 @@ class TrainModel(QMainWindow):
             if trainObject.calculations["currBlock"] == block_num and trainObject.calculations["line"] == line_num:
                 trainObject.navigation_status["Authority"] = 1
     
-    def signal_blockInfo(self, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
+    def signal_blockInfo(self, currBlock, nextBlock, blockLength, blockGrade, speedLimit, suggestedSpeed, authority):
         for trainObject in self.trainsList:
-            if trainObject.calculations["currBlock"] == nextBlock: 
-                tempBlock = trainObject.calculations["currBlock"]
-                trainObject.calculations["prevBlock"] = tempBlock
-                trainObject.calculations["currBlock"] = trainObject.calculations["nextBlock"]
-                trainObject.calculations["nextBlock"] = nextBlock
+            if trainObject.calculations["currBlock"] == currBlock:
+                trainObject.calculations["prevBlock"] = trainObject.calculations["currBlock"]
+                trainObject.calculations["currBlock"] = nextBlock
+                # trainObject.calculations["nextBlock"] = nextBlock
                 trainObject.navigation_status["block_length"] = blockLength
                 trainObject.navigation_status["block_grade"] = blockGrade
                 trainObject.vehicle_status["speed_limit"] = speedLimit
                 trainObject.vehicle_status["commanded_speed"] = suggestedSpeed
                 trainObject.navigation_status["authority"] = authority
+        
         return
 
     def signal_beacon(self, beaconDict):
@@ -428,9 +430,10 @@ class TrainModel(QMainWindow):
             
         return
 
-    def signal_new_passengers(self, passengers):
+    def signal_new_passengers(self, passengers, station_name):
         for trainObject in self.trainsList:
-            trainObject.passenger_status["passengers"] = passengers
+           if trainObject.calculations["currStation"] == station_name:
+                trainObject.passenger_status["passengers"] = passengers
 
     def signal_power(self, id, power):
         for train in self.trainsList:
@@ -506,7 +509,7 @@ class ResultsWindow(QMainWindow):
 
     moduleName = "Results Window"
 
-    def __init__(self, selected_text, trains):
+    def __init__(self, selected_text, trains, selected_index):
         super().__init__()
         # Trains List
         self.trainsList = trains
@@ -645,6 +648,9 @@ class ResultsWindow(QMainWindow):
         # Extract the selected train name from the QLabel's text
         self.selected_train_name = current_train.text().split(":")[-1].strip()
 
+        self.selected_index = selected_index
+        self.selected_train = self.trainsList[self.selected_index]
+
         """ Vehicle Status """
 
         # Create a QLabel for the vehicle status window
@@ -689,10 +695,10 @@ class ResultsWindow(QMainWindow):
             "Power: {} kW",
             "Power Limit: {} kW",
         ]
-
+        
         # QLabel for speed limit
         self.word_label_speed_limit = QLabel(
-            "Speed Limit: {} mph".format(self.trainsList[0].vehicle_status["speed_limit"]),
+            "Speed Limit: {} mph".format(self.selected_train.vehicle_status["speed_limit"]),
             self.vehicle_white_background_label
         )
         self.word_label_speed_limit.setStyleSheet(
@@ -704,7 +710,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for current speed
         self.word_label_current_speed = QLabel(
-            "Current Speed: {} mph".format(self.trainsList[0].vehicle_status["current_speed"]),
+            "Current Speed: {} mph".format(self.selected_train.vehicle_status["current_speed"]),
             self.vehicle_white_background_label
         )
         self.word_label_current_speed.setStyleSheet(
@@ -716,7 +722,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for Setpoint Speed
         self.word_label_setpoint_speed = QLabel(
-            "Setpoint Speed: {} mph".format(self.trainsList[0].vehicle_status["setpoint_speed"]),
+            "Setpoint Speed: {} mph".format(self.selected_train.vehicle_status["setpoint_speed"]),
             self.vehicle_white_background_label
         )
         self.word_label_setpoint_speed.setStyleSheet(
@@ -728,7 +734,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for commanded speed
         self.word_label_commanded_speed = QLabel(
-            "Commanded Speed: {} mph".format(self.trainsList[0].vehicle_status["commanded_speed"]),
+            "Commanded Speed: {} mph".format(self.selected_train.vehicle_status["commanded_speed"]),
             self.vehicle_white_background_label
         )
         self.word_label_commanded_speed.setStyleSheet(
@@ -740,7 +746,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for acceleration
         self.word_label_acceleration = QLabel(
-            "Acceleration: {} ft/s".format(self.trainsList[0].vehicle_status["acceleration"]),
+            "Acceleration: {} ft/s".format(self.selected_train.vehicle_status["acceleration"]),
             self.vehicle_white_background_label
         )
         self.word_label_acceleration.setStyleSheet(
@@ -752,7 +758,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for brakes
         self.word_label_brakes = QLabel(
-            "Brakes: {}".format(self.trainsList[0].vehicle_status["brakes"]),
+            "Brakes: {}".format(self.selected_train.vehicle_status["brakes"]),
             self.vehicle_white_background_label
         )
         self.word_label_brakes.setStyleSheet(
@@ -764,7 +770,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for power
         self.word_label_power = QLabel(
-            "Power: {} kW".format(self.trainsList[0].vehicle_status["power"]),
+            "Power: {} kW".format(self.selected_train.vehicle_status["power"]),
             self.vehicle_white_background_label
         )
         self.word_label_power.setStyleSheet(
@@ -776,7 +782,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for power limit
         self.word_label_power_limit = QLabel(
-            "Power Limit: {} kW".format(self.trainsList[0].vehicle_status["power_limit"]),
+            "Power Limit: {} kW".format(self.selected_train.vehicle_status["power_limit"]),
             self.vehicle_white_background_label
         )
         self.word_label_power_limit.setStyleSheet(
@@ -955,7 +961,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for emergency brake
         self.word_label_emergency_brake = QLabel(
-            "Emergency Brake: {}".format(self.trainsList[0].failure_status["emergency_brake"]),
+            "Emergency Brake: {}".format(self.selected_train.failure_status["emergency_brake"]),
             self.failure_white_background_label
         )
         self.word_label_emergency_brake.setStyleSheet(
@@ -1091,7 +1097,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for passengers
         self.word_label_passengers = QLabel(
-            "Passengers: {}".format(self.trainsList[0].passenger_status["passengers"]),
+            "Passengers: {}".format(self.selected_train.passenger_status["passengers"]),
             self.passenger_white_background_label            
         )
         self.word_label_passengers.setStyleSheet(
@@ -1103,7 +1109,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for passenger limit
         self.word_label_passenger_limit = QLabel(
-            "Passenger Limit: {}".format(self.trainsList[0].passenger_status["passenger_limit"]),
+            "Passenger Limit: {}".format(self.selected_train.passenger_status["passenger_limit"]),
             self.passenger_white_background_label
         )
         self.word_label_passenger_limit.setStyleSheet(
@@ -1115,7 +1121,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for left door
         self.word_label_left_door = QLabel(
-            "Left Door: {}".format(self.trainsList[0].passenger_status["left_door"]),
+            "Left Door: {}".format(self.selected_train.passenger_status["left_door"]),
             self.passenger_white_background_label
         )
         self.word_label_left_door.setStyleSheet(
@@ -1127,7 +1133,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for right door
         self.word_label_right_door = QLabel(
-            "Right Door: {}".format(self.trainsList[0].passenger_status["right_door"]),
+            "Right Door: {}".format(self.selected_train.passenger_status["right_door"]),
             self.passenger_white_background_label
         )
         self.word_label_right_door.setStyleSheet(
@@ -1139,7 +1145,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for lights status
         self.word_label_lights_status = QLabel(
-            "Lights Status: {}".format(self.trainsList[0].passenger_status["lights_status"]),
+            "Lights Status: {}".format(self.selected_train.passenger_status["lights_status"]),
             self.passenger_white_background_label
         )
         self.word_label_lights_status.setStyleSheet(
@@ -1151,7 +1157,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for announcements
         self.word_label_announcements = QLabel(
-            "Announcements: {}".format(self.trainsList[0].passenger_status["announcements"]),
+            "Announcements: {}".format(self.selected_train.passenger_status["announcements"]),
             self.passenger_white_background_label
         )
         self.word_label_announcements.setStyleSheet(
@@ -1163,7 +1169,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for temperature
         self.word_label_temperature = QLabel(
-            "Temperature: {}".format(self.trainsList[0].passenger_status["temperature"]),
+            "Temperature: {}".format(self.selected_train.passenger_status["temperature"]),
             self.passenger_white_background_label
         )
         self.word_label_temperature.setStyleSheet(
@@ -1175,7 +1181,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for air conditioning
         self.word_label_air_conditioning = QLabel(
-            "Air Conditioning: {}".format(self.trainsList[0].passenger_status["air_conditioning"]),
+            "Air Conditioning: {}".format(self.selected_train.passenger_status["air_conditioning"]),
             self.passenger_white_background_label
         )
         self.word_label_air_conditioning.setStyleSheet(
@@ -1187,7 +1193,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for advertisements
         self.word_label_advertisements = QLabel(
-            "Advertisements: {}".format(self.trainsList[0].passenger_status["advertisements"]),
+            "Advertisements: {}".format(self.selected_train.passenger_status["advertisements"]),
             self.passenger_white_background_label
         )
         self.word_label_advertisements.setStyleSheet(
@@ -1347,7 +1353,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for authority
         self.word_label_authority = QLabel(
-            "Authority: {}".format(self.trainsList[0].navigation_status["authority"]),
+            "Authority: {}".format(self.selected_train.navigation_status["authority"]),
             self.navigation_white_background_label
         )
         self.word_label_authority.setStyleSheet(
@@ -1359,7 +1365,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for beacon
         self.word_label_beacon = QLabel(
-            "Beacon: {}".format(self.trainsList[0].navigation_status["beacon"]),
+            "Beacon: {}".format(self.selected_train.navigation_status["beacon"]),
             self.navigation_white_background_label
         )
         self.word_label_beacon.setStyleSheet(
@@ -1371,7 +1377,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for block length
         self.word_label_block_length = QLabel(
-            "Block Length: {}".format(self.trainsList[0].navigation_status["block_length"]),
+            "Block Length: {}".format(self.selected_train.navigation_status["block_length"]),
             self.navigation_white_background_label
         )
         self.word_label_block_length.setStyleSheet(
@@ -1383,7 +1389,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for block grade
         self.word_label_block_grade = QLabel(
-            "Block Grade: {}".format(self.trainsList[0].navigation_status["block_grade"]),
+            "Block Grade: {}".format(self.selected_train.navigation_status["block_grade"]),
             self.navigation_white_background_label
         )
         self.word_label_block_grade.setStyleSheet(
@@ -1395,7 +1401,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for next station
         self.word_label_next_station = QLabel(
-            "Next Station: {}".format(self.trainsList[0].navigation_status["next_station"]),
+            "Next Station: {}".format(self.selected_train.navigation_status["next_station"]),
             self.navigation_white_background_label
         )
         self.word_label_next_station.setStyleSheet(
@@ -1407,7 +1413,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for prev station
         self.word_label_prev_station = QLabel(
-            "Previous Station: {}".format(self.trainsList[0].navigation_status["prev_station"]),
+            "Previous Station: {}".format(self.selected_train.navigation_status["prev_station"]),
             self.navigation_white_background_label
         )
         self.word_label_prev_station.setStyleSheet(
@@ -1419,7 +1425,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for headlights
         self.word_label_headlights = QLabel(
-            "Headlights: {}".format(self.trainsList[0].navigation_status["headlights"]),
+            "Headlights: {}".format(self.selected_train.navigation_status["headlights"]),
             self.navigation_white_background_label
         )
         self.word_label_headlights.setStyleSheet(
@@ -1431,7 +1437,7 @@ class ResultsWindow(QMainWindow):
 
         # QLabel for passenger emergency brake
         self.word_label_pass_emergency_brake = QLabel(
-            "Passenger Emergency Brake: {}".format(self.trainsList[0].navigation_status["passenger_emergency_brake"]),
+            "Passenger Emergency Brake: {}".format(self.selected_train.navigation_status["passenger_emergency_brake"]),
             self.navigation_white_background_label
         )
         self.word_label_pass_emergency_brake.setStyleSheet(
@@ -1542,7 +1548,7 @@ class ResultsWindow(QMainWindow):
 
     def update_failure_status(self, status, checked):
         component = status.split(":")[0].lower().replace(" ", "_")
-        self.trainsList[0].failure_status[component] = checked
+        self.selected_train.failure_status[component] = checked
 
     def update_ui(self):
         word_value = {}
@@ -1600,7 +1606,7 @@ class ResultsWindow(QMainWindow):
         for checkbox, status in zip(self.checkboxes, self.failure_word_list[:3]):
             component = status.split(":")[0].lower().replace(" ", "_")
             checked = checkbox.isChecked()
-            self.trainsList[0].failure_status[component] = checked
+            self.selected_train.failure_status[component] = checked
         
         for trainObject in self.trainsList:
             # Update QLabel widgets with new information
@@ -1637,7 +1643,7 @@ class ResultsWindow(QMainWindow):
             )
 
             self.word_label_emergency_brake.setText(
-                "Emergency Brake: {}".format(self.trainsList[0].failure_status["emergency_brake"])
+                "Emergency Brake: {}".format(self.selected_train.failure_status["emergency_brake"])
             )
 
             self.word_label_passengers.setText(
@@ -1707,8 +1713,6 @@ class ResultsWindow(QMainWindow):
             self.word_label_pass_emergency_brake.setText(
                 "Passenger Emergency Brake: {}".format(trainObject.navigation_status["passenger_emergency_brake"])
             )
-
-
 
 
 
