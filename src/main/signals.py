@@ -89,6 +89,7 @@ class CTCTrackController(QObject):
     sendMaintenance = pyqtSignal(int, int, int, bool)  # line, wayside, block number, 1 if disabled, 0 if enabled
     sendTrainDispatched = pyqtSignal(int, int, str, bool)  # line, wayside #, trainID, authority
     signalTrainDwelling = pyqtSignal(QTime) # target time -- only for CTC
+    nextBlock = pyqtSignal(int, int, int, int) # line, wayside, currentBlock, nextBlock
 
 class CTCToTrackModel(QObject):
     requestThroughput = pyqtSignal(str)  # requests hourly

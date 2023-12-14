@@ -2455,6 +2455,12 @@ class Routing:
         if occupancy == True and blockNum == self.routeQ[1] and trainTrack == track:
             print("inside check position")
             self.routeQ.pop(0)
+            if globalSelectLine == "Green Line":
+                lineNum = 1
+            waysideNum = self.find_wayside(blockNum)
+
+            ctcToTrackController.nextBlock.emit(lineNum, waysideNum, self.routeQ[0], self.routeQ[1])
+
             #train_routes[train_id] = self.routeQ
 
             if(len(self.routeQ) == 1):
