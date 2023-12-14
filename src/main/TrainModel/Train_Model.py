@@ -315,6 +315,15 @@ class TrainModel(QMainWindow):
         # self.sysTime = self.sysTime.addSecs(1)
         masterSignals.addTrain.emit("green", "train1")
         trackModelToTrainModel.blockInfo.emit(999, 1, 100, 5, 40, 20, 1)
+        
+        self.dict = {
+            "Next Station1": "FIRST AVE",
+            "Next Station2": "SOUTH HILLS JUNCTION",
+            "Current Station": "STATION SQUARE",
+            "Door Side": "Left",
+            }       
+        
+        trackModelToTrainModel.beacon.emit(self.dict)
         # current block, next block, length, grade, speed limit, suggested speed, authority
         masterSignals.timingMultiplier.connect(self.signal_period)
         masterSignals.clockSignal.connect(self.sysTime.setTime)
