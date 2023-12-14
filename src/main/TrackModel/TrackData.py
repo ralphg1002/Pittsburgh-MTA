@@ -303,7 +303,7 @@ class TrackData:
                             newPassengers,
                         )
 
-                        trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
+                        trackModelToTrainModel.newCurrentPassengers.emit(newPassengers, stationName)
                         
                         # No duplicate station blocks
         elif line == "Green":
@@ -336,7 +336,7 @@ class TrackData:
                             newPassengers,
                         )
 
-                        trackModelToTrainModel.newCurrentPassengers.emit(newPassengers)
+                        trackModelToTrainModel.newCurrentPassengers.emit(newPassengers, stationName)
 
                         # Check if another block has the same station
                         blockNumRepeat = block["Block Number"]
@@ -470,63 +470,63 @@ class TrackData:
                         if block["Block Number"] == 0:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #After first yard block
                 elif curBlock == 0:
                     for block in self.greenTrackData:
                         if block["Block Number"] == 63:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #Q -> N
                 elif curBlock == 100:
                     for block in self.greenTrackData:
                         if block["Block Number"] == 85:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #N -> R
                 elif curBlock == 77 and prevBlock == 78:
                     for block in self.greenTrackData:
                         if block["Block Number"] == 101:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #Z -> F
                 elif curBlock == 150:
                     for block in self.greenTrackData:
                         if block["Block Number"] == 28:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #A -> D
                 elif curBlock == 1:
                     for block in self.greenTrackData:
                         if block["Block Number"] == 13:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #For last yard block
                 elif curBlock == 57:
                     for block in self.greenTrackData:
                         if block["Block Number"] == 151:
                             block["Occupancy"] = 1
                             #No need to update occupancy of block 151
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], 1) #Authority is always 1 for block 151
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], 1) #Authority is always 1 for block 151
                 elif curBlock > prevBlock:
                     nextBlock = curBlock + 1
                     for block in self.greenTrackData:
                         if block["Block Number"] == nextBlock:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 elif curBlock < prevBlock:
                     nextBlock = curBlock - 1
                     for block in self.greenTrackData:
                         if block["Block Number"] == nextBlock:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(1, self.get_wayside_num(block["Block Number"], 1), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #Beacon data emission below
                 if curBlock in greenBeforeStation:
                     print(f"In Beacon data") #Checker
@@ -565,98 +565,98 @@ class TrackData:
                         if block["Block Number"] == 0:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #Yard -> C
                 elif curBlock == 0 and prevBlock == 999:
                     for block in self.redTrackData:
                         if block["Block Number"] == 9:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #C -> Yard
                 elif curBlock == 9 and prevBlock == 8:
                     for block in self.redTrackData:
                         if block["Block Number"] == 0:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #9 -> 8
                 elif curBlock == 9 and prevBlock == 0:
                     for block in self.redTrackData:
                         if block["Block Number"] == 8:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #1 -> 2
                 elif curBlock == 1 and prevBlock == 16:
                     for block in self.redTrackData:
                         if block["Block Number"] == 2:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #A -> F
                 elif curBlock == 1:
                     for block in self.redTrackData:
                         if block["Block Number"] == 16:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #F -> A
                 elif curBlock == 16 and prevBlock == 17:
                     for block in self.redTrackData:
                         if block["Block Number"] == 1:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #N -> J
                 elif curBlock == 66:
                     for block in self.redTrackData:
                         if block["Block Number"] == 52:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #H -> O
                 elif curBlock == 44 and prevBlock == 45:
                     for block in self.redTrackData:
                         if block["Block Number"] == 67:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #Q -> H
                 elif curBlock == 71:
                     for block in self.redTrackData:
                         if block["Block Number"] == 38:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #H -> R
                 elif curBlock == 33 and prevBlock == 34:
                     for block in self.redTrackData:
                         if block["Block Number"] == 72:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #T -> H
                 elif curBlock == 76:
                     for block in self.redTrackData:
                         if block["Block Number"] == 27:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 elif curBlock > prevBlock:
                     nextBlock = curBlock + 1
                     for block in self.greenTrackData:
                         if block["Block Number"] == nextBlock:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 elif curBlock < prevBlock:
                     nextBlock = curBlock - 1
                     for block in self.greenTrackData:
                         if block["Block Number"] == nextBlock:
                             block["Occupancy"] = 1
                             trackModelToTrackController.occupancyState.emit(2, self.get_wayside_num(block["Block Number"], 2), int(block["Block Number"]), True)
-                            trackModelToTrainModel.blockInfo.emit(block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
+                            trackModelToTrainModel.blockInfo.emit(curBlock, block["Block Number"], block["Block Length (m)"], block["Block Grade (%)"], block["Speed Limit (Km/Hr)"], block["Suggested Speed"], block["Authority"])
                 #Beacon data emission below
                 if curBlock in redBeforeStation:
                     print(f"In Beacon data") #Checker

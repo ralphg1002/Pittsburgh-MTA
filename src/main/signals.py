@@ -33,7 +33,7 @@ class TrackModelToCTC(QObject):
 
 class TrackModelToTrainModel(QObject):
     blockInfo = pyqtSignal(
-        float, float, float, float, float, int, int
+        int, int, float, float, int, int, int
     )  # current block, next block, length, grade, speed limit, suggested speed, authority
     beacon = pyqtSignal(dict)
     newCurrentPassengers = pyqtSignal(int, str) # passengers, station name
