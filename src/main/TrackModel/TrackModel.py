@@ -101,6 +101,7 @@ class TrackModel:
         # NEW
         self.setup_content_widget()
         self.map_toggle()
+        self.add_legend()
 
         # Hide by default
         # self.mainWindow.show()
@@ -268,7 +269,7 @@ class TrackModel:
 
     def setup_content_widget(self):
         mapWidget = QWidget(self.mainWindow)
-        mapWidget.setGeometry(30, 300, 500, 700)
+        mapWidget.setGeometry(30, 230, 500, 700)
         mapWidget.setStyleSheet(f'border: 20px solid {MTA_STYLING["darkBlue"]}')
         self.trackView = TrackView(mapWidget)
         self.trackView.setGeometry(0, 0, mapWidget.width(), mapWidget.height())
@@ -277,7 +278,7 @@ class TrackModel:
         selectLine = QLabel("Select Line:", self.mainWindow)
         selectLineFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["headerFontSize"])
         selectLine.setFont(selectLineFont)
-        selectLine.setGeometry(210, 260, 135, 30)
+        selectLine.setGeometry(210, 190, 135, 30)
         selectLine.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         buttonStyle = f'background-color: white; color: {MTA_STYLING["darkBlue"]}; border: 1px solid {MTA_STYLING["darkBlue"]}; border-radius: 10px;'
@@ -287,14 +288,14 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]
         )
         self.greenLineButton.setFont(greenLineButtonFont)
-        self.greenLineButton.setGeometry(350, 260, 90, 30)
+        self.greenLineButton.setGeometry(350, 190, 90, 30)
         self.greenLineButton.setStyleSheet(buttonStyle)
         self.greenLineButton.clicked.connect(self.toggle_green_data)
 
         self.redLineButton = QPushButton("Red Line", self.mainWindow)
         redLineButtonFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
         self.redLineButton.setFont(redLineButtonFont)
-        self.redLineButton.setGeometry(440, 260, 90, 30)
+        self.redLineButton.setGeometry(440, 190, 90, 30)
         self.redLineButton.setStyleSheet(buttonStyle)
         self.redLineButton.clicked.connect(self.toggle_red_data)
 
@@ -427,25 +428,12 @@ class TrackModel:
         importButton = QPushButton("Import Track Data", self.mainWindow)
         importButtonFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
         importButton.setFont(importButtonFont)
-        importButton.setGeometry(30, 260, 150, 30)
+        importButton.setGeometry(30, 190, 150, 30)
         importButton.setStyleSheet(
             f'background-color: {MTA_STYLING["darkBlue"]}; color: white'
         )
         # Need to call lambda as parent_window is not accessible otherwise
         importButton.clicked.connect(lambda: self.import_track_data())
-
-    # def update_gui(self, filePath):
-        # self.update_file_path(filePath)
-        # self.select_line("Blue Line")  # Sets label to blue as that is the only line
-        # self.trackMap.show()
-        # self.zoomInButton.show()
-        # self.zoomOutButton.show()
-        # self.zoomInButton.setDisabled(True)
-        # self.zoomOutButton.setDisabled(True)
-        # self.changeFailuresButton.setEnabled(True)
-        # self.goButton.setEnabled(True)
-        # for checkbox in self.trackInfoCheckboxes.values():
-        #     checkbox.setDisabled(False)
 
     def import_track_data(self):
         options = QFileDialog.Options() | QFileDialog.ReadOnly
@@ -471,13 +459,13 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["headerFontSize"]
         )
         entryFieldLabel.setFont(entryFieldLabelFont)
-        entryFieldLabel.setGeometry(570, 260, 170, 30)
+        entryFieldLabel.setGeometry(570, 190, 170, 30)
         entryFieldLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         self.entryField = QLineEdit(self.mainWindow)
         entryFieldFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
         self.entryField.setFont(entryFieldFont)
-        self.entryField.setGeometry(750, 260, 120, 30)
+        self.entryField.setGeometry(750, 190, 120, 30)
         self.entryField.setPlaceholderText("Enter Block #")
         self.entryField.setStyleSheet(
             f'color: {MTA_STYLING["darkBlue"]}; border: 1px solid {MTA_STYLING["darkBlue"]};'
@@ -486,7 +474,7 @@ class TrackModel:
         self.goButton = QPushButton("Go", self.mainWindow)
         goButtonFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
         self.goButton.setFont(goButtonFont)
-        self.goButton.setGeometry(880, 260, 60, 30)
+        self.goButton.setGeometry(880, 190, 60, 30)
         self.goButton.setStyleSheet(
             f'background-color: {MTA_STYLING["darkBlue"]}; color: white'
         )
@@ -498,13 +486,13 @@ class TrackModel:
         self.errorLabel = QLabel("", self.mainWindow)
         errorLabelFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"])
         self.errorLabel.setFont(errorLabelFont)
-        self.errorLabel.setGeometry(750, 290, 210, 30)
+        self.errorLabel.setGeometry(750, 220, 210, 30)
         self.errorLabel.setStyleSheet(f'color: {MTA_STYLING["red"]}; font-size: 14px')
 
         blockInfoLabel = QLabel("Block Information:", self.mainWindow)
         blockInfoFont = QFont(MTA_STYLING["fontStyle"], MTA_STYLING["headerFontSize"])
         blockInfoLabel.setFont(blockInfoFont)
-        blockInfoLabel.setGeometry(645, 350, 220, 30)
+        blockInfoLabel.setGeometry(645, 280, 220, 30)
         blockInfoLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
     def show_block_data(self):
@@ -517,118 +505,179 @@ class TrackModel:
     def add_blockinfo_labels(self, style, font):
         lengthLabel = QLabel("Length:", self.mainWindow)
         lengthLabel.setFont(font)
-        lengthLabel.setGeometry(600, 400, 140, 25)
+        lengthLabel.setGeometry(600, 330, 140, 25)
         lengthLabel.setStyleSheet(style)
 
         speedLimitLabel = QLabel("Speed Limit:", self.mainWindow)
         speedLimitLabel.setFont(font)
-        speedLimitLabel.setGeometry(600, 435, 140, 25)
+        speedLimitLabel.setGeometry(600, 365, 140, 25)
         speedLimitLabel.setStyleSheet(style)
 
         gradeLabel = QLabel("Grade:", self.mainWindow)
         gradeLabel.setFont(font)
-        gradeLabel.setGeometry(600, 470, 140, 25)
+        gradeLabel.setGeometry(600, 400, 140, 25)
         gradeLabel.setStyleSheet(style)
 
         elevationLabel = QLabel("Elevation:", self.mainWindow)
         elevationLabel.setFont(font)
-        elevationLabel.setGeometry(600, 505, 140, 25)
+        elevationLabel.setGeometry(600, 435, 140, 25)
         elevationLabel.setStyleSheet(style)
 
-        cumElevationLabel = QLabel("Cum. Elevation:", self.mainWindow)
+        cumElevationLabel = QLabel("Cumul. Elevation:", self.mainWindow)
         cumElevationLabel.setFont(font)
-        cumElevationLabel.setGeometry(600, 540, 140, 25)
+        cumElevationLabel.setGeometry(600, 470, 160, 25)
         cumElevationLabel.setStyleSheet(style)
 
         trackHeaterLabel = QLabel("Track Heater:", self.mainWindow)
         trackHeaterLabel.setFont(font)
-        trackHeaterLabel.setGeometry(600, 575, 140, 25)
+        trackHeaterLabel.setGeometry(600, 505, 140, 25)
         trackHeaterLabel.setStyleSheet(style)
+
+        directionLabel = QLabel("Direction:", self.mainWindow)
+        directionLabel.setFont(font)
+        directionLabel.setGeometry(600, 540, 140, 25)
+        directionLabel.setStyleSheet(style)
 
     def add_blockinfo(self, style, font):
         self.blockLengthLabel = QLabel(self.mainWindow)
         self.blockLengthLabel.setFont(font)
         self.blockLengthLabel.setStyleSheet(style)
-        self.blockLengthLabel.setGeometry(750, 400, 110, 25)
+        self.blockLengthLabel.setGeometry(800, 330, 110, 25)
 
         self.speedLimitLabel = QLabel(self.mainWindow)
         self.speedLimitLabel.setFont(font)
         self.speedLimitLabel.setStyleSheet(style)
-        self.speedLimitLabel.setGeometry(750, 435, 110, 25)
+        self.speedLimitLabel.setGeometry(800, 365, 110, 25)
 
         self.gradeLabel = QLabel(self.mainWindow)
         self.gradeLabel.setFont(font)
         self.gradeLabel.setStyleSheet(style)
-        self.gradeLabel.setGeometry(750, 470, 110, 25)
+        self.gradeLabel.setGeometry(800, 400, 110, 25)
 
         self.elevationLabel = QLabel(self.mainWindow)
         self.elevationLabel.setFont(font)
         self.elevationLabel.setStyleSheet(style)
-        self.elevationLabel.setGeometry(750, 505, 110, 25)
+        self.elevationLabel.setGeometry(800, 435, 110, 25)
 
         self.cumElevationLabel = QLabel(self.mainWindow)
         self.cumElevationLabel.setFont(font)
         self.cumElevationLabel.setStyleSheet(style)
-        self.cumElevationLabel.setGeometry(750, 540, 110, 25)
+        self.cumElevationLabel.setGeometry(800, 470, 110, 25)
 
         self.trackHeaterLabel = QLabel(self.mainWindow)
         self.trackHeaterLabel.setFont(font)
         self.trackHeaterLabel.setStyleSheet(style)
-        self.trackHeaterLabel.setGeometry(750, 575, 110, 25)
+        self.trackHeaterLabel.setGeometry(800, 505, 110, 25)
+
+        biArrowPNG = QPixmap("src/main/TrackModel/pngs/bidirectional-arrow.png")
+        biArrowPNG = biArrowPNG.scaledToWidth(30)
+        self.biArrow = QLabel(self.mainWindow)
+        self.biArrow.setPixmap(biArrowPNG)
+        self.biArrow.setGeometry(800, 540, biArrowPNG.width(), biArrowPNG.height())
+        self.biArrow.hide()
+
+        uniArrowPNG = QPixmap("src/main/TrackModel/pngs/unidirectional-arrow.png")
+        uniArrowPNG = uniArrowPNG.scaledToWidth(40)
+        self.uniArrow = QLabel(self.mainWindow)
+        self.uniArrow.setPixmap(uniArrowPNG)
+        self.uniArrow.setGeometry(795, 535, uniArrowPNG.width(), uniArrowPNG.height())
+        self.uniArrow.hide()
 
         # Station Labels:
         self.stationNameLabel = QLabel(self.mainWindow)
         self.stationNameLabel.setFont(font)
         self.stationNameLabel.setStyleSheet(style)
-        self.stationNameLabel.setGeometry(650, 800, 250, 25)
+        self.stationNameLabel.setGeometry(600, 700, 350, 25)
 
         self.ticketSalesLabel = QLabel(self.mainWindow)
         self.ticketSalesLabel.setFont(font)
         self.ticketSalesLabel.setStyleSheet(style)
         self.ticketSalesLabel.setText("Ticket Sales:")
-        self.ticketSalesLabel.setGeometry(600, 830, 200, 25)
+        self.ticketSalesLabel.setGeometry(600, 730, 200, 25)
         self.ticketSalesLabel.hide()
 
         self.ticketSalesOutput = QLabel(self.mainWindow)
         self.ticketSalesOutput.setFont(font)
         self.ticketSalesOutput.setStyleSheet(style)
-        self.ticketSalesOutput.setGeometry(850, 830, 200, 25)
+        self.ticketSalesOutput.setGeometry(850, 730, 200, 25)
 
         self.waitingLabel = QLabel(self.mainWindow)
         self.waitingLabel.setFont(font)
         self.waitingLabel.setStyleSheet(style)
         self.waitingLabel.setText("Passengers Waiting:")
-        self.waitingLabel.setGeometry(600, 860, 200, 25)
+        self.waitingLabel.setGeometry(600, 760, 200, 25)
         self.waitingLabel.hide()
 
         self.waitingOutput = QLabel(self.mainWindow)
         self.waitingOutput.setFont(font)
         self.waitingOutput.setStyleSheet(style)
-        self.waitingOutput.setGeometry(850, 860, 200, 25)
+        self.waitingOutput.setGeometry(850, 760, 200, 25)
 
         self.boardingLabel = QLabel(self.mainWindow)
         self.boardingLabel.setFont(font)
         self.boardingLabel.setStyleSheet(style)
         self.boardingLabel.setText("Passengers Boarding:")
-        self.boardingLabel.setGeometry(600, 890, 200, 25)
+        self.boardingLabel.setGeometry(600, 790, 200, 25)
         self.boardingLabel.hide()
 
         self.boardingOutput = QLabel(self.mainWindow)
         self.boardingOutput.setFont(font)
         self.boardingOutput.setStyleSheet(style)
-        self.boardingOutput.setGeometry(850, 890, 200, 25)
+        self.boardingOutput.setGeometry(850, 790, 200, 25)
 
         self.leavingLabel = QLabel(self.mainWindow)
         self.leavingLabel.setFont(font)
         self.leavingLabel.setStyleSheet(style)
         self.leavingLabel.setText("Passengers Disembarking:")
-        self.leavingLabel.setGeometry(600, 920, 200, 25)
+        self.leavingLabel.setGeometry(600, 820, 200, 25)
         self.leavingLabel.hide()
 
         self.leavingOutput = QLabel(self.mainWindow)
         self.leavingOutput.setFont(font)
         self.leavingOutput.setStyleSheet(style)
-        self.leavingOutput.setGeometry(850, 920, 200, 25)
+        self.leavingOutput.setGeometry(850, 820, 200, 25)
+
+        #Beacon Data
+        self.beaconText = QLabel(self.mainWindow)
+        self.beaconText.setFont(QFont(MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]))
+        self.beaconText.setStyleSheet(style)
+        self.beaconText.setText("Beacon Data:")
+        self.beaconText.setGeometry(600, 880, 200, 25)
+        self.beaconText.hide()
+
+        self.beaconNext = QLabel(self.mainWindow)
+        self.beaconNext.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        self.beaconNext.setStyleSheet(style)
+        self.beaconNext.setGeometry(600, 910, 50, 25)
+        self.beaconNext.setText("Next:")
+        self.beaconNext.hide()
+
+        self.beaconCurrent = QLabel(self.mainWindow)
+        self.beaconCurrent.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        self.beaconCurrent.setStyleSheet(style)
+        self.beaconCurrent.setGeometry(600, 940, 50, 25)
+        self.beaconCurrent.setText("Current:")
+        self.beaconCurrent.hide()
+
+        self.nextStation1 = QLabel(self.mainWindow)
+        self.nextStation1.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        self.nextStation1.setStyleSheet(style)
+        self.nextStation1.setGeometry(650, 910, 150, 25)
+
+        self.nextStation2 = QLabel(self.mainWindow)
+        self.nextStation2.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        self.nextStation2.setStyleSheet(style)
+        self.nextStation2.setGeometry(800, 910, 150, 25)
+
+        self.currentStation = QLabel(self.mainWindow)
+        self.currentStation.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        self.currentStation.setStyleSheet(style)
+        self.currentStation.setGeometry(650, 940, 150, 25)
+
+        self.doorSide = QLabel(self.mainWindow)
+        self.doorSide.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        self.doorSide.setStyleSheet(style)
+        self.doorSide.setGeometry(850, 940, 150, 25)
 
     def update_blockinfo(self):
         if self.entryField.text() == "":
@@ -674,6 +723,7 @@ class TrackModel:
     def parse_block_info(self):
         # Obtain block number provided
         blockNumber = self.entryField.text()
+
         # Update the block info based on the block selected
         for data in self.trackData:
             if data["Block Number"] == int(blockNumber):
@@ -683,6 +733,18 @@ class TrackModel:
                 self.blockElevation = str(data["ELEVATION (M)"])
                 self.blockCumElevation = str(data["CUMALTIVE ELEVATION (M)"])
 
+                #For directional of block
+                if self.selectedLine == "Green":
+                    if (int(blockNumber) >= 13 and int(blockNumber) <= 28) or (int(blockNumber) >= 77 and int(blockNumber) <= 88):
+                        self.uniArrow.hide()
+                        self.biArrow.show()
+                    else:
+                        self.biArrow.hide()
+                        self.uniArrow.show()
+                elif self.selectedLine == "Red":
+                    self.uniArrow.hide()
+                    self.biArrow.show()
+                
                 self.failures = data[
                     "Failures"
                 ]  # Store new blocks data in self.failures
@@ -713,6 +775,17 @@ class TrackModel:
                     self.boardingOutput.show()
                     self.leavingOutput.setText(f"{data['Passengers Disembarking']}")
                     self.leavingOutput.show()
+                    self.beaconText.show()
+                    self.beaconNext.show()
+                    self.beaconCurrent.show()
+                    self.nextStation1.setText(f"{data['Beacon']['Next Station1']}")
+                    self.nextStation1.show()
+                    self.nextStation2.setText(f"{data['Beacon']['Next Station2']}")
+                    self.nextStation2.show()
+                    self.currentStation.setText(f"{data['Beacon']['Current Station']}")
+                    self.currentStation.show()
+                    self.doorSide.setText(f"{data['Beacon']['Door Side']}")
+                    self.doorSide.show()
                 else:
                     self.stationNameLabel.setText(f"")
                     self.ticketSalesOutput.hide()
@@ -723,6 +796,13 @@ class TrackModel:
                     self.waitingLabel.hide()
                     self.boardingLabel.hide()
                     self.leavingLabel.hide()
+                    self.beaconText.hide()
+                    self.beaconNext.hide()
+                    self.beaconCurrent.hide()
+                    self.nextStation1.hide()
+                    self.nextStation2.hide()
+                    self.currentStation.hide()
+                    self.doorSide.hide()
 
     def check_failures(self):
         if "Track Circuit Failure" in self.failures:
@@ -744,7 +824,7 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["headerFontSize"]
         )
         failuresLabel.setFont(failuresLabelFont)
-        failuresLabel.setGeometry(670, 630, 150, 30)
+        failuresLabel.setGeometry(670, 580, 150, 30)
         failuresLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         circuitFailureLabel = QLabel("Circuit", self.mainWindow)
@@ -752,7 +832,7 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]
         )
         circuitFailureLabel.setFont(circuitFailureLabelFont)
-        circuitFailureLabel.setGeometry(615, 665, 50, 30)
+        circuitFailureLabel.setGeometry(615, 615, 50, 30)
         circuitFailureLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         powerFailureLabel = QLabel("Power", self.mainWindow)
@@ -760,7 +840,7 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]
         )
         powerFailureLabel.setFont(powerFailureLabelFont)
-        powerFailureLabel.setGeometry(715, 665, 50, 30)
+        powerFailureLabel.setGeometry(715, 615, 50, 30)
         powerFailureLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         brokenFailureLabel = QLabel("Broken", self.mainWindow)
@@ -768,32 +848,32 @@ class TrackModel:
             MTA_STYLING["fontStyle"], MTA_STYLING["textFontSize"]
         )
         brokenFailureLabel.setFont(brokenFailureLabelFont)
-        brokenFailureLabel.setGeometry(815, 665, 50, 30)
+        brokenFailureLabel.setGeometry(815, 615, 50, 30)
         brokenFailureLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
 
         circuitFailureSelector = QLabel(self.mainWindow)
-        circuitFailureSelector.setGeometry(630, 695, 20, 20)
+        circuitFailureSelector.setGeometry(630, 645, 20, 20)
         circuitFailureSelector.setPixmap(
             QPixmap("src/main/TrackModel/pngs/circle_outline.png").scaled(20, 20)
         )
         circuitFailureSelector.mousePressEvent = self.set_circuit_failure
 
         powerFailureSelector = QLabel(self.mainWindow)
-        powerFailureSelector.setGeometry(730, 695, 20, 20)
+        powerFailureSelector.setGeometry(730, 645, 20, 20)
         powerFailureSelector.setPixmap(
             QPixmap("src/main/TrackModel/pngs/circle_outline.png").scaled(20, 20)
         )
         powerFailureSelector.mousePressEvent = self.set_power_failure
 
         brokenFailureSelector = QLabel(self.mainWindow)
-        brokenFailureSelector.setGeometry(830, 695, 20, 20)
+        brokenFailureSelector.setGeometry(830, 645, 20, 20)
         brokenFailureSelector.setPixmap(
             QPixmap("src/main/TrackModel/pngs/circle_outline.png").scaled(20, 20)
         )
         brokenFailureSelector.mousePressEvent = self.set_broken_failure
 
         self.circuitSelection = QLabel(self.mainWindow)
-        self.circuitSelection.setGeometry(630, 695, 20, 20)
+        self.circuitSelection.setGeometry(630, 645, 20, 20)
         self.circuitSelection.setPixmap(
             QPixmap("src/main/TrackModel/pngs/red_circle.png").scaled(20, 20)
         )
@@ -801,7 +881,7 @@ class TrackModel:
         self.circuitSelection.mousePressEvent = self.set_circuit_failure
 
         self.powerSelection = QLabel(self.mainWindow)
-        self.powerSelection.setGeometry(730, 695, 20, 20)
+        self.powerSelection.setGeometry(730, 645, 20, 20)
         self.powerSelection.setPixmap(
             QPixmap("src/main/TrackModel/pngs/red_circle.png").scaled(20, 20)
         )
@@ -809,7 +889,7 @@ class TrackModel:
         self.powerSelection.mousePressEvent = self.set_power_failure
 
         self.brokenSelection = QLabel(self.mainWindow)
-        self.brokenSelection.setGeometry(830, 695, 20, 20)
+        self.brokenSelection.setGeometry(830, 645, 20, 20)
         self.brokenSelection.setPixmap(
             QPixmap("src/main/TrackModel/pngs/red_circle.png").scaled(20, 20)
         )
@@ -819,75 +899,134 @@ class TrackModel:
     def set_circuit_failure(self, event):
         # Obtain block number provided
         blockNumber = self.entryField.text()
-        # Update the block info based on the block selected
-        for data in self.trackData:
-            if data["Block Number"] == int(blockNumber):
-                if self.circuitSelection.isHidden():
-                    self.circuitSelection.show()
-                    self.failures.append("Track Circuit Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should append failure to this block
-                    data["Occupancy"] = 1
-                    self.emit_occupancy(int(blockNumber), None)
-                else:
-                    self.circuitSelection.hide()
-                    self.failures.remove("Track Circuit Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should remove failure to this block
-                    data["Occupancy"] = 0
-                    self.emit_occupancy(None, int(blockNumber))
-        self.block.set_data(self.selectedLine, self.trackData)
+        if blockNumber != "" and blockNumber.isnumeric():
+            # Update the block info based on the block selected
+            for data in self.trackData:
+                if data["Block Number"] == int(blockNumber):
+                    if self.circuitSelection.isHidden():
+                        self.circuitSelection.show()
+                        self.failures.append("Track Circuit Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should append failure to this block
+                        data["Occupancy"] = 1
+                        self.emit_occupancy(int(blockNumber), None)
+                    else:
+                        self.circuitSelection.hide()
+                        self.failures.remove("Track Circuit Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should remove failure to this block
+                        data["Occupancy"] = 0
+                        self.emit_occupancy(None, int(blockNumber))
+            self.block.set_data(self.selectedLine, self.trackData)
 
     def set_power_failure(self, event):
         # Obtain block number provided
         blockNumber = self.entryField.text()
-        # Update the block info based on the block selected
-        for data in self.trackData:
-            if data["Block Number"] == int(blockNumber):
-                if self.powerSelection.isHidden():
-                    self.powerSelection.show()
-                    self.failures.append("Power Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should append failure to this block
-                    data["Occupancy"] = 1
-                    self.emit_occupancy(int(blockNumber), None)
-                else:
-                    self.powerSelection.hide()
-                    self.failures.remove("Power Failure")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should remove failure to this block
-                    data["Occupancy"] = 0
-                    self.emit_occupancy(None, int(blockNumber))
-        self.block.set_data(self.selectedLine, self.trackData)
+        if blockNumber != "" and blockNumber.isnumeric():
+            # Update the block info based on the block selected
+            for data in self.trackData:
+                if data["Block Number"] == int(blockNumber):
+                    if self.powerSelection.isHidden():
+                        self.powerSelection.show()
+                        self.failures.append("Power Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should append failure to this block
+                        data["Occupancy"] = 1
+                        self.emit_occupancy(int(blockNumber), None)
+                    else:
+                        self.powerSelection.hide()
+                        self.failures.remove("Power Failure")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should remove failure to this block
+                        data["Occupancy"] = 0
+                        self.emit_occupancy(None, int(blockNumber))
+            self.block.set_data(self.selectedLine, self.trackData)
 
     def set_broken_failure(self, event):
         # Obtain block number provided
         blockNumber = self.entryField.text()
-        # Update the block info based on the block selected
-        for data in self.trackData:
-            if data["Block Number"] == int(blockNumber):
-                if self.brokenSelection.isHidden():
-                    self.brokenSelection.show()
-                    self.failures.append("Broken Rail")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should append failure to this block
-                    data["Occupancy"] = 1
-                    self.emit_occupancy(int(blockNumber), None)
-                else:
-                    self.brokenSelection.hide()
-                    self.failures.remove("Broken Rail")
-                    data[
-                        "Failures"
-                    ] = self.failures  # Should remove failure to this block
-                    data["Occupancy"] = 0
-                    self.emit_occupancy(None, int(blockNumber))
-        self.block.set_data(self.selectedLine, self.trackData)
+        if blockNumber != "" and blockNumber.isnumeric():
+            # Update the block info based on the block selected
+            for data in self.trackData:
+                if data["Block Number"] == int(blockNumber):
+                    if self.brokenSelection.isHidden():
+                        self.brokenSelection.show()
+                        self.failures.append("Broken Rail")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should append failure to this block
+                        data["Occupancy"] = 1
+                        self.emit_occupancy(int(blockNumber), None)
+                    else:
+                        self.brokenSelection.hide()
+                        self.failures.remove("Broken Rail")
+                        data[
+                            "Failures"
+                        ] = self.failures  # Should remove failure to this block
+                        data["Occupancy"] = 0
+                        self.emit_occupancy(None, int(blockNumber))
+            self.block.set_data(self.selectedLine, self.trackData)
     
+    def add_legend(self):
+        stationPNG = QPixmap("src/main/TrackModel/pngs/station.png")
+        stationPNG = stationPNG.scaledToWidth(25)
+        station = QLabel(self.mainWindow)
+        station.setPixmap(stationPNG)
+        station.setGeometry(50, 950, stationPNG.width(), stationPNG.height())
+
+        stationLabel = QLabel("- Station", self.mainWindow)
+        stationLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        stationLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        stationLabel.setGeometry(80, 950, 50, 25)
+
+        beaconPNG = QPixmap("src/main/TrackModel/pngs/beacon.png")
+        beaconPNG = beaconPNG.scaledToWidth(20)
+        beacon = QLabel(self.mainWindow)
+        beacon.setPixmap(beaconPNG)
+        beacon.setGeometry(50, 992, beaconPNG.width(), beaconPNG.height())
+
+        stationLabel = QLabel("- Beacon", self.mainWindow)
+        stationLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        stationLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        stationLabel.setGeometry(80, 990, 50, 25)
+
+        switchPNG = QPixmap("src/main/TrackModel/pngs/legend-switch.png")
+        switchPNG = switchPNG.scaledToWidth(25)
+        switch = QLabel(self.mainWindow)
+        switch.setPixmap(switchPNG)
+        switch.setGeometry(200, 960, switchPNG.width(), switchPNG.height())
+
+        switchLabel = QLabel("- Switch", self.mainWindow)
+        switchLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        switchLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        switchLabel.setGeometry(230, 950, 50, 25)
+
+        lightPNG = QPixmap("src/main/TrackModel/pngs/legend-light.png")
+        lightPNG = lightPNG.scaledToWidth(15)
+        light = QLabel(self.mainWindow)
+        light.setPixmap(lightPNG)
+        light.setGeometry(200, 990, lightPNG.width(), lightPNG.height())
+
+        lightLabel = QLabel("- Light", self.mainWindow)
+        lightLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        lightLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        lightLabel.setGeometry(230, 990, 50, 25)
+
+        crossingPNG = QPixmap("src/main/TrackModel/pngs/crossing.png")
+        crossingPNG = crossingPNG.scaledToWidth(35)
+        crossing = QLabel(self.mainWindow)
+        crossing.setPixmap(crossingPNG)
+        crossing.setGeometry(350, 950, crossingPNG.width(), crossingPNG.height())
+
+        crossingLabel = QLabel("- Crossing", self.mainWindow)
+        crossingLabel.setFont(QFont(MTA_STYLING["fontStyle"], 8))
+        crossingLabel.setStyleSheet(f'color: {MTA_STYLING["darkBlue"]}')
+        crossingLabel.setGeometry(380, 950, 60, 25)
+
     def emit_occupancy(self, onBlockNum, offBlockNum):
         line = self.selectedLine
         if offBlockNum == None:
@@ -920,7 +1059,6 @@ class TrackModel:
                 return 1
         return 2
                 
-
     def update_switch_state(self, line, _, blockNum, state):
         self.trackView.change_switch(line, blockNum, state)
 

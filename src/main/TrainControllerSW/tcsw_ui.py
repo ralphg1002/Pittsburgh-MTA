@@ -959,6 +959,24 @@ class TrainControllerUI(QMainWindow):
         # masterSignals.addTrain.emit("green", "test")
         masterSignals.addTrain.connect(self.signal_addTrain)
 
+        # testing train model signals
+        # trainModelToTrainController.sendSpeedLimit.emit("green_test", 48) # km/hr
+        # trainModelToTrainController.sendAuthority.emit("green_test", False)
+        # trainModelToTrainController.sendLeftDoor.emit("green_test", True)
+        # trainModelToTrainController.sendRightDoor.emit("green_test", True)
+        # trainModelToTrainController.sendNextStation1.emit("green_test", "INGLEWOOD")
+        # trainModelToTrainController.sendNextStation2.emit("green_test", "SOUTH BANK")
+        # trainModelToTrainController.sendCurrStation.emit("green_test", "CENTRAL")
+        # trainModelToTrainController.sendCommandedSpeed.emit("green_test", 5) # mph
+        # trainModelToTrainController.sendCurrentSpeed.emit("green_test", 8) # km/hr
+        # trainModelToTrainController.sendTemperature.emit("green_test", 65)
+        # trainModelToTrainController.sendPassengerEmergencyBrake.emit("green_test", True)
+        # trainModelToTrainController.sendEngineFailure.emit("green_test", True)
+        # trainModelToTrainController.sendSignalPickupFailure.emit("green_test", True)
+        # trainModelToTrainController.sendBrakeFailure.emit("green_test", True)
+        # trainModelToTrainController.sendPolarity.emit("green_test", bool)
+        # trainModelToTrainController.sendBlockNumber.emit("green_test", 39)
+
         # from test bench
         for train in self.testWindow.testbenchVariables["trainList"]:
             idCheck = False
@@ -1046,6 +1064,8 @@ class TrainControllerUI(QMainWindow):
         trainModelToTrainController.sendBlockNumber.connect(self.signal_blockNumber)
 
         for train in self.tcFunctions.trainList:
+            print("speed: ", train.currentSpeed, ", power: ", train.powerCommand, ", nextStation: ", train.nextStop)
+            print("distance traveled: ", train.blockTravelled, "total distance of block: ", train.block["blockLength"]) # in m
             self.tcFunctions.set_samplePeriod(train, self.tcVariables["samplePeriod"])
 
             if train.get_auto():
@@ -1380,7 +1400,7 @@ class TrainControllerUI(QMainWindow):
         # km/hr -> mph
         for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
-                train.set_speedLimit(int(speedLimit * 2.237))
+                train.set_speedLimit(math.ceil(speedLimit / 1.609))
         return
 
     def signal_authority(self, name, authority):
@@ -1428,11 +1448,11 @@ class TrainControllerUI(QMainWindow):
         return
 
     def signal_currSpeed(self, name, currSpeed):
-        # mph
+        # km/hr -> mph
         for train in self.tcFunctions.trainList:
             if train.get_trainID() == name:
                 train.prevSpeed = train.currentSpeed
-                train.set_currentSpeed(int(currSpeed * 2.237))
+                train.set_currentSpeed(math.ceil(currSpeed / 1.609))
         return
 
     def signal_currTemp(self, name, currTemp):
