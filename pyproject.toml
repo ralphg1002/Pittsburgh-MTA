@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "ece-1140"
 version = "0.1.0"
-description = "Pittsburgh MTA Group 1"
-authors = ["Your Name <you@example.com>"]
+description = "Pittsburgh MTA package"
+authors = "Ralph Gonsalves"
 license = "MIT"
 readme = "README.md"
 
